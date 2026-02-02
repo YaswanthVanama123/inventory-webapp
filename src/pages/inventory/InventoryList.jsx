@@ -755,7 +755,7 @@ const InventoryList = () => {
                       alt={itemToDelete.name}
                       className="w-16 h-16 rounded-lg object-cover"
                       onError={(e) => {
-                        e.target.src = 'https:
+                        e.target.src = 'https://via.placeholder.com/64?text=No+Image';
                       }}
                     />
                   ) : (

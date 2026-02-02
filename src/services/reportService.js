@@ -1,4 +1,5 @@
 import api from './api';
+import { handleApiError } from './errorHandler';
 
 /**
  * Report Service
@@ -10,13 +11,17 @@ const reportService = {
   /**
    * Get dashboard statistics
    * @returns {Promise} Response with dashboard summary and statistics
+   * @throws {Object} Formatted error with user-friendly message
    */
   dashboard: async () => {
     try {
       const response = await api.get('/reports/dashboard');
       return response;
     } catch (error) {
-      throw error;
+      throw handleApiError(error, {
+        permission: 'You need administrator privileges to view dashboard statistics.',
+        network: 'Unable to load dashboard data. Please check your connection.',
+      });
     }
   },
 
@@ -26,6 +31,7 @@ const reportService = {
    * @param {string} params.category - Filter by category
    * @param {string} params.format - Response format: 'json', 'csv', 'pdf', 'excel' (default: 'json')
    * @returns {Promise} Response with stock summary or file download
+   * @throws {Object} Formatted error with user-friendly message
    */
   stockSummary: async (params = {}) => {
     try {
@@ -59,7 +65,10 @@ const reportService = {
       const response = await api.get('/reports/stock-summary', { params });
       return response;
     } catch (error) {
-      throw error;
+      throw handleApiError(error, {
+        permission: 'You need administrator privileges to view reports.',
+        server: 'Failed to generate report. Please try again.',
+      });
     }
   },
 
@@ -72,6 +81,7 @@ const reportService = {
    * @param {string} params.order - Sort order: 'asc', 'desc' (default: 'desc')
    * @param {string} params.format - Response format: 'json', 'pdf', 'excel' (default: 'json')
    * @returns {Promise} Response with profit margin analysis
+   * @throws {Object} Formatted error with user-friendly message
    */
   profitMargin: async (params = {}) => {
     try {
@@ -102,7 +112,10 @@ const reportService = {
       const response = await api.get('/reports/profit-margin', { params });
       return response;
     } catch (error) {
-      throw error;
+      throw handleApiError(error, {
+        permission: 'You need administrator privileges to view reports.',
+        server: 'Failed to generate report. Please try again.',
+      });
     }
   },
 
@@ -111,6 +124,7 @@ const reportService = {
    * @param {Object} params - Query parameters
    * @param {string} params.format - Response format: 'json', 'pdf', 'excel' (default: 'json')
    * @returns {Promise} Response with items needing reorder
+   * @throws {Object} Formatted error with user-friendly message
    */
   reorderList: async (params = {}) => {
     try {
@@ -141,7 +155,9 @@ const reportService = {
       const response = await api.get('/reports/reorder-list', { params });
       return response;
     } catch (error) {
-      throw error;
+      throw handleApiError(error, {
+        permission: 'You need administrator privileges to view reports.',
+      });
     }
   },
 
@@ -156,13 +172,16 @@ const reportService = {
    * @param {string} params.startDate - Filter from date (ISO 8601)
    * @param {string} params.endDate - Filter to date (ISO 8601)
    * @returns {Promise} Response with audit logs and pagination
+   * @throws {Object} Formatted error with user-friendly message
    */
   auditLogs: async (params = {}) => {
     try {
       const response = await api.get('/reports/audit-logs', { params });
       return response;
     } catch (error) {
-      throw error;
+      throw handleApiError(error, {
+        permission: 'You need administrator privileges to view audit logs.',
+      });
     }
   },
 
@@ -174,6 +193,7 @@ const reportService = {
    * @param {string} params.category - Filter by category
    * @param {string} params.format - Response format: 'json', 'pdf', 'excel' (default: 'json')
    * @returns {Promise} Response with sales data
+   * @throws {Object} Formatted error with user-friendly message
    */
   sales: async (params = {}) => {
     try {
@@ -204,7 +224,9 @@ const reportService = {
       const response = await api.get('/reports/sales', { params });
       return response;
     } catch (error) {
-      throw error;
+      throw handleApiError(error, {
+        permission: 'You need administrator privileges to view reports.',
+      });
     }
   },
 
@@ -215,6 +237,7 @@ const reportService = {
    * @param {string} params.valuationType - Valuation type: 'purchase', 'selling', 'profit'
    * @param {string} params.format - Response format: 'json', 'pdf', 'excel' (default: 'json')
    * @returns {Promise} Response with valuation data
+   * @throws {Object} Formatted error with user-friendly message
    */
   valuation: async (params = {}) => {
     try {
@@ -245,7 +268,9 @@ const reportService = {
       const response = await api.get('/reports/valuation', { params });
       return response;
     } catch (error) {
-      throw error;
+      throw handleApiError(error, {
+        permission: 'You need administrator privileges to view reports.',
+      });
     }
   },
 
@@ -255,6 +280,7 @@ const reportService = {
    * @param {Object} params - Export parameters
    * @param {string} params.format - Format: 'csv', 'pdf', 'excel'
    * @returns {Promise} File download
+   * @throws {Object} Formatted error with user-friendly message
    */
   export: async (reportType, params = {}) => {
     try {
@@ -279,20 +305,26 @@ const reportService = {
 
       return { success: true, message: 'Export completed successfully' };
     } catch (error) {
-      throw error;
+      throw handleApiError(error, {
+        permission: 'You need administrator privileges to export reports.',
+        server: 'Failed to export data. Please try again.',
+      });
     }
   },
 
   /**
    * Get category-wise stock distribution
    * @returns {Promise} Response with stock distribution by category
+   * @throws {Object} Formatted error with user-friendly message
    */
   stockByCategory: async () => {
     try {
       const response = await api.get('/reports/stock-by-category');
       return response;
     } catch (error) {
-      throw error;
+      throw handleApiError(error, {
+        permission: 'You need administrator privileges to view reports.',
+      });
     }
   },
 
@@ -300,6 +332,7 @@ const reportService = {
    * Get top items by value
    * @param {number} limit - Number of top items (default: 10)
    * @returns {Promise} Response with top items
+   * @throws {Object} Formatted error with user-friendly message
    */
   topItems: async (limit = 10) => {
     try {
@@ -308,7 +341,9 @@ const reportService = {
       });
       return response;
     } catch (error) {
-      throw error;
+      throw handleApiError(error, {
+        permission: 'You need administrator privileges to view reports.',
+      });
     }
   },
 
@@ -316,6 +351,7 @@ const reportService = {
    * Get recent activity/changes
    * @param {number} limit - Number of recent changes (default: 20)
    * @returns {Promise} Response with recent changes
+   * @throws {Object} Formatted error with user-friendly message
    */
   recentActivity: async (limit = 20) => {
     try {
@@ -324,7 +360,9 @@ const reportService = {
       });
       return response;
     } catch (error) {
-      throw error;
+      throw handleApiError(error, {
+        permission: 'You need administrator privileges to view activity logs.',
+      });
     }
   },
 };

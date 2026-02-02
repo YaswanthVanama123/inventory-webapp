@@ -66,7 +66,7 @@ const Table = ({
             <th
               key={column.key}
               scope="col"
-              className={`px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider ${
+              className={`px-3 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider ${
                 sortable && column.sortable !== false ? 'cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-gray-800' : ''
               }`}
               onClick={() => column.sortable !== false && handleSort(column.key)}
@@ -82,7 +82,7 @@ const Table = ({
       <tbody className={`bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700 ${striped ? 'divide-y-0' : ''}`}>
         {sortedData.length === 0 ? (
           <tr>
-            <td colSpan={columns.length} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+            <td colSpan={columns.length} className="px-3 sm:px-4 lg:px-6 py-8 text-center text-gray-500 dark:text-gray-400">
               {emptyMessage}
             </td>
           </tr>
@@ -98,7 +98,7 @@ const Table = ({
               {columns.map((column) => (
                 <td
                   key={column.key}
-                  className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100"
+                  className="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-sm text-gray-900 dark:text-gray-100"
                 >
                   {column.render ? column.render(row[column.key], row) : row[column.key]}
                 </td>
@@ -112,9 +112,13 @@ const Table = ({
 
   if (responsive) {
     return (
-      <div className={`overflow-x-auto shadow-md rounded-lg ${className}`}>
-        <div className="inline-block min-w-full align-middle">
-          {tableContent}
+      <div className={`shadow-md rounded-lg ${className}`}>
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <div className="inline-block min-w-full align-middle px-4 sm:px-0">
+            <div className="overflow-hidden">
+              {tableContent}
+            </div>
+          </div>
         </div>
       </div>
     );

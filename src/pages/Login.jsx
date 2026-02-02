@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
+import authService from '../services/authService';
 
 const Login = () => {
-  const { login, isAuthenticated, loading: authLoading } = useContext(AuthContext);
+  const { isAuthenticated, loading: authLoading, setUser, setIsAuthenticated } = useContext(AuthContext);
+  const [loginType, setLoginType] = useState('admin'); // 'admin' or 'employee'
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -71,7 +73,14 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const result = await login(formData.username, formData.password);
+      let result;
+
+      // Use appropriate login method based on type
+      if (loginType === 'admin') {
+        result = await authService.loginAdmin(formData.username, formData.password);
+      } else {
+        result = await authService.loginEmployee(formData.username, formData.password);
+      }
 
       if (result.success) {
         // Store remember me preference
@@ -81,13 +90,22 @@ const Login = () => {
           localStorage.removeItem('rememberMe');
         }
 
+        // Update auth context
+        if (setUser && result.data?.user) {
+          setUser(result.data.user);
+        }
+        if (setIsAuthenticated) {
+          setIsAuthenticated(true);
+        }
+
         // Redirect to dashboard
         window.location.href = '/dashboard';
       } else {
         setError(result.error || 'Invalid credentials. Please try again.');
       }
     } catch (err) {
-      setError(err.message || 'An error occurred. Please try again.');
+      console.error('Login error:', err);
+      setError(err.userMessage || err.message || 'An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -95,41 +113,42 @@ const Login = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden">
-      {/* Animated background circles */}
-      <div className="absolute top-0 left-0 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-      <div className="absolute top-0 right-0 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-      <div className="absolute bottom-0 left-1/2 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 relative">
+      {/* Professional geometric background pattern */}
+      <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] opacity-20"></div>
 
-      <div className="max-w-md w-full space-y-8 relative z-10">
+      <div className="max-w-md w-full space-y-6 relative z-10">
         {/* Login Card */}
-        <div className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl p-8 sm:p-10 border border-white/20">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 mb-4 shadow-lg">
-              <svg
-                className="w-8 h-8 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
-            </div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        <div className="bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
+          {/* Top accent bar */}
+          <div className="h-2 bg-gradient-to-r from-blue-600 to-blue-500"></div>
+
+          <div className="p-8 sm:p-10">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-blue-600 mb-4 shadow-lg">
+                <svg
+                  className="w-8 h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                  />
+                </svg>
+              </div>
+              <h2 className="text-3xl font-bold text-slate-900">
               Welcome Back
             </h2>
             <p className="mt-2 text-sm text-gray-600">
@@ -137,12 +156,76 @@ const Login = () => {
             </p>
           </div>
 
+          {/* Login Type Tabs */}
+          <div className="flex rounded-lg bg-slate-100 p-1 mb-6">
+            <button
+              type="button"
+              onClick={() => {
+                setLoginType('admin');
+                setError('');
+                setFieldErrors({});
+              }}
+              className={`flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                loginType === 'admin'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <div className="flex items-center justify-center">
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
+                Administrator
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setLoginType('employee');
+                setError('');
+                setFieldErrors({});
+              }}
+              className={`flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                loginType === 'employee'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <div className="flex items-center justify-center">
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+                Employee
+              </div>
+            </button>
+          </div>
+
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 animate-shake">
+            <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200">
               <div className="flex items-center">
                 <svg
-                  className="w-5 h-5 text-red-500 mr-2 flex-shrink-0"
+                  className="w-5 h-5 text-red-600 mr-2 flex-shrink-0"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -152,7 +235,7 @@ const Login = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-sm text-red-700">{error}</span>
+                <span className="text-sm text-red-800">{error}</span>
               </div>
             </div>
           )}
@@ -163,14 +246,14 @@ const Login = () => {
             <div>
               <label
                 htmlFor="username"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-slate-700 mb-2"
               >
                 Username
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
-                    className="h-5 w-5 text-gray-400"
+                    className="h-5 w-5 text-slate-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -194,8 +277,8 @@ const Login = () => {
                   className={`block w-full pl-10 pr-3 py-3 border ${
                     fieldErrors.username
                       ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                      : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                  } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200`}
+                      : 'border-slate-300 focus:ring-blue-500 focus:border-blue-500'
+                  } rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 transition-all duration-200`}
                   placeholder="Enter your username"
                   disabled={loading}
                 />
@@ -209,14 +292,14 @@ const Login = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-slate-700 mb-2"
               >
                 Password
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
-                    className="h-5 w-5 text-gray-400"
+                    className="h-5 w-5 text-slate-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -240,15 +323,15 @@ const Login = () => {
                   className={`block w-full pl-10 pr-10 py-3 border ${
                     fieldErrors.password
                       ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                      : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                  } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200`}
+                      : 'border-slate-300 focus:ring-blue-500 focus:border-blue-500'
+                  } rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 transition-all duration-200`}
                   placeholder="Enter your password"
                   disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
                   disabled={loading}
                 >
                   {showPassword ? (
@@ -292,12 +375,12 @@ const Login = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-all cursor-pointer"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded transition-all cursor-pointer"
                   disabled={loading}
                 />
                 <label
                   htmlFor="remember-me"
-                  className="ml-2 block text-sm text-gray-700 cursor-pointer select-none"
+                  className="ml-2 block text-sm text-slate-700 cursor-pointer select-none"
                 >
                   Remember me
                 </label>
@@ -318,7 +401,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -368,7 +451,7 @@ const Login = () => {
 
           {/* Footer */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-600">
               Don't have an account?{' '}
               <a
                 href="/signup"
@@ -379,61 +462,25 @@ const Login = () => {
             </p>
           </div>
         </div>
-
-        {/* Additional Info */}
-        <div className="text-center">
-          <p className="text-xs text-gray-500">
-            Protected by enterprise-grade security
-          </p>
-        </div>
+        {/* End of padding wrapper (p-8 sm:p-10) */}
       </div>
+      {/* End of Login Card (bg-white) */}
 
-      <style jsx>{`
-        @keyframes blob {
-          0% {
-            transform: translate(0px, 0px) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          100% {
-            transform: translate(0px, 0px) scale(1);
-          }
-        }
-
-        @keyframes shake {
-          0%, 100% {
-            transform: translateX(0);
-          }
-          10%, 30%, 50%, 70%, 90% {
-            transform: translateX(-5px);
-          }
-          20%, 40%, 60%, 80% {
-            transform: translateX(5px);
-          }
-        }
-
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-
-        .animate-shake {
-          animation: shake 0.5s;
-        }
-      `}</style>
+      {/* Additional Info */}
+      <div className="text-center">
+        <p className="text-xs text-slate-500">
+          Protected by enterprise-grade security
+        </p>
+      </div>
     </div>
-  );
+
+    <style>{`
+      .bg-grid-slate-100 {
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23cbd5e1' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+    `}</style>
+  </div>
+);
 };
 
 export default Login;

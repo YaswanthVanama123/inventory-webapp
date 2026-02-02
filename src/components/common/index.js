@@ -11,3 +11,6 @@ export { default as EmptyState } from './EmptyState';
 export { default as Alert } from './Alert';
 export { default as SearchBar } from './SearchBar';
 export { default as Pagination } from './Pagination';
+export { default as ProtectedRoute } from './ProtectedRoute';
+export { default as UnauthorizedPage } from './UnauthorizedPage';
+export { default as Toast } from './Toast';

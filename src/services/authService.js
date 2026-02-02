@@ -1,4 +1,4 @@
-import api, { setAuthToken } from './api';
+import api, { setAuthToken, getErrorMessage, isErrorType } from './api';
 
 /**
  * Authentication Service
@@ -7,10 +7,118 @@ import api, { setAuthToken } from './api';
 
 const authService = {
   /**
-   * Login user with username and password
-   * @param {string} username - User's username
-   * @param {string} password - User's password
+   * Login admin user with username and password
+   * @param {string} username - Admin's username
+   * @param {string} password - Admin's password
    * @returns {Promise} Response with token and user data
+   * @throws {Object} Formatted error with user-friendly message
+   */
+  loginAdmin: async (username, password) => {
+    try {
+      const response = await api.post('/auth/admin/login', {
+        username,
+        password,
+      });
+
+      // Store token and user data in localStorage
+      if (response.success && response.data) {
+        setAuthToken(response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('userType', 'admin');
+      }
+
+      return response;
+    } catch (error) {
+      // Handle validation errors
+      if (isErrorType(error, 'validation')) {
+        throw {
+          ...error,
+          userMessage: error.details || 'Please check your username and password.',
+        };
+      }
+
+      // Handle authentication errors (401 or 403)
+      if (error.status === 401 || error.status === 403) {
+        throw {
+          ...error,
+          userMessage: error.message || 'Invalid admin credentials. Please try again.',
+        };
+      }
+
+      // Handle network errors
+      if (isErrorType(error, 'network')) {
+        throw {
+          ...error,
+          userMessage: 'Unable to connect to the server. Please check your internet connection.',
+        };
+      }
+
+      // Throw formatted error
+      throw {
+        ...error,
+        userMessage: getErrorMessage(error),
+      };
+    }
+  },
+
+  /**
+   * Login employee user with username and password
+   * @param {string} username - Employee's username
+   * @param {string} password - Employee's password
+   * @returns {Promise} Response with token and user data
+   * @throws {Object} Formatted error with user-friendly message
+   */
+  loginEmployee: async (username, password) => {
+    try {
+      const response = await api.post('/auth/login', {
+        username,
+        password,
+      });
+
+      // Store token and user data in localStorage
+      if (response.success && response.data) {
+        setAuthToken(response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('userType', 'employee');
+      }
+
+      return response;
+    } catch (error) {
+      // Handle validation errors
+      if (isErrorType(error, 'validation')) {
+        throw {
+          ...error,
+          userMessage: error.details || 'Please check your username and password.',
+        };
+      }
+
+      // Handle authentication errors (401 or 403)
+      if (error.status === 401 || error.status === 403) {
+        throw {
+          ...error,
+          userMessage: error.message || 'Invalid employee credentials. Please try again.',
+        };
+      }
+
+      // Handle network errors
+      if (isErrorType(error, 'network')) {
+        throw {
+          ...error,
+          userMessage: 'Unable to connect to the server. Please check your internet connection.',
+        };
+      }
+
+      // Throw formatted error
+      throw {
+        ...error,
+        userMessage: getErrorMessage(error),
+      };
+    }
+  },
+
+  /**
+   * Generic login (backwards compatibility)
+   * @deprecated Use loginAdmin or loginEmployee instead
    */
   login: async (username, password) => {
     try {
@@ -27,13 +135,42 @@ const authService = {
 
       return response;
     } catch (error) {
-      throw error;
+      // Handle validation errors
+      if (isErrorType(error, 'validation')) {
+        throw {
+          ...error,
+          userMessage: error.details || 'Please check your username and password.',
+        };
+      }
+
+      // Handle authentication errors
+      if (error.status === 401) {
+        throw {
+          ...error,
+          userMessage: 'Invalid username or password. Please try again.',
+        };
+      }
+
+      // Handle network errors
+      if (isErrorType(error, 'network')) {
+        throw {
+          ...error,
+          userMessage: 'Unable to connect to the server. Please check your internet connection.',
+        };
+      }
+
+      // Throw formatted error
+      throw {
+        ...error,
+        userMessage: getErrorMessage(error),
+      };
     }
   },
 
   /**
    * Logout current user
    * @returns {Promise} Response confirming logout
+   * @throws {Object} Formatted error with user-friendly message
    */
   logout: async () => {
     try {
@@ -42,19 +179,25 @@ const authService = {
       // Clear token and user data from localStorage
       setAuthToken(null);
       localStorage.removeItem('user');
+      localStorage.removeItem('userType');
 
       return response;
     } catch (error) {
       // Even if API call fails, clear local data
       setAuthToken(null);
       localStorage.removeItem('user');
-      throw error;
+      localStorage.removeItem('userType');
+
+      // Don't throw error for logout - always succeed locally
+      console.error('Logout error:', getErrorMessage(error));
+      return { success: true, message: 'Logged out successfully' };
     }
   },
 
   /**
    * Get current authenticated user's information
    * @returns {Promise} Response with user data
+   * @throws {Object} Formatted error with user-friendly message
    */
   getMe: async () => {
     try {
@@ -67,7 +210,18 @@ const authService = {
 
       return response;
     } catch (error) {
-      throw error;
+      // Handle authentication errors
+      if (isErrorType(error, 'auth')) {
+        throw {
+          ...error,
+          userMessage: 'Your session has expired. Please log in again.',
+        };
+      }
+
+      throw {
+        ...error,
+        userMessage: getErrorMessage(error),
+      };
     }
   },
 
@@ -76,6 +230,7 @@ const authService = {
    * @param {string} currentPassword - Current password
    * @param {string} newPassword - New password
    * @returns {Promise} Response confirming password change
+   * @throws {Object} Formatted error with user-friendly message
    */
   changePassword: async (currentPassword, newPassword) => {
     try {
@@ -86,7 +241,26 @@ const authService = {
 
       return response;
     } catch (error) {
-      throw error;
+      // Handle validation errors
+      if (isErrorType(error, 'validation')) {
+        throw {
+          ...error,
+          userMessage: error.validationErrors || 'Please check your password requirements.',
+        };
+      }
+
+      // Handle authentication errors
+      if (error.status === 401) {
+        throw {
+          ...error,
+          userMessage: 'Current password is incorrect.',
+        };
+      }
+
+      throw {
+        ...error,
+        userMessage: getErrorMessage(error),
+      };
     }
   },
 

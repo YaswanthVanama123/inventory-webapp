@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Sidebar, { MobileMenuButton } from './Sidebar';
 
 /**
@@ -9,16 +9,16 @@ import Sidebar, { MobileMenuButton } from './Sidebar';
 const MainLayout = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const handleCloseMobileMenu = () => {
+  const handleCloseMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false);
-  };
+  }, []);
 
-  const handleToggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  const handleToggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(prev => !prev);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-900">
       {/* Mobile menu toggle button */}
       <MobileMenuButton
         onClick={handleToggleMobileMenu}
@@ -33,7 +33,7 @@ const MainLayout = ({ children }) => {
 
       {/* Main content area */}
       <div className="md:ml-64 transition-all duration-300">
-        <main className="p-4 md:p-6 lg:p-8">
+        <main className="pt-20 md:pt-0 p-4 md:p-6 lg:p-8">
           {children}
         </main>
       </div>

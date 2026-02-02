@@ -33,10 +33,10 @@ const Modal = ({
   if (!isOpen) return null;
 
   const sizes = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl',
+    sm: 'max-w-sm sm:max-w-md',
+    md: 'max-w-md sm:max-w-lg',
+    lg: 'max-w-lg sm:max-w-2xl',
+    xl: 'max-w-xl sm:max-w-4xl',
     full: 'max-w-full mx-4',
   };
 
@@ -60,9 +60,9 @@ const Modal = ({
       />
 
       {/* Modal Container */}
-      <div className="flex min-h-screen items-center justify-center p-4">
+      <div className="flex min-h-screen items-end sm:items-center justify-center p-0 sm:p-4">
         <div
-          className={`relative bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full ${sizes[size]} transform transition-all ${className}`}
+          className={`relative bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-lg shadow-xl w-full ${sizes[size]} transform transition-all max-h-[90vh] sm:max-h-[85vh] flex flex-col ${className}`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -101,7 +101,7 @@ const Modal = ({
           )}
 
           {/* Body */}
-          <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(100vh-200px)]">
+          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
             {children}
           </div>
 

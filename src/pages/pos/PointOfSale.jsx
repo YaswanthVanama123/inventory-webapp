@@ -24,21 +24,21 @@ const PointOfSale = () => {
   const { showSuccess, showError, showInfo } = useContext(ToastContext);
   const { user } = useAuth();
 
-  // Product list states
+  
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState('grid'); 
 
-  // Cart states
+  
   const [cart, setCart] = useState([]);
   const [savedCarts, setSavedCarts] = useState([]);
   const [showSavedCarts, setShowSavedCarts] = useState(false);
 
-  // Customer and checkout states
+  
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [processingCheckout, setProcessingCheckout] = useState(false);
   const [customerDetails, setCustomerDetails] = useState({
@@ -48,17 +48,17 @@ const PointOfSale = () => {
     address: '',
   });
 
-  // Payment and discount states
+  
   const [discount, setDiscount] = useState({ type: 'percentage', value: 0 });
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [notes, setNotes] = useState('');
 
-  // Coupon states
+  
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
 
-  // Helper function to get image URL
+  
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '/placeholder-product.png';
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
@@ -71,7 +71,7 @@ const PointOfSale = () => {
     return imagePath || '/placeholder-product.png';
   };
 
-  // Load saved carts from localStorage
+  
   useEffect(() => {
     const saved = localStorage.getItem('savedCarts');
     if (saved) {
@@ -79,7 +79,7 @@ const PointOfSale = () => {
     }
   }, []);
 
-  // Fetch products and categories
+  
   useEffect(() => {
     fetchData();
   }, []);
@@ -95,7 +95,7 @@ const PointOfSale = () => {
       const productsData = productsRes?.data?.items || [];
       const categoriesData = categoriesRes?.data?.categories || [];
 
-      // Only show products with stock > 0
+      
       const availableProducts = productsData.filter(p => p.currentStock > 0);
 
       setProducts(availableProducts);
@@ -109,7 +109,7 @@ const PointOfSale = () => {
     }
   };
 
-  // Filter products based on search and category
+  
   useEffect(() => {
     let filtered = products;
 
@@ -128,7 +128,7 @@ const PointOfSale = () => {
     setFilteredProducts(filtered);
   }, [searchTerm, selectedCategory, products]);
 
-  // Add item to cart (optimized with useCallback)
+  
   const addToCart = useCallback((product) => {
     const existingItem = cart.find((item) => item._id === product._id);
 
@@ -160,7 +160,7 @@ const PointOfSale = () => {
     }
   }, [cart, showError, showSuccess]);
 
-  // Update cart item quantity (optimized with useCallback)
+  
   const updateQuantity = useCallback((productId, newQuantity) => {
     const product = products.find((p) => p._id === productId);
 
@@ -177,7 +177,7 @@ const PointOfSale = () => {
     setCart(cart.map((item) => (item._id === productId ? { ...item, quantity: newQuantity } : item)));
   }, [products, cart, showError]);
 
-  // Remove item from cart (optimized with useCallback)
+  
   const removeFromCart = useCallback((productId) => {
     const item = cart.find(i => i._id === productId);
     setCart(cart.filter((item) => item._id !== productId));
@@ -186,7 +186,7 @@ const PointOfSale = () => {
     }
   }, [cart, showInfo]);
 
-  // Clear cart
+  
   const clearCart = () => {
     setCart([]);
     setCustomerDetails({ name: '', email: '', phone: '', address: '' });
@@ -197,7 +197,7 @@ const PointOfSale = () => {
     showInfo('Cart cleared');
   };
 
-  // Save cart for later
+  
   const saveCart = () => {
     if (cart.length === 0) {
       showError('Cart is empty');
@@ -223,7 +223,7 @@ const PointOfSale = () => {
     showSuccess(`Cart saved as "${cartName}"`);
   };
 
-  // Load saved cart
+  
   const loadCart = (savedCart) => {
     setCart(savedCart.items);
     setCustomerDetails(savedCart.customer);
@@ -233,7 +233,7 @@ const PointOfSale = () => {
     showSuccess(`Cart "${savedCart.name}" loaded`);
   };
 
-  // Delete saved cart
+  
   const deleteSavedCart = (cartId) => {
     const updated = savedCarts.filter(c => c.id !== cartId);
     setSavedCarts(updated);
@@ -241,7 +241,7 @@ const PointOfSale = () => {
     showInfo('Saved cart deleted');
   };
 
-  // Apply coupon
+  
   const applyCoupon = async () => {
     if (!couponCode.trim()) {
       showError('Please enter a coupon code');
@@ -261,7 +261,7 @@ const PointOfSale = () => {
         const coupon = response.data.coupon;
         setAppliedCoupon(coupon);
 
-        // Apply coupon discount (replace manual discount)
+        
         setDiscount({
           type: 'fixed',
           value: coupon.discountAmount,
@@ -277,7 +277,7 @@ const PointOfSale = () => {
     }
   };
 
-  // Remove coupon
+  
   const removeCoupon = () => {
     setAppliedCoupon(null);
     setCouponCode('');
@@ -285,7 +285,7 @@ const PointOfSale = () => {
     showInfo('Coupon removed');
   };
 
-  // Calculate totals with memoization for performance
+  
   const calculateSubtotal = useMemo(() => {
     return cart.reduce((sum, item) => sum + item.sellingPrice * item.quantity, 0);
   }, [cart]);
@@ -305,7 +305,7 @@ const PointOfSale = () => {
     return subtotal - discountAmount;
   }, [calculateSubtotal, calculateDiscount]);
 
-  // Handle checkout
+  
   const handleCheckout = () => {
     if (cart.length === 0) {
       showError('Cart is empty');
@@ -314,7 +314,7 @@ const PointOfSale = () => {
     setShowCheckoutModal(true);
   };
 
-  // Process sale
+  
   const processSale = async () => {
     if (!customerDetails.name || !customerDetails.email) {
       showError('Customer name and email are required');
@@ -338,7 +338,7 @@ const PointOfSale = () => {
         items: cart.map((item) => ({
           inventory: item._id,
           itemName: item.itemName,
-          description: item.itemName, // Add description (required by backend)
+          description: item.itemName, 
           skuCode: item.skuCode,
           quantity: item.quantity,
           unitPrice: item.sellingPrice,
@@ -361,8 +361,8 @@ const PointOfSale = () => {
           discountAmount: appliedCoupon.discountAmount,
         } : null,
         paymentMethod,
-        paymentStatus: 'pending', // Set to pending for admin approval
-        status: 'pending', // Invoice needs admin approval
+        paymentStatus: 'pending', 
+        status: 'pending', 
         notes,
         issueDate: new Date().toISOString(),
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
@@ -370,26 +370,26 @@ const PointOfSale = () => {
 
       const response = await api.post('/invoices', invoiceData);
 
-      // Increment coupon usage if coupon was applied
+      
       if (appliedCoupon) {
         try {
           await api.post(`/coupons/${appliedCoupon._id}/use`);
         } catch (error) {
           console.error('Error updating coupon usage:', error);
-          // Non-critical error, don't show to user
+          
         }
       }
 
       showSuccess(`Sale submitted for approval! Invoice #${response.data.invoice.invoiceNumber} is pending`);
 
-      // Clear cart and reset form
+      
       clearCart();
       setShowCheckoutModal(false);
 
-      // Refresh products to update stock
+      
       fetchData();
 
-      // Navigate to invoice
+      
       navigate(`/invoices/${response.data.invoice._id}`);
     } catch (error) {
       console.error('Error processing sale:', error);
@@ -406,7 +406,7 @@ const PointOfSale = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-6 lg:px-8 py-8 max-w-[1800px]">
-        {/* Header */}
+        {}
         <div className="mb-6 md:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>

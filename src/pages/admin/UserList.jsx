@@ -18,27 +18,27 @@ const UserList = () => {
   const { isAdmin, user: currentUser } = useAuth();
   const { showSuccess, showError, showInfo } = useContext(ToastContext);
 
-  // State management
+  
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [viewMode, setViewMode] = useState('table'); // 'table' or 'card'
+  const [viewMode, setViewMode] = useState('table'); 
 
-  // Modal states
+  
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState(null);
 
-  // Pagination state
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(15);
 
-  // Fetch users on mount and when filters change
+  
   useEffect(() => {
     if (isAdmin) {
       fetchUsers();
@@ -51,7 +51,7 @@ const UserList = () => {
 
     try {
       const response = await api.get('/users');
-      // Backend returns { success: true, data: { users: [...], pagination: {...} } }
+      
       const usersData = response.data?.data?.users || response.data?.users || [];
       setUsers(Array.isArray(usersData) ? usersData : []);
     } catch (err) {
@@ -63,7 +63,7 @@ const UserList = () => {
     }
   };
 
-  // Filter users based on search and filters
+  
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       !searchTerm ||
@@ -77,7 +77,7 @@ const UserList = () => {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  // Pagination calculations
+  
   const totalItems = filteredUsers.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -86,17 +86,17 @@ const UserList = () => {
 
   const handleSearch = (value) => {
     setSearchTerm(value);
-    setCurrentPage(1); // Reset to first page on search
+    setCurrentPage(1); 
   };
 
   const handleRoleFilterChange = (e) => {
     setRoleFilter(e.target.value);
-    setCurrentPage(1); // Reset to first page on filter change
+    setCurrentPage(1); 
   };
 
   const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
-    setCurrentPage(1); // Reset to first page on filter change
+    setCurrentPage(1); 
   };
 
   const handlePageChange = (page) => {
@@ -106,7 +106,7 @@ const UserList = () => {
 
   const handlePageSizeChange = (newSize) => {
     setItemsPerPage(newSize);
-    setCurrentPage(1); // Reset to first page when changing page size
+    setCurrentPage(1); 
   };
 
   const handleAddUser = () => {
@@ -130,7 +130,7 @@ const UserList = () => {
     setShowResetPasswordModal(false);
     setSelectedUser(null);
     if (success) {
-      fetchUsers(); // Refresh the list if password was reset successfully
+      fetchUsers(); 
     }
   };
 
@@ -157,7 +157,7 @@ const UserList = () => {
     try {
       await api.patch(`/users/${userId}/status`, { isActive: !currentStatus });
       showSuccess(`User ${currentStatus ? 'deactivated' : 'activated'} successfully`);
-      fetchUsers(); // Refresh the list
+      fetchUsers(); 
     } catch (err) {
       console.error('Error toggling user status:', err);
       const errorMessage = err.message || 'Failed to update user status';
@@ -180,7 +180,7 @@ const UserList = () => {
       showSuccess(`User ${selectedUser.fullName || selectedUser.username} deleted successfully`);
       setShowDeleteModal(false);
       setSelectedUser(null);
-      fetchUsers(); // Refresh the list
+      fetchUsers(); 
     } catch (err) {
       console.error('Error deleting user:', err);
       const errorMessage = err.message || 'Failed to delete user';
@@ -220,19 +220,19 @@ const UserList = () => {
     return fullName.substring(0, 2).toUpperCase();
   };
 
-  // Role filter options
+  
   const roleOptions = [
     { value: 'admin', label: 'Admin' },
     { value: 'employee', label: 'Employee' },
   ];
 
-  // Status filter options
+  
   const statusOptions = [
     { value: 'active', label: 'Active' },
     { value: 'inactive', label: 'Inactive' },
   ];
 
-  // Redirect if not admin
+  
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -276,10 +276,10 @@ const UserList = () => {
         </div>
       </div>
 
-      {/* Filters and Search */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="space-y-4">
-          {/* Search Bar */}
+          {}
           <div className="w-full">
             <SearchBar
               value={searchTerm}
@@ -301,7 +301,7 @@ const UserList = () => {
               fullWidth
             />
 
-            {/* Status Filter */}
+            {}
             <Select
               name="status"
               value={statusFilter}
@@ -311,7 +311,7 @@ const UserList = () => {
               fullWidth
             />
 
-            {/* Clear Filters */}
+            {}
             {(searchTerm || roleFilter || statusFilter) && (
               <Button
                 variant="outline"
@@ -362,7 +362,7 @@ const UserList = () => {
         </div>
       </div>
 
-      {/* Error State */}
+      {}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-center gap-3">
@@ -384,7 +384,7 @@ const UserList = () => {
         </div>
       )}
 
-      {/* Content Area */}
+      {}
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
           <LoadingSpinner size="lg" text="Loading..." className="mx-auto" />
@@ -419,7 +419,7 @@ const UserList = () => {
         </div>
       ) : (
         <>
-          {/* Table View (Desktop) */}
+          {}
           {viewMode === 'table' && (
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
               <div className="overflow-x-auto">

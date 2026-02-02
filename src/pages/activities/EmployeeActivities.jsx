@@ -14,7 +14,7 @@ const EmployeeActivities = () => {
   const { showSuccess, showError } = useContext(ToastContext);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // State
+  
   const [loading, setLoading] = useState(true);
   const [activities, setActivities] = useState([]);
   const [stats, setStats] = useState(null);
@@ -26,7 +26,7 @@ const EmployeeActivities = () => {
     limit: 20,
   });
 
-  // Filters
+  
   const [filters, setFilters] = useState({
     employeeId: '',
     action: '',
@@ -37,15 +37,15 @@ const EmployeeActivities = () => {
     page: 1,
   });
 
-  const [activeTab, setActiveTab] = useState('all'); // all, sales, stock, deletions
+  const [activeTab, setActiveTab] = useState('all'); 
 
-  // Fetch employees
+  
   useEffect(() => {
     fetchEmployees();
     fetchStats();
   }, []);
 
-  // Fetch activities when filters change
+  
   useEffect(() => {
     fetchActivities();
   }, [filters, activeTab]);
@@ -74,7 +74,7 @@ const EmployeeActivities = () => {
 
       let endpoint = '/activities';
 
-      // Change endpoint based on active tab
+      
       if (activeTab === 'sales') {
         endpoint = '/activities/sales';
       } else if (activeTab === 'stock') {
@@ -110,7 +110,7 @@ const EmployeeActivities = () => {
     setFilters(prev => ({
       ...prev,
       [key]: value,
-      page: 1, // Reset to first page on filter change
+      page: 1, 
     }));
   };
 
@@ -162,13 +162,13 @@ const EmployeeActivities = () => {
     return new Date(date).toLocaleString();
   };
 
-  // Get unique actions from stats data
+  
   const getAvailableActions = () => {
     if (!stats || !stats.actionBreakdown) return [];
     return stats.actionBreakdown.map(item => item._id).filter(Boolean);
   };
 
-  // Get unique resources from stats data
+  
   const getAvailableResources = () => {
     if (!stats || !stats.resourceBreakdown) return [];
     return stats.resourceBreakdown.map(item => item._id).filter(Boolean);
@@ -177,7 +177,7 @@ const EmployeeActivities = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 py-8">
       <div className="container mx-auto px-6 max-w-7xl">
-        {/* Header */}
+        {}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Employee Activities

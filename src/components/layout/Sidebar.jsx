@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 
-// SVG Icons as React components
+
 const DashboardIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -273,7 +273,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     navigate('/login');
   };
 
-  // Toggle submenu expansion
+  
   const toggleSubmenu = (label) => {
     setExpandedMenus((prev) => ({
       ...prev,
@@ -281,7 +281,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     }));
   };
 
-  // Auto-expand submenus when on a submenu page
+  
   useEffect(() => {
     const menuItems = isAdmin ? adminMenuItems : employeeMenuItems;
     menuItems.forEach((item) => {
@@ -301,13 +301,13 @@ const Sidebar = ({ isOpen, onClose }) => {
     });
   }, [location.pathname, isAdmin]);
 
-  // Detect screen size
+  
   useEffect(() => {
     const checkScreenSize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
 
-      // Auto-collapse on mobile, expand on desktop
+      
       if (mobile) {
         setIsCollapsed(false);
       }
@@ -319,24 +319,24 @@ const Sidebar = ({ isOpen, onClose }) => {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Close mobile menu on route change
+  
   useEffect(() => {
     if (isMobile && onClose) {
       onClose();
     }
   }, [location.pathname, isMobile, onClose]);
 
-  // Get menu items based on user role
+  
   const menuItems = isAdmin ? adminMenuItems : employeeMenuItems;
 
-  // Toggle sidebar collapse
+  
   const handleToggleCollapse = () => {
     if (!isMobile) {
       setIsCollapsed(!isCollapsed);
     }
   };
 
-  // Sidebar classes
+  
   const sidebarClasses = `
     fixed top-0 left-0 h-screen
     bg-white dark:bg-gray-800
@@ -348,7 +348,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     ${isMobile ? (isOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'}
   `;
 
-  // Overlay for mobile
+  
   const overlayClasses = `
     fixed inset-0 bg-black bg-opacity-50
     transition-opacity duration-300
@@ -358,7 +358,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <>
-      {/* Mobile overlay */}
+      {}
       <div className={overlayClasses} onClick={onClose} />
 
       {/* Sidebar */}
@@ -399,7 +399,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           )}
         </div>
 
-        {/* User info */}
+        {}
         {user && (!isCollapsed || isMobile) && (
           <div className="px-4 py-4 border-b border-slate-200 dark:border-gray-700">
             <div className="flex items-center space-x-3">
@@ -431,7 +431,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           </div>
         )}
 
-        {/* Navigation menu */}
+        {}
         <nav className="flex-1 overflow-y-auto py-4 px-2">
           <ul className="space-y-1">
             {menuItems.map((item) => {
@@ -439,13 +439,13 @@ const Sidebar = ({ isOpen, onClose }) => {
               const hasSubmenu = item.submenu && item.submenu.length > 0;
               const isExpanded = expandedMenus[item.label];
 
-              // Get current location info
+              
               const currentPathOnly = location.pathname;
 
-              // Determine if this item is active
+              
               let isActive = false;
 
-              // Check if this is a submenu parent with active submenu items
+              
               if (hasSubmenu) {
                 const hasActiveSubmenu = item.submenu.some(sub => {
                   const subPath = sub.path.split('?')[0];
@@ -454,13 +454,13 @@ const Sidebar = ({ isOpen, onClose }) => {
                 });
                 isActive = hasActiveSubmenu;
               } else {
-                // No submenu - direct path match
+                
                 isActive = currentPathOnly === item.path;
               }
 
               return (
                 <li key={item.label + '-' + item.path}>
-                  {/* Main menu item */}
+                  {}
                   {hasSubmenu ? (
                     <div>
                       <button
@@ -476,7 +476,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                         `}
                         title={isCollapsed && !isMobile ? item.label : ''}
                       >
-                        {/* Icon */}
+                        {}
                         <span className={`${isCollapsed && !isMobile ? '' : 'ml-1'} flex-shrink-0`}>
                           <Icon />
                         </span>
@@ -545,7 +545,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                       `}
                       title={isCollapsed && !isMobile ? item.label : ''}
                     >
-                      {/* Icon */}
+                      {}
                       <span className={`${isCollapsed && !isMobile ? '' : 'ml-1'} flex-shrink-0`}>
                         <Icon />
                       </span>
@@ -564,7 +564,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           </ul>
         </nav>
 
-        {/* Footer */}
+        {}
         <div className="border-t border-slate-200 dark:border-gray-700 p-4">
           {(!isCollapsed || isMobile) ? (
             <div className="space-y-3">

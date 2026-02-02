@@ -1,13 +1,8 @@
-/**
- * Toast Integration Examples
- *
- * This file demonstrates how to integrate the Toast notification system
- * into various parts of your application.
- */
 
-// ============================================================
-// Example 1: Login Page Integration
-// ============================================================
+
+
+
+
 
 import { useToast } from '../hooks/useToast';
 
@@ -20,7 +15,7 @@ function LoginPage() {
     try {
       await authService.login(credentials);
       showSuccess('Welcome back! Login successful.');
-      // Navigate to dashboard
+      
     } catch (error) {
       showError(error.message || 'Invalid credentials. Please try again.');
     } finally {
@@ -28,12 +23,12 @@ function LoginPage() {
     }
   };
 
-  return (/* Login form JSX */);
+  return ();
 }
 
-// ============================================================
-// Example 2: Inventory Management Integration
-// ============================================================
+
+
+
 
 function InventoryList() {
   const { showSuccess, showError, showWarning } = useToast();
@@ -46,7 +41,7 @@ function InventoryList() {
     try {
       await inventoryService.deleteItem(itemId);
       showSuccess('Inventory item deleted successfully!');
-      // Refresh list
+      
     } catch (error) {
       showError('Failed to delete item. Please try again.');
     }
@@ -65,12 +60,12 @@ function InventoryList() {
     }
   };
 
-  return (/* Inventory list JSX */);
+  return ();
 }
 
-// ============================================================
-// Example 3: Invoice Form Integration
-// ============================================================
+
+
+
 
 function InvoiceForm() {
   const { showSuccess, showError, showInfo } = useToast();
@@ -82,7 +77,7 @@ function InvoiceForm() {
       const invoice = await invoiceService.create(invoiceData);
       showSuccess('Invoice created successfully!');
       showInfo(`Invoice #${invoice.invoiceNumber} has been saved.`, 5000);
-      // Navigate to invoice detail or list
+      
     } catch (error) {
       showError('Failed to create invoice. Please check all fields.');
     } finally {
@@ -99,12 +94,12 @@ function InvoiceForm() {
     }
   };
 
-  return (/* Invoice form JSX */);
+  return ();
 }
 
-// ============================================================
-// Example 4: User Management Integration
-// ============================================================
+
+
+
 
 function UserManagement() {
   const { showSuccess, showError, showWarning } = useToast();
@@ -113,7 +108,7 @@ function UserManagement() {
     try {
       await userService.create(userData);
       showSuccess(`User "${userData.username}" created successfully!`);
-      // Refresh user list
+      
     } catch (error) {
       if (error.code === 'DUPLICATE_EMAIL') {
         showError('Email already exists. Please use a different email.');
@@ -141,12 +136,12 @@ function UserManagement() {
     }
   };
 
-  return (/* User management JSX */);
+  return ();
 }
 
-// ============================================================
-// Example 5: File Upload Integration
-// ============================================================
+
+
+
 
 function FileUpload() {
   const { showSuccess, showError, showInfo } = useToast();
@@ -171,12 +166,12 @@ function FileUpload() {
     }
   };
 
-  return (/* File upload JSX */);
+  return ();
 }
 
-// ============================================================
-// Example 6: Bulk Operations Integration
-// ============================================================
+
+
+
 
 function BulkOperations() {
   const { showSuccess, showError, showInfo } = useToast();
@@ -208,12 +203,12 @@ function BulkOperations() {
     }
   };
 
-  return (/* Bulk operations JSX */);
+  return ();
 }
 
-// ============================================================
-// Example 7: API Error Handling Utility
-// ============================================================
+
+
+
 
 function useApiWithToast() {
   const { showError } = useToast();
@@ -247,7 +242,7 @@ function useApiWithToast() {
   return { handleApiCall };
 }
 
-// Usage:
+
 function MyComponent() {
   const { handleApiCall } = useApiWithToast();
 
@@ -263,9 +258,9 @@ function MyComponent() {
   };
 }
 
-// ============================================================
-// Example 8: Form Validation Integration
-// ============================================================
+
+
+
 
 function FormWithValidation() {
   const { showError, showWarning } = useToast();
@@ -296,15 +291,15 @@ function FormWithValidation() {
       return;
     }
 
-    // Proceed with submission
+    
   };
 
-  return (/* Form JSX */);
+  return ();
 }
 
-// ============================================================
-// Example 9: Real-time Updates Integration
-// ============================================================
+
+
+
 
 function RealtimeNotifications() {
   const { showInfo, showWarning } = useToast();
@@ -326,12 +321,12 @@ function RealtimeNotifications() {
     return () => socket.disconnect();
   }, []);
 
-  return (/* Component JSX */);
+  return ();
 }
 
-// ============================================================
-// Example 10: Clipboard Operations
-// ============================================================
+
+
+
 
 function CopyToClipboard() {
   const { showSuccess, showError } = useToast();

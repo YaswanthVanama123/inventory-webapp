@@ -77,7 +77,7 @@ const InvoiceDetail = () => {
   const handleDownloadPDF = async () => {
     setActionLoading('download');
     try {
-      // Implement PDF download logic
+      
       const response = await api.get(`/invoices/${id}/pdf`, {
         responseType: 'blob',
       });

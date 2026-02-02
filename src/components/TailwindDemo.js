@@ -1,13 +1,10 @@
 import React from 'react';
 
-/**
- * TailwindDemo Component
- * Demonstrates various Tailwind CSS utilities and custom classes
- */
+
 const TailwindDemo = () => {
   return (
     <div className="min-h-screen bg-light">
-      {/* Hero Section */}
+      {}
       <section className="bg-gradient-hero text-white section">
         <div className="container-custom">
           <h1 className="text-center mb-6 animate-fade-in">
@@ -19,7 +16,7 @@ const TailwindDemo = () => {
         </div>
       </section>
 
-      {/* Buttons Section */}
+      {}
       <section className="section">
         <div className="container-custom">
           <h2 className="text-center mb-8">Button Styles</h2>
@@ -105,7 +102,7 @@ const TailwindDemo = () => {
         </div>
       </section>
 
-      {/* Form Section */}
+      {}
       <section className="section">
         <div className="container-custom">
           <h2 className="text-center mb-8">Form Elements</h2>
@@ -172,7 +169,7 @@ const TailwindDemo = () => {
         </div>
       </section>
 
-      {/* Responsive Grid Section */}
+      {}
       <section className="section bg-dark-50">
         <div className="container-custom">
           <h2 className="text-center mb-8">Responsive Grid</h2>
@@ -193,7 +190,7 @@ const TailwindDemo = () => {
         </div>
       </section>
 
-      {/* Color Palette Section */}
+      {}
       <section className="section">
         <div className="container-custom">
           <h2 className="text-center mb-8">Color Palette</h2>
@@ -227,7 +224,7 @@ const TailwindDemo = () => {
         </div>
       </section>
 
-      {/* Footer */}
+      {}
       <footer className="bg-dark-900 text-white py-8">
         <div className="container-custom text-center">
           <p>&copy; 2026 Tailwind CSS Demo. Built with React and Tailwind.</p>

@@ -10,7 +10,7 @@ const Trash = () => {
   const { showSuccess, showError, showInfo } = useContext(ToastContext);
   const [loading, setLoading] = useState(true);
   const [deletedItems, setDeletedItems] = useState([]);
-  const [filter, setFilter] = useState('all'); // all, inventory, invoices, users
+  const [filter, setFilter] = useState('all'); 
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -20,8 +20,8 @@ const Trash = () => {
   const fetchDeletedItems = async () => {
     setLoading(true);
     try {
-      // TODO: Implement API call to fetch deleted items
-      // For now, using placeholder data
+      
+      
       setDeletedItems([]);
       showInfo('Trash feature coming soon');
     } catch (error) {
@@ -34,7 +34,7 @@ const Trash = () => {
 
   const handleRestore = async (item) => {
     try {
-      // TODO: Implement restore API call
+      
       showSuccess(`${item.name} restored successfully`);
       fetchDeletedItems();
     } catch (error) {
@@ -49,7 +49,7 @@ const Trash = () => {
     }
 
     try {
-      // TODO: Implement permanent delete API call
+      
       showSuccess('Item permanently deleted');
       fetchDeletedItems();
     } catch (error) {
@@ -64,7 +64,7 @@ const Trash = () => {
     }
 
     try {
-      // TODO: Implement empty trash API call
+      
       showSuccess('Trash emptied successfully');
       fetchDeletedItems();
     } catch (error) {
@@ -103,11 +103,11 @@ const Trash = () => {
           </p>
         </div>
 
-        {/* Filters and Actions */}
+        {}
         <Card padding="lg" className="mb-6 border border-slate-200 dark:border-gray-700">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex flex-col sm:flex-row gap-3 flex-1">
-              {/* Search */}
+              {}
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input

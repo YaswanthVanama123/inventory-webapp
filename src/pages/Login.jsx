@@ -4,7 +4,7 @@ import authService from '../services/authService';
 
 const Login = () => {
   const { isAuthenticated, loading: authLoading, setUser, setIsAuthenticated } = useContext(AuthContext);
-  const [loginType, setLoginType] = useState('admin'); // 'admin' or 'employee'
+  const [loginType, setLoginType] = useState('admin'); 
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -15,7 +15,7 @@ const Login = () => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
-  // Redirect to dashboard if already authenticated
+  
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
       window.location.href = '/dashboard';
@@ -48,7 +48,7 @@ const Login = () => {
       [name]: value,
     }));
 
-    // Clear field error when user starts typing
+    
     if (fieldErrors[name]) {
       setFieldErrors((prev) => ({
         ...prev,
@@ -56,7 +56,7 @@ const Login = () => {
       }));
     }
 
-    // Clear general error
+    
     if (error) {
       setError('');
     }
@@ -75,7 +75,7 @@ const Login = () => {
     try {
       let result;
 
-      // Use appropriate login method based on type
+      
       if (loginType === 'admin') {
         result = await authService.loginAdmin(formData.username, formData.password);
       } else {
@@ -83,14 +83,14 @@ const Login = () => {
       }
 
       if (result.success) {
-        // Store remember me preference
+        
         if (rememberMe) {
           localStorage.setItem('rememberMe', 'true');
         } else {
           localStorage.removeItem('rememberMe');
         }
 
-        // Update auth context
+        
         if (setUser && result.data?.user) {
           setUser(result.data.user);
         }
@@ -98,7 +98,7 @@ const Login = () => {
           setIsAuthenticated(true);
         }
 
-        // Redirect to dashboard
+        
         window.location.href = '/dashboard';
       } else {
         setError(result.error || 'Invalid credentials. Please try again.');
@@ -121,7 +121,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 relative">
-      {/* Professional geometric background pattern */}
+      {}
       <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] opacity-20"></div>
 
       <div className="max-w-md w-full space-y-6 relative z-10">
@@ -131,7 +131,7 @@ const Login = () => {
           <div className="h-2 bg-gradient-to-r from-blue-600 to-blue-500"></div>
 
           <div className="p-8 sm:p-10">
-            {/* Header */}
+            {}
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-blue-600 mb-4 shadow-lg">
                 <svg
@@ -220,7 +220,7 @@ const Login = () => {
             </button>
           </div>
 
-          {/* Error Message */}
+          {}
           {error && (
             <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200">
               <div className="flex items-center">
@@ -240,9 +240,9 @@ const Login = () => {
             </div>
           )}
 
-          {/* Login Form */}
+          {}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Username Field */}
+            {}
             <div>
               <label
                 htmlFor="username"
@@ -288,7 +288,7 @@ const Login = () => {
               )}
             </div>
 
-            {/* Password Field */}
+            {}
             <div>
               <label
                 htmlFor="password"

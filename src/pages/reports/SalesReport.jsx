@@ -43,7 +43,7 @@ const SalesReport = () => {
       const response = await reportService.sales(params);
       setSalesData(response.data);
 
-      // Extract unique categories from the data
+      
       if (response.data?.categoryBreakdown) {
         const cats = response.data.categoryBreakdown.map(item => item.category);
         setCategories([...new Set(cats)]);
@@ -97,15 +97,15 @@ const SalesReport = () => {
 
     const doc = new jsPDF();
 
-    // Title
+    
     doc.setFontSize(18);
     doc.text('Sales Report', 14, 22);
 
-    // Date Range
+    
     doc.setFontSize(11);
     doc.text(`Period: ${dateRange.startDate} to ${dateRange.endDate}`, 14, 32);
 
-    // Summary Stats
+    
     doc.setFontSize(12);
     doc.text('Summary', 14, 45);
     doc.setFontSize(10);
@@ -114,7 +114,7 @@ const SalesReport = () => {
     doc.text(`Total Orders: ${salesData.summary?.totalOrders?.toLocaleString() || 0}`, 14, 64);
     doc.text(`Average Order Value: $${salesData.summary?.averageOrderValue?.toFixed(2) || 0}`, 14, 70);
 
-    // Daily Sales Table
+    
     if (salesData.dailySales && salesData.dailySales.length > 0) {
       doc.autoTable({
         startY: 80,
@@ -128,7 +128,7 @@ const SalesReport = () => {
       });
     }
 
-    // Category Breakdown Table
+    
     if (salesData.categoryBreakdown && salesData.categoryBreakdown.length > 0) {
       doc.addPage();
       doc.setFontSize(12);
@@ -168,7 +168,7 @@ const SalesReport = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
@@ -194,7 +194,7 @@ const SalesReport = () => {
         </div>
       </div>
 
-      {/* Filters */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-5 h-5 text-slate-600" />
@@ -202,7 +202,7 @@ const SalesReport = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Date Range */}
+          {}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Start Date
@@ -244,7 +244,7 @@ const SalesReport = () => {
             </select>
           </div>
 
-          {/* Quick Filters */}
+          {}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Quick Select
@@ -273,7 +273,7 @@ const SalesReport = () => {
         </div>
       </div>
 
-      {/* Summary Stats */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm p-6 text-white">
           <div className="flex items-center justify-between mb-2">
@@ -308,7 +308,7 @@ const SalesReport = () => {
         </div>
       </div>
 
-      {/* Sales Trend Chart */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <h2 className="text-lg font-semibold text-slate-900 mb-4">Sales Trend</h2>
         <div className="h-80">
@@ -348,7 +348,7 @@ const SalesReport = () => {
         </div>
       </div>
 
-      {/* Orders Bar Chart */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <h2 className="text-lg font-semibold text-slate-900 mb-4">Daily Orders</h2>
         <div className="h-80">
@@ -375,9 +375,9 @@ const SalesReport = () => {
         </div>
       </div>
 
-      {/* Category Breakdown */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Pie Chart */}
+        {}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Category Distribution</h2>
           <div className="h-80">
@@ -408,7 +408,7 @@ const SalesReport = () => {
           </div>
         </div>
 
-        {/* Category Table */}
+        {}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Category Breakdown</h2>
           <div className="overflow-x-auto">

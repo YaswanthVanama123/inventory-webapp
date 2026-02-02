@@ -1,15 +1,10 @@
-/**
- * Example: Wrapping Complex Components with ErrorBoundary
- *
- * This file demonstrates how to wrap specific complex components
- * (like forms, tables, etc.) with ErrorBoundary within a page.
- */
+
 
 import React from 'react';
 import ErrorBoundary from '../components/common/ErrorBoundary';
 import ErrorFallback from '../components/common/ErrorFallback';
 
-// Example 1: Wrapping a complex form
+
 export const FormWithErrorBoundary = () => {
   return (
     <div className="container">
@@ -25,7 +20,7 @@ export const FormWithErrorBoundary = () => {
   );
 };
 
-// Example 2: Wrapping a data table with custom fallback
+
 export const TableWithErrorBoundary = () => {
   const tableFallback = (
     <ErrorFallback
@@ -48,7 +43,7 @@ export const TableWithErrorBoundary = () => {
   );
 };
 
-// Example 3: Multiple sections with separate error boundaries
+
 export const DashboardWithMultipleErrorBoundaries = () => {
   return (
     <div className="container">
@@ -99,17 +94,17 @@ export const DashboardWithMultipleErrorBoundaries = () => {
   );
 };
 
-// Example 4: Form with error reporting
+
 export const FormWithErrorReporting = () => {
   const handleFormError = (error, errorInfo) => {
-    // Log to analytics
+    
     console.log('Form error:', error.message);
 
-    // Send to error tracking service
-    // reportErrorToService(error, errorInfo, {
-    //   formType: 'invoice',
-    //   userId: currentUser.id,
-    // });
+    
+    
+    
+    
+    
   };
 
   return (
@@ -126,7 +121,7 @@ export const FormWithErrorReporting = () => {
   );
 };
 
-// Example 5: Nested error boundaries for complex layouts
+
 export const NestedErrorBoundaries = () => {
   return (
     <div className="container">
@@ -140,9 +135,9 @@ export const NestedErrorBoundaries = () => {
           </ErrorBoundary>
         </div>
 
-        {/* Right Column */}
+        {}
         <div>
-          {/* Main Content */}
+          {}
           <ErrorBoundary>
             <MainContent />
           </ErrorBoundary>
@@ -165,7 +160,7 @@ export const NestedErrorBoundaries = () => {
   );
 };
 
-// Example 6: Conditional error boundaries
+
 export const ConditionalErrorBoundary = ({ isComplexView }) => {
   return (
     <div className="container">
@@ -211,28 +206,9 @@ export const ErrorBoundaryWithRetry = () => {
   );
 };
 
-/*
- * USAGE PATTERNS SUMMARY
- *
- * 1. Wrap entire forms to catch validation/submission errors
- * 2. Wrap data tables/grids to handle render errors with large datasets
- * 3. Wrap chart/visualization components that might fail
- * 4. Use separate boundaries for independent sections
- * 5. Add custom error reporting for critical components
- * 6. Use nested boundaries for complex layouts
- * 7. Implement retry mechanisms for recoverable errors
- *
- * BEST PRACTICES:
- *
- * - Place boundaries at logical component boundaries
- * - Don't over-wrap - too many boundaries can hide issues
- * - Use specific error messages for better UX
- * - Add error reporting for production monitoring
- * - Test error scenarios in development
- * - Document which components are wrapped and why
- */
 
-// Dummy components for examples
+
+
 const ComplexProductForm = () => <div>Form</div>;
 const InventoryTable = () => <div>Table</div>;
 const StatsSection = () => <div>Stats</div>;

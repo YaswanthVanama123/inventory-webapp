@@ -18,14 +18,14 @@ const InventoryList = () => {
   const { isAdmin } = useAuth();
   const { showSuccess, showError, showInfo } = useContext(ToastContext);
 
-  // Helper function to get full image URL
+  
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '/placeholder-product.png';
-    // If it's already a full URL (from ImgBB or other source), use it directly
+    
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
-    // For legacy local images
+    
     if (imagePath.startsWith('/uploads')) {
       const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
       return `${backendUrl}${imagePath}`;
@@ -33,30 +33,30 @@ const InventoryList = () => {
     return imagePath || '/placeholder-product.png';
   };
 
-  // Initialize state from URL params
+  
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
-  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || ''); // 'all', 'low', 'adequate'
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || ''); 
   const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'name');
   const [sortOrder, setSortOrder] = useState(searchParams.get('sortOrder') || 'asc');
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page')) || 1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [categories, setCategories] = useState([]);
-  const [viewMode, setViewMode] = useState('table'); // 'table' or 'card'
+  const [viewMode, setViewMode] = useState('table'); 
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
 
-  // Delete confirmation modal state
+  
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
   const [itemsPerPage, setItemsPerPage] = useState(20);
 
-  // Debounce search input (300ms)
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -65,7 +65,7 @@ const InventoryList = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Update URL params whenever filters change
+  
   useEffect(() => {
     const params = {};
     if (debouncedSearchTerm) params.search = debouncedSearchTerm;
@@ -78,12 +78,12 @@ const InventoryList = () => {
     setSearchParams(params, { replace: true });
   }, [debouncedSearchTerm, selectedCategory, statusFilter, sortBy, sortOrder, currentPage, setSearchParams]);
 
-  // Fetch categories on mount
+  
   useEffect(() => {
     fetchCategories();
   }, []);
 
-  // Fetch inventory items whenever filters change
+  
   useEffect(() => {
     fetchInventoryItems();
   }, [debouncedSearchTerm, selectedCategory, statusFilter, sortBy, sortOrder, currentPage, itemsPerPage]);
@@ -91,12 +91,12 @@ const InventoryList = () => {
   const fetchCategories = async () => {
     try {
       const response = await api.get('/inventory/categories');
-      // Backend returns { success: true, data: { categories: [...] } }
+      
       const categoriesData = response.data?.data?.categories || response.data?.categories || [];
       setCategories(Array.isArray(categoriesData) ? categoriesData : []);
     } catch (err) {
       console.error('Error fetching categories:', err);
-      // Don't show error for categories, just continue with empty array
+      
       setCategories([]);
     }
   };
@@ -121,7 +121,7 @@ const InventoryList = () => {
         params.category = selectedCategory;
       }
 
-      // Handle status filter
+      
       if (statusFilter === 'low') {
         params.lowStock = true;
       } else if (statusFilter === 'adequate') {
@@ -135,7 +135,7 @@ const InventoryList = () => {
       setTotalItems(response.data.total || (response.data.items || response.data || []).length);
       setCurrentPage(response.data.currentPage || 1);
 
-      // Show info toast for low stock items if filter is active
+      
       if (statusFilter === 'low' && (response.data.items || response.data || []).length > 0) {
         showInfo(`Found ${(response.data.items || response.data || []).length} low stock items`);
       }
@@ -152,7 +152,7 @@ const InventoryList = () => {
 
   const handleSearch = (value) => {
     setSearchTerm(value);
-    setCurrentPage(1); // Reset to first page on search
+    setCurrentPage(1); 
   };
 
   const handleCategoryChange = (e) => {
@@ -179,7 +179,7 @@ const InventoryList = () => {
 
   const handlePageSizeChange = (newSize) => {
     setItemsPerPage(newSize);
-    setCurrentPage(1); // Reset to first page when changing page size
+    setCurrentPage(1); 
   };
 
   const handleAddNew = () => {
@@ -208,7 +208,7 @@ const InventoryList = () => {
       showSuccess(`Successfully deleted "${itemToDelete.name}"`);
       setDeleteModalOpen(false);
       setItemToDelete(null);
-      fetchInventoryItems(); // Refresh the list
+      fetchInventoryItems(); 
     } catch (err) {
       console.error('Error deleting item:', err);
       showError(err.message || 'Failed to delete item');
@@ -232,7 +232,7 @@ const InventoryList = () => {
     return variants[category] || 'default';
   };
 
-  // Sort options
+  
   const sortOptions = [
     { value: 'name-asc', label: 'Name (A-Z)' },
     { value: 'name-desc', label: 'Name (Z-A)' },
@@ -244,20 +244,20 @@ const InventoryList = () => {
     { value: 'price-desc', label: 'Price (High to Low)' },
   ];
 
-  // Category options for select
+  
   const categoryOptions = categories.map(cat => ({
     value: cat,
     label: cat,
   }));
 
-  // Status filter options
+  
   const statusOptions = [
     { value: '', label: 'All Items' },
     { value: 'low', label: 'Low Stock' },
     { value: 'adequate', label: 'Adequate Stock' },
   ];
 
-  // Loading state
+  
   if (loading && items.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -292,10 +292,10 @@ const InventoryList = () => {
         </div>
       </div>
 
-      {/* Filters and Search */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="space-y-4">
-          {/* Search Bar */}
+          {}
           <div className="w-full">
             <SearchBar
               value={searchTerm}
@@ -306,9 +306,9 @@ const InventoryList = () => {
             />
           </div>
 
-          {/* Filters Row */}
+          {}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {/* Category Filter */}
+            {}
             <Select
               name="category"
               value={selectedCategory}
@@ -318,7 +318,7 @@ const InventoryList = () => {
               fullWidth
             />
 
-            {/* Status Filter */}
+            {}
             <Select
               name="status"
               value={statusFilter}
@@ -328,7 +328,7 @@ const InventoryList = () => {
               fullWidth
             />
 
-            {/* Sort */}
+            {}
             <Select
               name="sort"
               value={`${sortBy}-${sortOrder}`}
@@ -338,7 +338,7 @@ const InventoryList = () => {
               fullWidth
             />
 
-            {/* View Mode Toggle */}
+            {}
             <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('table')}
@@ -402,7 +402,7 @@ const InventoryList = () => {
         </div>
       )}
 
-      {/* Content Area */}
+      {}
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
           <LoadingSpinner size="lg" text="Loading..." className="mx-auto" />
@@ -432,7 +432,7 @@ const InventoryList = () => {
         </div>
       ) : (
         <>
-          {/* Table View (Desktop) */}
+          {}
           {viewMode === 'table' && (
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
               <div className="overflow-x-auto">
@@ -755,7 +755,7 @@ const InventoryList = () => {
                       alt={itemToDelete.name}
                       className="w-16 h-16 rounded-lg object-cover"
                       onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/64?text=No+Image';
+                        e.target.src = 'https:
                       }}
                     />
                   ) : (

@@ -1,17 +1,10 @@
 import api from './api';
 import { handleApiError } from './errorHandler';
 
-/**
- * Dashboard Service
- * Handles all dashboard-related API calls
- */
+
 
 const dashboardService = {
-  /**
-   * Get dashboard statistics and data
-   * @returns {Promise} Response with dashboard data
-   * @throws {Object} Formatted error with user-friendly message
-   */
+  
   getDashboardData: async () => {
     try {
       const response = await api.get('/reports/dashboard');
@@ -24,12 +17,7 @@ const dashboardService = {
     }
   },
 
-  /**
-   * Get recent activity logs
-   * @param {number} limit - Number of activities to fetch (default: 20)
-   * @returns {Promise} Response with recent activities
-   * @throws {Object} Formatted error with user-friendly message
-   */
+  
   getRecentActivity: async (limit = 20) => {
     try {
       const response = await api.get('/reports/recent-activity', {
@@ -43,11 +31,7 @@ const dashboardService = {
     }
   },
 
-  /**
-   * Get low stock items
-   * @returns {Promise} Response with low stock items
-   * @throws {Object} Formatted error with user-friendly message
-   */
+  
   getLowStockItems: async () => {
     try {
       const response = await api.get('/inventory', {
@@ -61,11 +45,7 @@ const dashboardService = {
     }
   },
 
-  /**
-   * Get stock summary
-   * @returns {Promise} Response with stock summary
-   * @throws {Object} Formatted error with user-friendly message
-   */
+  
   getStockSummary: async () => {
     try {
       const response = await api.get('/reports/stock-summary');

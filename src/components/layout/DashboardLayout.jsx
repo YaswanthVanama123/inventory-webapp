@@ -21,7 +21,7 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Handle responsive behavior
+  
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 1024;
@@ -36,14 +36,14 @@ const DashboardLayout = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Close sidebar on route change (mobile)
+  
   useEffect(() => {
     if (isMobile) {
       setSidebarOpen(false);
     }
   }, [location, isMobile]);
 
-  // Close sidebar when clicking outside (mobile)
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isMobile && sidebarOpen) {
@@ -64,7 +64,7 @@ const DashboardLayout = () => {
   }, [isMobile, sidebarOpen]);
 
   const handleLogout = () => {
-    // Clear auth token
+    
     localStorage.removeItem('token');
     navigate('/login');
   };
@@ -85,13 +85,13 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navbar */}
+      {}
       <nav className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-30">
         <div className="px-4 lg:px-6">
           <div className="flex items-center justify-between h-16">
-            {/* Left section */}
+            {}
             <div className="flex items-center gap-4">
-              {/* Mobile menu button */}
+              {}
               <button
                 id="menu-button"
                 onClick={() => setSidebarOpen(!sidebarOpen)}

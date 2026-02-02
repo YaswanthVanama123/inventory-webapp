@@ -36,7 +36,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-// Reusable Card Component
+
 const Card = ({ children, className = '' }) => {
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
@@ -91,7 +91,7 @@ const StatCard = ({ title, value, change, changeType, icon: Icon, loading }) => 
   );
 };
 
-// Chart Skeleton Loader
+
 const ChartSkeleton = () => (
   <div className="animate-pulse">
     <div className="h-4 bg-gray-200 rounded w-32 mb-4"></div>

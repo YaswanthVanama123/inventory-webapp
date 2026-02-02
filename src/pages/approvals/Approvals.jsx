@@ -22,7 +22,7 @@ const Approvals = () => {
   const fetchPendingInvoices = async () => {
     setLoading(true);
     try {
-      // Fetch invoices with pending status
+      
       const response = await api.get('/invoices?status=pending');
       setPendingInvoices(response.data.invoices || []);
     } catch (error) {
@@ -41,7 +41,7 @@ const Approvals = () => {
         paymentStatus: 'paid'
       });
       showSuccess('Invoice approved successfully');
-      fetchPendingInvoices(); // Refresh list
+      fetchPendingInvoices(); 
     } catch (error) {
       console.error('Error approving invoice:', error);
       showError('Failed to approve invoice');
@@ -61,7 +61,7 @@ const Approvals = () => {
         rejectionReason: reason
       });
       showSuccess('Invoice rejected');
-      fetchPendingInvoices(); // Refresh list
+      fetchPendingInvoices(); 
     } catch (error) {
       console.error('Error rejecting invoice:', error);
       showError('Failed to reject invoice');
@@ -81,7 +81,7 @@ const Approvals = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-6 lg:px-8 py-8 max-w-[1800px]">
-        {/* Header */}
+        {}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
@@ -104,7 +104,7 @@ const Approvals = () => {
           </div>
         </div>
 
-        {/* Pending Invoices List */}
+        {}
         {pendingInvoices.length === 0 ? (
           <Card padding="lg" className="text-center py-20 shadow-sm border border-slate-200 dark:border-gray-700">
             <CheckCircle className="w-16 h-16 text-slate-400 dark:text-gray-500 mx-auto mb-4" />

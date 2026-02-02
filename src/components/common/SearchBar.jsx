@@ -38,7 +38,7 @@ const SearchBar = ({
 
   return (
     <div className={`relative ${widthClass} ${className}`}>
-      {/* Search Icon */}
+      {}
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         {loading ? (
           <svg
@@ -78,7 +78,7 @@ const SearchBar = ({
         )}
       </div>
 
-      {/* Input */}
+      {}
       <input
         type="text"
         value={value}

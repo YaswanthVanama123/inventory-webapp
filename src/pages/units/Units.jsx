@@ -15,9 +15,9 @@ const Units = () => {
   const [loading, setLoading] = useState(true);
   const [units, setUnits] = useState([]);
 
-  // Modal states
+  
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
+  const [modalMode, setModalMode] = useState('add'); 
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [form, setForm] = useState({ value: '', label: '' });
   const [modalLoading, setModalLoading] = useState(false);
@@ -29,7 +29,7 @@ const Units = () => {
   const fetchUnits = async () => {
     setLoading(true);
     try {
-      const response = await settingsService.getUnits(true); // Include inactive
+      const response = await settingsService.getUnits(true); 
       const unitsData = response?.data?.units || [];
       setUnits(unitsData);
     } catch (error) {
@@ -61,10 +61,10 @@ const Units = () => {
       return;
     }
 
-    // Check for duplicates
+    
     const normalizedValue = form.value.trim().toLowerCase();
     const isDuplicate = units.some(unit => {
-      // If editing, exclude the current unit from duplicate check
+      
       if (modalMode === 'edit' && selectedUnit && unit._id === selectedUnit._id) {
         return false;
       }
@@ -133,7 +133,7 @@ const Units = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Measurement Units

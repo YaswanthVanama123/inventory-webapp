@@ -17,25 +17,25 @@ const InventoryForm = () => {
   const { showSuccess, showError, showWarning, showInfo } = useContext(ToastContext);
   const { isAdmin } = useAuth();
 
-  // Helper function to get full image URL
+  
   const getImageUrl = (image) => {
-    // If it's a blob URL (from file input), return as is
+    
     if (typeof image === 'string' && image.startsWith('blob:')) return image;
 
-    // If it's a placeholder, return as is
+    
     if (image === '/placeholder-product.png') return image;
 
-    // Extract path from image object or use string directly
+    
     const path = typeof image === 'object' ? image?.path : image;
 
     if (!path) return '/placeholder-product.png';
 
-    // If it's already a full URL (from ImgBB or other source), use it directly
+    
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
 
-    // For legacy local images
+    
     if (path.startsWith('/uploads')) {
       const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
       return `${backendUrl}${path}`;
@@ -44,26 +44,26 @@ const InventoryForm = () => {
     return path;
   };
 
-  // Current step state (0-3 for 4 steps)
+  
   const [currentStep, setCurrentStep] = useState(0);
 
-  // Form data state
+  
   const [formData, setFormData] = useState({
-    // Basic Information
+    
     itemName: '',
     skuCode: '',
     description: '',
-    category: '', // Always string, never undefined
+    category: '', 
     tags: [],
 
-    // Quantity & Pricing
+    
     currentQuantity: '',
     minimumQuantity: '',
-    unit: '', // Always string, never undefined
+    unit: '', 
     purchasePrice: '',
     sellingPrice: '',
 
-    // Supplier Information
+    
     supplierName: '',
     contactPerson: '',
     supplierEmail: '',
@@ -73,31 +73,31 @@ const InventoryForm = () => {
     reorderPoint: '',
     minOrderQuantity: '',
 
-    // Images
+    
     images: [],
     primaryImageIndex: 0,
   });
 
-  // Loading and error states
+  
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
 
-  // Tag input state
+  
   const [tagInput, setTagInput] = useState('');
 
-  // Image preview states
+  
   const [imagePreviews, setImagePreviews] = useState([]);
   const [uploadingImages, setUploadingImages] = useState(false);
 
-  // Categories and units from backend
+  
   const [categories, setCategories] = useState([]);
   const [units, setUnits] = useState([]);
   const [loadingSettings, setLoadingSettings] = useState(true);
 
-  // Step configuration
+  
   const steps = [
     { id: 0, title: 'Basic Information', icon: FileText },
     { id: 1, title: 'Quantity & Pricing', icon: DollarSign },
@@ -105,19 +105,19 @@ const InventoryForm = () => {
     { id: 3, title: 'Images', icon: Image },
   ];
 
-  // Load existing data in edit mode
+  
   useEffect(() => {
     if (isEditMode) {
       loadInventoryData();
     }
   }, [id]);
 
-  // Fetch categories and units on mount
+  
   useEffect(() => {
     fetchCategoriesAndUnits();
   }, []);
 
-  // Auto-generate SKU for new items
+  
   useEffect(() => {
     if (!isEditMode && !formData.skuCode) {
       const generateUniqueSKU = () => {
@@ -130,7 +130,7 @@ const InventoryForm = () => {
         const seconds = String(now.getSeconds()).padStart(2, '0');
         const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
 
-        // Format: SKU-YYYYMMDD-HHMMSS-mmm
+        
         return `SKU-${year}${month}${day}-${hours}${minutes}${seconds}-${milliseconds}`;
       };
 
@@ -149,7 +149,7 @@ const InventoryForm = () => {
         settingsService.getUnits(),
       ]);
 
-      // Safely extract categories and units from the response data
+      
       const categoriesData = categoriesRes?.data?.categories || [];
       const unitsData = unitsRes?.data?.units || [];
 
@@ -157,7 +157,7 @@ const InventoryForm = () => {
       setUnits(unitsData);
     } catch (error) {
       console.error('Error fetching settings:', error);
-      // Set empty arrays on error to prevent undefined values
+      
       setCategories([]);
       setUnits([]);
       showError('Failed to load categories and units. Please ensure the server is running.');
@@ -166,18 +166,18 @@ const InventoryForm = () => {
     }
   };
 
-  // Auto-save draft functionality
+  
   useEffect(() => {
     if (!isEditMode) {
       const timer = setTimeout(() => {
         saveDraft();
-      }, 5000); // Auto-save after 5 seconds of inactivity
+      }, 5000); 
 
       return () => clearTimeout(timer);
     }
   }, [formData]);
 
-  // Load draft on mount
+  
   useEffect(() => {
     if (!isEditMode) {
       loadDraft();
@@ -188,7 +188,7 @@ const InventoryForm = () => {
     setLoading(true);
     try {
       const response = await api.get(`/inventory/${id}`);
-      // Access the nested item data correctly
+      
       const item = response.data.item || response.data.data?.item || response.data;
 
       setFormData({
@@ -242,16 +242,16 @@ const InventoryForm = () => {
       const draft = localStorage.getItem('inventoryDraft');
       if (draft) {
         const parsedDraft = JSON.parse(draft);
-        // Merge with defaults to ensure all fields have valid values
+        
         setFormData((prev) => ({
           ...prev,
           ...parsedDraft,
-          // Ensure critical fields are never undefined
+          
           category: parsedDraft.category || '',
           unit: parsedDraft.unit || '',
           tags: parsedDraft.tags || [],
           images: parsedDraft.images || [],
-          // Preserve auto-generated SKU if draft doesn't have one
+          
           skuCode: parsedDraft.skuCode || prev.skuCode,
         }));
         setAutoSaveStatus('Draft loaded');
@@ -266,7 +266,7 @@ const InventoryForm = () => {
     localStorage.removeItem('inventoryDraft');
   };
 
-  // Handle input changes
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -274,7 +274,7 @@ const InventoryForm = () => {
       [name]: value,
     }));
 
-    // Clear error for this field
+    
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -283,7 +283,7 @@ const InventoryForm = () => {
     }
   };
 
-  // Handle tag input
+  
   const handleTagInputChange = (e) => {
     setTagInput(e.target.value);
   };
@@ -313,7 +313,7 @@ const InventoryForm = () => {
     }));
   };
 
-  // Handle image upload
+  
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
@@ -321,32 +321,32 @@ const InventoryForm = () => {
     setUploadingImages(true);
 
     try {
-      // Create previews
+      
       const newPreviews = [];
       const newImages = [];
       let hasErrors = false;
 
       for (const file of files) {
-        // Validate file type
+        
         if (!file.type.startsWith('image/')) {
           showWarning(`${file.name} is not an image file`);
           hasErrors = true;
           continue;
         }
 
-        // Validate file size (max 5MB)
+        
         if (file.size > 5 * 1024 * 1024) {
           showWarning(`${file.name} is too large (max 5MB)`);
           hasErrors = true;
           continue;
         }
 
-        // Create preview URL
+        
         const previewUrl = URL.createObjectURL(file);
         newPreviews.push(previewUrl);
 
-        // For actual upload, you would upload to server here
-        // For now, we'll store the file object
+        
+        
         newImages.push(file);
       }
 
@@ -360,7 +360,7 @@ const InventoryForm = () => {
         showSuccess(`${newImages.length} image(s) uploaded successfully`);
       }
 
-      // Clear the file input value to allow re-uploading the same file
+      
       e.target.value = '';
     } catch (error) {
       showError('Failed to upload images');
@@ -390,7 +390,7 @@ const InventoryForm = () => {
     }));
   };
 
-  // Calculate profit margin
+  
   const calculateProfitMargin = () => {
     const purchase = parseFloat(formData.purchasePrice);
     const selling = parseFloat(formData.sellingPrice);
@@ -402,12 +402,12 @@ const InventoryForm = () => {
     return '0.00';
   };
 
-  // Validation
+  
   const validateStep = (step) => {
     const newErrors = {};
 
     switch (step) {
-      case 0: // Basic Information
+      case 0: 
         if (!formData.itemName.trim()) {
           newErrors.itemName = 'Item name is required';
         } else if (formData.itemName.trim().length < 2) {
@@ -427,7 +427,7 @@ const InventoryForm = () => {
         }
         break;
 
-      case 1: // Quantity & Pricing
+      case 1: 
         if (formData.currentQuantity === '' || formData.currentQuantity === null) {
           newErrors.currentQuantity = 'Current quantity is required';
         } else if (isNaN(formData.currentQuantity)) {
@@ -468,13 +468,13 @@ const InventoryForm = () => {
           newErrors.sellingPrice = 'Selling price must be greater than 0';
         }
 
-        // Optional: Warn if selling price is less than purchase price
+        
         if (parseFloat(formData.sellingPrice) < parseFloat(formData.purchasePrice)) {
           newErrors.sellingPrice = 'Warning: Selling price is less than purchase price (negative margin)';
         }
         break;
 
-      case 2: // Supplier Information
+      case 2: 
         if (!formData.supplierName.trim()) {
           newErrors.supplierName = 'Supplier name is required';
         } else if (formData.supplierName.trim().length < 2) {
@@ -502,8 +502,8 @@ const InventoryForm = () => {
         }
         break;
 
-      case 3: // Images
-        // Images are optional, no validation required
+      case 3: 
+        
         break;
 
       default:
@@ -524,12 +524,12 @@ const InventoryForm = () => {
     return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 10;
   };
 
-  // Check if current step is valid (for disabling next/submit button)
+  
   const isCurrentStepValid = () => {
     return validateStep(currentStep);
   };
 
-  // Navigation
+  
   const handleNext = () => {
     if (validateStep(currentStep)) {
       setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
@@ -543,16 +543,16 @@ const InventoryForm = () => {
   };
 
   const handleStepClick = (stepIndex) => {
-    // Allow navigation to previous steps or current step
+    
     if (stepIndex <= currentStep) {
       setCurrentStep(stepIndex);
       window.scrollTo(0, 0);
     }
   };
 
-  // Prevent Enter key from submitting form accidentally
+  
   const handleKeyDown = (e) => {
-    // Never allow Enter to do anything on file inputs
+    
     if (e.target.type === 'file') {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -562,10 +562,10 @@ const InventoryForm = () => {
     }
 
     if (e.key === 'Enter' && e.target.type !== 'textarea') {
-      // Allow Enter in textareas for multi-line input
-      // On the images step (last step), never auto-submit on Enter
+      
+      
       if (currentStep === steps.length - 1) {
-        // Only allow submission if explicitly on the submit button
+        
         if (e.target.type !== 'submit') {
           e.preventDefault();
           e.stopPropagation();
@@ -573,11 +573,11 @@ const InventoryForm = () => {
         return;
       }
 
-      // Prevent Enter from submitting unless on last step and focused on submit button
+      
       if (currentStep < steps.length - 1 || e.target.type !== 'submit') {
         e.preventDefault();
 
-        // If on a valid step, move to next step when Enter is pressed
+        
         if (currentStep < steps.length - 1 && validateStep(currentStep)) {
           handleNext();
         }
@@ -585,19 +585,19 @@ const InventoryForm = () => {
     }
   };
 
-  // Submit form
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // CRITICAL: Only allow submission if on the last step
-    // This prevents accidental submissions from other steps
+    
+    
     if (currentStep !== steps.length - 1) {
       console.warn('Form submission blocked: not on final step');
       e.stopPropagation();
       return false;
     }
 
-    // Validate all steps
+    
     let isValid = true;
     for (let i = 0; i < steps.length; i++) {
       if (!validateStep(i)) {
@@ -620,24 +620,24 @@ const InventoryForm = () => {
     setAlert(null);
 
     try {
-      // Prepare form data for submission
+      
       const submitData = new FormData();
 
-      // Basic Information
+      
       submitData.append('itemName', formData.itemName);
       submitData.append('skuCode', formData.skuCode);
       submitData.append('description', formData.description);
       submitData.append('category', formData.category);
       submitData.append('tags', JSON.stringify(formData.tags));
 
-      // Quantity & Pricing
+      
       submitData.append('currentQuantity', formData.currentQuantity);
       submitData.append('minimumQuantity', formData.minimumQuantity);
       submitData.append('unit', formData.unit);
       submitData.append('purchasePrice', formData.purchasePrice);
       submitData.append('sellingPrice', formData.sellingPrice);
 
-      // Supplier Information
+      
       const supplier = {
         name: formData.supplierName,
         contactPerson: formData.contactPerson,
@@ -650,7 +650,7 @@ const InventoryForm = () => {
       submitData.append('reorderPoint', formData.reorderPoint);
       submitData.append('minOrderQuantity', formData.minOrderQuantity);
 
-      // Images
+      
       formData.images.forEach((image, index) => {
         if (image instanceof File) {
           submitData.append('images', image);
@@ -658,7 +658,7 @@ const InventoryForm = () => {
       });
       submitData.append('primaryImageIndex', formData.primaryImageIndex);
 
-      // Make API request
+      
       let response;
       if (isEditMode) {
         response = await api.put(`/inventory/${id}`, submitData, {
@@ -670,10 +670,10 @@ const InventoryForm = () => {
         });
       }
 
-      // Clear draft on successful submission
+      
       clearDraft();
 
-      // Show success message
+      
       const successMessage = isEditMode
         ? 'Inventory item updated successfully'
         : 'Inventory item created successfully';
@@ -684,12 +684,12 @@ const InventoryForm = () => {
         message: successMessage,
       });
 
-      // Check for low stock warning
+      
       if (formData.currentQuantity <= formData.minimumQuantity) {
         showWarning(`Stock level is at or below minimum threshold for ${formData.itemName}`);
       }
 
-      // Redirect after short delay
+      
       setTimeout(() => {
         navigate('/inventory');
       }, 1500);
@@ -705,7 +705,7 @@ const InventoryForm = () => {
     }
   };
 
-  // Cancel and go back
+  
   const handleCancel = () => {
     if (window.confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
       clearDraft();
@@ -727,7 +727,7 @@ const InventoryForm = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8 px-4 sm:px-6 lg:px-8 pb-20 sm:pb-8">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
+        {}
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             {isEditMode ? 'Edit Inventory Item' : 'Add New Inventory Item'}
@@ -738,7 +738,7 @@ const InventoryForm = () => {
               : 'Fill in the details to add a new item to your inventory'}
           </p>
 
-          {/* Prominent SKU Display */}
+          {}
           {formData.skuCode && (
             <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg">
               <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -804,7 +804,7 @@ const InventoryForm = () => {
           </div>
         </div>
 
-        {/* Alert */}
+        {}
         {alert && (
           <div className="mb-6">
             <Alert
@@ -817,10 +817,10 @@ const InventoryForm = () => {
           </div>
         )}
 
-        {/* Form */}
+        {}
         <form onSubmit={handleSubmit} onKeyDown={handleKeyDown}>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-            {/* Step 0: Basic Information */}
+            {}
             {currentStep === 0 && (
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
@@ -1208,23 +1208,7 @@ const InventoryForm = () => {
                       <input
                         type="file"
                         multiple
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        onKeyDown={(e) => {
-                          // Absolutely prevent Enter key on file input
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            e.stopPropagation();
-                          }
-                        }}
-                        className="hidden"
-                        disabled={uploadingImages}
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                {/* Image Previews */}
+                        accept="image}
                 {imagePreviews.length > 0 && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
@@ -1246,7 +1230,7 @@ const InventoryForm = () => {
                             className="w-full h-32 object-cover"
                           />
 
-                          {/* Primary Badge */}
+                          {}
                           {formData.primaryImageIndex === index && (
                             <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
                               Primary
@@ -1297,7 +1281,7 @@ const InventoryForm = () => {
             )}
           </div>
 
-          {/* Navigation Buttons */}
+          {}
           <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
             <div className="flex gap-3 order-2 sm:order-1">
               {currentStep > 0 && (

@@ -24,10 +24,10 @@ import {
   Clock,
 } from 'lucide-react';
 
-// API Configuration
+
 const API_BASE_URL = 'http://localhost:5000/api';
 
-// Reusable Card Component
+
 const Card = ({ children, className = '' }) => {
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
@@ -51,7 +51,7 @@ const ReportCard = ({
   return (
     <Card className="p-6 hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
       <div className="flex flex-col h-full">
-        {/* Header with Icon */}
+        {}
         <div className="flex items-start justify-between mb-4">
           <div className={`p-3 rounded-lg ${iconBgColor}`}>
             <Icon className={`w-6 h-6 ${iconColor}`} />
@@ -66,7 +66,7 @@ const ReportCard = ({
           )}
         </div>
 
-        {/* Title and Description */}
+        {}
         <div className="flex-1 mb-4">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
           <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
@@ -107,7 +107,7 @@ const ReportCard = ({
   );
 };
 
-// Quick Stats Component
+
 const QuickStat = ({ icon: Icon, label, value, change, changeType }) => {
   const isPositive = changeType === 'positive';
   const changeColor = isPositive ? 'text-green-600' : 'text-red-600';

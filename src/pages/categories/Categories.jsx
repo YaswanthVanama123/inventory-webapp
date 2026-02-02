@@ -15,9 +15,9 @@ const Categories = () => {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
 
-  // Modal states
+  
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
+  const [modalMode, setModalMode] = useState('add'); 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [form, setForm] = useState({ value: '', label: '' });
   const [modalLoading, setModalLoading] = useState(false);
@@ -29,7 +29,7 @@ const Categories = () => {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const response = await settingsService.getCategories(true); // Include inactive
+      const response = await settingsService.getCategories(true); 
       const categoriesData = response?.data?.categories || [];
       setCategories(categoriesData);
     } catch (error) {
@@ -61,10 +61,10 @@ const Categories = () => {
       return;
     }
 
-    // Check for duplicates
+    
     const normalizedValue = form.value.trim().toLowerCase();
     const isDuplicate = categories.some(cat => {
-      // If editing, exclude the current category from duplicate check
+      
       if (modalMode === 'edit' && selectedCategory && cat._id === selectedCategory._id) {
         return false;
       }
@@ -133,7 +133,7 @@ const Categories = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Inventory Categories

@@ -18,10 +18,10 @@ const InvoiceList = () => {
   const { isAdmin } = useAuth();
   const { showSuccess, showError, showInfo } = useContext(ToastContext);
 
-  // State management
+  
   const [searchParams, setSearchParams] = useSearchParams();
   
-  // Initialize state from URL params
+  
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,24 +35,24 @@ const InvoiceList = () => {
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page')) || 1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [viewMode, setViewMode] = useState('table'); // 'table' or 'card'
+  const [viewMode, setViewMode] = useState('table'); 
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
 
-  // Email modal state
+  
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [emailAddress, setEmailAddress] = useState('');
   const [emailMessage, setEmailMessage] = useState('');
   const [sendingEmail, setSendingEmail] = useState(false);
 
-  // Delete confirmation modal state
+  
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [invoiceToDelete, setInvoiceToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
   const [itemsPerPage, setItemsPerPage] = useState(15);
 
-  // Fetch invoices whenever filters change
+  
   useEffect(() => {
     fetchInvoices();
   }, [searchTerm, statusFilter, paymentStatusFilter, dateFrom, dateTo, currentPage, itemsPerPage]);
@@ -143,7 +143,7 @@ const InvoiceList = () => {
 
   const handlePageSizeChange = (newSize) => {
     setItemsPerPage(newSize);
-    setCurrentPage(1); // Reset to first page when changing page size
+    setCurrentPage(1); 
   };
 
   const handleCreateInvoice = () => {
@@ -203,7 +203,7 @@ const InvoiceList = () => {
       showSuccess(`Successfully deleted invoice "${invoiceToDelete.invoiceNumber}"`);
       setDeleteModalOpen(false);
       setInvoiceToDelete(null);
-      fetchInvoices(); // Refresh the list
+      fetchInvoices(); 
     } catch (err) {
       console.error('Error deleting invoice:', err);
       showError(err.message || 'Failed to delete invoice');
@@ -214,7 +214,7 @@ const InvoiceList = () => {
 
   const handleDownloadPDF = (id, invoiceNumber) => {
     try {
-      // Open PDF in new tab
+      
       const pdfUrl = `${api.defaults.baseURL}/invoices/${id}/pdf`;
       window.open(pdfUrl, '_blank');
       showInfo(`Downloading invoice ${invoiceNumber}`);
@@ -223,7 +223,7 @@ const InvoiceList = () => {
     }
   };
 
-  // Badge variant helpers
+  
   const getStatusBadgeVariant = (status) => {
     const variants = {
       draft: 'default',
@@ -243,7 +243,7 @@ const InvoiceList = () => {
     return variants[paymentStatus?.toLowerCase()] || 'default';
   };
 
-  // Format currency
+  
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -251,7 +251,7 @@ const InvoiceList = () => {
     }).format(amount || 0);
   };
 
-  // Format date
+  
   const formatDate = (date) => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleDateString('en-US', {
@@ -261,7 +261,7 @@ const InvoiceList = () => {
     });
   };
 
-  // Status filter options
+  
   const statusOptions = [
     { value: '', label: 'All Statuses' },
     { value: 'draft', label: 'Draft' },
@@ -270,7 +270,7 @@ const InvoiceList = () => {
     { value: 'cancelled', label: 'Cancelled' },
   ];
 
-  // Payment status filter options
+  
   const paymentStatusOptions = [
     { value: '', label: 'All Payment Statuses' },
     { value: 'pending', label: 'Pending' },
@@ -278,10 +278,10 @@ const InvoiceList = () => {
     { value: 'overdue', label: 'Overdue' },
   ];
 
-  // Check if filters are active
+  
   const hasActiveFilters = searchTerm || statusFilter || paymentStatusFilter || dateFrom || dateTo;
 
-  // Loading state
+  
   if (loading && invoices.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -316,10 +316,10 @@ const InvoiceList = () => {
         </div>
       </div>
 
-      {/* Filters and Search */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="space-y-4">
-          {/* Search Bar */}
+          {}
           <div className="w-full">
             <SearchBar
               value={searchTerm}
@@ -340,7 +340,7 @@ const InvoiceList = () => {
               fullWidth
             />
 
-            {/* Payment Status Filter */}
+            {}
             <Select
               name="paymentStatus"
               value={paymentStatusFilter}
@@ -349,7 +349,7 @@ const InvoiceList = () => {
               fullWidth
             />
 
-            {/* Date From */}
+            {}
             <Input
               type="date"
               name="dateFrom"
@@ -359,7 +359,7 @@ const InvoiceList = () => {
               fullWidth
             />
 
-            {/* Date To */}
+            {}
             <Input
               type="date"
               name="dateTo"
@@ -386,7 +386,7 @@ const InvoiceList = () => {
               </Button>
             )}
 
-            {/* View Mode Toggle */}
+            {}
             <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1 ml-auto">
               <button
                 onClick={() => setViewMode('table')}
@@ -419,7 +419,7 @@ const InvoiceList = () => {
         </div>
       </div>
 
-      {/* Error State */}
+      {}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-center gap-3">
@@ -431,7 +431,7 @@ const InvoiceList = () => {
         </div>
       )}
 
-      {/* Content Area */}
+      {}
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
           <LoadingSpinner size="lg" text="Loading..." className="mx-auto" />
@@ -461,7 +461,7 @@ const InvoiceList = () => {
         </div>
       ) : (
         <>
-          {/* Table View (Desktop) */}
+          {}
           {viewMode === 'table' && (
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
               <div className="overflow-x-auto">

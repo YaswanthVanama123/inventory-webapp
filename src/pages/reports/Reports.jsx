@@ -76,7 +76,7 @@ const Reports = () => {
     },
   ];
 
-  // Generate quick preview data for charts
+  
   const getPreviewChartData = () => {
     if (!dashboardData?.recentSales) return [];
 
@@ -101,7 +101,7 @@ const Reports = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
@@ -128,7 +128,7 @@ const Reports = () => {
           </div>
         </div>
 
-        {/* Quick Date Filters */}
+        {}
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             onClick={() => handleQuickDateRange(7)}
@@ -254,7 +254,7 @@ const Reports = () => {
           </div>
         </div>
 
-        {/* Orders Preview */}
+        {}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-900">Orders Overview (7 Days)</h2>

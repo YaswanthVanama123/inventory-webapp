@@ -1,24 +1,15 @@
 import * as colors from '../constants/colors';
 
-/**
- * Design System Theme
- * Complete design tokens for consistent styling across the application
- *
- * Features:
- * - WCAG AA compliant color palette
- * - Mobile-first responsive breakpoints
- * - Consistent spacing and typography scales
- * - Accessible design patterns
- */
+
 
 const theme = {
-  // ========================================
-  // COLOR PALETTE
-  // ========================================
+  
+  
+  
   colors: {
     ...colors,
 
-    // Quick access to common colors
+    
     primary: colors.primary[500],
     primaryHover: colors.primary[600],
     primaryActive: colors.primary[700],
@@ -55,11 +46,11 @@ const theme = {
     borderSecondary: colors.border.secondary,
   },
 
-  // ========================================
-  // TYPOGRAPHY
-  // ========================================
+  
+  
+  
   typography: {
-    // Font families
+    
     fontFamily: {
       sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
       serif: 'Georgia, Cambria, "Times New Roman", Times, serif',
@@ -67,24 +58,24 @@ const theme = {
       display: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
     },
 
-    // Font sizes (mobile-first, scales up on larger screens)
+    
     fontSize: {
-      xs: '0.75rem',      // 12px
-      sm: '0.875rem',     // 14px
-      base: '1rem',       // 16px
-      lg: '1.125rem',     // 18px
-      xl: '1.25rem',      // 20px
-      '2xl': '1.5rem',    // 24px
-      '3xl': '1.875rem',  // 30px
-      '4xl': '2.25rem',   // 36px
-      '5xl': '3rem',      // 48px
-      '6xl': '3.75rem',   // 60px
-      '7xl': '4.5rem',    // 72px
-      '8xl': '6rem',      // 96px
-      '9xl': '8rem',      // 128px
+      xs: '0.75rem',      
+      sm: '0.875rem',     
+      base: '1rem',       
+      lg: '1.125rem',     
+      xl: '1.25rem',      
+      '2xl': '1.5rem',    
+      '3xl': '1.875rem',  
+      '4xl': '2.25rem',   
+      '5xl': '3rem',      
+      '6xl': '3.75rem',   
+      '7xl': '4.5rem',    
+      '8xl': '6rem',      
+      '9xl': '8rem',      
     },
 
-    // Font weights
+    
     fontWeight: {
       thin: '100',
       extralight: '200',
@@ -97,7 +88,7 @@ const theme = {
       black: '900',
     },
 
-    // Line heights
+    
     lineHeight: {
       none: '1',
       tight: '1.25',
@@ -105,13 +96,13 @@ const theme = {
       normal: '1.5',
       relaxed: '1.625',
       loose: '2',
-      // Specific use cases
+      
       heading: '1.2',
       body: '1.6',
       caption: '1.4',
     },
 
-    // Letter spacing
+    
     letterSpacing: {
       tighter: '-0.05em',
       tight: '-0.025em',
@@ -121,7 +112,7 @@ const theme = {
       widest: '0.1em',
     },
 
-    // Text styles (pre-configured combinations)
+    
     styles: {
       h1: {
         fontSize: '3rem',
@@ -206,62 +197,62 @@ const theme = {
     },
   },
 
-  // ========================================
-  // SPACING SCALE
-  // ========================================
+  
+  
+  
   spacing: {
     0: '0',
-    1: '0.25rem',   // 4px
-    2: '0.5rem',    // 8px
-    3: '0.75rem',   // 12px
-    4: '1rem',      // 16px
-    5: '1.25rem',   // 20px
-    6: '1.5rem',    // 24px
-    7: '1.75rem',   // 28px
-    8: '2rem',      // 32px
-    9: '2.25rem',   // 36px
-    10: '2.5rem',   // 40px
-    11: '2.75rem',  // 44px
-    12: '3rem',     // 48px
-    14: '3.5rem',   // 56px
-    16: '4rem',     // 64px
-    20: '5rem',     // 80px
-    24: '6rem',     // 96px
-    28: '7rem',     // 112px
-    32: '8rem',     // 128px
-    36: '9rem',     // 144px
-    40: '10rem',    // 160px
-    44: '11rem',    // 176px
-    48: '12rem',    // 192px
-    52: '13rem',    // 208px
-    56: '14rem',    // 224px
-    60: '15rem',    // 240px
-    64: '16rem',    // 256px
-    72: '18rem',    // 288px
-    80: '20rem',    // 320px
-    96: '24rem',    // 384px
+    1: '0.25rem',   
+    2: '0.5rem',    
+    3: '0.75rem',   
+    4: '1rem',      
+    5: '1.25rem',   
+    6: '1.5rem',    
+    7: '1.75rem',   
+    8: '2rem',      
+    9: '2.25rem',   
+    10: '2.5rem',   
+    11: '2.75rem',  
+    12: '3rem',     
+    14: '3.5rem',   
+    16: '4rem',     
+    20: '5rem',     
+    24: '6rem',     
+    28: '7rem',     
+    32: '8rem',     
+    36: '9rem',     
+    40: '10rem',    
+    44: '11rem',    
+    48: '12rem',    
+    52: '13rem',    
+    56: '14rem',    
+    60: '15rem',    
+    64: '16rem',    
+    72: '18rem',    
+    80: '20rem',    
+    96: '24rem',    
   },
 
-  // ========================================
-  // BORDER RADIUS
-  // ========================================
+  
+  
+  
   borderRadius: {
     none: '0',
-    xs: '0.125rem',   // 2px
-    sm: '0.25rem',    // 4px
-    base: '0.375rem', // 6px
-    md: '0.5rem',     // 8px
-    lg: '0.75rem',    // 12px
-    xl: '1rem',       // 16px
-    '2xl': '1.5rem',  // 24px
-    '3xl': '2rem',    // 32px
-    full: '9999px',   // Fully rounded
-    circle: '50%',    // Circle
+    xs: '0.125rem',   
+    sm: '0.25rem',    
+    base: '0.375rem', 
+    md: '0.5rem',     
+    lg: '0.75rem',    
+    xl: '1rem',       
+    '2xl': '1.5rem',  
+    '3xl': '2rem',    
+    full: '9999px',   
+    circle: '50%',    
   },
 
-  // ========================================
-  // SHADOWS
-  // ========================================
+  
+  
+  
   shadows: {
     none: 'none',
     xs: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
@@ -273,16 +264,16 @@ const theme = {
     '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
     inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
 
-    // Colored shadows
+    
     primary: `0 10px 15px -3px ${colors.alpha.primary[30]}, 0 4px 6px -4px ${colors.alpha.primary[20]}`,
     secondary: `0 10px 15px -3px ${colors.alpha.secondary[30]}, 0 4px 6px -4px ${colors.alpha.secondary[20]}`,
 
-    // Focus shadows (for accessibility)
+    
     focusPrimary: `0 0 0 3px ${colors.alpha.primary[30]}`,
     focusSecondary: `0 0 0 3px ${colors.alpha.secondary[30]}`,
     focusError: `0 0 0 3px ${colors.error[200]}`,
 
-    // Elevation system
+    
     elevation1: '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)',
     elevation2: '0 3px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12)',
     elevation3: '0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.10)',
@@ -290,11 +281,11 @@ const theme = {
     elevation5: '0 20px 40px rgba(0, 0, 0, 0.2)',
   },
 
-  // ========================================
-  // BREAKPOINTS (Mobile-First)
-  // ========================================
+  
+  
+  
   breakpoints: {
-    // Pixel values
+    
     values: {
       xs: 0,
       sm: 640,
@@ -304,7 +295,7 @@ const theme = {
       '2xl': 1536,
     },
 
-    // Media query helpers
+    
     up: (breakpoint) => {
       const breakpoints = {
         xs: 0,
@@ -355,11 +346,11 @@ const theme = {
     },
   },
 
-  // ========================================
-  // ANIMATIONS & TRANSITIONS
-  // ========================================
+  
+  
+  
   transitions: {
-    // Duration
+    
     duration: {
       fastest: '100ms',
       fast: '150ms',
@@ -369,7 +360,7 @@ const theme = {
       slowest: '500ms',
     },
 
-    // Timing functions
+    
     easing: {
       linear: 'linear',
       easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
@@ -380,7 +371,7 @@ const theme = {
       bounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
     },
 
-    // Common transitions
+    
     default: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1)',
     color: 'color 150ms cubic-bezier(0.4, 0, 0.2, 1)',
     background: 'background-color 200ms cubic-bezier(0.4, 0, 0.2, 1)',
@@ -389,16 +380,16 @@ const theme = {
     shadow: 'box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1)',
     border: 'border 150ms cubic-bezier(0.4, 0, 0.2, 1)',
 
-    // Component-specific transitions
+    
     button: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
     modal: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
     dropdown: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1)',
     tooltip: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
   },
 
-  // Animation keyframes (for use in styled-components or CSS-in-JS)
+  
   animations: {
-    // Fade animations
+    
     fadeIn: {
       from: { opacity: 0 },
       to: { opacity: 1 },
@@ -408,7 +399,7 @@ const theme = {
       to: { opacity: 0 },
     },
 
-    // Slide animations
+    
     slideInUp: {
       from: { transform: 'translateY(20px)', opacity: 0 },
       to: { transform: 'translateY(0)', opacity: 1 },
@@ -426,7 +417,7 @@ const theme = {
       to: { transform: 'translateX(0)', opacity: 1 },
     },
 
-    // Scale animations
+    
     scaleIn: {
       from: { transform: 'scale(0.95)', opacity: 0 },
       to: { transform: 'scale(1)', opacity: 1 },
@@ -436,25 +427,25 @@ const theme = {
       to: { transform: 'scale(0.95)', opacity: 0 },
     },
 
-    // Spin animation
+    
     spin: {
       from: { transform: 'rotate(0deg)' },
       to: { transform: 'rotate(360deg)' },
     },
 
-    // Pulse animation
+    
     pulse: {
       '0%, 100%': { opacity: 1 },
       '50%': { opacity: 0.5 },
     },
 
-    // Bounce animation
+    
     bounce: {
       '0%, 100%': { transform: 'translateY(0)' },
       '50%': { transform: 'translateY(-10px)' },
     },
 
-    // Shake animation
+    
     shake: {
       '0%, 100%': { transform: 'translateX(0)' },
       '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-5px)' },
@@ -462,15 +453,15 @@ const theme = {
     },
   },
 
-  // ========================================
-  // Z-INDEX SCALE
-  // ========================================
+  
+  
+  
   zIndex: {
-    // Base layers
+    
     base: 0,
     hide: -1,
 
-    // Component layers (in ascending order)
+    
     dropdown: 1000,
     sticky: 1100,
     fixed: 1200,
@@ -480,21 +471,21 @@ const theme = {
     tooltip: 1600,
     notification: 1700,
 
-    // Top-level layers
+    
     toast: 1800,
     spotlight: 1900,
     max: 2000,
 
-    // Special cases
+    
     behind: -1,
     auto: 'auto',
   },
 
-  // ========================================
-  // COMPONENT SIZES
-  // ========================================
+  
+  
+  
   sizes: {
-    // Container max-widths
+    
     container: {
       sm: '640px',
       md: '768px',
@@ -503,7 +494,7 @@ const theme = {
       '2xl': '1536px',
     },
 
-    // Common component sizes
+    
     button: {
       sm: '32px',
       base: '40px',
@@ -538,17 +529,17 @@ const theme = {
     },
   },
 
-  // ========================================
-  // ACCESSIBILITY
-  // ========================================
+  
+  
+  
   accessibility: {
-    // Focus visible styles
+    
     focusVisible: {
       outline: `3px solid ${colors.primary[500]}`,
       outlineOffset: '2px',
     },
 
-    // Skip link styles
+    
     skipLink: {
       position: 'absolute',
       top: '-40px',
@@ -560,7 +551,7 @@ const theme = {
       zIndex: 2000,
     },
 
-    // Screen reader only
+    
     srOnly: {
       position: 'absolute',
       width: '1px',
@@ -573,10 +564,10 @@ const theme = {
       borderWidth: 0,
     },
 
-    // Minimum touch target size (WCAG 2.1 Level AAA)
+    
     minTouchTarget: '44px',
 
-    // Contrast ratios (WCAG AA compliant)
+    
     contrastRatios: {
       normalText: 4.5,
       largeText: 3,
@@ -584,11 +575,11 @@ const theme = {
     },
   },
 
-  // ========================================
-  // UTILITIES
-  // ========================================
+  
+  
+  
   utilities: {
-    // Max width constraints
+    
     maxWidth: {
       xs: '20rem',
       sm: '24rem',
@@ -605,7 +596,7 @@ const theme = {
       prose: '65ch',
     },
 
-    // Aspect ratios
+    
     aspectRatio: {
       square: '1 / 1',
       video: '16 / 9',
@@ -614,7 +605,7 @@ const theme = {
       ultrawide: '21 / 9',
     },
 
-    // Common filters
+    
     filters: {
       blur: {
         none: 'blur(0)',

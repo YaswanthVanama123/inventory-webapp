@@ -1,13 +1,10 @@
 import React from 'react';
 
-/**
- * Example Dashboard Page
- * Shows how to structure a page that will be displayed within the MainLayout
- */
+
 const Dashboard = () => {
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <h1 className="text-3xl font-bold text-slate-900 mb-2">Dashboard</h1>
         <p className="text-slate-600">Welcome to your inventory management dashboard</p>
@@ -33,7 +30,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Stat Card 2 */}
+        {}
         <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div>

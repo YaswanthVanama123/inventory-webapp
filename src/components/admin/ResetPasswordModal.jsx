@@ -20,14 +20,14 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState(null);
 
-  // Password strength state
+  
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     label: '',
     color: '',
   });
 
-  // Reset form when modal opens/closes
+  
   useEffect(() => {
     if (!isOpen) {
       setFormData({
@@ -42,7 +42,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
     }
   }, [isOpen]);
 
-  // Calculate password strength
+  
   const calculatePasswordStrength = (password) => {
     if (!password) {
       return { score: 0, label: '', color: '' };
@@ -50,11 +50,11 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
 
     let score = 0;
 
-    // Length check
+    
     if (password.length >= 8) score++;
     if (password.length >= 12) score++;
 
-    // Character variety checks
+    
     if (/[a-z]/.test(password)) score++;
     if (/[A-Z]/.test(password)) score++;
     if (/[0-9]/.test(password)) score++;
@@ -77,7 +77,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
     return { score, label, color };
   };
 
-  // Update password strength when password changes
+  
   useEffect(() => {
     if (formData.newPassword) {
       const strength = calculatePasswordStrength(formData.newPassword);
@@ -87,7 +87,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
     }
   }, [formData.newPassword]);
 
-  // Handle input changes
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -95,22 +95,22 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
       [name]: value,
     }));
 
-    // Clear error for this field
+    
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
 
-    // Clear alert
+    
     if (alert) {
       setAlert(null);
     }
   };
 
-  // Validate form
+  
   const validateForm = () => {
     const newErrors = {};
 
-    // New password validation
+    
     if (!formData.newPassword) {
       newErrors.newPassword = 'New password is required';
     } else if (formData.newPassword.length < 8) {
@@ -119,7 +119,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
       newErrors.newPassword = 'Password must contain uppercase, lowercase, and numbers';
     }
 
-    // Confirm password validation
+    
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm the password';
     } else if (formData.newPassword !== formData.confirmPassword) {
@@ -130,7 +130,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAlert(null);
@@ -169,9 +169,9 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
         message: 'Password reset successfully!',
       });
 
-      // Close modal after a short delay
+      
       setTimeout(() => {
-        onClose(true); // Pass true to indicate success
+        onClose(true); 
       }, 1500);
     } catch (err) {
       console.error('Error resetting password:', err);
@@ -237,7 +237,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
           </Alert>
         )}
 
-        {/* New Password */}
+        {}
         <div>
           <div className="relative">
             <Input
@@ -264,7 +264,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
             </button>
           </div>
 
-          {/* Password Strength Indicator */}
+          {}
           {formData.newPassword && (
             <div className="mt-3">
               <div className="flex items-center justify-between mb-1">

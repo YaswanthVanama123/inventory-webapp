@@ -5,7 +5,7 @@ const Toast = ({ message, type = 'info', onClose }) => {
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    // Trigger slide-in animation
+    
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
   }, []);
@@ -97,7 +97,7 @@ const Toast = ({ message, type = 'info', onClose }) => {
       `}
       role="alert"
     >
-      {/* Icon */}
+      {}
       <div className={`flex-shrink-0 ${styles.icon}`}>
         <svg
           className="w-6 h-6"
@@ -109,7 +109,7 @@ const Toast = ({ message, type = 'info', onClose }) => {
         </svg>
       </div>
 
-      {/* Message */}
+      {}
       <div className={`flex-1 ${styles.text} text-sm font-medium`}>
         {message}
       </div>

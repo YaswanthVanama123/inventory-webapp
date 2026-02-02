@@ -4,18 +4,16 @@ import ErrorFallback from '../components/common/ErrorFallback';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 
-/**
- * Component that intentionally throws errors for testing
- */
+
 const ErrorThrower = ({ shouldThrow, errorType = 'render' }) => {
   const [count, setCount] = useState(0);
 
-  // Throw error on render
+  
   if (shouldThrow && errorType === 'render') {
     throw new Error('Test render error: Component intentionally failed during render');
   }
 
-  // Throw error on event handler
+  
   const handleClick = () => {
     if (errorType === 'event') {
       throw new Error('Test event error: Button click handler failed');
@@ -23,7 +21,7 @@ const ErrorThrower = ({ shouldThrow, errorType = 'render' }) => {
     setCount(count + 1);
   };
 
-  // Throw error on async operation
+  
   const handleAsyncError = async () => {
     if (errorType === 'async') {
       await new Promise((_, reject) => {
@@ -111,7 +109,7 @@ const ErrorBoundaryDemo = () => {
           </p>
         </div>
 
-        {/* Info Card */}
+        {}
         <Card className="mb-6 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
           <div className="flex items-start gap-3">
             <svg
@@ -140,7 +138,7 @@ const ErrorBoundaryDemo = () => {
           </div>
         </Card>
 
-        {/* Scenario Selection */}
+        {}
         <Card title="Select a Test Scenario" className="mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {scenarios.map((s) => (
@@ -203,7 +201,7 @@ const ErrorBoundaryDemo = () => {
           </ErrorBoundary>
         </Card>
 
-        {/* Code Examples */}
+        {}
         <Card title="Usage Examples">
           <div className="space-y-4">
             <div>

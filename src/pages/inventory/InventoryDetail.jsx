@@ -17,35 +17,35 @@ const InventoryDetail = () => {
   const { user, isAdmin, isEmployee } = useAuth();
   const { showSuccess, showError } = useToast();
 
-  // State management
+  
   const [item, setItem] = useState(null);
   const [stockHistory, setStockHistory] = useState([]);
   const [activityLogs, setActivityLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('info'); // info, history, supplier
+  const [activeTab, setActiveTab] = useState('info'); 
 
-  // Image gallery state
+  
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
 
-  // Modal states
+  
   const [updateStockModal, setUpdateStockModal] = useState(false);
   const [uploadImagesModal, setUploadImagesModal] = useState(false);
   const [deleteConfirmModal, setDeleteConfirmModal] = useState(false);
   const [deleteImageModal, setDeleteImageModal] = useState(false);
   const [imageToDelete, setImageToDelete] = useState(null);
 
-  // Form states
+  
   const [stockQuantity, setStockQuantity] = useState('');
   const [stockAction, setStockAction] = useState('add');
   const [stockReason, setStockReason] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Fetch item details and history
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -72,7 +72,7 @@ const InventoryDetail = () => {
     fetchData();
   }, [id]);
 
-  // Touch handlers for mobile swipe
+  
   const handleTouchStart = (e) => {
     setTouchStart(e.targetTouches[0].clientX);
   };
@@ -99,7 +99,7 @@ const InventoryDetail = () => {
     setTouchEnd(0);
   };
 
-  // Handle stock update
+  
   const handleUpdateStock = async () => {
     try {
       setActionLoading(true);
@@ -111,7 +111,7 @@ const InventoryDetail = () => {
 
       showSuccess('Stock updated successfully');
 
-      // Refresh data
+      
       const [itemResponse, historyResponse] = await Promise.all([
         inventoryService.getById(id),
         inventoryService.getHistory(id),
@@ -120,7 +120,7 @@ const InventoryDetail = () => {
       setItem(itemResponse.data.item);
       setStockHistory(historyResponse.data || []);
 
-      // Reset form
+      
       setStockQuantity('');
       setStockReason('');
       setUpdateStockModal(false);
@@ -134,7 +134,7 @@ const InventoryDetail = () => {
     }
   };
 
-  // Handle image upload
+  
   const handleUploadImages = async () => {
     try {
       setActionLoading(true);
@@ -142,11 +142,11 @@ const InventoryDetail = () => {
 
       showSuccess('Images uploaded successfully');
 
-      // Refresh data
+      
       const itemResponse = await inventoryService.getById(id);
       setItem(itemResponse.data.item);
 
-      // Reset form
+      
       setSelectedFiles([]);
       setUploadImagesModal(false);
       setError(null);
@@ -159,7 +159,7 @@ const InventoryDetail = () => {
     }
   };
 
-  // Handle delete item
+  
   const handleDeleteItem = async () => {
     try {
       setActionLoading(true);
@@ -175,7 +175,7 @@ const InventoryDetail = () => {
     }
   };
 
-  // Helper function to get image path (handle both string and object formats)
+  
   const getImagePath = (image) => {
     let path = '';
 
@@ -185,12 +185,12 @@ const InventoryDetail = () => {
       path = image?.path || '/placeholder-product.png';
     }
 
-    // If it's already a full URL (from ImgBB or other source), use it directly
+    
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
 
-    // For legacy local images
+    
     if (path.startsWith('/uploads')) {
       const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
       return `${backendUrl}${path}`;
@@ -199,13 +199,13 @@ const InventoryDetail = () => {
     return path;
   };
 
-  // Helper function to get image ID
+  
   const getImageId = (image) => {
     if (typeof image === 'object' && image?._id) return image._id;
     return null;
   };
 
-  // Handle delete image
+  
   const handleDeleteImage = (image) => {
     const imageId = getImageId(image);
     if (!imageId) {
@@ -225,11 +225,11 @@ const InventoryDetail = () => {
 
       showSuccess('Image removed successfully');
 
-      // Refresh data
+      
       const itemResponse = await inventoryService.getById(id);
       setItem(itemResponse.data.item);
 
-      // Reset selected image if needed
+      
       if (selectedImage >= (itemResponse.data.item.images?.length || 0)) {
         setSelectedImage(Math.max(0, (itemResponse.data.item.images?.length || 1) - 1));
       }
@@ -244,14 +244,14 @@ const InventoryDetail = () => {
     }
   };
 
-  // Calculate profit margin
+  
   const calculateProfitMargin = () => {
     if (!item?.purchasePrice || !item?.sellingPrice) return 0;
     const profit = item.sellingPrice - item.purchasePrice;
     return ((profit / item.purchasePrice) * 100).toFixed(2);
   };
 
-  // Get stock badge variant
+  
   const getStockBadgeVariant = () => {
     if (!item) return 'default';
     if (item.currentStock === 0) return 'danger';
@@ -259,7 +259,7 @@ const InventoryDetail = () => {
     return 'success';
   };
 
-  // Check if low stock
+  
   const isLowStock = () => {
     return item && item.currentStock <= item.lowStockThreshold && item.currentStock > 0;
   };

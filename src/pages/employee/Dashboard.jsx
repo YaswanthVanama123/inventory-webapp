@@ -13,7 +13,7 @@ const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  // State management
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({
@@ -32,7 +32,7 @@ const EmployeeDashboard = () => {
     reason: '',
   });
 
-  // Fetch dashboard data
+  
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -42,20 +42,20 @@ const EmployeeDashboard = () => {
     setError(null);
 
     try {
-      // Fetch all inventory items to calculate stats
+      
       const inventoryResponse = await inventoryService.getAll({ limit: 1000 });
       const items = inventoryResponse.data.items || [];
 
-      // Calculate total items
+      
       const totalItems = items.length;
 
-      // Calculate low stock items
+      
       const lowStockItemsData = items.filter(
         (item) => item.currentStock <= item.minimumStock
       );
       const lowStockCount = lowStockItemsData.length;
 
-      // Calculate items updated today
+      
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const itemsUpdatedToday = items.filter((item) => {
@@ -70,22 +70,22 @@ const EmployeeDashboard = () => {
         itemsUpdatedToday,
       });
 
-      // Get recent updates (last 5 items updated)
+      
       const sortedItems = [...items].sort(
         (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
       );
       setRecentUpdates(sortedItems.slice(0, 5));
 
-      // Set low stock items for the alerts section
+      
       setLowStockItems(lowStockItemsData.slice(0, 5));
 
-      // Fetch recent activity from reportService
+      
       try {
         const activityResponse = await reportService.recentActivity(10);
         setRecentActivity(activityResponse.data.activities || []);
       } catch (activityErr) {
         console.warn('Could not fetch recent activity:', activityErr);
-        // Use fallback data from items
+        
         setRecentActivity([]);
       }
     } catch (err) {
@@ -97,7 +97,7 @@ const EmployeeDashboard = () => {
     }
   };
 
-  // Format date and time
+  
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString('en-US', {
@@ -109,7 +109,7 @@ const EmployeeDashboard = () => {
     });
   };
 
-  // Format time ago
+  
   const getTimeAgo = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -124,7 +124,7 @@ const EmployeeDashboard = () => {
     return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
   };
 
-  // Navigation handlers
+  
   const handleUpdateStock = () => {
     navigate('/inventory');
   };
@@ -141,7 +141,7 @@ const EmployeeDashboard = () => {
     navigate(`/inventory/${itemId}`);
   };
 
-  // Quick stock update handler
+  
   const handleQuickStockUpdate = async (e) => {
     e.preventDefault();
 
@@ -160,7 +160,7 @@ const EmployeeDashboard = () => {
 
       showToast('success', `Stock ${quickUpdateData.action === 'add' ? 'added to' : quickUpdateData.action === 'remove' ? 'removed from' : 'updated for'} ${selectedItem.itemName}`);
 
-      // Reset form
+      
       setSelectedItem(null);
       setQuickUpdateData({
         quantity: '',
@@ -168,7 +168,7 @@ const EmployeeDashboard = () => {
         reason: '',
       });
 
-      // Refresh dashboard data
+      
       await fetchDashboardData();
     } catch (err) {
       console.error('Error updating stock:', err);
@@ -178,7 +178,7 @@ const EmployeeDashboard = () => {
     }
   };
 
-  // Cancel quick update
+  
   const handleCancelQuickUpdate = () => {
     setSelectedItem(null);
     setQuickUpdateData({

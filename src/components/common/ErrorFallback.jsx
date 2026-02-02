@@ -2,21 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Button from './Button';
 
-/**
- * ErrorFallback Component
- *
- * A reusable error fallback UI component that can be used with ErrorBoundary
- * or as a standalone error display component.
- *
- * @example
- * // As ErrorBoundary fallback
- * <ErrorBoundary fallback={<ErrorFallback title="Form Error" />}>
- *   <FormComponent />
- * </ErrorBoundary>
- *
- * // Standalone
- * {hasError && <ErrorFallback onRetry={handleRetry} />}
- */
+
 const ErrorFallback = ({
   title = 'Something went wrong',
   message = 'An error occurred while loading this content.',
@@ -90,7 +76,7 @@ const ErrorFallback = ({
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
+        xmlns="http:
       >
         <path
           strokeLinecap="round"

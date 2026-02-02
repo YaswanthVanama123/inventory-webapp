@@ -9,7 +9,7 @@ const Pagination = ({
   maxPageNumbers = 5,
   showFirstLast = true,
   className = '',
-  // New props for enhanced pagination
+  
   totalItems = 0,
   itemsPerPage = 10,
   onPageSizeChange,
@@ -65,10 +65,10 @@ const Pagination = ({
 
   return (
     <div className="space-y-4">
-      {/* Result Count and Page Size Selector */}
+      {}
       {(showResultCount || showPageSize) && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          {/* Result Count */}
+          {}
           {showResultCount && totalItems > 0 && (
             <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">
               {getResultCountText()}
@@ -98,13 +98,13 @@ const Pagination = ({
         </div>
       )}
 
-      {/* Pagination Controls */}
+      {}
       {totalPages > 1 && (
         <nav
           className={`flex items-center justify-center gap-2 ${className}`}
           aria-label="Pagination"
         >
-          {/* First Page Button */}
+          {}
           {showFirstLast && currentPage > 1 && (
             <button
               onClick={() => handlePageChange(1)}
@@ -117,7 +117,7 @@ const Pagination = ({
             </button>
           )}
 
-          {/* Previous Button */}
+          {}
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -129,7 +129,7 @@ const Pagination = ({
             </svg>
           </button>
 
-          {/* Page Numbers */}
+          {}
           {showPageNumbers && (
             <>
               {pages[0] > 1 && (
@@ -156,12 +156,12 @@ const Pagination = ({
             </>
           )}
 
-          {/* Mobile Page Indicator */}
+          {}
           <span className="sm:hidden px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
             {currentPage} / {totalPages}
           </span>
 
-          {/* Next Button */}
+          {}
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
@@ -173,7 +173,7 @@ const Pagination = ({
             </svg>
           </button>
 
-          {/* Last Page Button */}
+          {}
           {showFirstLast && currentPage < totalPages && (
             <button
               onClick={() => handlePageChange(totalPages)}

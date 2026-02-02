@@ -53,7 +53,7 @@ const Modal = ({
       role="dialog"
       aria-modal="true"
     >
-      {/* Overlay */}
+      {}
       <div
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity backdrop-blur-sm"
         onClick={handleOverlayClick}
@@ -105,7 +105,7 @@ const Modal = ({
             {children}
           </div>
 
-          {/* Footer */}
+          {}
           {footer && (
             <div className="flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-b-lg">
               {footer}

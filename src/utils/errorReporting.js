@@ -1,16 +1,6 @@
-/**
- * Error Reporting Utilities
- *
- * Functions for logging and reporting errors to external services
- * or internal logging systems.
- */
 
-/**
- * Log error to console with enhanced formatting
- * @param {Error} error - The error object
- * @param {Object} errorInfo - React error info with component stack
- * @param {Object} context - Additional context information
- */
+
+
 export const logErrorToConsole = (error, errorInfo, context = {}) => {
   console.group('%c Error Occurred ', 'background: #ef4444; color: white; padding: 2px 8px; border-radius: 3px;');
 
@@ -33,23 +23,18 @@ export const logErrorToConsole = (error, errorInfo, context = {}) => {
   console.groupEnd();
 };
 
-/**
- * Report error to external service (e.g., Sentry, LogRocket, Bugsnag)
- * @param {Error} error - The error object
- * @param {Object} errorInfo - React error info with component stack
- * @param {Object} context - Additional context information
- */
-export const reportErrorToService = async (error, errorInfo, context = {}) => {
-  // Example: Sentry integration
-  // if (window.Sentry) {
-  //   window.Sentry.withScope((scope) => {
-  //     scope.setContext('errorInfo', errorInfo);
-  //     scope.setContext('additionalContext', context);
-  //     window.Sentry.captureException(error);
-  //   });
-  // }
 
-  // Example: Custom API endpoint
+export const reportErrorToService = async (error, errorInfo, context = {}) => {
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
   try {
     const errorData = {
       message: error.message,
@@ -62,16 +47,16 @@ export const reportErrorToService = async (error, errorInfo, context = {}) => {
       environment: process.env.NODE_ENV,
     };
 
-    // Uncomment to send to your error reporting API
-    // await fetch('/api/errors/report', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(errorData),
-    // });
+    
+    
+    
+    
+    
+    
+    
+    
 
-    // For now, just log to console in development
+    
     if (process.env.NODE_ENV === 'development') {
       logErrorToConsole(error, errorInfo, context);
     }
@@ -80,11 +65,7 @@ export const reportErrorToService = async (error, errorInfo, context = {}) => {
   }
 };
 
-/**
- * Create an error context object with user and app information
- * @param {Object} additionalContext - Additional context to include
- * @returns {Object} Context object
- */
+
 export const createErrorContext = (additionalContext = {}) => {
   return {
     timestamp: new Date().toISOString(),
@@ -99,14 +80,11 @@ export const createErrorContext = (additionalContext = {}) => {
   };
 };
 
-/**
- * Error handler for Promise rejections
- * @param {PromiseRejectionEvent} event - The unhandled rejection event
- */
+
 export const handleUnhandledRejection = (event) => {
   console.error('Unhandled Promise Rejection:', event.reason);
 
-  // Report to error service
+  
   reportErrorToService(
     new Error(event.reason),
     { componentStack: 'Promise Rejection' },
@@ -114,14 +92,11 @@ export const handleUnhandledRejection = (event) => {
   );
 };
 
-/**
- * Error handler for global errors
- * @param {ErrorEvent} event - The error event
- */
+
 export const handleGlobalError = (event) => {
   console.error('Global Error:', event.error);
 
-  // Report to error service
+  
   reportErrorToService(
     event.error,
     { componentStack: 'Global Error' },
@@ -129,22 +104,18 @@ export const handleGlobalError = (event) => {
   );
 };
 
-/**
- * Initialize global error handlers
- */
+
 export const initializeErrorHandlers = () => {
-  // Handle unhandled promise rejections
+  
   window.addEventListener('unhandledrejection', handleUnhandledRejection);
 
-  // Handle global errors
+  
   window.addEventListener('error', handleGlobalError);
 
   console.log('Global error handlers initialized');
 };
 
-/**
- * Cleanup global error handlers
- */
+
 export const cleanupErrorHandlers = () => {
   window.removeEventListener('unhandledrejection', handleUnhandledRejection);
   window.removeEventListener('error', handleGlobalError);

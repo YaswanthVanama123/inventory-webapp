@@ -20,7 +20,7 @@ import {
   ChevronUp,
 } from 'lucide-react';
 
-// Priority badge colors
+
 const PRIORITY_COLORS = {
   High: {
     bg: 'bg-red-100',
@@ -42,7 +42,7 @@ const PRIORITY_COLORS = {
   },
 };
 
-// Reusable Card Component
+
 const Card = ({ children, className = '' }) => {
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
@@ -94,7 +94,7 @@ const PriorityBadge = ({ priority }) => {
   );
 };
 
-// Item Card Component (Mobile View)
+
 const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
   const [expanded, setExpanded] = useState(false);
   const colors = PRIORITY_COLORS[item.priority] || PRIORITY_COLORS.Low;
@@ -102,7 +102,7 @@ const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
   return (
     <Card className={`p-4 border-l-4 ${colors.border.replace('border-', 'border-l-')}`}>
       <div className="space-y-3">
-        {/* Header */}
+        {}
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <h3 className="text-base font-semibold text-gray-900 truncate">
@@ -129,7 +129,7 @@ const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
           </div>
         </div>
 
-        {/* Supplier & Order Info */}
+        {}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600">Supplier:</span>
@@ -149,7 +149,7 @@ const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
           </div>
         </div>
 
-        {/* Expandable Supplier Details */}
+        {}
         {item.supplier.email && (
           <button
             onClick={() => setExpanded(!expanded)}
@@ -221,25 +221,25 @@ const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
   );
 };
 
-// Main Low Stock Report Component
+
 const LowStockReport = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [filteredItems, setFilteredItems] = useState([]);
   const [error, setError] = useState(null);
 
-  // Filters
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
   const [supplierFilter, setSupplierFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Derived data
+  
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
 
-  // Fetch low stock report data
+  
   const fetchLowStockReport = async () => {
     setLoading(true);
     setError(null);
@@ -251,7 +251,7 @@ const LowStockReport = () => {
         setData(response.data);
         setFilteredItems(response.data.items);
 
-        // Extract unique categories and suppliers
+        
         const uniqueCategories = [...new Set(response.data.items.map(item => item.category))];
         const uniqueSuppliers = [...new Set(response.data.items.map(item => item.supplier.name))];
 
@@ -270,13 +270,13 @@ const LowStockReport = () => {
     fetchLowStockReport();
   }, []);
 
-  // Apply filters
+  
   useEffect(() => {
     if (!data) return;
 
     let filtered = [...data.items];
 
-    // Search filter
+    
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -287,17 +287,17 @@ const LowStockReport = () => {
       );
     }
 
-    // Category filter
+    
     if (categoryFilter) {
       filtered = filtered.filter(item => item.category === categoryFilter);
     }
 
-    // Priority filter
+    
     if (priorityFilter) {
       filtered = filtered.filter(item => item.priority === priorityFilter);
     }
 
-    // Supplier filter
+    
     if (supplierFilter) {
       filtered = filtered.filter(item => item.supplier.name === supplierFilter);
     }
@@ -305,7 +305,7 @@ const LowStockReport = () => {
     setFilteredItems(filtered);
   }, [searchQuery, categoryFilter, priorityFilter, supplierFilter, data]);
 
-  // Handler functions
+  
   const handleEmailSupplier = (item) => {
     const subject = encodeURIComponent(`Reorder Request: ${item.itemName}`);
     const body = encodeURIComponent(
@@ -323,7 +323,7 @@ const LowStockReport = () => {
   };
 
   const handleCreateOrder = (item) => {
-    // TODO: Implement order creation logic
+    
     alert(`Creating order for ${item.itemName} - ${item.suggestedOrderQuantity} ${item.unit}`);
   };
 
@@ -382,11 +382,11 @@ const LowStockReport = () => {
 
   const hasActiveFilters = searchQuery || categoryFilter || priorityFilter || supplierFilter;
 
-  // Loading state
+  
   if (loading) {
     return (
       <div className="space-y-6">
-        {/* Header Skeleton */}
+        {}
         <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-lg shadow-lg p-6 md:p-8">
           <div className="animate-pulse">
             <div className="h-8 bg-white/20 rounded w-64 mb-2"></div>

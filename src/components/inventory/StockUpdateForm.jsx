@@ -22,7 +22,7 @@ const StockUpdateForm = ({
   const [alert, setAlert] = useState(null);
   const [previewStock, setPreviewStock] = useState(item?.currentStock || 0);
 
-  // Action configuration for visual feedback
+  
   const actionConfig = {
     add: {
       label: 'Add Stock',
@@ -109,7 +109,7 @@ const StockUpdateForm = ({
       newErrors.quantity = `Cannot remove more than available stock (${item?.currentStock || 0})`;
     }
 
-    // Validate reason
+    
     if (!formData.reason.trim()) {
       newErrors.reason = 'Reason is required';
     } else if (formData.reason.trim().length < 3) {
@@ -127,7 +127,7 @@ const StockUpdateForm = ({
       [name]: value,
     }));
 
-    // Clear error for this field
+    
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -135,7 +135,7 @@ const StockUpdateForm = ({
       }));
     }
 
-    // Clear alert when user starts typing
+    
     if (alert) {
       setAlert(null);
     }
@@ -171,20 +171,20 @@ const StockUpdateForm = ({
         throw new Error(data.message || 'Failed to update stock');
       }
 
-      // Show success message
+      
       setAlert({
         variant: 'success',
         message: `Stock updated successfully! New stock level: ${data.data?.currentStock || previewStock}`,
       });
 
-      // Reset form
+      
       setFormData({
         action: 'add',
         quantity: '',
         reason: '',
       });
 
-      // Call success callback
+      
       if (onSuccess) {
         setTimeout(() => {
           onSuccess(data.data);
@@ -217,7 +217,7 @@ const StockUpdateForm = ({
 
   return (
     <div className={standalone ? 'max-w-2xl mx-auto p-4 sm:p-6' : ''}>
-      {/* Item Information */}
+      {}
       <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -276,7 +276,7 @@ const StockUpdateForm = ({
           </div>
         </div>
 
-        {/* Quantity Input */}
+        {}
         <div>
           <Input
             label="Quantity"

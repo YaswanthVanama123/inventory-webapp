@@ -32,10 +32,10 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-// API Configuration
+
 const API_BASE_URL = 'http://localhost:5000/api';
 
-// Reusable Card Component
+
 const Card = ({ children, className = '' }) => {
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
@@ -92,7 +92,7 @@ const SummaryCard = ({ title, value, change, changeType, icon: Icon, loading, pr
   );
 };
 
-// Chart Skeleton Loader
+
 const ChartSkeleton = () => (
   <div className="animate-pulse">
     <div className="h-4 bg-gray-200 rounded w-32 mb-4"></div>
@@ -116,7 +116,7 @@ const ErrorState = ({ message, onRetry }) => (
   </div>
 );
 
-// Custom Tooltip for Charts
+
 const CustomTooltip = ({ active, payload, label, prefix = '', suffix = '' }) => {
   if (active && payload && payload.length) {
     return (
@@ -159,7 +159,7 @@ const SalesReport = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Filter States
+  
   const [dateRange, setDateRange] = useState({
     startDate: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
@@ -168,7 +168,7 @@ const SalesReport = () => {
   const [groupBy, setGroupBy] = useState('day');
   const [chartType, setChartType] = useState('line');
 
-  // Fetch Sales Report Data
+  
   const fetchSalesReport = async () => {
     setLoading(true);
     setError(null);
@@ -199,7 +199,7 @@ const SalesReport = () => {
       console.error('Error fetching sales report:', err);
       setError(err.message || 'Failed to load sales report');
 
-      // Use mock data for development
+      
       setReportData(getMockSalesData());
     } finally {
       setLoading(false);
@@ -210,7 +210,7 @@ const SalesReport = () => {
     fetchSalesReport();
   }, [dateRange, selectedCategory, groupBy]);
 
-  // Mock data for development
+  
   const getMockSalesData = () => ({
     summary: {
       totalSales: 284500,
@@ -294,7 +294,7 @@ const SalesReport = () => {
     categories: ['All', 'Electronics', 'Clothing', 'Food & Beverage', 'Books', 'Other'],
   });
 
-  // Export handlers
+  
   const handleExportCSV = () => {
     if (!reportData) return;
 
@@ -337,7 +337,7 @@ const SalesReport = () => {
 
   return (
     <div className="space-y-4 md:space-y-6 p-4 md:p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
+      {}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-4 md:p-6 lg:p-8 text-white">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div className="flex-1">

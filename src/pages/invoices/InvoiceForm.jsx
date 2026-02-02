@@ -12,73 +12,73 @@ const InvoiceForm = () => {
   const isEditMode = Boolean(id);
   const { showSuccess, showError, showInfo } = useContext(ToastContext);
 
-  // Form data state
+  
   const [formData, setFormData] = useState({
-    // Customer Information
+    
     customerName: '',
     customerEmail: '',
     customerPhone: '',
     customerAddress: '',
 
-    // Invoice Details
+    
     invoiceDate: new Date().toISOString().split('T')[0],
     dueDate: '',
     notes: '',
 
-    // Items
+    
     items: [],
 
-    // Financial
-    discountType: 'percentage', // 'percentage' or 'fixed'
+    
+    discountType: 'percentage', 
     discountValue: 0,
     taxRate: 0,
   });
 
-  // UI States
+  
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
 
-  // Item search states
+  
   const [inventoryItems, setInventoryItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
 
-  // Load existing invoice in edit mode
+  
   useEffect(() => {
     if (isEditMode) {
       loadInvoiceData();
     }
   }, [id]);
 
-  // Load inventory items
+  
   useEffect(() => {
     loadInventoryItems();
   }, []);
 
-  // Auto-save draft functionality
+  
   useEffect(() => {
     if (!isEditMode) {
       const timer = setTimeout(() => {
         saveDraft();
-      }, 5000); // Auto-save after 5 seconds of inactivity
+      }, 5000); 
 
       return () => clearTimeout(timer);
     }
   }, [formData]);
 
-  // Load draft on mount
+  
   useEffect(() => {
     if (!isEditMode) {
       loadDraft();
     }
   }, []);
 
-  // Search inventory items
+  
   useEffect(() => {
     if (searchQuery.trim()) {
       performSearch();
@@ -135,7 +135,7 @@ const InvoiceForm = () => {
         item.sku?.toLowerCase().includes(query) ||
         item.category?.toLowerCase().includes(query)
     );
-    setSearchResults(results.slice(0, 10)); // Limit to 10 results
+    setSearchResults(results.slice(0, 10)); 
     setShowSearchDropdown(results.length > 0);
     setSearchLoading(false);
   };
@@ -167,7 +167,7 @@ const InvoiceForm = () => {
     localStorage.removeItem('invoiceDraft');
   };
 
-  // Handle input changes
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -175,7 +175,7 @@ const InvoiceForm = () => {
       [name]: value,
     }));
 
-    // Clear error for this field
+    
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -184,10 +184,10 @@ const InvoiceForm = () => {
     }
   };
 
-  // Item management
+  
   const handleAddItem = (inventoryItem) => {
     const newItem = {
-      id: Date.now(), // Temporary ID for UI
+      id: Date.now(), 
       inventoryId: inventoryItem._id,
       itemName: inventoryItem.itemName,
       sku: inventoryItem.sku,
@@ -201,7 +201,7 @@ const InvoiceForm = () => {
       items: [...prev.items, newItem],
     }));
 
-    // Clear search
+    
     setSearchQuery('');
     setSearchResults([]);
     setShowSearchDropdown(false);
@@ -225,7 +225,7 @@ const InvoiceForm = () => {
     }));
   };
 
-  // Calculations
+  
   const calculateItemSubtotal = (item) => {
     return (item.quantity || 0) * (item.unitPrice || 0);
   };
@@ -251,11 +251,11 @@ const InvoiceForm = () => {
     return calculateSubtotal() - calculateDiscount() + calculateTax();
   };
 
-  // Validation
+  
   const validateForm = () => {
     const newErrors = {};
 
-    // Customer Information
+    
     if (!formData.customerName.trim()) {
       newErrors.customerName = 'Customer name is required';
     } else if (formData.customerName.trim().length < 2) {
@@ -280,7 +280,7 @@ const InvoiceForm = () => {
       newErrors.customerAddress = 'Please provide a complete address';
     }
 
-    // Invoice Details
+    
     if (!formData.invoiceDate) {
       newErrors.invoiceDate = 'Invoice date is required';
     }
@@ -291,7 +291,7 @@ const InvoiceForm = () => {
       newErrors.dueDate = 'Due date must be on or after invoice date';
     }
 
-    // Items
+    
     if (formData.items.length === 0) {
       newErrors.items = 'At least one item is required';
     } else {
@@ -314,7 +314,7 @@ const InvoiceForm = () => {
       });
     }
 
-    // Financial
+    
     if (formData.discountValue < 0) {
       newErrors.discountValue = 'Discount cannot be negative';
     } else if (isNaN(formData.discountValue)) {
@@ -324,7 +324,7 @@ const InvoiceForm = () => {
     }
 
     if (formData.taxRate === '' || formData.taxRate === null) {
-      // Tax rate is optional, but if provided must be valid
+      
     } else if (isNaN(formData.taxRate)) {
       newErrors.taxRate = 'Tax rate must be a valid number';
     } else if (formData.taxRate < 0 || formData.taxRate > 100) {
@@ -345,7 +345,7 @@ const InvoiceForm = () => {
     return cleaned.length >= 10;
   };
 
-  // Submit form
+  
   const handleSubmit = async (e, isDraft = false) => {
     e.preventDefault();
 
@@ -395,12 +395,12 @@ const InvoiceForm = () => {
         response = await api.post('/invoices', submitData);
       }
 
-      // Clear draft on successful submission
+      
       if (!isDraft) {
         clearDraft();
       }
 
-      // Show success message
+      
       const successMessage = isDraft
         ? 'Invoice draft saved successfully'
         : isEditMode
@@ -413,7 +413,7 @@ const InvoiceForm = () => {
         message: successMessage,
       });
 
-      // Redirect after short delay
+      
       setTimeout(() => {
         navigate('/invoices');
       }, 1500);
@@ -455,7 +455,7 @@ const InvoiceForm = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
+        {}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             {isEditMode ? 'Edit Invoice' : 'Create New Invoice'}
@@ -472,7 +472,7 @@ const InvoiceForm = () => {
           )}
         </div>
 
-        {/* Alert */}
+        {}
         {alert && (
           <div className="mb-6">
             <Alert
@@ -485,9 +485,9 @@ const InvoiceForm = () => {
           </div>
         )}
 
-        {/* Form */}
+        {}
         <form onSubmit={handleSubmit}>
-          {/* Section 1: Customer Information */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
               <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -561,7 +561,7 @@ const InvoiceForm = () => {
             </div>
           </div>
 
-          {/* Section 2: Invoice Details */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
               <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -621,7 +621,7 @@ const InvoiceForm = () => {
               Items
             </h2>
 
-            {/* Item Search */}
+            {}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
                 Search and Add Items
@@ -641,7 +641,7 @@ const InvoiceForm = () => {
                   </svg>
                 </div>
 
-                {/* Search Dropdown */}
+                {}
                 {showSearchDropdown && searchResults.length > 0 && (
                   <div className="absolute z-10 mt-2 w-full bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 max-h-64 overflow-y-auto">
                     {searchResults.map((item) => (
@@ -687,7 +687,7 @@ const InvoiceForm = () => {
               )}
             </div>
 
-            {/* Items Table */}
+            {}
             {formData.items.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -787,7 +787,7 @@ const InvoiceForm = () => {
                   </tbody>
                 </table>
 
-                {/* Running Subtotal */}
+                {}
                 <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <div className="flex justify-between items-center text-lg">
                     <span className="font-medium text-gray-700 dark:text-gray-300">Running Subtotal:</span>
@@ -809,7 +809,7 @@ const InvoiceForm = () => {
             )}
           </div>
 
-          {/* Section 4: Financial Summary */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
               <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -819,7 +819,7 @@ const InvoiceForm = () => {
             </h2>
 
             <div className="space-y-6">
-              {/* Discount */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-1">
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
@@ -853,7 +853,7 @@ const InvoiceForm = () => {
                 </div>
               </div>
 
-              {/* Tax Rate */}
+              {}
               <Input
                 label="Tax Rate (%)"
                 type="number"
@@ -868,7 +868,7 @@ const InvoiceForm = () => {
                 fullWidth
               />
 
-              {/* Summary Calculations */}
+              {}
               <div className="mt-8 space-y-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex justify-between items-center text-base">
                   <span className="text-gray-700 dark:text-gray-300">Subtotal:</span>

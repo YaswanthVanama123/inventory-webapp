@@ -7,7 +7,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // State management
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -18,14 +18,14 @@ const Navbar = () => {
     { id: 3, message: 'System update available', unread: false }
   ]);
 
-  // Refs
+  
   const userMenuRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
-  // Get unread notification count
+  
   const unreadCount = notifications.filter(n => n.unread).length;
 
-  // Navigation links based on role
+  
   const getNavigationLinks = () => {
     const baseLinks = [
       { name: 'Dashboard', path: '/dashboard', roles: ['admin', 'employee'] }
@@ -54,7 +54,7 @@ const Navbar = () => {
 
   const navigationLinks = getNavigationLinks();
 
-  // Handle scroll effect for sticky navbar
+  
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -64,7 +64,7 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close dropdowns when clicking outside
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
@@ -76,18 +76,18 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Close mobile menu on route change
+  
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Handle logout
+  
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
 
-  // Handle search
+  
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -96,7 +96,7 @@ const Navbar = () => {
     }
   };
 
-  // Get initials from user's full name
+  
   const getInitials = (name) => {
     if (!name) return 'U';
     return name
@@ -117,7 +117,7 @@ const Navbar = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo and Brand */}
+          {}
           <div className="flex items-center">
             <Link to="/dashboard" className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
@@ -198,7 +198,7 @@ const Navbar = () => {
               </button>
             </div>
 
-            {/* User Menu */}
+            {}
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -232,7 +232,7 @@ const Navbar = () => {
                 </svg>
               </button>
 
-              {/* User Dropdown Menu */}
+              {}
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
                   <div className="px-4 py-3 border-b border-gray-200">

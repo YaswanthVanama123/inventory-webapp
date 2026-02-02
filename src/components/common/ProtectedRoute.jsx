@@ -8,7 +8,7 @@ import UnauthorizedPage from './UnauthorizedPage';
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
   const { user, loading, isAuthenticated } = useAuth();
 
-  // Show loading spinner while checking authentication
+  
   if (loading) {
     return (
       <LoadingSpinner
@@ -20,23 +20,23 @@ const ProtectedRoute = ({ element, allowedRoles = [] }) => {
     );
   }
 
-  // Redirect to login if not authenticated
+  
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // If no specific roles are required, just check authentication
+  
   if (!allowedRoles || allowedRoles.length === 0) {
     return element;
   }
 
-  // Check if user has one of the allowed roles
+  
   const userRole = user?.role?.toLowerCase();
   const hasRequiredRole = allowedRoles.some(
     (role) => role.toLowerCase() === userRole
   );
 
-  // Show unauthorized page if user doesn't have required role
+  
   if (!hasRequiredRole) {
     return <UnauthorizedPage userRole={userRole} requiredRoles={allowedRoles} />;
   }

@@ -1,17 +1,14 @@
 import api from './api';
 
-/**
- * Settings Service
- * API calls for managing system settings (categories, units, SKU)
- */
 
-// Get all settings
+
+
 export const getSettings = async () => {
   const response = await api.get('/settings');
   return response;
 };
 
-// Categories
+
 export const getCategories = async (includeInactive = false) => {
   const response = await api.get('/settings/categories', {
     params: { includeInactive },
@@ -34,7 +31,7 @@ export const deleteCategory = async (id) => {
   return response;
 };
 
-// Units
+
 export const getUnits = async (includeInactive = false) => {
   const response = await api.get('/settings/units', {
     params: { includeInactive },
@@ -57,7 +54,7 @@ export const deleteUnit = async (id) => {
   return response;
 };
 
-// SKU Generation
+
 export const generateSKU = async () => {
   const response = await api.post('/settings/generate-sku');
   return response;

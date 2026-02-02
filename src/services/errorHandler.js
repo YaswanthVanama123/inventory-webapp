@@ -1,18 +1,10 @@
 import { getErrorMessage, isErrorType } from './api';
 
-/**
- * Error Handler Utility
- * Provides consistent error handling across all services
- */
 
-/**
- * Handle API errors with specific status code handling
- * @param {Object} error - The error object from API
- * @param {Object} customMessages - Custom error messages for specific cases
- * @returns {Object} Formatted error with user-friendly message
- */
+
+
 export const handleApiError = (error, customMessages = {}) => {
-  // Handle validation errors (400, 422)
+  
   if (isErrorType(error, 'validation')) {
     return {
       ...error,
@@ -22,7 +14,7 @@ export const handleApiError = (error, customMessages = {}) => {
     };
   }
 
-  // Handle authentication errors (401)
+  
   if (isErrorType(error, 'auth')) {
     return {
       ...error,
@@ -31,7 +23,7 @@ export const handleApiError = (error, customMessages = {}) => {
     };
   }
 
-  // Handle permission errors (403)
+  
   if (isErrorType(error, 'permission')) {
     return {
       ...error,
@@ -40,7 +32,7 @@ export const handleApiError = (error, customMessages = {}) => {
     };
   }
 
-  // Handle not found errors (404)
+  
   if (isErrorType(error, 'notfound')) {
     return {
       ...error,
@@ -49,7 +41,7 @@ export const handleApiError = (error, customMessages = {}) => {
     };
   }
 
-  // Handle conflict errors (409)
+  
   if (isErrorType(error, 'conflict')) {
     return {
       ...error,
@@ -59,7 +51,7 @@ export const handleApiError = (error, customMessages = {}) => {
     };
   }
 
-  // Handle network errors
+  
   if (isErrorType(error, 'network')) {
     return {
       ...error,
@@ -68,7 +60,7 @@ export const handleApiError = (error, customMessages = {}) => {
     };
   }
 
-  // Handle timeout errors
+  
   if (isErrorType(error, 'timeout')) {
     return {
       ...error,
@@ -77,7 +69,7 @@ export const handleApiError = (error, customMessages = {}) => {
     };
   }
 
-  // Handle server errors (500+)
+  
   if (isErrorType(error, 'server')) {
     return {
       ...error,
@@ -86,19 +78,14 @@ export const handleApiError = (error, customMessages = {}) => {
     };
   }
 
-  // Default error handling
+  
   return {
     ...error,
     userMessage: customMessages.default || getErrorMessage(error),
   };
 };
 
-/**
- * Wrapper for service methods with automatic error handling
- * @param {Function} serviceMethod - The service method to wrap
- * @param {Object} customMessages - Custom error messages
- * @returns {Function} Wrapped method with error handling
- */
+
 export const withErrorHandling = (serviceMethod, customMessages = {}) => {
   return async (...args) => {
     try {
@@ -109,11 +96,7 @@ export const withErrorHandling = (serviceMethod, customMessages = {}) => {
   };
 };
 
-/**
- * Extract validation errors from error object
- * @param {Object} error - The error object
- * @returns {Object|null} Validation errors object or null
- */
+
 export const getValidationErrors = (error) => {
   if (!error) return null;
 
@@ -128,11 +111,7 @@ export const getValidationErrors = (error) => {
   return null;
 };
 
-/**
- * Check if error should show retry option
- * @param {Object} error - The error object
- * @returns {boolean} True if retry is recommended
- */
+
 export const shouldRetry = (error) => {
   if (!error) return false;
 

@@ -3,25 +3,7 @@ import PropTypes from 'prop-types';
 import Button from './Button';
 import Card from './Card';
 
-/**
- * ErrorBoundary Component
- *
- * Catches JavaScript errors anywhere in the child component tree,
- * logs those errors, and displays a fallback UI instead of crashing the whole app.
- *
- * Features:
- * - Catches and handles React component errors
- * - Displays user-friendly error message
- * - Shows "Reload Page" button for recovery
- * - Logs error details to console in development
- * - Shows detailed error information in development mode
- * - Matches application theme (Tailwind CSS)
- *
- * @example
- * <ErrorBoundary fallback={<CustomErrorUI />}>
- *   <YourComponent />
- * </ErrorBoundary>
- */
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -34,45 +16,45 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI
+    
     return { hasError: true };
   }
 
   componentDidCatch(error, errorInfo) {
-    // Log error details to console
+    
     console.error('ErrorBoundary caught an error:', error);
     console.error('Error component stack:', errorInfo.componentStack);
 
-    // Update state with error details
+    
     this.setState(prevState => ({
       error,
       errorInfo,
       errorCount: prevState.errorCount + 1,
     }));
 
-    // Call custom error handler if provided
+    
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
 
-    // TODO: Send error to error reporting service (e.g., Sentry, LogRocket)
-    // Example: logErrorToService(error, errorInfo);
+    
+    
   }
 
   handleReload = () => {
-    // Reset error state and reload the page
+    
     this.setState({
       hasError: false,
       error: null,
       errorInfo: null,
     });
 
-    // Full page reload
+    
     window.location.reload();
   };
 
   handleReset = () => {
-    // Reset error state without reloading (try to recover)
+    
     this.setState({
       hasError: false,
       error: null,
@@ -82,17 +64,17 @@ class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      // Use custom fallback if provided
+      
       if (this.props.fallback) {
         return this.props.fallback;
       }
 
-      // Default error UI
+      
       return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4">
           <div className="w-full max-w-2xl">
             <Card padding="lg">
-              {/* Error Icon */}
+              {}
               <div className="flex justify-center mb-6">
                 <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
                   <svg
@@ -123,7 +105,7 @@ class ErrorBoundary extends React.Component {
                 </p>
               </div>
 
-              {/* Development Mode Error Details */}
+              {}
               {process.env.NODE_ENV === 'development' && this.state.error && (
                 <div className="mb-6">
                   <details className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
@@ -150,7 +132,7 @@ class ErrorBoundary extends React.Component {
                       </div>
                     )}
 
-                    {/* Component Stack */}
+                    {}
                     {this.state.errorInfo && this.state.errorInfo.componentStack && (
                       <div>
                         <h4 className="font-semibold text-sm text-red-900 dark:text-red-300 mb-2">
@@ -213,7 +195,7 @@ class ErrorBoundary extends React.Component {
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+                      xmlns="http:
                     >
                       <path
                         strokeLinecap="round"

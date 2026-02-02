@@ -1,16 +1,11 @@
-/**
- * NAVBAR USAGE EXAMPLE
- *
- * This file demonstrates how to integrate the Navbar component
- * into your application with proper routing and authentication.
- */
+
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '../../contexts/AuthContext';
 import Navbar from './Navbar';
 
-// Example page components
+
 const Dashboard = () => (
   <div className="p-6">
     <h1 className="text-2xl font-bold">Dashboard</h1>
@@ -98,21 +93,19 @@ const Login = () => (
   </div>
 );
 
-/**
- * Main App Component with Navbar Integration
- */
+
 function AppWithNavbar() {
   return (
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-gray-50">
-          {/* Navbar Component - Fixed at top */}
+          {}
           <Navbar />
 
-          {/* Main Content Area - Add pt-16 to prevent content hiding under fixed navbar */}
+          {}
           <main className="pt-16">
             <Routes>
-              {/* Dashboard */}
+              {}
               <Route path="/dashboard" element={<Dashboard />} />
 
               {/* Admin Routes */}

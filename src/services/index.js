@@ -1,7 +1,4 @@
-/**
- * Services Index
- * Central export point for all API services
- */
+
 
 export { default as api, setAuthToken, getAuthToken, isAuthenticated } from './api';
 export { default as authService } from './authService';

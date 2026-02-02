@@ -4,45 +4,34 @@ import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
 
-/**
- * User Profile Page
- * Accessible to all authenticated users
- *
- * Features:
- * - Profile Information Display
- * - Change Password
- * - User Preferences
- * - Tabbed Layout
- * - Form Validation
- * - Mobile Responsive
- */
+
 const UserProfile = () => {
   const { user, changePassword, loading } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  // Password change form state
+  
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
 
-  // Preferences state
+  
   const [preferences, setPreferences] = useState({
     emailNotifications: true,
     language: 'en',
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
 
-  // Password validation state
+  
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     label: '',
     color: '',
   });
 
-  // Load preferences from localStorage on mount
+  
   useEffect(() => {
     const savedPreferences = localStorage.getItem('userPreferences');
     if (savedPreferences) {
@@ -50,7 +39,7 @@ const UserProfile = () => {
     }
   }, []);
 
-  // Clear message after 5 seconds
+  
   useEffect(() => {
     if (message.text) {
       const timer = setTimeout(() => {
@@ -60,7 +49,7 @@ const UserProfile = () => {
     }
   }, [message]);
 
-  // Calculate password strength
+  
   useEffect(() => {
     const password = passwordForm.newPassword;
     if (!password) {
@@ -70,17 +59,17 @@ const UserProfile = () => {
 
     let score = 0;
 
-    // Length check
+    
     if (password.length >= 8) score++;
     if (password.length >= 12) score++;
 
-    // Character variety checks
+    
     if (/[a-z]/.test(password)) score++;
     if (/[A-Z]/.test(password)) score++;
     if (/[0-9]/.test(password)) score++;
     if (/[^a-zA-Z0-9]/.test(password)) score++;
 
-    // Determine strength label and color
+    
     let label = '';
     let color = '';
 
@@ -98,7 +87,7 @@ const UserProfile = () => {
     setPasswordStrength({ score, label, color });
   }, [passwordForm.newPassword]);
 
-  // Handle password form input changes
+  
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
     setPasswordForm((prev) => ({
@@ -107,7 +96,7 @@ const UserProfile = () => {
     }));
   };
 
-  // Handle preferences input changes
+  
   const handlePreferencesChange = (e) => {
     const { name, value, type, checked } = e.target;
     setPreferences((prev) => ({
@@ -116,7 +105,7 @@ const UserProfile = () => {
     }));
   };
 
-  // Validate password change form
+  
   const validatePasswordForm = () => {
     const { currentPassword, newPassword, confirmPassword } = passwordForm;
 
@@ -143,7 +132,7 @@ const UserProfile = () => {
     return true;
   };
 
-  // Handle password change submission
+  
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     setMessage({ type: '', text: '' });
@@ -169,7 +158,7 @@ const UserProfile = () => {
     }
   };
 
-  // Handle preferences save
+  
   const handlePreferencesSave = (e) => {
     e.preventDefault();
     setMessage({ type: '', text: '' });
@@ -182,7 +171,7 @@ const UserProfile = () => {
     }
   };
 
-  // Format date for display
+  
   const formatDate = (dateString) => {
     if (!dateString) return 'Never';
     const date = new Date(dateString);
@@ -195,7 +184,7 @@ const UserProfile = () => {
     });
   };
 
-  // Get user initials for avatar
+  
   const getUserInitials = () => {
     if (user?.fullName) {
       const names = user.fullName.split(' ');
@@ -204,7 +193,7 @@ const UserProfile = () => {
     return user?.username?.slice(0, 2).toUpperCase() || 'U';
   };
 
-  // Tab configuration
+  
   const tabs = [
     { id: 'profile', label: 'Profile Information', icon: '👤' },
     { id: 'password', label: 'Change Password', icon: '🔒' },
@@ -213,7 +202,7 @@ const UserProfile = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <h1 className="text-3xl font-bold text-slate-900 mb-2">My Profile</h1>
         <p className="text-slate-600">Manage your account settings and preferences</p>
@@ -226,9 +215,9 @@ const UserProfile = () => {
         </Alert>
       )}
 
-      {/* Tabbed Content */}
+      {}
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-        {/* Tab Navigation */}
+        {}
         <div className="border-b border-slate-200 bg-slate-50">
           <nav className="flex flex-col sm:flex-row -mb-px overflow-x-auto">
             {tabs.map((tab) => (
@@ -262,7 +251,7 @@ const UserProfile = () => {
                   {getUserInitials()}
                 </div>
 
-                {/* User Info */}
+                {}
                 <div className="flex-1 text-center sm:text-left">
                   <h2 className="text-2xl font-bold text-slate-900">{user?.fullName || user?.username}</h2>
                   <p className="text-slate-600 mt-1">{user?.email}</p>
@@ -280,7 +269,7 @@ const UserProfile = () => {
                 </div>
               </div>
 
-              {/* Profile Details */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
                   <label className="block text-sm font-medium text-slate-600 mb-1">Username</label>

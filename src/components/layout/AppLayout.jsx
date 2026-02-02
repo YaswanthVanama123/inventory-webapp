@@ -17,11 +17,11 @@ const AppLayout = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {/* Header */}
+      {}
       <header className="sticky top-0 bg-white border-b border-gray-200 z-50">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
+            {}
             <Link to="/" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">S</span>
@@ -29,7 +29,7 @@ const AppLayout = () => {
               <span className="text-xl font-bold text-gray-900">SEO Platform</span>
             </Link>
 
-            {/* Desktop Navigation */}
+            {}
             <div className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => (
                 <Link
@@ -49,7 +49,7 @@ const AppLayout = () => {
               ))}
             </div>
 
-            {/* Desktop Auth Buttons */}
+            {}
             <div className="hidden md:flex items-center gap-4">
               <Link
                 to="/login"
@@ -145,7 +145,7 @@ const AppLayout = () => {
               </p>
               <div className="flex gap-4">
                 <a
-                  href="https://twitter.com"
+                  href="https:
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -180,7 +180,7 @@ const AppLayout = () => {
               </div>
             </div>
 
-            {/* Product */}
+            {}
             <div>
               <h3 className="text-sm font-semibold text-gray-900 mb-4">Product</h3>
               <ul className="space-y-3">

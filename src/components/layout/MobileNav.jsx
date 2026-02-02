@@ -10,21 +10,9 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 
-/**
- * Mobile Bottom Navigation Component
- *
- * Features:
- * - Fixed bottom navigation bar (mobile only)
- * - 4-5 main navigation items with icons
- * - Active state highlighting
- * - Icon + label display
- * - Hidden on desktop (> md breakpoint)
- * - Smooth transitions
- * - Safe area padding for iOS
- * - Role-based navigation (Admin vs Employee)
- */
 
-// Navigation items configuration
+
+
 const getNavItems = (isAdmin) => {
   const baseItems = [
     {
@@ -48,7 +36,7 @@ const getNavItems = (isAdmin) => {
     showFor: ['admin'],
   };
 
-  // Return items based on role
+  
   if (isAdmin) {
     return [...baseItems, adminItem];
   }
@@ -56,7 +44,7 @@ const getNavItems = (isAdmin) => {
   return baseItems;
 };
 
-// More menu items (shown in slide-up menu)
+
 const getMoreMenuItems = (isAdmin) => {
   const adminItems = [
     { label: 'Users', path: '/users' },
@@ -79,27 +67,27 @@ const MobileNav = () => {
   const navItems = getNavItems(isAdmin);
   const moreMenuItems = getMoreMenuItems(isAdmin);
 
-  // Check if current path is active
+  
   const isActiveRoute = (path) => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
-  // Check if any "More" menu item is active
+  
   const isMoreMenuActive = moreMenuItems.some(item => isActiveRoute(item.path));
 
-  // Toggle more menu
+  
   const toggleMoreMenu = () => {
     setIsMoreMenuOpen(!isMoreMenuOpen);
   };
 
-  // Close more menu when navigating
+  
   const handleMoreMenuItemClick = () => {
     setIsMoreMenuOpen(false);
   };
 
   return (
     <>
-      {/* Overlay for More Menu */}
+      {}
       {isMoreMenuOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300"
@@ -108,7 +96,7 @@ const MobileNav = () => {
         />
       )}
 
-      {/* More Menu Slide-up Panel */}
+      {}
       <div
         className={`
           fixed bottom-0 left-0 right-0 z-50 md:hidden
@@ -118,7 +106,7 @@ const MobileNav = () => {
         `}
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {/* Handle bar */}
+        {}
         <div className="flex justify-center pt-3 pb-2">
           <div className="w-12 h-1.5 bg-slate-300 rounded-full" />
         </div>
@@ -135,7 +123,7 @@ const MobileNav = () => {
           </button>
         </div>
 
-        {/* Menu Items */}
+        {}
         <nav className="px-4 py-4 pb-6">
           <ul className="space-y-1">
             {moreMenuItems.map((item) => {

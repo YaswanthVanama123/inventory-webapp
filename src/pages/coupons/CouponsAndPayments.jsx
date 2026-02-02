@@ -15,9 +15,9 @@ import {
 
 const CouponsAndPayments = () => {
   const { showSuccess, showError } = useContext(ToastContext);
-  const [activeTab, setActiveTab] = useState('coupons'); // 'coupons' or 'payments'
+  const [activeTab, setActiveTab] = useState('coupons'); 
 
-  // Coupons state
+  
   const [coupons, setCoupons] = useState([]);
   const [couponStats, setCouponStats] = useState({ active: 0, inactive: 0, expired: 0, total: 0 });
   const [loadingCoupons, setLoadingCoupons] = useState(true);
@@ -35,7 +35,7 @@ const CouponsAndPayments = () => {
     isActive: true,
   });
 
-  // Payment types state
+  
   const [paymentTypes, setPaymentTypes] = useState([]);
   const [loadingPayments, setLoadingPayments] = useState(true);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -49,7 +49,7 @@ const CouponsAndPayments = () => {
     order: 0,
   });
 
-  // Fetch data on mount
+  
   useEffect(() => {
     if (activeTab === 'coupons') {
       fetchCoupons();
@@ -59,7 +59,7 @@ const CouponsAndPayments = () => {
     }
   }, [activeTab]);
 
-  // ===== COUPONS FUNCTIONS =====
+  
 
   const fetchCoupons = async () => {
     setLoadingCoupons(true);
@@ -157,7 +157,7 @@ const CouponsAndPayments = () => {
     });
   };
 
-  // ===== PAYMENT TYPES FUNCTIONS =====
+  
 
   const fetchPaymentTypes = async () => {
     setLoadingPayments(true);
@@ -231,7 +231,7 @@ const CouponsAndPayments = () => {
     });
   };
 
-  // Helper functions
+  
   const isCouponExpired = (expiryDate) => {
     return new Date(expiryDate) < new Date();
   };
@@ -243,7 +243,7 @@ const CouponsAndPayments = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-6 lg:px-8 py-8 max-w-[1800px]">
-        {/* Header */}
+        {}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
             <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-md">
@@ -256,7 +256,7 @@ const CouponsAndPayments = () => {
           </p>
         </div>
 
-        {/* Tabs */}
+        {}
         <div className="mb-6 flex gap-4">
           <button
             onClick={() => setActiveTab('coupons')}
@@ -282,10 +282,10 @@ const CouponsAndPayments = () => {
           </button>
         </div>
 
-        {/* Coupons Tab */}
+        {}
         {activeTab === 'coupons' && (
           <>
-            {/* Coupon Stats */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
               <Card padding="lg" className="border border-slate-200 dark:border-gray-700 shadow-sm">
                 <div className="flex items-center justify-between">
@@ -347,7 +347,7 @@ const CouponsAndPayments = () => {
               </Button>
             </div>
 
-            {/* Coupons List */}
+            {}
             {loadingCoupons ? (
               <LoadingSpinner />
             ) : coupons.length === 0 ? (

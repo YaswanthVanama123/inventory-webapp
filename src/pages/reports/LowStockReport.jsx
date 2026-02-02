@@ -111,15 +111,15 @@ const LowStockReport = () => {
   const exportToPDF = () => {
     const doc = new jsPDF();
 
-    // Title
+    
     doc.setFontSize(18);
     doc.text('Low Stock Report', 14, 22);
 
-    // Date
+    
     doc.setFontSize(11);
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 32);
 
-    // Summary
+    
     doc.setFontSize(12);
     doc.text('Summary', 14, 45);
     doc.setFontSize(10);
@@ -134,7 +134,7 @@ const LowStockReport = () => {
     doc.text(`Critical Priority: ${criticalCount}`, 14, 58);
     doc.text(`High Priority: ${highCount}`, 14, 64);
 
-    // Table
+    
     doc.autoTable({
       startY: 75,
       head: [['Item Name', 'SKU', 'Current', 'Min', 'Priority']],
@@ -183,7 +183,7 @@ const LowStockReport = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
@@ -209,7 +209,7 @@ const LowStockReport = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
           <div className="flex items-center justify-between mb-2">
@@ -244,10 +244,10 @@ const LowStockReport = () => {
         </div>
       </div>
 
-      {/* Filters */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Search */}
+          {}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
@@ -276,7 +276,7 @@ const LowStockReport = () => {
         </div>
       </div>
 
-      {/* Desktop Table View */}
+      {}
       <div className="hidden lg:block bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">

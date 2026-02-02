@@ -15,7 +15,7 @@ const UserForm = () => {
   const isEditMode = !!id;
   const { showSuccess, showError, showInfo } = useContext(ToastContext);
 
-  // Form state
+  
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -26,7 +26,7 @@ const UserForm = () => {
     isActive: true,
   });
 
-  // UI state
+  
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -34,14 +34,14 @@ const UserForm = () => {
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState(null);
 
-  // Password strength state
+  
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     label: '',
     color: '',
   });
 
-  // Fetch user data if in edit mode
+  
   useEffect(() => {
     if (isEditMode) {
       fetchUser();
@@ -84,7 +84,7 @@ const UserForm = () => {
     }
   };
 
-  // Calculate password strength
+  
   const calculatePasswordStrength = (password) => {
     if (!password) {
       return { score: 0, label: '', color: '' };
@@ -92,11 +92,11 @@ const UserForm = () => {
 
     let score = 0;
 
-    // Length check
+    
     if (password.length >= 8) score++;
     if (password.length >= 12) score++;
 
-    // Character variety checks
+    
     if (/[a-z]/.test(password)) score++;
     if (/[A-Z]/.test(password)) score++;
     if (/[0-9]/.test(password)) score++;
@@ -119,7 +119,7 @@ const UserForm = () => {
     return { score, label, color };
   };
 
-  // Update password strength when password changes
+  
   useEffect(() => {
     if (!isEditMode && formData.password) {
       const strength = calculatePasswordStrength(formData.password);
@@ -127,7 +127,7 @@ const UserForm = () => {
     }
   }, [formData.password, isEditMode]);
 
-  // Handle input changes
+  
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -135,17 +135,17 @@ const UserForm = () => {
       [name]: type === 'checkbox' ? checked : value,
     }));
 
-    // Clear error for this field
+    
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
-  // Validate form
+  
   const validateForm = () => {
     const newErrors = {};
 
-    // Username validation
+    
     if (!formData.username.trim()) {
       newErrors.username = 'Username is required';
     } else if (formData.username.length < 3) {
@@ -156,14 +156,14 @@ const UserForm = () => {
       newErrors.username = 'Username can only contain letters, numbers, and underscores';
     }
 
-    // Email validation
+    
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Invalid email format (e.g., user@example.com)';
     }
 
-    // Full name validation
+    
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full name is required';
     } else if (formData.fullName.trim().length < 2) {
@@ -172,7 +172,7 @@ const UserForm = () => {
       newErrors.fullName = 'Full name must not exceed 50 characters';
     }
 
-    // Password validation (required for new users, optional for edit)
+    
     if (!isEditMode) {
       if (!formData.password) {
         newErrors.password = 'Password is required';
@@ -188,14 +188,14 @@ const UserForm = () => {
         newErrors.password = 'Password must contain at least one number';
       }
 
-      // Confirm password validation (required for new users)
+      
       if (!formData.confirmPassword) {
         newErrors.confirmPassword = 'Please confirm your password';
       } else if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
       }
     } else if (formData.password) {
-      // If editing and password is provided, validate it
+      
       if (formData.password.length < 8) {
         newErrors.password = 'Password must be at least 8 characters';
       } else if (formData.password.length > 100) {
@@ -204,7 +204,7 @@ const UserForm = () => {
         newErrors.password = 'Password must contain uppercase, lowercase, and numbers';
       }
 
-      // Confirm password validation (required if password is being changed)
+      
       if (!formData.confirmPassword) {
         newErrors.confirmPassword = 'Please confirm your new password';
       } else if (formData.password !== formData.confirmPassword) {
@@ -212,7 +212,7 @@ const UserForm = () => {
       }
     }
 
-    // Role validation
+    
     if (!formData.role) {
       newErrors.role = 'Role is required';
     }
@@ -221,7 +221,7 @@ const UserForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAlert(null);
@@ -245,7 +245,7 @@ const UserForm = () => {
 
       const method = isEditMode ? 'PUT' : 'POST';
 
-      // Prepare data - don't send password if empty in edit mode
+      
       const payload = {
         username: formData.username,
         email: formData.email,
@@ -270,7 +270,7 @@ const UserForm = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        // Handle specific errors
+        
         if (response.status === 409 || data.error?.includes('exists')) {
           setErrors({
             username: data.error?.includes('username') ? 'Username already exists' : '',
@@ -288,7 +288,7 @@ const UserForm = () => {
         message: successMessage,
       });
 
-      // Redirect after a short delay
+      
       setTimeout(() => {
         navigate('/admin/users');
       }, 1500);
@@ -305,7 +305,7 @@ const UserForm = () => {
     }
   };
 
-  // Handle cancel
+  
   const handleCancel = () => {
     navigate('/admin/users');
   };
@@ -324,7 +324,7 @@ const UserForm = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        {/* Header */}
+        {}
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             {isEditMode ? 'Edit User' : 'Add New User'}
@@ -384,7 +384,7 @@ const UserForm = () => {
             helperText="Valid email address required"
           />
 
-          {/* Full Name */}
+          {}
           <Input
             label="Full Name"
             name="fullName"
@@ -426,7 +426,7 @@ const UserForm = () => {
               </button>
             </div>
 
-            {/* Password Strength Indicator (only for new users) */}
+            {}
             {!isEditMode && formData.password && (
               <div className="mt-2">
                 <div className="flex items-center justify-between mb-1">

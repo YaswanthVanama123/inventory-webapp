@@ -41,7 +41,7 @@ import {
   Radar,
 } from 'recharts';
 
-// Custom Tooltip Component with enhanced styling
+
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
@@ -79,7 +79,7 @@ const EnhancedStatCard = ({ title, value, subtitle, change, changeType, icon: Ic
 
   return (
     <div className="group relative bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-xl transition-all duration-300 overflow-hidden">
-      {/* Animated background gradient on hover */}
+      {}
       <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses[color]} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
 
       <div className="relative z-10">
@@ -140,7 +140,7 @@ const EnhancedDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Mock comprehensive dashboard data
+  
   const dashboardData = {
     kpis: {
       totalRevenue: 342580,
@@ -208,21 +208,21 @@ const EnhancedDashboard = () => {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    // Simulate API call
+    
     await new Promise(resolve => setTimeout(resolve, 1000));
     setRefreshing(false);
   };
 
-  // Trend data for sparklines
+  
   const revenueTrendMini = [
     { value: 28 }, { value: 32 }, { value: 29 }, { value: 35 }, { value: 38 }, { value: 42 }, { value: 45 }
   ];
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Header with gradient */}
+      {}
       <div className="relative bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-xl shadow-xl p-8 overflow-hidden">
-        {/* Animated background pattern */}
+        {}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`

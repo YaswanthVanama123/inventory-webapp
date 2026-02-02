@@ -5,7 +5,7 @@ import { ToastProvider } from './contexts/ToastContext';
 import MainLayout from './components/layout/MainLayout';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
-// Loading component
+
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50">
     <div className="text-center">
@@ -15,7 +15,7 @@ const LoadingFallback = () => (
   </div>
 );
 
-// Lazy load page components for code splitting
+
 const Login = lazy(() => import('./pages/Login'));
 const AdminDashboard = lazy(() => import('./pages/admin/EnhancedDashboard'));
 const EmployeeDashboard = lazy(() => import('./pages/employee/Dashboard'));
@@ -43,10 +43,7 @@ const Trash = lazy(() => import('./pages/trash/Trash'));
 const EmployeeActivities = lazy(() => import('./pages/activities/EmployeeActivities'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
-/**
- * Protected Route Component
- * Handles authentication and authorization
- */
+
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
   const { isAuthenticated, isAdmin, loading } = React.useContext(AuthContext);
 
@@ -76,7 +73,7 @@ const DashboardRoute = () => {
     return <LoadingFallback />;
   }
 
-  // Render appropriate dashboard based on role
+  
   if (isAdmin) {
     return <AdminDashboard />;
   } else {
@@ -84,10 +81,7 @@ const DashboardRoute = () => {
   }
 };
 
-/**
- * Root Route Component
- * Redirects to login or dashboard based on authentication
- */
+
 const RootRoute = () => {
   const { isAuthenticated, loading } = React.useContext(AuthContext);
 
@@ -102,9 +96,7 @@ const RootRoute = () => {
   return <Navigate to="/login" replace />;
 };
 
-/**
- * Main App Component
- */
+
 function App() {
   return (
     <ErrorBoundary>
@@ -113,7 +105,7 @@ function App() {
           <Router>
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
-                {/* Root Route */}
+                {}
                 <Route
                   path="/"
                   element={
@@ -123,7 +115,7 @@ function App() {
                   }
                 />
 
-                {/* Public Route */}
+                {}
                 <Route
                   path="/login"
                   element={
@@ -133,7 +125,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Dashboard (role-based) */}
+                {}
                 <Route
                   path="/dashboard"
                   element={

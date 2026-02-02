@@ -14,20 +14,20 @@ const ImageUpload = ({
   const { showToast } = useToast();
   const fileInputRef = useRef(null);
 
-  // State for drag and drop
+  
   const [isDragging, setIsDragging] = useState(false);
 
-  // State for upload progress
+  
   const [uploadProgress, setUploadProgress] = useState({});
 
-  // State for preview images
+  
   const [previews, setPreviews] = useState([]);
 
-  // Initialize previews from existing images
+  
   useEffect(() => {
     if (images && images.length > 0) {
       const newPreviews = images.map((img) => {
-        // If it's a File object, create blob URL
+        
         if (img instanceof File) {
           return {
             url: URL.createObjectURL(img),
@@ -36,7 +36,7 @@ const ImageUpload = ({
             size: img.size,
           };
         }
-        // If it's a URL string
+        
         return {
           url: img,
           file: null,
@@ -50,11 +50,11 @@ const ImageUpload = ({
     }
   }, [images]);
 
-  // Validate file
+  
   const validateFile = (file) => {
     const errors = [];
 
-    // Check file type
+    
     if (!allowedTypes.includes(file.type)) {
       const allowedExtensions = allowedTypes
         .map((type) => type.split('/')[1])
@@ -64,7 +64,7 @@ const ImageUpload = ({
       );
     }
 
-    // Check file size
+    
     const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
     if (file.size > maxSizeInBytes) {
       errors.push(`File size exceeds ${maxSizeInMB}MB limit`);
@@ -73,11 +73,11 @@ const ImageUpload = ({
     return errors;
   };
 
-  // Process and add files
+  
   const processFiles = async (files) => {
     const fileArray = Array.from(files);
 
-    // Check total images limit
+    
     if (images.length + fileArray.length > maxImages) {
       showToast(
         `You can only upload up to ${maxImages} images. Currently: ${images.length}`,
@@ -89,7 +89,7 @@ const ImageUpload = ({
     const validFiles = [];
     const invalidFiles = [];
 
-    // Validate each file
+    
     fileArray.forEach((file) => {
       const errors = validateFile(file);
       if (errors.length === 0) {
@@ -99,21 +99,21 @@ const ImageUpload = ({
       }
     });
 
-    // Show errors for invalid files
+    
     if (invalidFiles.length > 0) {
       invalidFiles.forEach(({ file, errors }) => {
         showToast(`${file.name}: ${errors.join(', ')}`, 'error');
       });
     }
 
-    // Process valid files
+    
     if (validFiles.length > 0) {
-      // Simulate upload progress
+      
       const newProgress = {};
       validFiles.forEach((file, index) => {
         newProgress[file.name] = 0;
 
-        // Simulate progressive upload
+        
         const interval = setInterval(() => {
           setUploadProgress((prev) => {
             const currentProgress = prev[file.name] || 0;
@@ -131,11 +131,11 @@ const ImageUpload = ({
 
       setUploadProgress(newProgress);
 
-      // Add files to images array
+      
       const updatedImages = [...images, ...validFiles];
       onImagesChange(updatedImages);
 
-      // Clear progress after completion
+      
       setTimeout(() => {
         setUploadProgress({});
         showToast(
@@ -148,15 +148,15 @@ const ImageUpload = ({
     }
   };
 
-  // Handle file input change
+  
   const handleFileInputChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       processFiles(e.target.files);
-      e.target.value = ''; // Reset input
+      e.target.value = ''; 
     }
   };
 
-  // Handle drag events
+  
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -184,12 +184,12 @@ const ImageUpload = ({
     }
   };
 
-  // Handle remove image
+  
   const handleRemoveImage = (index) => {
     const updatedImages = images.filter((_, i) => i !== index);
     onImagesChange(updatedImages);
 
-    // Update primary image index if needed
+    
     if (primaryImageIndex === index) {
       onPrimaryImageChange(0);
     } else if (primaryImageIndex > index) {
@@ -199,13 +199,13 @@ const ImageUpload = ({
     showToast('Image removed', 'info');
   };
 
-  // Handle set primary image
+  
   const handleSetPrimary = (index) => {
     onPrimaryImageChange(index);
     showToast('Primary image updated', 'success');
   };
 
-  // Get file size display
+  
   const getFileSizeDisplay = (bytes) => {
     if (bytes === 0) return '';
     const kb = bytes / 1024;
@@ -218,7 +218,7 @@ const ImageUpload = ({
 
   return (
     <div className="space-y-4">
-      {/* Upload Area */}
+      {}
       <div
         className={`
           relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
@@ -331,7 +331,7 @@ const ImageUpload = ({
         </div>
       )}
 
-      {/* Image Previews */}
+      {}
       {previews.length > 0 && (
         <div>
           <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">

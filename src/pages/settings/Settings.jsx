@@ -17,23 +17,23 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [units, setUnits] = useState([]);
-  const [activeTab, setActiveTab] = useState('categories'); // 'categories' or 'units'
+  const [activeTab, setActiveTab] = useState('categories'); 
 
-  // Modal states for categories
+  
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
-  const [categoryModalMode, setCategoryModalMode] = useState('add'); // 'add' or 'edit'
+  const [categoryModalMode, setCategoryModalMode] = useState('add'); 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryForm, setCategoryForm] = useState({ value: '', label: '' });
   const [categoryModalLoading, setCategoryModalLoading] = useState(false);
 
-  // Modal states for units
+  
   const [unitModalOpen, setUnitModalOpen] = useState(false);
-  const [unitModalMode, setUnitModalMode] = useState('add'); // 'add' or 'edit'
+  const [unitModalMode, setUnitModalMode] = useState('add'); 
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [unitForm, setUnitForm] = useState({ value: '', label: '' });
   const [unitModalLoading, setUnitModalLoading] = useState(false);
 
-  // Set active tab based on URL query parameter
+  
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tab = params.get('tab');
@@ -50,11 +50,11 @@ const Settings = () => {
     setLoading(true);
     try {
       const [categoriesRes, unitsRes] = await Promise.all([
-        settingsService.getCategories(true), // Include inactive
-        settingsService.getUnits(true), // Include inactive
+        settingsService.getCategories(true), 
+        settingsService.getUnits(true), 
       ]);
 
-      // Safely extract categories and units - response is already unwrapped by axios interceptor
+      
       const categoriesData = categoriesRes?.categories || [];
       const unitsData = unitsRes?.units || [];
 
@@ -62,7 +62,7 @@ const Settings = () => {
       setUnits(unitsData);
     } catch (error) {
       console.error('Error fetching settings:', error);
-      // Set empty arrays on error to prevent undefined values
+      
       setCategories([]);
       setUnits([]);
       showError(error.message || 'Failed to load settings. Please ensure the server is running.');
@@ -71,7 +71,7 @@ const Settings = () => {
     }
   };
 
-  // Category handlers
+  
   const handleAddCategory = () => {
     setCategoryForm({ value: '', label: '' });
     setCategoryModalMode('add');
@@ -126,7 +126,7 @@ const Settings = () => {
     }
   };
 
-  // Unit handlers
+  
   const handleAddUnit = () => {
     setUnitForm({ value: '', label: '' });
     setUnitModalMode('add');
@@ -212,7 +212,7 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* Tabs */}
+      {}
       <div className="bg-white rounded-lg shadow-sm border border-slate-200">
         <div className="border-b border-slate-200">
           <div className="flex">
@@ -239,7 +239,7 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Categories Tab */}
+        {}
         {activeTab === 'categories' && (
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
@@ -304,7 +304,7 @@ const Settings = () => {
           </div>
         )}
 
-        {/* Units Tab */}
+        {}
         {activeTab === 'units' && (
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
@@ -409,7 +409,7 @@ const Settings = () => {
         </div>
       </Modal>
 
-      {/* Unit Modal */}
+      {}
       <Modal
         isOpen={unitModalOpen}
         onClose={() => !unitModalLoading && setUnitModalOpen(false)}

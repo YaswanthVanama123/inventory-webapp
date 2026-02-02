@@ -1208,7 +1208,14 @@ const InventoryForm = () => {
                       <input
                         type="file"
                         multiple
-                        accept="image}
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
+
                 {imagePreviews.length > 0 && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">

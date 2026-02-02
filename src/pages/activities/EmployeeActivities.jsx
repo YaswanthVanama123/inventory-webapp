@@ -194,7 +194,7 @@ const EmployeeActivities = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-100 text-sm">Total Activities</p>
-                  <h3 className="text-3xl font-bold mt-1">{stats.totalActivities}</h3>
+                  <h3 className="text-3xl font-bold mt-1 text-white">{stats.totalActivities}</h3>
                 </div>
                 <Activity className="w-12 h-12 text-blue-200" />
               </div>
@@ -204,7 +204,7 @@ const EmployeeActivities = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-green-100 text-sm">Most Active</p>
-                  <h3 className="text-lg font-bold mt-1 truncate">
+                  <h3 className="text-lg font-bold mt-1 truncate text-white">
                     {stats.mostActiveEmployees[0]?.fullName || 'N/A'}
                   </h3>
                   <p className="text-green-100 text-sm">
@@ -219,7 +219,7 @@ const EmployeeActivities = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-purple-100 text-sm">Top Action</p>
-                  <h3 className="text-lg font-bold mt-1">
+                  <h3 className="text-lg font-bold mt-1 text-white">
                     {stats.actionBreakdown[0]?._id || 'N/A'}
                   </h3>
                   <p className="text-purple-100 text-sm">
@@ -234,7 +234,7 @@ const EmployeeActivities = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-orange-100 text-sm">Top Resource</p>
-                  <h3 className="text-lg font-bold mt-1">
+                  <h3 className="text-lg font-bold mt-1 text-white">
                     {stats.resourceBreakdown[0]?._id || 'N/A'}
                   </h3>
                   <p className="text-orange-100 text-sm">
@@ -458,8 +458,10 @@ const EmployeeActivities = () => {
                     </div>
 
                     {activity.details && (
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {JSON.stringify(activity.details)}
+                      <div className="text-sm text-gray-600 dark:text-gray-400 overflow-x-auto">
+                        <pre className="whitespace-pre-wrap break-words font-mono text-xs bg-gray-100 dark:bg-gray-900 p-2 rounded">
+                          {JSON.stringify(activity.details, null, 2)}
+                        </pre>
                       </div>
                     )}
                   </div>

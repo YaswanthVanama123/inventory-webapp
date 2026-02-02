@@ -339,6 +339,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   
   const sidebarClasses = `
     fixed top-0 left-0 h-screen
+    flex flex-col
     bg-white dark:bg-gray-800
     border-r border-slate-200 dark:border-gray-700
     transition-all duration-300 ease-in-out

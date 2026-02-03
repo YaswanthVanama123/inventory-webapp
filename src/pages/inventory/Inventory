@@ -104,23 +104,21 @@ const InventoryList = () => {
   }, []);
 
 
-  // Fetch data based on filters and pagination, but only for the purchases tab
+  // Always fetch inventory items regardless of tab
   useEffect(() => {
-    if (activeTab === 'purchases') {
-      fetchInventoryItems();
-    }
-  }, [debouncedSearchTerm, selectedCategory, statusFilter, sortBy, sortOrder, currentPage, itemsPerPage, activeTab]);
+    fetchInventoryItems();
+  }, [debouncedSearchTerm, selectedCategory, statusFilter, sortBy, sortOrder, currentPage, itemsPerPage]);
 
-  // Fetch data based on search and pagination for the sells tab
+  // Fetch invoices when component mounts or when activeTab changes to 'sells'
   useEffect(() => {
+    // Clear errors when switching tabs
+    setError(null);
+
     if (activeTab === 'sells') {
       fetchInvoices();
+    } else if (activeTab === 'purchases') {
+      fetchInventoryItems();
     }
-  }, [debouncedSearchTerm, currentPage, itemsPerPage, activeTab]);
-
-  // Clear errors when switching tabs
-  useEffect(() => {
-    setError(null);
   }, [activeTab]);
 
   const fetchCategories = async () => {
@@ -359,6 +357,25 @@ const InventoryList = () => {
       ...prev,
       [itemId]: !prev[itemId]
     }));
+
+    if (!isExpanded && !sales[itemId]) {
+      await fetchSalesForItem(itemId);
+    }
+  };
+
+  const fetchAllInvoices = async () => {
+    setLoadingAllInvoices(true);
+    try {
+      const response = await api.get('/invoices');
+      const invoicesData = response.data?.data?.invoices || response.data?.invoices || response.data || [];
+      setAllInvoices(Array.isArray(invoicesData) ? invoicesData : []);
+    } catch (err) {
+      console.error('Error fetching invoices:', err);
+      showError('Failed to load invoices');
+      setAllInvoices([]);
+    } finally {
+      setLoadingAllInvoices(false);
+    }
   };
 
   const formatDate = (date) => {
@@ -374,17 +391,26 @@ const InventoryList = () => {
   };
 
   const getCategoryBadgeVariant = (category) => {
+  const getCategoryBadgeVariant = (category) => {
+    const variants = {
     const variants = {
       'Electronics': 'info',
+      'Electronics': 'info',
+      'Clothing': 'success',
       'Clothing': 'success',
       'Food': 'warning',
+      'Food': 'warning',
+      'Books': 'primary',
       'Books': 'primary',
       'Furniture': 'default',
+      'Furniture': 'default',
     };
+    };
+    return variants[category] || 'default';
     return variants[category] || 'default';
   };
 
-  // Component for displaying invoice items filtered by itemId (used in purchases tab)
+  // Reusable component for displaying invoice items as cards
   const InvoiceItemCards = ({ invoiceItems, itemId, itemName }) => {
     const filteredItems = invoiceItems.filter(
       invoiceItem => invoiceItem.item?._id === itemId || invoiceItem.itemId === itemId
@@ -453,77 +479,7 @@ const InventoryList = () => {
     );
   };
 
-  // Component for displaying ALL invoice items without filtering (used in sells tab)
-  const AllInvoiceItemCards = ({ invoiceItems }) => {
-    if (!invoiceItems || invoiceItems.length === 0) {
-      return (
-        <div className="text-center py-3 text-emerald-600 text-xs">
-          No items found in this invoice
-        </div>
-      );
-    }
-
-    return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-        {invoiceItems.map((invoiceItem, idx) => {
-          // Get item details from either the populated item object or use invoiceItem data directly
-          const itemName = invoiceItem.item?.name || invoiceItem.name || 'Unknown Item';
-          const itemImage = invoiceItem.item?.image || invoiceItem.image;
-
-          return (
-            <div
-              key={idx}
-              className="bg-white rounded-lg border-2 border-emerald-200 p-3 hover:shadow-md hover:border-emerald-400 transition-all duration-200 transform hover:-translate-y-1"
-            >
-              {/* Product Image */}
-              {itemImage ? (
-                <div className="mb-2 rounded-md overflow-hidden bg-slate-100">
-                  <img
-                    src={getImageUrl(itemImage)}
-                    alt={itemName}
-                    className="w-full h-24 object-cover"
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/150?text=No+Image';
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="mb-2 rounded-md bg-emerald-50 h-24 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-              )}
-
-              {/* Item Name */}
-              <h6 className="text-xs font-semibold text-slate-800 mb-2 line-clamp-2 min-h-[2rem]">
-                {itemName}
-              </h6>
-
-              {/* Item Details */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Quantity:</span>
-                  <span className="font-bold text-emerald-700">{invoiceItem.quantity}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Unit Price:</span>
-                  <span className="font-semibold text-slate-700">${invoiceItem.price?.toFixed(2) || '0.00'}</span>
-                </div>
-                <div className="pt-1.5 border-t border-emerald-100">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-slate-600">Subtotal:</span>
-                    <span className="font-bold text-emerald-600 text-sm">${invoiceItem.subtotal?.toFixed(2) || '0.00'}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
+  
   const sortOptions = [
     { value: 'name-asc', label: 'Name (A-Z)' },
     { value: 'name-desc', label: 'Name (Z-A)' },
@@ -723,41 +679,38 @@ const InventoryList = () => {
         </div>
       )}
 
-      {/* Content based on active tab */}
-      {activeTab === 'purchases' ? (
-        // Purchases Tab Content - Show Inventory Items
+      {}
+      {loading ? (
+        <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
+          <LoadingSpinner size="lg" text="Loading..." className="mx-auto" />
+        </div>
+      ) : items.length === 0 ? (
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200">
+          <EmptyState
+            icon={
+              <svg className="w-20 h-20 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            }
+            title="No items found"
+            description={
+              searchTerm || selectedCategory || statusFilter
+                ? "Try adjusting your filters or search terms"
+                : "Get started by adding your first inventory item"
+            }
+            action={
+              isAdmin && !searchTerm && !selectedCategory && !statusFilter && (
+                <Button variant="primary" onClick={handleAddNew}>
+                  Add Your First Item
+                </Button>
+              )
+            }
+          />
+        </div>
+      ) : (
         <>
-          {loading ? (
-            <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
-              <LoadingSpinner size="lg" text="Loading inventory..." className="mx-auto" />
-            </div>
-          ) : items.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200">
-              <EmptyState
-                icon={
-                  <svg className="w-20 h-20 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                  </svg>
-                }
-                title="No items found"
-                description={
-                  searchTerm || selectedCategory || statusFilter
-                    ? "Try adjusting your filters or search terms"
-                    : "Get started by adding your first inventory item"
-                }
-                action={
-                  isAdmin && !searchTerm && !selectedCategory && !statusFilter && (
-                    <Button variant="primary" onClick={handleAddNew}>
-                      Add Your First Item
-                    </Button>
-                  )
-                }
-              />
-            </div>
-          ) : (
-            <>
-              {/* Table View */}
-              {viewMode === 'table' && (
+          {}
+          {viewMode === 'table' && (
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-slate-200">
@@ -905,6 +858,7 @@ const InventoryList = () => {
                                         <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Total Cost</th>
                                         <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Supplier</th>
                                         <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Remaining</th>
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Added By</th>
                                         {isAdmin && (
                                           <th className="px-4 py-2 text-center text-xs font-medium text-slate-600">Actions</th>
                                         )}
@@ -921,6 +875,14 @@ const InventoryList = () => {
                                           <td className="px-4 py-3 text-sm">
                                             <span className={`font-semibold ${purchase.remainingQuantity === 0 ? 'text-red-600' : 'text-green-600'}`}>
                                               {purchase.remainingQuantity} {purchase.unit}
+                                            </span>
+                                          </td>
+                                          <td className="px-4 py-3 text-sm text-slate-700">
+                                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 rounded-md text-xs">
+                                              <svg className="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                              </svg>
+                                              {purchase.createdBy?.username || purchase.createdBy?.name || purchase.addedBy || 'N/A'}
                                             </span>
                                           </td>
                                           {isAdmin && (
@@ -1004,14 +966,41 @@ const InventoryList = () => {
                                             </tr>
                                             {expandedSales[compoundKey] && invoice.items && (
                                               <tr>
-                                                <td colSpan="6" className="px-4 py-4 bg-emerald-50">
-                                                  <div className="ml-8 space-y-3">
-                                                    <h5 className="text-sm font-semibold text-emerald-800 mb-3">Items in this Invoice:</h5>
-                                                    <InvoiceItemCards
-                                                      invoiceItems={invoice.items}
-                                                      itemId={item._id}
-                                                      itemName={item.name}
-                                                    />
+                                                <td colSpan="6" className="px-4 py-3 bg-green-50">
+                                                  <div className="ml-8 space-y-2">
+                                                    <h5 className="text-xs font-semibold text-green-800 mb-2">Items in this Invoice:</h5>
+                                                    <div className="bg-white rounded-lg border border-green-200 overflow-hidden">
+                                                      <table className="min-w-full">
+                                                        <thead className="bg-green-100">
+                                                          <tr>
+                                                            <th className="px-3 py-2 text-left text-xs font-medium text-green-800">Item Name</th>
+                                                            <th className="px-3 py-2 text-left text-xs font-medium text-green-800">Quantity</th>
+                                                            <th className="px-3 py-2 text-left text-xs font-medium text-green-800">Price</th>
+                                                            <th className="px-3 py-2 text-left text-xs font-medium text-green-800">Subtotal</th>
+                                                          </tr>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-green-100">
+                                                          {invoice.items
+                                                            .filter(invoiceItem => invoiceItem.item?._id === item._id || invoiceItem.itemId === item._id)
+                                                            .map((invoiceItem, idx) => (
+                                                              <tr key={idx} className="hover:bg-green-50">
+                                                                <td className="px-3 py-2 text-xs text-slate-700">
+                                                                  {invoiceItem.item?.name || item.name}
+                                                                </td>
+                                                                <td className="px-3 py-2 text-xs text-slate-700 font-semibold">
+                                                                  {invoiceItem.quantity}
+                                                                </td>
+                                                                <td className="px-3 py-2 text-xs text-slate-700">
+                                                                  ${invoiceItem.price?.toFixed(2) || '0.00'}
+                                                                </td>
+                                                                <td className="px-3 py-2 text-xs font-semibold text-green-700">
+                                                                  ${invoiceItem.subtotal?.toFixed(2) || '0.00'}
+                                                                </td>
+                                                              </tr>
+                                                            ))}
+                                                        </tbody>
+                                                      </table>
+                                                    </div>
                                                   </div>
                                                 </td>
                                               </tr>
@@ -1044,8 +1033,11 @@ const InventoryList = () => {
 
           {/* Card View (Mobile-friendly) */}
           {viewMode === 'card' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              {items.map((item) => (
+            <>
+              {/* Purchases Tab Card View - Shows Inventory Items */}
+              {activeTab === 'purchases' && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                  {items.map((item) => (
                 <div
                   key={item._id}
                   className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow duration-200"
@@ -1158,6 +1150,12 @@ const InventoryList = () => {
                                               {purchase.remainingQuantity} {purchase.unit}
                                             </span>
                                           </div>
+                                          <div className="col-span-2">
+                                            <span className="text-slate-500">Added By:</span>
+                                            <span className="ml-1 text-slate-700 font-medium">
+                                              {purchase.createdBy?.username || purchase.createdBy?.name || purchase.addedBy || 'N/A'}
+                                            </span>
+                                          </div>
                                         </div>
                                         {isAdmin && (
                                           <button
@@ -1236,13 +1234,26 @@ const InventoryList = () => {
 
                                       {/* Expanded Items Sold */}
                                       {expandedSales[compoundKey] && invoice.items && (
-                                        <div className="px-3 pb-3 pt-2 bg-emerald-50 border-t border-emerald-200">
-                                          <div className="text-xs font-semibold text-emerald-800 mb-2">Items Sold:</div>
-                                          <InvoiceItemCards
-                                            invoiceItems={invoice.items}
-                                            itemId={item._id}
-                                            itemName={item.name}
-                                          />
+                                        <div className="px-2 pb-2 space-y-1 bg-green-50">
+                                          <div className="text-xs font-semibold text-green-700 mb-1 border-t border-green-200 pt-2">Items Sold:</div>
+                                          {invoice.items
+                                            .filter(invoiceItem => invoiceItem.item?._id === item._id || invoiceItem.itemId === item._id)
+                                            .map((invoiceItem, idx) => (
+                                              <div key={idx} className="bg-white p-1.5 rounded border border-green-100 grid grid-cols-3 gap-1">
+                                                <div>
+                                                  <span className="text-slate-500">Qty:</span>
+                                                  <span className="ml-1 text-slate-700 font-semibold">{invoiceItem.quantity}</span>
+                                                </div>
+                                                <div>
+                                                  <span className="text-slate-500">Price:</span>
+                                                  <span className="ml-1 text-slate-700">${invoiceItem.price?.toFixed(2)}</span>
+                                                </div>
+                                                <div>
+                                                  <span className="text-slate-500">Subtotal:</span>
+                                                  <span className="ml-1 text-green-600 font-bold">${invoiceItem.subtotal?.toFixed(2)}</span>
+                                                </div>
+                                              </div>
+                                            ))}
                                         </div>
                                       )}
                                     </div>
@@ -1251,12 +1262,9 @@ const InventoryList = () => {
                                 </div>
                               </div>
                             ) : (
-                              <EmptyState
-                                icon={<ShoppingCart className="w-16 h-16 text-slate-300" />}
-                                title="No sales recorded yet"
-                                description="Sales will appear here once you create invoices"
-                                className="py-6"
-                              />
+                              <div className="text-center py-3 text-green-500 text-xs">
+                                No sales recorded yet.
+                              </div>
                             )}
                           </div>
                         )}
@@ -1317,279 +1325,6 @@ const InventoryList = () => {
           </div>
         </>
       )}
-      </>
-      ) : activeTab === 'sells' ? (
-        // Sells Tab Content - Show Invoices
-        <>
-          {loadingInvoices ? (
-            <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
-              <LoadingSpinner size="lg" text="Loading invoices..." className="mx-auto" />
-            </div>
-          ) : invoices.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200">
-              <EmptyState
-                icon={
-                  <ShoppingCart className="w-20 h-20 text-emerald-300" />
-                }
-                title="No sales recorded yet"
-                description="Sales will appear here once you create invoices"
-              />
-            </div>
-          ) : (
-            <>
-              {/* Card View for Sells */}
-              {viewMode === 'card' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                  {invoices.map((invoice) => (
-                    <div
-                      key={invoice._id}
-                      className="bg-white rounded-lg shadow-sm border border-emerald-200 overflow-hidden hover:shadow-lg transition-all duration-200 hover:border-emerald-400"
-                    >
-                      {/* Invoice Header */}
-                      <div className="bg-gradient-to-r from-emerald-500 to-green-600 p-4 text-white">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-lg font-bold">
-                            {invoice.invoiceNumber}
-                          </h3>
-                          <Badge
-                            variant={
-                              invoice.status === 'paid'
-                                ? 'success'
-                                : invoice.status === 'pending'
-                                ? 'warning'
-                                : 'default'
-                            }
-                            className="bg-white text-emerald-700 border-white"
-                          >
-                            {invoice.status || 'N/A'}
-                          </Badge>
-                        </div>
-                        <p className="text-emerald-50 text-sm">
-                          {formatDate(invoice.date)}
-                        </p>
-                      </div>
-
-                      {/* Invoice Details */}
-                      <div className="p-4">
-                        <div className="space-y-3 mb-4">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-slate-500">Customer:</span>
-                            <span className="text-sm font-medium text-slate-900">
-                              {invoice.customer?.name || 'Walk-in'}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-slate-500">Items:</span>
-                            <span className="text-sm font-medium text-slate-900">
-                              {invoice.items?.length || 0}
-                            </span>
-                          </div>
-                          <div className="pt-3 border-t border-emerald-100">
-                            <div className="flex items-center justify-between">
-                              <span className="text-base font-semibold text-slate-700">Total Amount:</span>
-                              <span className="text-xl font-bold text-emerald-600">
-                                ${invoice.total?.toFixed(2) || '0.00'}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Expand/Collapse Button */}
-                        <button
-                          onClick={() => toggleInvoiceExpand(invoice._id)}
-                          className="w-full px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 text-emerald-600 bg-emerald-50 hover:bg-emerald-100"
-                        >
-                          <span>
-                            {expandedInvoices[invoice._id] ? 'Hide' : 'View'} Invoice Items
-                          </span>
-                          <svg
-                            className={`w-4 h-4 transition-transform ${
-                              expandedInvoices[invoice._id] ? 'rotate-180' : ''
-                            }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </button>
-
-                        {/* Expanded Items Section */}
-                        {expandedInvoices[invoice._id] && invoice.items && invoice.items.length > 0 && (
-                          <div className="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                            <h5 className="text-xs font-semibold text-emerald-800 mb-3">
-                              Items in this Invoice:
-                            </h5>
-                            <div className="space-y-2 max-h-96 overflow-y-auto">
-                              {invoice.items.map((invoiceItem, idx) => (
-                                <div
-                                  key={idx}
-                                  className="bg-white rounded-lg border border-emerald-200 p-3 hover:shadow-md transition-all duration-200"
-                                >
-                                  {/* Product Image */}
-                                  {invoiceItem.item?.image ? (
-                                    <div className="mb-2 rounded-md overflow-hidden bg-slate-100">
-                                      <img
-                                        src={getImageUrl(invoiceItem.item.image)}
-                                        alt={invoiceItem.item?.name || 'Product'}
-                                        className="w-full h-20 object-cover"
-                                        onError={(e) => {
-                                          e.target.src = 'https://via.placeholder.com/150?text=No+Image';
-                                        }}
-                                      />
-                                    </div>
-                                  ) : (
-                                    <div className="mb-2 rounded-md bg-emerald-50 h-20 flex items-center justify-center">
-                                      <svg className="w-6 h-6 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                      </svg>
-                                    </div>
-                                  )}
-
-                                  {/* Item Name */}
-                                  <h6 className="text-xs font-semibold text-slate-800 mb-2 line-clamp-2">
-                                    {invoiceItem.item?.name || 'Unknown Item'}
-                                  </h6>
-
-                                  {/* Item Details */}
-                                  <div className="space-y-1">
-                                    <div className="flex items-center justify-between text-xs">
-                                      <span className="text-slate-500">Quantity:</span>
-                                      <span className="font-bold text-emerald-700">
-                                        {invoiceItem.quantity}
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-xs">
-                                      <span className="text-slate-500">Unit Price:</span>
-                                      <span className="font-semibold text-slate-700">
-                                        ${invoiceItem.price?.toFixed(2) || '0.00'}
-                                      </span>
-                                    </div>
-                                    <div className="pt-1 border-t border-emerald-100">
-                                      <div className="flex items-center justify-between text-xs">
-                                        <span className="font-medium text-slate-600">Subtotal:</span>
-                                        <span className="font-bold text-emerald-600">
-                                          ${invoiceItem.subtotal?.toFixed(2) || '0.00'}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Table View for Sells */}
-              {viewMode === 'table' && (
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-slate-200">
-                    <thead className="bg-emerald-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider w-12">
-
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                          Invoice #
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                          Customer
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                          Total
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                          Status
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-slate-200">
-                      {invoices.map((invoice) => (
-                        <React.Fragment key={invoice._id}>
-                          <tr className="hover:bg-emerald-50 transition-colors">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <button
-                                onClick={() => toggleInvoiceExpand(invoice._id)}
-                                className="p-1 hover:bg-emerald-200 rounded transition-colors"
-                                title={expandedInvoices[invoice._id] ? "Collapse items" : "Expand items"}
-                              >
-                                <ChevronRight
-                                  className={`w-5 h-5 text-emerald-600 transition-transform ${
-                                    expandedInvoices[invoice._id] ? 'rotate-90' : ''
-                                  }`}
-                                />
-                              </button>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-semibold text-emerald-700">{invoice.invoiceNumber}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-slate-700">{formatDate(invoice.date)}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-slate-700">{invoice.customer?.name || 'Walk-in'}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-semibold text-emerald-700">${invoice.total?.toFixed(2) || '0.00'}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <Badge variant={invoice.status === 'paid' ? 'success' : invoice.status === 'pending' ? 'warning' : 'default'}>
-                                {invoice.status || 'N/A'}
-                              </Badge>
-                            </td>
-                          </tr>
-
-                          {/* Invoice Items Expanded Row */}
-                          {expandedInvoices[invoice._id] && (
-                            <tr>
-                              <td colSpan="6" className="px-6 py-4 bg-emerald-50">
-                                <div className="space-y-3">
-                                  <h4 className="text-sm font-semibold text-emerald-800 mb-3">Items in this Invoice:</h4>
-                                  <AllInvoiceItemCards invoiceItems={invoice.items} />
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              )}
-
-              {/* Pagination for Invoices */}
-              <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                  totalItems={invoices.length}
-                  itemsPerPage={itemsPerPage}
-                  onPageSizeChange={handlePageSizeChange}
-                  pageSizeOptions={[10, 20, 50, 100]}
-                  showPageSize={true}
-                  showResultCount={true}
-                />
-              </div>
-            </>
-          )}
-        </>
-      ) : null}
 
       {/* Delete Confirmation Modal */}
       <Modal

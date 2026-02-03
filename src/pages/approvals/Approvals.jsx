@@ -6,23 +6,26 @@ import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { CheckCircle, XCircle, Eye, Clock, User, DollarSign, Calendar } from 'lucide-react';
+import { CheckCircle, XCircle, Eye, Clock, User, DollarSign, Calendar, Package, Trash2 } from 'lucide-react';
 
 const Approvals = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useContext(ToastContext);
+  const [activeTab, setActiveTab] = useState('invoices');
   const [pendingInvoices, setPendingInvoices] = useState([]);
+  const [pendingPurchaseDeletions, setPendingPurchaseDeletions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     fetchPendingInvoices();
+    fetchPendingPurchaseDeletions();
   }, []);
 
   const fetchPendingInvoices = async () => {
     setLoading(true);
     try {
-      
+
       const response = await api.get('/invoices?status=pending');
       setPendingInvoices(response.data.invoices || []);
     } catch (error) {
@@ -30,6 +33,16 @@ const Approvals = () => {
       showError('Failed to load pending approvals');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPendingPurchaseDeletions = async () => {
+    try {
+      const response = await api.get('/approvals/purchases/pending');
+      setPendingPurchaseDeletions(response.data || []);
+    } catch (error) {
+      console.error('Error fetching pending purchase deletions:', error);
+      showError('Failed to load pending purchase deletions');
     }
   };
 
@@ -74,6 +87,37 @@ const Approvals = () => {
     navigate(`/invoices/${invoiceId}`);
   };
 
+  const handleApprovePurchaseDeletion = async (purchaseId) => {
+    setProcessing(true);
+    try {
+      await api.post(`/approvals/purchases/${purchaseId}/approve`);
+      showSuccess('Purchase deletion approved successfully');
+      fetchPendingPurchaseDeletions();
+    } catch (error) {
+      console.error('Error approving purchase deletion:', error);
+      showError(error.response?.data?.message || 'Failed to approve purchase deletion');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleRejectPurchaseDeletion = async (purchaseId) => {
+    const reason = prompt('Please enter rejection reason:');
+    if (!reason) return;
+
+    setProcessing(true);
+    try {
+      await api.post(`/approvals/purchases/${purchaseId}/reject`, { reason });
+      showSuccess('Purchase deletion rejected');
+      fetchPendingPurchaseDeletions();
+    } catch (error) {
+      console.error('Error rejecting purchase deletion:', error);
+      showError(error.response?.data?.message || 'Failed to reject purchase deletion');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -81,7 +125,7 @@ const Approvals = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-6 lg:px-8 py-8 max-w-[1800px]">
-        {}
+        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
@@ -92,129 +136,297 @@ const Approvals = () => {
                 Pending Approvals
               </h1>
               <p className="text-slate-600 dark:text-gray-400 mt-2 ml-1">
-                Review and approve pending sales invoices
+                Review and approve pending items
               </p>
             </div>
             <div className="flex items-center gap-3">
               <Badge variant="warning" className="px-4 py-2 text-base">
                 <Clock className="w-4 h-4 mr-2" />
-                {pendingInvoices.length} Pending
+                {activeTab === 'invoices' ? pendingInvoices.length : pendingPurchaseDeletions.length} Pending
               </Badge>
             </div>
           </div>
         </div>
 
-        {}
-        {pendingInvoices.length === 0 ? (
-          <Card padding="lg" className="text-center py-20 shadow-sm border border-slate-200 dark:border-gray-700">
-            <CheckCircle className="w-16 h-16 text-slate-400 dark:text-gray-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-              All caught up!
-            </h3>
-            <p className="text-slate-600 dark:text-gray-400">
-              There are no pending invoices requiring approval at this time.
-            </p>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 gap-6">
-            {pendingInvoices.map((invoice) => (
-              <Card
-                key={invoice._id}
-                padding="lg"
-                className="shadow-sm border border-slate-200 dark:border-gray-700 hover:shadow-lg transition-all bg-white dark:from-gray-800 dark:to-gray-700"
+        {/* Tabs */}
+        <div className="mb-6">
+          <div className="border-b border-slate-200 dark:border-gray-700">
+            <nav className="-mb-px flex space-x-8">
+              <button
+                onClick={() => setActiveTab('invoices')}
+                className={`
+                  py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                  ${activeTab === 'invoices'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  }
+                `}
               >
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-                  {/* Invoice Info */}
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                            Invoice #{invoice.invoiceNumber}
-                          </h3>
-                          <Badge variant="warning" className="shadow-md">
-                            <Clock className="w-3 h-3 mr-1" />
-                            Pending Approval
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            {new Date(invoice.issueDate).toLocaleDateString()}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <User className="w-4 h-4" />
-                            {invoice.customer?.name || 'N/A'}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                          ${invoice.totalAmount?.toFixed(2)}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          {invoice.items?.length || 0} items
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Customer Details */}
-                    <div className="bg-blue-50 dark:bg-gray-750 p-4 rounded-xl border border-blue-200 dark:border-blue-800">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                        <div>
-                          <span className="text-gray-600 dark:text-gray-400">Email:</span>
-                          <span className="ml-2 font-medium text-gray-900 dark:text-white">
-                            {invoice.customer?.email || 'N/A'}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-gray-600 dark:text-gray-400">Phone:</span>
-                          <span className="ml-2 font-medium text-gray-900 dark:text-white">
-                            {invoice.customer?.phone || 'N/A'}
-                          </span>
-                        </div>
-                        <div className="md:col-span-2">
-                          <span className="text-gray-600 dark:text-gray-400">Payment Method:</span>
-                          <span className="ml-2 font-medium text-gray-900 dark:text-white capitalize">
-                            {invoice.paymentMethod?.replace('_', ' ') || 'N/A'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex lg:flex-col gap-3 lg:min-w-[180px]">
-                    <Button
-                      onClick={() => handleView(invoice._id)}
-                      variant="outline"
-                      className="flex-1 lg:flex-none"
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View Details
-                    </Button>
-                    <Button
-                      onClick={() => handleApprove(invoice._id)}
-                      disabled={processing}
-                      className="flex-1 lg:flex-none"
-                    >
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Approve
-                    </Button>
-                    <Button
-                      onClick={() => handleReject(invoice._id)}
-                      disabled={processing}
-                      variant="outline"
-                      className="flex-1 lg:flex-none border-red-300 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
-                    >
-                      <XCircle className="w-4 h-4 mr-2" />
-                      Reject
-                    </Button>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-4 h-4" />
+                  Invoice Approvals
+                  {pendingInvoices.length > 0 && (
+                    <Badge variant="warning" className="ml-1">
+                      {pendingInvoices.length}
+                    </Badge>
+                  )}
                 </div>
-              </Card>
-            ))}
+              </button>
+              <button
+                onClick={() => setActiveTab('purchase-deletions')}
+                className={`
+                  py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                  ${activeTab === 'purchase-deletions'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  }
+                `}
+              >
+                <div className="flex items-center gap-2">
+                  <Trash2 className="w-4 h-4" />
+                  Purchase Deletions
+                  {pendingPurchaseDeletions.length > 0 && (
+                    <Badge variant="warning" className="ml-1">
+                      {pendingPurchaseDeletions.length}
+                    </Badge>
+                  )}
+                </div>
+              </button>
+            </nav>
           </div>
+        </div>
+
+        {/* Invoice Approvals Tab */}
+        {activeTab === 'invoices' && (
+          <>
+            {pendingInvoices.length === 0 ? (
+              <Card padding="lg" className="text-center py-20 shadow-sm border border-slate-200 dark:border-gray-700">
+                <CheckCircle className="w-16 h-16 text-slate-400 dark:text-gray-500 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+                  All caught up!
+                </h3>
+                <p className="text-slate-600 dark:text-gray-400">
+                  There are no pending invoices requiring approval at this time.
+                </p>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 gap-6">
+                {pendingInvoices.map((invoice) => (
+                  <Card
+                    key={invoice._id}
+                    padding="lg"
+                    className="shadow-sm border border-slate-200 dark:border-gray-700 hover:shadow-lg transition-all bg-white dark:from-gray-800 dark:to-gray-700"
+                  >
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                      {/* Invoice Info */}
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                                Invoice #{invoice.invoiceNumber}
+                              </h3>
+                              <Badge variant="warning" className="shadow-md">
+                                <Clock className="w-3 h-3 mr-1" />
+                                Pending Approval
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                              <div className="flex items-center gap-1">
+                                <Calendar className="w-4 h-4" />
+                                {new Date(invoice.issueDate).toLocaleDateString()}
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <User className="w-4 h-4" />
+                                {invoice.customer?.name || 'N/A'}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                              ${invoice.totalAmount?.toFixed(2)}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              {invoice.items?.length || 0} items
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Customer Details */}
+                        <div className="bg-blue-50 dark:bg-gray-750 p-4 rounded-xl border border-blue-200 dark:border-blue-800">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                            <div>
+                              <span className="text-gray-600 dark:text-gray-400">Email:</span>
+                              <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                                {invoice.customer?.email || 'N/A'}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-600 dark:text-gray-400">Phone:</span>
+                              <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                                {invoice.customer?.phone || 'N/A'}
+                              </span>
+                            </div>
+                            <div className="md:col-span-2">
+                              <span className="text-gray-600 dark:text-gray-400">Payment Method:</span>
+                              <span className="ml-2 font-medium text-gray-900 dark:text-white capitalize">
+                                {invoice.paymentMethod?.replace('_', ' ') || 'N/A'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex lg:flex-col gap-3 lg:min-w-[180px]">
+                        <Button
+                          onClick={() => handleView(invoice._id)}
+                          variant="outline"
+                          className="flex-1 lg:flex-none"
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Details
+                        </Button>
+                        <Button
+                          onClick={() => handleApprove(invoice._id)}
+                          disabled={processing}
+                          className="flex-1 lg:flex-none"
+                        >
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Approve
+                        </Button>
+                        <Button
+                          onClick={() => handleReject(invoice._id)}
+                          disabled={processing}
+                          variant="outline"
+                          className="flex-1 lg:flex-none border-red-300 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
+                        >
+                          <XCircle className="w-4 h-4 mr-2" />
+                          Reject
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Purchase Deletions Tab */}
+        {activeTab === 'purchase-deletions' && (
+          <>
+            {pendingPurchaseDeletions.length === 0 ? (
+              <Card padding="lg" className="text-center py-20 shadow-sm border border-slate-200 dark:border-gray-700">
+                <CheckCircle className="w-16 h-16 text-slate-400 dark:text-gray-500 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+                  All caught up!
+                </h3>
+                <p className="text-slate-600 dark:text-gray-400">
+                  There are no pending purchase deletions requiring approval at this time.
+                </p>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 gap-6">
+                {pendingPurchaseDeletions.map((purchase) => (
+                  <Card
+                    key={purchase._id}
+                    padding="lg"
+                    className="shadow-sm border border-slate-200 dark:border-gray-700 hover:shadow-lg transition-all bg-white dark:from-gray-800 dark:to-gray-700"
+                  >
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                      {/* Purchase Info */}
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <Package className="w-6 h-6 text-orange-600" />
+                                {purchase.inventoryItem?.name || 'Unknown Item'}
+                              </h3>
+                              <Badge variant="danger" className="shadow-md">
+                                <Trash2 className="w-3 h-3 mr-1" />
+                                Deletion Request
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                              <div className="flex items-center gap-1">
+                                <Calendar className="w-4 h-4" />
+                                Purchase Date: {new Date(purchase.purchaseDate).toLocaleDateString()}
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <User className="w-4 h-4" />
+                                Requested by: {purchase.deletionRequestedBy?.username || 'N/A'}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">
+                              ${purchase.totalCost?.toFixed(2)}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              Qty: {purchase.quantity}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Purchase Details */}
+                        <div className="bg-orange-50 dark:bg-gray-750 p-4 rounded-xl border border-orange-200 dark:border-orange-800">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                            <div>
+                              <span className="text-gray-600 dark:text-gray-400">Supplier:</span>
+                              <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                                {purchase.supplier?.name || 'N/A'}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-600 dark:text-gray-400">Unit Cost:</span>
+                              <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                                ${purchase.unitCost?.toFixed(2)}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-600 dark:text-gray-400">Quantity:</span>
+                              <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                                {purchase.quantity}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-600 dark:text-gray-400">Requested At:</span>
+                              <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                                {new Date(purchase.deletionRequestedAt).toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex lg:flex-col gap-3 lg:min-w-[180px]">
+                        <Button
+                          onClick={() => handleApprovePurchaseDeletion(purchase._id)}
+                          disabled={processing}
+                          className="flex-1 lg:flex-none bg-green-600 hover:bg-green-700"
+                        >
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Approve Deletion
+                        </Button>
+                        <Button
+                          onClick={() => handleRejectPurchaseDeletion(purchase._id)}
+                          disabled={processing}
+                          variant="outline"
+                          className="flex-1 lg:flex-none border-red-300 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
+                        >
+                          <XCircle className="w-4 h-4 mr-2" />
+                          Reject
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

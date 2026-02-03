@@ -306,8 +306,9 @@ const EnhancedDashboard = () => {
             <span className="text-sm font-semibold text-emerald-600">+24.5% Growth</span>
           </div>
         </div>
-        <ResponsiveContainer width="100%" height={400}>
-          <AreaChart data={dashboardData.revenueTrend}>
+        <div className="h-96">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={dashboardData.revenueTrend}>
             <defs>
               <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
@@ -360,6 +361,7 @@ const EnhancedDashboard = () => {
             />
           </AreaChart>
         </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Top Products & Sales Channels */}
@@ -370,8 +372,9 @@ const EnhancedDashboard = () => {
             <h2 className="text-xl font-bold text-slate-900">Top Selling Products</h2>
             <p className="text-sm text-slate-500">Best performers this month</p>
           </div>
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={dashboardData.topProducts} layout="vertical">
+          <div className="h-96">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={dashboardData.topProducts} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
               <XAxis type="number" stroke="#64748B" fontSize={12} tickFormatter={(value) => `$${value/1000}k`} />
               <YAxis type="category" dataKey="name" stroke="#64748B" fontSize={12} width={120} />
@@ -384,6 +387,7 @@ const EnhancedDashboard = () => {
               />
             </BarChart>
           </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Sales by Channel Pie Chart */}
@@ -392,8 +396,9 @@ const EnhancedDashboard = () => {
             <h2 className="text-xl font-bold text-slate-900">Sales by Channel</h2>
             <p className="text-sm text-slate-500">Distribution across platforms</p>
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
               <Pie
                 data={dashboardData.salesByChannel}
                 cx="50%"
@@ -412,6 +417,7 @@ const EnhancedDashboard = () => {
               <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
+          </div>
 
           {/* Channel Legend */}
           <div className="grid grid-cols-2 gap-3 mt-4">
@@ -437,8 +443,9 @@ const EnhancedDashboard = () => {
             <h2 className="text-xl font-bold text-slate-900">Category Performance</h2>
             <p className="text-sm text-slate-500">Multi-dimensional analysis</p>
           </div>
-          <ResponsiveContainer width="100%" height={350}>
-            <RadarChart data={dashboardData.categoryPerformance}>
+          <div className="h-96">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart data={dashboardData.categoryPerformance}>
               <PolarGrid stroke="#E2E8F0" />
               <PolarAngleAxis dataKey="category" stroke="#64748B" fontSize={12} />
               <PolarRadiusAxis stroke="#64748B" fontSize={11} />
@@ -462,6 +469,7 @@ const EnhancedDashboard = () => {
               <Legend wrapperStyle={{ fontSize: '14px' }} />
             </RadarChart>
           </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Stock Turnover Rate */}
@@ -470,8 +478,9 @@ const EnhancedDashboard = () => {
             <h2 className="text-xl font-bold text-slate-900">Stock Turnover Rate</h2>
             <p className="text-sm text-slate-500">Inventory efficiency by category</p>
           </div>
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={dashboardData.stockTurnover}>
+          <div className="h-96">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={dashboardData.stockTurnover}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
               <XAxis dataKey="category" stroke="#64748B" fontSize={12} />
               <YAxis stroke="#64748B" fontSize={12} tickFormatter={(value) => `${value}x`} />
@@ -484,6 +493,7 @@ const EnhancedDashboard = () => {
               />
             </BarChart>
           </ResponsiveContainer>
+          </div>
         </div>
       </div>
 

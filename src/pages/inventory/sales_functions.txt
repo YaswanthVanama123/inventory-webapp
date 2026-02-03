@@ -1,0 +1,31 @@
+
+  const toggleExpandSales = async (itemId) => {
+    const isExpanded = expandedSales[itemId];
+
+    setExpandedSales(prev => ({
+      ...prev,
+      [itemId]: \!prev[itemId]
+    }));
+
+    if (\!isExpanded && \!sales[itemId]) {
+      await fetchSalesForItem(itemId);
+    }
+  };
+
+  const fetchSalesForItem = async (itemId) => {
+    setLoadingSales(prev => ({ ...prev, [itemId]: true }));
+
+    try {
+      const response = await api.get(`/inventory/${itemId}/sales`);
+      const salesData = response.data?.data?.sales || response.data?.sales || [];
+      setSales(prev => ({
+        ...prev,
+        [itemId]: salesData
+      }));
+    } catch (err) {
+      console.error('Error fetching sales:', err);
+      showError('Failed to load sales');
+    } finally {
+      setLoadingSales(prev => ({ ...prev, [itemId]: false }));
+    }
+  };

@@ -22,6 +22,7 @@ const EmployeeDashboard = lazy(() => import('./pages/employee/Dashboard'));
 const InventoryList = lazy(() => import('./pages/inventory/InventoryList'));
 const InventoryForm = lazy(() => import('./pages/inventory/InventoryForm'));
 const InventoryDetail = lazy(() => import('./pages/inventory/InventoryDetail'));
+const Stock = lazy(() => import('./pages/inventory/Stock'));
 const PointOfSale = lazy(() => import('./pages/pos/PointOfSale'));
 const Categories = lazy(() => import('./pages/categories/Categories'));
 const Units = lazy(() => import('./pages/units/Units'));
@@ -144,6 +145,16 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute>
                         <InventoryList />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/stock"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute>
+                        <Stock />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

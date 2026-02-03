@@ -397,34 +397,36 @@ const Dashboard = () => {
                 <h2 className="text-lg font-semibold text-gray-900">Category Distribution</h2>
                 <p className="text-sm text-gray-500">Inventory by category</p>
               </div>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={categoryDistribution}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, value }) => `${name} (${value})`}
-                    labelLine={false}
-                  >
-                    {categoryDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#fff',
-                      border: '1px solid #E5E7EB',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                    }}
-                    formatter={(value) => [value, 'Items']}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={categoryDistribution}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={5}
+                      dataKey="value"
+                      label={({ name, value }) => `${name} (${value})`}
+                      labelLine={false}
+                    >
+                      {categoryDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#fff',
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      }}
+                      formatter={(value) => [value, 'Items']}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
 
               {/* Legend */}
               <div className="grid grid-cols-2 gap-2 mt-4">

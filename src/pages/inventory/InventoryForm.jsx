@@ -8,7 +8,7 @@ import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
 import api from '../../services/api';
 import settingsService from '../../services/settingsService';
-import { FileText, DollarSign, Building2, Image } from 'lucide-react';
+import { FileText, Image } from 'lucide-react';
 
 const InventoryForm = () => {
   const navigate = useNavigate();
@@ -49,31 +49,14 @@ const InventoryForm = () => {
 
   
   const [formData, setFormData] = useState({
-    
+
     itemName: '',
     skuCode: '',
     description: '',
-    category: '', 
+    category: '',
     tags: [],
 
-    
-    currentQuantity: '',
-    minimumQuantity: '',
-    unit: '', 
-    purchasePrice: '',
-    sellingPrice: '',
 
-    
-    supplierName: '',
-    contactPerson: '',
-    supplierEmail: '',
-    supplierPhone: '',
-    supplierAddress: '',
-    leadTime: '',
-    reorderPoint: '',
-    minOrderQuantity: '',
-
-    
     images: [],
     primaryImageIndex: 0,
   });
@@ -94,15 +77,12 @@ const InventoryForm = () => {
 
   
   const [categories, setCategories] = useState([]);
-  const [units, setUnits] = useState([]);
   const [loadingSettings, setLoadingSettings] = useState(true);
 
   
   const steps = [
     { id: 0, title: 'Basic Information', icon: FileText },
-    { id: 1, title: 'Quantity & Pricing', icon: DollarSign },
-    { id: 2, title: 'Supplier Information', icon: Building2 },
-    { id: 3, title: 'Images', icon: Image },
+    { id: 1, title: 'Images', icon: Image },
   ];
 
   
@@ -114,10 +94,10 @@ const InventoryForm = () => {
 
   
   useEffect(() => {
-    fetchCategoriesAndUnits();
+    fetchCategories();
   }, []);
 
-  
+
   useEffect(() => {
     if (!isEditMode && !formData.skuCode) {
       const generateUniqueSKU = () => {
@@ -130,7 +110,7 @@ const InventoryForm = () => {
         const seconds = String(now.getSeconds()).padStart(2, '0');
         const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
 
-        
+
         return `SKU-${year}${month}${day}-${hours}${minutes}${seconds}-${milliseconds}`;
       };
 
@@ -141,26 +121,20 @@ const InventoryForm = () => {
     }
   }, [isEditMode]);
 
-  const fetchCategoriesAndUnits = async () => {
+  const fetchCategories = async () => {
     setLoadingSettings(true);
     try {
-      const [categoriesRes, unitsRes] = await Promise.all([
-        settingsService.getCategories(),
-        settingsService.getUnits(),
-      ]);
+      const categoriesRes = await settingsService.getCategories();
 
-      
+
       const categoriesData = categoriesRes?.data?.categories || [];
-      const unitsData = unitsRes?.data?.units || [];
 
       setCategories(categoriesData);
-      setUnits(unitsData);
     } catch (error) {
       console.error('Error fetching settings:', error);
-      
+
       setCategories([]);
-      setUnits([]);
-      showError('Failed to load categories and units. Please ensure the server is running.');
+      showError('Failed to load categories. Please ensure the server is running.');
     } finally {
       setLoadingSettings(false);
     }
@@ -197,19 +171,6 @@ const InventoryForm = () => {
         description: item.description || '',
         category: item.category || '',
         tags: item.tags || [],
-        currentQuantity: item.currentStock || item.currentQuantity || '',
-        minimumQuantity: item.lowStockThreshold || item.minimumQuantity || '',
-        unit: item.unit || '',
-        purchasePrice: item.purchasePrice || '',
-        sellingPrice: item.sellingPrice || '',
-        supplierName: item.supplier?.name || '',
-        contactPerson: item.supplier?.contactPerson || '',
-        supplierEmail: item.supplier?.email || '',
-        supplierPhone: item.supplier?.phone || '',
-        supplierAddress: item.supplier?.address || '',
-        leadTime: item.supplier?.leadTime || '',
-        reorderPoint: item.reorderPoint || '',
-        minOrderQuantity: item.minOrderQuantity || '',
         images: item.images || [],
         primaryImageIndex: item.primaryImageIndex || 0,
       });
@@ -242,16 +203,15 @@ const InventoryForm = () => {
       const draft = localStorage.getItem('inventoryDraft');
       if (draft) {
         const parsedDraft = JSON.parse(draft);
-        
+
         setFormData((prev) => ({
           ...prev,
           ...parsedDraft,
-          
+
           category: parsedDraft.category || '',
-          unit: parsedDraft.unit || '',
           tags: parsedDraft.tags || [],
           images: parsedDraft.images || [],
-          
+
           skuCode: parsedDraft.skuCode || prev.skuCode,
         }));
         setAutoSaveStatus('Draft loaded');
@@ -390,24 +350,12 @@ const InventoryForm = () => {
     }));
   };
 
-  
-  const calculateProfitMargin = () => {
-    const purchase = parseFloat(formData.purchasePrice);
-    const selling = parseFloat(formData.sellingPrice);
 
-    if (purchase && selling && purchase > 0) {
-      const margin = ((selling - purchase) / purchase) * 100;
-      return margin.toFixed(2);
-    }
-    return '0.00';
-  };
-
-  
   const validateStep = (step) => {
     const newErrors = {};
 
     switch (step) {
-      case 0: 
+      case 0:
         if (!formData.itemName.trim()) {
           newErrors.itemName = 'Item name is required';
         } else if (formData.itemName.trim().length < 2) {
@@ -427,83 +375,8 @@ const InventoryForm = () => {
         }
         break;
 
-      case 1: 
-        if (formData.currentQuantity === '' || formData.currentQuantity === null) {
-          newErrors.currentQuantity = 'Current quantity is required';
-        } else if (isNaN(formData.currentQuantity)) {
-          newErrors.currentQuantity = 'Current quantity must be a valid number';
-        } else if (parseFloat(formData.currentQuantity) < 0) {
-          newErrors.currentQuantity = 'Current quantity cannot be negative';
-        }
-
-        if (formData.minimumQuantity === '' || formData.minimumQuantity === null) {
-          newErrors.minimumQuantity = 'Minimum quantity is required';
-        } else if (isNaN(formData.minimumQuantity)) {
-          newErrors.minimumQuantity = 'Minimum quantity must be a valid number';
-        } else if (parseFloat(formData.minimumQuantity) < 0) {
-          newErrors.minimumQuantity = 'Minimum quantity cannot be negative';
-        }
-
-        if (!formData.unit) {
-          newErrors.unit = 'Unit is required';
-        }
-
-        if (formData.purchasePrice === '' || formData.purchasePrice === null) {
-          newErrors.purchasePrice = 'Purchase price is required';
-        } else if (isNaN(formData.purchasePrice)) {
-          newErrors.purchasePrice = 'Purchase price must be a valid number';
-        } else if (parseFloat(formData.purchasePrice) < 0) {
-          newErrors.purchasePrice = 'Purchase price cannot be negative';
-        } else if (parseFloat(formData.purchasePrice) === 0) {
-          newErrors.purchasePrice = 'Purchase price must be greater than 0';
-        }
-
-        if (formData.sellingPrice === '' || formData.sellingPrice === null) {
-          newErrors.sellingPrice = 'Selling price is required';
-        } else if (isNaN(formData.sellingPrice)) {
-          newErrors.sellingPrice = 'Selling price must be a valid number';
-        } else if (parseFloat(formData.sellingPrice) < 0) {
-          newErrors.sellingPrice = 'Selling price cannot be negative';
-        } else if (parseFloat(formData.sellingPrice) === 0) {
-          newErrors.sellingPrice = 'Selling price must be greater than 0';
-        }
-
-        
-        if (parseFloat(formData.sellingPrice) < parseFloat(formData.purchasePrice)) {
-          newErrors.sellingPrice = 'Warning: Selling price is less than purchase price (negative margin)';
-        }
-        break;
-
-      case 2: 
-        if (!formData.supplierName.trim()) {
-          newErrors.supplierName = 'Supplier name is required';
-        } else if (formData.supplierName.trim().length < 2) {
-          newErrors.supplierName = 'Supplier name must be at least 2 characters';
-        }
-
-        if (formData.supplierEmail && !isValidEmail(formData.supplierEmail)) {
-          newErrors.supplierEmail = 'Invalid email format (e.g., example@domain.com)';
-        }
-
-        if (formData.supplierPhone && !isValidPhone(formData.supplierPhone)) {
-          newErrors.supplierPhone = 'Invalid phone format (minimum 10 digits)';
-        }
-
-        if (formData.leadTime && (isNaN(formData.leadTime) || parseFloat(formData.leadTime) < 0)) {
-          newErrors.leadTime = 'Lead time must be a positive number';
-        }
-
-        if (formData.reorderPoint && (isNaN(formData.reorderPoint) || parseFloat(formData.reorderPoint) < 0)) {
-          newErrors.reorderPoint = 'Reorder point must be a positive number';
-        }
-
-        if (formData.minOrderQuantity && (isNaN(formData.minOrderQuantity) || parseFloat(formData.minOrderQuantity) <= 0)) {
-          newErrors.minOrderQuantity = 'Minimum order quantity must be greater than 0';
-        }
-        break;
-
-      case 3: 
-        
+      case 1:
+        // Images step - no required validation
         break;
 
       default:
@@ -514,17 +387,7 @@ const InventoryForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
 
-  const isValidPhone = (phone) => {
-    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-    return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 10;
-  };
-
-  
   const isCurrentStepValid = () => {
     return validateStep(currentStep);
   };
@@ -623,34 +486,13 @@ const InventoryForm = () => {
       
       const submitData = new FormData();
 
-      
       submitData.append('itemName', formData.itemName);
       submitData.append('skuCode', formData.skuCode);
       submitData.append('description', formData.description);
       submitData.append('category', formData.category);
       submitData.append('tags', JSON.stringify(formData.tags));
 
-      
-      submitData.append('currentQuantity', formData.currentQuantity);
-      submitData.append('minimumQuantity', formData.minimumQuantity);
-      submitData.append('unit', formData.unit);
-      submitData.append('purchasePrice', formData.purchasePrice);
-      submitData.append('sellingPrice', formData.sellingPrice);
 
-      
-      const supplier = {
-        name: formData.supplierName,
-        contactPerson: formData.contactPerson,
-        email: formData.supplierEmail,
-        phone: formData.supplierPhone,
-        address: formData.supplierAddress,
-        leadTime: formData.leadTime,
-      };
-      submitData.append('supplier', JSON.stringify(supplier));
-      submitData.append('reorderPoint', formData.reorderPoint);
-      submitData.append('minOrderQuantity', formData.minOrderQuantity);
-
-      
       formData.images.forEach((image, index) => {
         if (image instanceof File) {
           submitData.append('images', image);
@@ -658,7 +500,7 @@ const InventoryForm = () => {
       });
       submitData.append('primaryImageIndex', formData.primaryImageIndex);
 
-      
+
       let response;
       if (isEditMode) {
         response = await api.put(`/inventory/${id}`, submitData, {
@@ -670,10 +512,10 @@ const InventoryForm = () => {
         });
       }
 
-      
+
       clearDraft();
 
-      
+
       const successMessage = isEditMode
         ? 'Inventory item updated successfully'
         : 'Inventory item created successfully';
@@ -684,12 +526,7 @@ const InventoryForm = () => {
         message: successMessage,
       });
 
-      
-      if (formData.currentQuantity <= formData.minimumQuantity) {
-        showWarning(`Stock level is at or below minimum threshold for ${formData.itemName}`);
-      }
 
-      
       setTimeout(() => {
         navigate('/inventory');
       }, 1500);
@@ -937,229 +774,8 @@ const InventoryForm = () => {
               </div>
             )}
 
-            {/* Step 1: Quantity & Pricing */}
+            {/* Step 1: Images */}
             {currentStep === 1 && (
-              <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                  Quantity & Pricing
-                </h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Input
-                    label="Current Quantity"
-                    type="number"
-                    name="currentQuantity"
-                    value={formData.currentQuantity}
-                    onChange={handleChange}
-                    placeholder="0"
-                    error={errors.currentQuantity}
-                    required
-                    fullWidth
-                    min="0"
-                  />
-
-                  <Input
-                    label="Minimum Quantity"
-                    type="number"
-                    name="minimumQuantity"
-                    value={formData.minimumQuantity}
-                    onChange={handleChange}
-                    placeholder="0"
-                    error={errors.minimumQuantity}
-                    helperText="Alert threshold for low stock"
-                    required
-                    fullWidth
-                    min="0"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Unit <span className="text-red-500">*</span>
-                    </label>
-                    {isAdmin && (
-                      <Link
-                        to="/settings"
-                        className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 flex items-center gap-1"
-                      >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        Manage Units
-                      </Link>
-                    )}
-                  </div>
-                  <Select
-                    name="unit"
-                    value={formData.unit}
-                    onChange={handleChange}
-                    options={units}
-                    placeholder="Select unit"
-                    error={errors.unit}
-                    required
-                    fullWidth
-                  />
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Units are managed by administrators
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Input
-                    label="Purchase Price"
-                    type="number"
-                    name="purchasePrice"
-                    value={formData.purchasePrice}
-                    onChange={handleChange}
-                    placeholder="0.00"
-                    error={errors.purchasePrice}
-                    required
-                    fullWidth
-                    min="0"
-                    step="0.01"
-                  />
-
-                  <Input
-                    label="Selling Price"
-                    type="number"
-                    name="sellingPrice"
-                    value={formData.sellingPrice}
-                    onChange={handleChange}
-                    placeholder="0.00"
-                    error={errors.sellingPrice}
-                    required
-                    fullWidth
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-
-                {/* Profit Margin Display */}
-                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-blue-900 dark:text-blue-200">
-                      Profit Margin
-                    </span>
-                    <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      {calculateProfitMargin()}%
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
-                    Calculated based on purchase and selling prices
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Step 2: Supplier Information */}
-            {currentStep === 2 && (
-              <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                  Supplier Information
-                </h2>
-
-                <Input
-                  label="Supplier Name"
-                  name="supplierName"
-                  value={formData.supplierName}
-                  onChange={handleChange}
-                  placeholder="Enter supplier name"
-                  error={errors.supplierName}
-                  required
-                  fullWidth
-                />
-
-                <Input
-                  label="Contact Person"
-                  name="contactPerson"
-                  value={formData.contactPerson}
-                  onChange={handleChange}
-                  placeholder="Enter contact person name"
-                  fullWidth
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Input
-                    label="Email"
-                    type="email"
-                    name="supplierEmail"
-                    value={formData.supplierEmail}
-                    onChange={handleChange}
-                    placeholder="supplier@example.com"
-                    error={errors.supplierEmail}
-                    fullWidth
-                  />
-
-                  <Input
-                    label="Phone"
-                    type="tel"
-                    name="supplierPhone"
-                    value={formData.supplierPhone}
-                    onChange={handleChange}
-                    placeholder="+1 (555) 123-4567"
-                    error={errors.supplierPhone}
-                    fullWidth
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
-                    Address
-                  </label>
-                  <textarea
-                    name="supplierAddress"
-                    value={formData.supplierAddress}
-                    onChange={handleChange}
-                    placeholder="Enter supplier address"
-                    rows={3}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <Input
-                    label="Lead Time (days)"
-                    type="number"
-                    name="leadTime"
-                    value={formData.leadTime}
-                    onChange={handleChange}
-                    placeholder="0"
-                    helperText="Delivery time"
-                    fullWidth
-                    min="0"
-                  />
-
-                  <Input
-                    label="Reorder Point"
-                    type="number"
-                    name="reorderPoint"
-                    value={formData.reorderPoint}
-                    onChange={handleChange}
-                    placeholder="0"
-                    helperText="When to reorder"
-                    fullWidth
-                    min="0"
-                  />
-
-                  <Input
-                    label="Min Order Quantity"
-                    type="number"
-                    name="minOrderQuantity"
-                    value={formData.minOrderQuantity}
-                    onChange={handleChange}
-                    placeholder="0"
-                    helperText="MOQ"
-                    fullWidth
-                    min="0"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Images */}
-            {currentStep === 3 && (
               <div
                 className="space-y-6"
                 onClick={(e) => {

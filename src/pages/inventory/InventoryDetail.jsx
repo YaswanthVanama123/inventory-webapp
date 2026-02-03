@@ -17,49 +17,39 @@ const InventoryDetail = () => {
   const { user, isAdmin, isEmployee } = useAuth();
   const { showSuccess, showError } = useToast();
 
-  
+
   const [item, setItem] = useState(null);
-  const [stockHistory, setStockHistory] = useState([]);
   const [activityLogs, setActivityLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('info'); 
 
-  
+
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
 
-  
-  const [updateStockModal, setUpdateStockModal] = useState(false);
   const [uploadImagesModal, setUploadImagesModal] = useState(false);
   const [deleteConfirmModal, setDeleteConfirmModal] = useState(false);
   const [deleteImageModal, setDeleteImageModal] = useState(false);
   const [imageToDelete, setImageToDelete] = useState(null);
 
-  
-  const [stockQuantity, setStockQuantity] = useState('');
-  const [stockAction, setStockAction] = useState('add');
-  const [stockReason, setStockReason] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [actionLoading, setActionLoading] = useState(false);
 
-  
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const [itemResponse, historyResponse, activityResponse] = await Promise.all([
+        const [itemResponse, activityResponse] = await Promise.all([
           inventoryService.getById(id),
-          inventoryService.getHistory(id),
           api.get(`/activities?resource=INVENTORY&search=${id}&limit=100`),
         ]);
 
         setItem(itemResponse.data.item);
-        setStockHistory(historyResponse.data || []);
         setActivityLogs(activityResponse.data?.activities || []);
       } catch (err) {
         setError(err.message || 'Failed to load item details');
@@ -72,7 +62,6 @@ const InventoryDetail = () => {
     fetchData();
   }, [id]);
 
-  
   const handleTouchStart = (e) => {
     setTouchStart(e.targetTouches[0].clientX);
   };
@@ -99,42 +88,6 @@ const InventoryDetail = () => {
     setTouchEnd(0);
   };
 
-  
-  const handleUpdateStock = async () => {
-    try {
-      setActionLoading(true);
-      await inventoryService.updateStock(id, {
-        quantity: parseInt(stockQuantity),
-        action: stockAction,
-        reason: stockReason,
-      });
-
-      showSuccess('Stock updated successfully');
-
-      
-      const [itemResponse, historyResponse] = await Promise.all([
-        inventoryService.getById(id),
-        inventoryService.getHistory(id),
-      ]);
-
-      setItem(itemResponse.data.item);
-      setStockHistory(historyResponse.data || []);
-
-      
-      setStockQuantity('');
-      setStockReason('');
-      setUpdateStockModal(false);
-      setError(null);
-    } catch (err) {
-      const errorMessage = err.message || 'Failed to update stock';
-      setError(errorMessage);
-      showError(errorMessage);
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  
   const handleUploadImages = async () => {
     try {
       setActionLoading(true);
@@ -175,7 +128,6 @@ const InventoryDetail = () => {
     }
   };
 
-  
   const getImagePath = (image) => {
     let path = '';
 
@@ -199,13 +151,11 @@ const InventoryDetail = () => {
     return path;
   };
 
-  
   const getImageId = (image) => {
     if (typeof image === 'object' && image?._id) return image._id;
     return null;
   };
 
-  
   const handleDeleteImage = (image) => {
     const imageId = getImageId(image);
     if (!imageId) {
@@ -242,26 +192,6 @@ const InventoryDetail = () => {
     } finally {
       setActionLoading(false);
     }
-  };
-
-  
-  const calculateProfitMargin = () => {
-    if (!item?.purchasePrice || !item?.sellingPrice) return 0;
-    const profit = item.sellingPrice - item.purchasePrice;
-    return ((profit / item.purchasePrice) * 100).toFixed(2);
-  };
-
-  
-  const getStockBadgeVariant = () => {
-    if (!item) return 'default';
-    if (item.currentStock === 0) return 'danger';
-    if (item.currentStock <= item.lowStockThreshold) return 'warning';
-    return 'success';
-  };
-
-  
-  const isLowStock = () => {
-    return item && item.currentStock <= item.lowStockThreshold && item.currentStock > 0;
   };
 
   if (loading) {
@@ -320,15 +250,6 @@ const InventoryDetail = () => {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {(isEmployee || isAdmin) && (
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => setUpdateStockModal(true)}
-              >
-                Update Stock
-              </Button>
-            )}
             {isAdmin && (
               <>
                 <Button
@@ -357,20 +278,6 @@ const InventoryDetail = () => {
           </div>
         </div>
       </div>
-
-      {/* Low Stock Alert */}
-      {isLowStock() && (
-        <Alert variant="warning" title="Low Stock Alert" dismissible className="mb-6">
-          Current stock ({item.currentStock} units) is below the threshold ({item.lowStockThreshold} units).
-          Consider restocking soon.
-        </Alert>
-      )}
-
-      {item.currentStock === 0 && (
-        <Alert variant="danger" title="Out of Stock" dismissible className="mb-6">
-          This item is currently out of stock.
-        </Alert>
-      )}
 
       {/* Error Alert */}
       {error && (
@@ -503,16 +410,6 @@ const InventoryDetail = () => {
               >
                 History
               </button>
-              <button
-                onClick={() => setActiveTab('supplier')}
-                className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'supplier'
-                    ? 'border-blue-600 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                }`}
-              >
-                Supplier
-              </button>
             </nav>
           </div>
 
@@ -532,16 +429,20 @@ const InventoryDetail = () => {
                         {item.category || 'N/A'}
                       </p>
                     </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        Current Stock
-                      </label>
-                      <div className="mt-1">
-                        <Badge variant={getStockBadgeVariant()} size="lg">
-                          {item.currentStock} units
-                        </Badge>
+                    {item.tags && item.tags.length > 0 && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                          Tags
+                        </label>
+                        <div className="mt-1 flex flex-wrap gap-2">
+                          {item.tags.map((tag, index) => (
+                            <Badge key={index} variant="default" size="sm">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Description */}
@@ -553,70 +454,6 @@ const InventoryDetail = () => {
                       {item.description || 'No description available'}
                     </p>
                   </div>
-
-                  {/* Pricing */}
-                  <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                      Pricing
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
-                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          Purchase Price
-                        </label>
-                        <p className="mt-1 text-xl font-bold text-gray-900 dark:text-white">
-                          ${item.purchasePrice?.toFixed(2) || '0.00'}
-                        </p>
-                      </div>
-                      <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
-                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          Selling Price
-                        </label>
-                        <p className="mt-1 text-xl font-bold text-gray-900 dark:text-white">
-                          ${item.sellingPrice?.toFixed(2) || '0.00'}
-                        </p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                        <label className="text-sm font-medium text-green-700 dark:text-green-400">
-                          Profit Margin
-                        </label>
-                        <p className="mt-1 text-xl font-bold text-green-700 dark:text-green-400">
-                          {calculateProfitMargin()}%
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Stock Thresholds */}
-                  <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                      Stock Management
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          Low Stock Threshold
-                        </label>
-                        <p className="mt-1 text-base text-gray-900 dark:text-white">
-                          {item.lowStockThreshold || 0} units
-                        </p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          Last Updated
-                        </label>
-                        <p className="mt-1 text-base text-gray-900 dark:text-white">
-                          {item.updatedAt
-                            ? new Date(item.updatedAt).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                              })
-                            : 'N/A'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </Card>
             )}
@@ -626,7 +463,7 @@ const InventoryDetail = () => {
               <div className="space-y-6">
                 {/* Activity Log Section */}
                 <Card title="Complete Activity History">
-                  {activityLogs.length === 0 && stockHistory.length === 0 ? (
+                  {activityLogs.length === 0 ? (
                     <div className="text-center py-8">
                       <svg
                         className="mx-auto h-12 w-12 text-gray-400"
@@ -811,174 +648,10 @@ const InventoryDetail = () => {
                           </div>
                         </div>
                       )}
-
-                      {/* Stock History Section */}
-                      {stockHistory.length > 0 && (
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                            Stock Movement History
-                          </h3>
-                          <div className="relative">
-                            {stockHistory.map((entry, index) => (
-                              <div key={entry._id || index} className="relative pb-8 last:pb-0">
-                                {/* Timeline line */}
-                                {index < stockHistory.length - 1 && (
-                                  <div className="absolute left-4 top-8 -bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
-                                )}
-
-                                <div className="relative flex items-start space-x-3">
-                                  {/* Timeline dot */}
-                                  <div
-                                    className={`relative flex h-8 w-8 items-center justify-center rounded-full ${
-                                      entry.action === 'add'
-                                        ? 'bg-green-100 dark:bg-green-900/30'
-                                        : entry.action === 'remove'
-                                        ? 'bg-red-100 dark:bg-red-900/30'
-                                        : 'bg-blue-100 dark:bg-blue-900/30'
-                                    }`}
-                                  >
-                                    <svg
-                                      className={`h-4 w-4 ${
-                                        entry.action === 'add'
-                                          ? 'text-green-600 dark:text-green-400'
-                                          : entry.action === 'remove'
-                                          ? 'text-red-600 dark:text-red-400'
-                                          : 'text-blue-600 dark:text-blue-400'
-                                      }`}
-                                      fill="currentColor"
-                                      viewBox="0 0 20 20"
-                                    >
-                                      {entry.action === 'add' ? (
-                                        <path
-                                          fillRule="evenodd"
-                                          d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                                          clipRule="evenodd"
-                                        />
-                                      ) : entry.action === 'remove' ? (
-                                        <path
-                                          fillRule="evenodd"
-                                          d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"
-                                          clipRule="evenodd"
-                                        />
-                                      ) : (
-                                        <path
-                                          fillRule="evenodd"
-                                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
-                                          clipRule="evenodd"
-                                        />
-                                      )}
-                                    </svg>
-                                  </div>
-
-                                  {/* Content */}
-                                  <div className="flex-1 min-w-0 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                                    <div className="flex items-center justify-between">
-                                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                        {entry.action === 'add' && 'Stock Added'}
-                                        {entry.action === 'remove' && 'Stock Removed'}
-                                        {entry.action === 'set' && 'Stock Set'}
-                                      </p>
-                                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                                        {new Date(entry.date).toLocaleDateString('en-US', {
-                                          month: 'short',
-                                          day: 'numeric',
-                                          year: 'numeric',
-                                        })}
-                                      </span>
-                                    </div>
-                                    <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                                      <span className="font-semibold">
-                                        {entry.action === 'add' ? '+' : entry.action === 'remove' ? '-' : ''}
-                                        {entry.quantity} units
-                                      </span>
-                                      {entry.previousStock !== undefined && entry.newStock !== undefined && (
-                                        <span className="text-gray-500 dark:text-gray-400 ml-2">
-                                          ({entry.previousStock} → {entry.newStock})
-                                        </span>
-                                      )}
-                                    </div>
-                                    {entry.reason && (
-                                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 italic">
-                                        {entry.reason}
-                                      </p>
-                                    )}
-                                    {entry.updatedBy && (
-                                      <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
-                                        By: {entry.updatedBy.username || 'Unknown'}
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )}
                 </Card>
               </div>
-            )}
-
-            {/* Supplier Tab */}
-            {activeTab === 'supplier' && (
-              <Card title="Supplier Details">
-                {item.supplier ? (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        Supplier Name
-                      </label>
-                      <p className="mt-1 text-base text-gray-900 dark:text-white">
-                        {item.supplier.name || 'N/A'}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        Contact Information
-                      </label>
-                      <p className="mt-1 text-base text-gray-900 dark:text-white">
-                        {item.supplier.contact || 'N/A'}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        Email
-                      </label>
-                      <p className="mt-1 text-base text-gray-900 dark:text-white">
-                        {item.supplier.email || 'N/A'}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        Address
-                      </label>
-                      <p className="mt-1 text-base text-gray-900 dark:text-white whitespace-pre-wrap">
-                        {item.supplier.address || 'N/A'}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <svg
-                      className="mx-auto h-12 w-12 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
-                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                      No supplier information available
-                    </p>
-                  </div>
-                )}
-              </Card>
             )}
           </div>
         </div>
@@ -1013,92 +686,6 @@ const InventoryDetail = () => {
                 ))}
               </div>
             )}
-          </div>
-        </Modal>
-      )}
-
-      {/* Update Stock Modal */}
-      {updateStockModal && (
-        <Modal
-          isOpen={updateStockModal}
-          onClose={() => setUpdateStockModal(false)}
-          title="Update Stock"
-          footer={
-            <>
-              <Button variant="ghost" onClick={() => setUpdateStockModal(false)}>
-                Cancel
-              </Button>
-              <Button
-                variant="primary"
-                onClick={handleUpdateStock}
-                loading={actionLoading}
-                disabled={!stockQuantity || parseInt(stockQuantity) <= 0}
-              >
-                Update Stock
-              </Button>
-            </>
-          }
-        >
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Action
-              </label>
-              <select
-                value={stockAction}
-                onChange={(e) => setStockAction(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="add">Add Stock</option>
-                <option value="remove">Remove Stock</option>
-                <option value="set">Set Stock</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Quantity
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={stockQuantity}
-                onChange={(e) => setStockQuantity(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter quantity"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Reason (Optional)
-              </label>
-              <textarea
-                value={stockReason}
-                onChange={(e) => setStockReason(e.target.value)}
-                rows="3"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter reason for stock update"
-              />
-            </div>
-
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-              <p className="text-sm text-blue-800 dark:text-blue-300">
-                <span className="font-medium">Current Stock:</span> {item.currentStock} units
-                {stockQuantity && (
-                  <>
-                    <br />
-                    <span className="font-medium">New Stock:</span>{' '}
-                    {stockAction === 'add'
-                      ? item.currentStock + parseInt(stockQuantity)
-                      : stockAction === 'remove'
-                      ? Math.max(0, item.currentStock - parseInt(stockQuantity))
-                      : parseInt(stockQuantity)}{' '}
-                    units
-                  </>
-                )}
-              </p>
-            </div>
           </div>
         </Modal>
       )}

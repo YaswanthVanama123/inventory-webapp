@@ -223,23 +223,41 @@ const Dashboard = () => {
 
   // Fetch dashboard data
   const fetchDashboardData = async () => {
+    console.log('fetchDashboardData called - starting API request...');
     setLoading(true);
     setError(null);
 
     try {
+      console.log('Making API request to dashboardService.getDashboardData()...');
       const response = await dashboardService.getDashboardData();
 
+      console.log('=== FRONTEND DASHBOARD DEBUG ===');
+      console.log('Raw API response:', response);
+      console.log('Response data:', response.data);
+
       if (response.success && response.data) {
-        const { summary, categoryStats, recentActivity, topValueItems } = response.data;
+        const { summary, categoryStats, recentActivity, topValueItems, salesTrend } = response.data;
+        console.log('Summary data:', summary);
+        console.log('Sales trend:', salesTrend);
 
         // Transform backend data to frontend format
         const transformedData = {
           stats: {
-            totalItems: summary.totalItems || 0,
-            totalInventoryValue: summary.totalValue || 0,
+            totalRevenue: summary.totalRevenue || 0,
+            totalOrders: summary.totalOrders || 0,
             lowStockItems: summary.lowStockCount || 0,
-            totalInvoices: summary.reorderCount || 0, // Using reorder count as placeholder
+            profitMargin: summary.profitMargin || 0,
+            revenueChange: summary.revenueChange || 0,
+            ordersChange: summary.ordersChange || 0,
+            lowStockChange: summary.lowStockChange || 0,
+            profitMarginChange: summary.profitMarginChange || 0,
           },
+          salesTrend: salesTrend?.map(trend => ({
+            month: trend.month,
+            revenue: trend.revenue || 0,
+            profit: trend.profit || 0,
+            orders: trend.orders || 0,
+          })) || [],
           categoryDistribution: categoryStats?.map((cat, index) => ({
             name: cat._id || 'Unknown',
             value: cat.count || 0,
@@ -253,6 +271,9 @@ const Dashboard = () => {
           })) || [],
           topValueItems: topValueItems || [],
         };
+
+        console.log('Transformed data:', transformedData);
+        console.log('=== END FRONTEND DASHBOARD DEBUG ===');
 
         setDashboardData(transformedData);
       }
@@ -307,6 +328,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    console.log('Dashboard component mounted, calling fetchDashboardData...');
     fetchDashboardData();
   }, []);
 
@@ -360,33 +382,97 @@ const Dashboard = () => {
       {/* Stats Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <StatCard
-          title="Total Items"
-          value={stats.totalItems?.toLocaleString() || '0'}
-          icon={Package}
+          title="Total Revenue"
+          value={formatCurrency(stats.totalRevenue)}
+          change={`${stats.revenueChange > 0 ? '+' : ''}${stats.revenueChange}%`}
+          changeType={stats.revenueChange >= 0 ? 'positive' : 'negative'}
+          icon={DollarSign}
           loading={loading}
         />
         <StatCard
-          title="Inventory Value"
-          value={formatCurrency(stats.totalInventoryValue)}
-          icon={DollarSign}
+          title="Total Orders"
+          value={stats.totalOrders?.toLocaleString() || '0'}
+          change={`${stats.ordersChange > 0 ? '+' : ''}${stats.ordersChange}%`}
+          changeType={stats.ordersChange >= 0 ? 'positive' : 'negative'}
+          icon={FileText}
           loading={loading}
         />
         <StatCard
           title="Low Stock Items"
           value={stats.lowStockItems?.toLocaleString() || '0'}
+          change={`${stats.lowStockChange}%`}
+          changeType={stats.lowStockChange >= 0 ? 'positive' : 'negative'}
           icon={AlertTriangle}
           loading={loading}
         />
         <StatCard
-          title="Items to Reorder"
-          value={stats.totalInvoices?.toLocaleString() || '0'}
-          icon={ShoppingCart}
+          title="Profit Margin"
+          value={`${stats.profitMargin}%`}
+          change={`${stats.profitMarginChange > 0 ? '+' : ''}${stats.profitMarginChange}%`}
+          changeType={stats.profitMarginChange >= 0 ? 'positive' : 'negative'}
+          icon={TrendingUp}
           loading={loading}
         />
       </div>
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        {/* Revenue & Profit Trend */}
+        <Card className="p-6">
+          {loading ? (
+            <ChartSkeleton />
+          ) : salesTrend.length > 0 ? (
+            <>
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">Revenue & Profit Trend</h2>
+                <p className="text-sm text-gray-500">Last {salesTrend.length} months performance</p>
+              </div>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={salesTrend}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                    <XAxis dataKey="month" stroke="#6B7280" />
+                    <YAxis stroke="#6B7280" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#fff',
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      }}
+                      formatter={(value) => `$${value.toFixed(2)}`}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="#3B82F6"
+                      strokeWidth={2}
+                      name="Revenue"
+                      dot={{ fill: '#3B82F6', r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="profit"
+                      stroke="#10B981"
+                      strokeWidth={2}
+                      name="Profit"
+                      dot={{ fill: '#10B981', r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <Activity className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-500">No sales data available</p>
+            </div>
+          )}
+        </Card>
+
         {/* Category Distribution Chart */}
         <Card className="p-6">
           {loading ? (
@@ -448,8 +534,10 @@ const Dashboard = () => {
             </div>
           )}
         </Card>
+      </div>
 
-        {/* Quick Stats or Info Card */}
+      {/* Quick Stats or Info Card */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <Card className="p-6">
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-gray-900">Quick Stats</h2>
@@ -483,23 +571,6 @@ const Dashboard = () => {
             </div>
           )}
         </Card>
-      </div>
-
-      {/* Recent Activity and Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-        {/* Recent Activity Table */}
-        <Card className="p-6 lg:col-span-2">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
-              <p className="text-sm text-gray-500">Latest actions and updates</p>
-            </div>
-            <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-              View All
-            </button>
-          </div>
-          <RecentActivityTable activities={recentActivities} loading={loading} />
-        </Card>
 
         {/* Quick Actions */}
         <Card className="p-6">
@@ -510,6 +581,20 @@ const Dashboard = () => {
           <QuickActions />
         </Card>
       </div>
+
+      {/* Recent Activity */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+            <p className="text-sm text-gray-500">Latest actions and updates</p>
+          </div>
+          <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+            View All
+          </button>
+        </div>
+        <RecentActivityTable activities={recentActivities} loading={loading} />
+      </Card>
     </div>
   );
 };

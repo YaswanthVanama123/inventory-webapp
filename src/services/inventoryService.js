@@ -4,10 +4,16 @@ import { handleApiError } from './errorHandler';
 
 
 const inventoryService = {
-  
+
   getAll: async (params = {}) => {
     try {
-      const response = await api.get('/inventory', { params });
+      // Use POS endpoint for weighted average pricing if requested
+      const endpoint = params.usePOSPricing ? '/inventory/pos' : '/inventory';
+
+      // Remove usePOSPricing from params before sending to backend
+      const { usePOSPricing, ...backendParams } = params;
+
+      const response = await api.get(endpoint, { params: backendParams });
       return response;
     } catch (error) {
       throw handleApiError(error, {

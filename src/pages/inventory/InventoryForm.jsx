@@ -8,7 +8,7 @@ import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
 import api from '../../services/api';
 import settingsService from '../../services/settingsService';
-import { FileText, Image } from 'lucide-react';
+import { FileText, Image, DollarSign, TrendingUp, Tag } from 'lucide-react';
 
 const InventoryForm = () => {
   const navigate = useNavigate();
@@ -54,14 +54,14 @@ const InventoryForm = () => {
     skuCode: '',
     description: '',
     category: '',
+    unit: 'pieces', // Unit of measurement
     tags: [],
-
 
     images: [],
     primaryImageIndex: 0,
   });
 
-  
+
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -165,11 +165,13 @@ const InventoryForm = () => {
       
       const item = response.data.item || response.data.data?.item || response.data;
 
+
       setFormData({
         itemName: item.itemName || '',
         skuCode: item.skuCode || '',
         description: item.description || '',
         category: item.category || '',
+        unit: item.quantity?.unit || item.unit || 'pieces',
         tags: item.tags || [],
         images: item.images || [],
         primaryImageIndex: item.primaryImageIndex || 0,
@@ -226,15 +228,15 @@ const InventoryForm = () => {
     localStorage.removeItem('inventoryDraft');
   };
 
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
 
-    
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -373,6 +375,10 @@ const InventoryForm = () => {
         if (!formData.category) {
           newErrors.category = 'Category is required';
         }
+
+        if (!formData.unit) {
+          newErrors.unit = 'Unit of measurement is required';
+        }
         break;
 
       case 1:
@@ -483,13 +489,14 @@ const InventoryForm = () => {
     setAlert(null);
 
     try {
-      
+
       const submitData = new FormData();
 
       submitData.append('itemName', formData.itemName);
       submitData.append('skuCode', formData.skuCode);
       submitData.append('description', formData.description);
       submitData.append('category', formData.category);
+      submitData.append('unit', formData.unit);
       submitData.append('tags', JSON.stringify(formData.tags));
 
 
@@ -732,6 +739,44 @@ const InventoryForm = () => {
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     Categories are managed by administrators
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Unit of Measurement <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    name="unit"
+                    value={formData.unit}
+                    onChange={handleChange}
+                    options={[
+                      { label: 'Pieces', value: 'pieces' },
+                      { label: 'Kilograms (kg)', value: 'kg' },
+                      { label: 'Grams (g)', value: 'g' },
+                      { label: 'Pounds (lbs)', value: 'lbs' },
+                      { label: 'Ounces (oz)', value: 'oz' },
+                      { label: 'Liters (L)', value: 'liters' },
+                      { label: 'Milliliters (ml)', value: 'ml' },
+                      { label: 'Gallons', value: 'gallons' },
+                      { label: 'Meters (m)', value: 'meters' },
+                      { label: 'Centimeters (cm)', value: 'cm' },
+                      { label: 'Feet (ft)', value: 'feet' },
+                      { label: 'Inches (in)', value: 'inches' },
+                      { label: 'Boxes', value: 'boxes' },
+                      { label: 'Packs', value: 'packs' },
+                      { label: 'Cartons', value: 'cartons' },
+                      { label: 'Dozens', value: 'dozens' },
+                      { label: 'Sets', value: 'sets' },
+                      { label: 'Pairs', value: 'pairs' },
+                    ]}
+                    placeholder="Select unit"
+                    error={errors.unit}
+                    required
+                    fullWidth
+                  />
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    How this item is measured (e.g., pieces, kg, liters)
                   </p>
                 </div>
 

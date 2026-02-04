@@ -16,7 +16,8 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import {
   ShoppingCart, Plus, Minus, Trash2, User, DollarSign, Package,
   Search, Filter, X, CreditCard, Percent, Tag, Receipt,
-  RefreshCw, Grid, List, Save, Trash, ChevronDown, ChevronUp
+  RefreshCw, Grid, List, Save, Trash, ChevronDown, ChevronUp,
+  CheckSquare, Square, Calendar, Layers
 } from 'lucide-react';
 
 const PointOfSale = () => {
@@ -53,14 +54,22 @@ const PointOfSale = () => {
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [notes, setNotes] = useState('');
 
-  
+
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
 
-  
+  // Purchase Selection Modal
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [productPurchases, setProductPurchases] = useState([]);
+  const [loadingPurchases, setLoadingPurchases] = useState(false);
+  const [purchaseAllocations, setPurchaseAllocations] = useState({});
+  const [customPrice, setCustomPrice] = useState(0);
+
+
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return '/placeholder-product.png';
+    if (!imagePath) return null; // Return null if no image
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
@@ -68,7 +77,7 @@ const PointOfSale = () => {
       const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
       return `${backendUrl}${imagePath}`;
     }
-    return imagePath || '/placeholder-product.png';
+    return imagePath;
   };
 
   
@@ -88,18 +97,16 @@ const PointOfSale = () => {
     setLoading(true);
     try {
       const [productsRes, categoriesRes] = await Promise.all([
-        inventoryService.getAll({ limit: 1000 }),
+        inventoryService.getAll({ limit: 1000, usePOSPricing: true }),
         settingsService.getCategories(),
       ]);
 
       const productsData = productsRes?.data?.items || [];
       const categoriesData = categoriesRes?.data?.categories || [];
 
-      
-      const availableProducts = productsData.filter(p => p.currentStock > 0);
-
-      setProducts(availableProducts);
-      setFilteredProducts(availableProducts);
+      // Show all products (don't filter by stock)
+      setProducts(productsData);
+      setFilteredProducts(productsData);
       setCategories(categoriesData);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -128,37 +135,169 @@ const PointOfSale = () => {
     setFilteredProducts(filtered);
   }, [searchTerm, selectedCategory, products]);
 
-  
-  const addToCart = useCallback((product) => {
-    const existingItem = cart.find((item) => item._id === product._id);
+  // Fetch purchases for a product
+  const fetchProductPurchases = async (productId) => {
+    setLoadingPurchases(true);
+    try {
+      const response = await api.get(`/inventory/${productId}/purchases`);
+      const purchases = response.data?.data?.purchases || response.data?.purchases || [];
+
+      // Filter only purchases with remaining quantity
+      const availablePurchases = purchases.filter(p => (p.remainingQuantity ?? p.quantity) > 0);
+
+      setProductPurchases(availablePurchases);
+
+      // Initialize allocations
+      const initialAllocations = {};
+      availablePurchases.forEach(purchase => {
+        initialAllocations[purchase._id] = {
+          selected: false,
+          quantity: 0,
+          maxQuantity: purchase.remainingQuantity ?? purchase.quantity
+        };
+      });
+      setPurchaseAllocations(initialAllocations);
+    } catch (error) {
+      console.error('Error fetching purchases:', error);
+      showError('Failed to load purchase history');
+      setProductPurchases([]);
+    } finally {
+      setLoadingPurchases(false);
+    }
+  };
+
+  // Open purchase selection modal
+  const openPurchaseModal = async (product) => {
+    setSelectedProduct(product);
+    setCustomPrice(product.sellingPrice || 0);
+    setShowPurchaseModal(true);
+    await fetchProductPurchases(product._id);
+  };
+
+  // Close purchase selection modal
+  const closePurchaseModal = () => {
+    if (!loadingPurchases) {
+      setShowPurchaseModal(false);
+      setSelectedProduct(null);
+      setProductPurchases([]);
+      setPurchaseAllocations({});
+      setCustomPrice(0);
+    }
+  };
+
+  // Handle purchase selection toggle
+  const togglePurchaseSelection = (purchaseId) => {
+    setPurchaseAllocations(prev => ({
+      ...prev,
+      [purchaseId]: {
+        ...prev[purchaseId],
+        selected: !prev[purchaseId].selected,
+        quantity: !prev[purchaseId].selected ? Math.min(1, prev[purchaseId].maxQuantity) : 0
+      }
+    }));
+  };
+
+  // Handle allocation quantity change
+  const updateAllocationQuantity = (purchaseId, quantity) => {
+    const allocation = purchaseAllocations[purchaseId];
+    const validQuantity = Math.max(0, Math.min(quantity, allocation.maxQuantity));
+
+    setPurchaseAllocations(prev => ({
+      ...prev,
+      [purchaseId]: {
+        ...prev[purchaseId],
+        quantity: validQuantity,
+        selected: validQuantity > 0
+      }
+    }));
+  };
+
+  // Calculate total quantity from allocations
+  const getTotalAllocatedQuantity = () => {
+    return Object.values(purchaseAllocations).reduce((sum, alloc) => sum + (alloc.selected ? alloc.quantity : 0), 0);
+  };
+
+  // Add to cart with purchase allocations
+  const addToCartWithAllocations = () => {
+    const totalQty = getTotalAllocatedQuantity();
+
+    if (totalQty === 0) {
+      showError('Please select at least one purchase and specify quantity');
+      return;
+    }
+
+    // Get selected allocations
+    const selectedAllocations = Object.entries(purchaseAllocations)
+      .filter(([_, alloc]) => alloc.selected && alloc.quantity > 0)
+      .map(([purchaseId, alloc]) => {
+        const purchase = productPurchases.find(p => p._id === purchaseId);
+        return {
+          purchaseId,
+          quantity: alloc.quantity,
+          purchaseDate: purchase.purchaseDate || purchase.date,
+          supplier: purchase.supplier?.name || purchase.supplier
+        };
+      });
+
+    // Check if item already in cart
+    const existingItem = cart.find((item) => item._id === selectedProduct._id);
 
     if (existingItem) {
-      if (existingItem.quantity >= product.currentStock) {
-        showError(`Only ${product.currentStock} units available in stock`);
+      // Merge allocations
+      const mergedAllocations = [...(existingItem.purchaseAllocations || [])];
+
+      selectedAllocations.forEach(newAlloc => {
+        const existing = mergedAllocations.find(a => a.purchaseId === newAlloc.purchaseId);
+        if (existing) {
+          existing.quantity += newAlloc.quantity;
+        } else {
+          mergedAllocations.push(newAlloc);
+        }
+      });
+
+      const newTotalQty = mergedAllocations.reduce((sum, a) => sum + a.quantity, 0);
+
+      if (newTotalQty > selectedProduct.currentStock) {
+        showError(`Only ${selectedProduct.currentStock} units available in stock`);
         return;
       }
-      setCart(
-        cart.map((item) =>
-          item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
-        )
-      );
-      showSuccess(`Added ${product.itemName} to cart`);
+
+      setCart(cart.map((item) =>
+        item._id === selectedProduct._id
+          ? { ...item, quantity: newTotalQty, sellingPrice: customPrice, purchaseAllocations: mergedAllocations }
+          : item
+      ));
+      showSuccess(`Updated ${selectedProduct.itemName} in cart`);
     } else {
       setCart([
         ...cart,
         {
-          _id: product._id,
-          itemName: product.itemName,
-          skuCode: product.skuCode,
-          sellingPrice: product.sellingPrice,
-          currentStock: product.currentStock,
-          image: product.image,
-          quantity: 1,
+          _id: selectedProduct._id,
+          itemName: selectedProduct.itemName,
+          skuCode: selectedProduct.skuCode,
+          sellingPrice: customPrice,
+          currentStock: selectedProduct.currentStock,
+          image: selectedProduct.image,
+          quantity: totalQty,
+          purchaseAllocations: selectedAllocations,
         },
       ]);
-      showSuccess(`${product.itemName} added to cart`);
+      showSuccess(`${selectedProduct.itemName} added to cart`);
     }
-  }, [cart, showError, showSuccess]);
+
+    // Close modal and reset
+    setShowPurchaseModal(false);
+    setSelectedProduct(null);
+    setProductPurchases([]);
+    setPurchaseAllocations({});
+    setCustomPrice(0);
+  };
+
+
+  const addToCart = useCallback((product) => {
+    // Open purchase selection modal instead of directly adding
+    openPurchaseModal(product);
+  }, []);
 
   
   const updateQuantity = useCallback((productId, newQuantity) => {
@@ -338,12 +477,13 @@ const PointOfSale = () => {
         items: cart.map((item) => ({
           inventory: item._id,
           itemName: item.itemName,
-          description: item.itemName, 
+          description: item.itemName,
           skuCode: item.skuCode,
           quantity: item.quantity,
           unitPrice: item.sellingPrice,
           taxRate: 0,
           discount: 0,
+          purchaseAllocations: item.purchaseAllocations || [], // Include which purchases to deduct from
         })),
         amounts: {
           subtotal: subtotal,
@@ -361,8 +501,8 @@ const PointOfSale = () => {
           discountAmount: appliedCoupon.discountAmount,
         } : null,
         paymentMethod,
-        paymentStatus: 'pending', 
-        status: 'pending', 
+        paymentStatus: 'pending',
+        status: 'pending',
         notes,
         issueDate: new Date().toISOString(),
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
@@ -530,7 +670,7 @@ const PointOfSale = () => {
               {/* Products Grid/List */}
               <div className={`max-h-[600px] overflow-y-auto ${
                 viewMode === 'grid'
-                  ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'
+                  ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3'
                   : 'space-y-2'
               }`}>
                 {filteredProducts.length > 0 ? (
@@ -538,101 +678,101 @@ const PointOfSale = () => {
                     viewMode === 'grid' ? (
                       <div
                         key={product._id}
-                        className="group relative border-2 border-slate-200 dark:border-gray-700 rounded-xl p-4 hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1 transition-all duration-300 cursor-pointer bg-gradient-to-br from-white to-slate-50 dark:from-gray-800 dark:to-gray-850 hover:border-blue-400 dark:hover:border-blue-500 hover:scale-[1.02] overflow-hidden"
+                        className="group relative border border-slate-200 rounded-lg p-2.5 hover:border-blue-400 transition-all duration-200 cursor-pointer bg-white hover:shadow-md"
                         onClick={() => addToCart(product)}
                       >
-                        {/* Subtle gradient overlay on hover */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 transition-all duration-300 rounded-xl pointer-events-none"></div>
-                        <div className="relative aspect-square bg-gradient-to-br from-slate-100 to-slate-200 dark:from-gray-700 dark:to-gray-600 rounded-xl mb-3 overflow-hidden shadow-inner">
-                          <img
-                            src={getImageUrl(product.image)}
-                            alt={product.itemName}
-                            className="w-full h-full object-cover group-hover:scale-110 group-hover:rotate-1 transition-all duration-500"
-                            onError={(e) => {
-                              // Prevent infinite loop - only set placeholder once
-                              if (e.target.src !== e.target.baseURI + 'placeholder-product.png') {
-                                e.target.onerror = null; // Remove error handler to prevent loop
-                                e.target.src = '/placeholder-product.png';
-                              }
-                            }}
-                          />
-                          {/* Image overlay gradient */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="relative h-32 bg-slate-100 rounded-md mb-2 overflow-hidden flex items-center justify-center">
+                          {getImageUrl(product.image) ? (
+                            <img
+                              src={getImageUrl(product.image)}
+                              alt={product.itemName}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextElementSibling.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div className={`${getImageUrl(product.image) ? 'hidden' : 'flex'} w-full h-full items-center justify-center bg-slate-100`}>
+                            <Package className="w-12 h-12 text-slate-400" />
+                          </div>
                           <Badge
                             variant={product.currentStock <= product.lowStockThreshold ? 'warning' : 'success'}
-                            className="absolute top-2 right-2 shadow-lg backdrop-blur-sm bg-opacity-90 font-semibold animate-pulse"
+                            className="absolute top-1.5 right-1.5 text-xs px-1.5 py-0.5"
                           >
-                            {product.currentStock} left
+                            {product.currentStock}
                           </Badge>
                         </div>
-                        <h3 className="font-bold text-sm text-slate-900 dark:text-white mb-1 truncate relative z-10 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
+                        <h3 className="font-semibold text-xs text-slate-900 mb-1 truncate group-hover:text-blue-600 transition-colors leading-tight">
                           {product.itemName}
                         </h3>
-                        <p className="text-xs text-slate-500 dark:text-gray-400 mb-3 font-medium">
-                          SKU: {product.skuCode}
+                        <p className="text-xs text-slate-500 mb-1.5 truncate">
+                          {product.skuCode}
                         </p>
-                        <div className="flex items-center justify-between relative z-10">
-                          <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 dark:from-blue-400 dark:to-teal-400 bg-clip-text text-transparent">
-                            ${product.sellingPrice?.toFixed(2)}
-                          </span>
-                          <Button size="sm" className="gap-1 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800">
-                            <Plus className="w-4 h-4" />
+                        <div className="flex items-center justify-between gap-1">
+                          <div className="flex items-center gap-1">
+                            <Package className="w-3.5 h-3.5 text-slate-500" />
+                            <span className={`text-sm font-bold ${product.currentStock > 0 ? 'text-slate-700' : 'text-red-600'}`}>
+                              {product.currentStock} {product.unit || 'units'}
+                            </span>
+                          </div>
+                          <button className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium flex items-center gap-1 transition-colors">
+                            <Plus className="w-3 h-3" />
                             Add
-                          </Button>
+                          </button>
                         </div>
                       </div>
                     ) : (
                       <div
                         key={product._id}
-                        className="group relative flex items-center gap-4 p-4 border-2 border-slate-200 dark:border-gray-700 rounded-xl hover:bg-gradient-to-r hover:from-slate-50 hover:to-blue-50/30 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:scale-[1.01] overflow-hidden"
+                        className="group relative flex items-center gap-3 p-3 border border-slate-200 dark:border-gray-700 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-700 cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800"
                         onClick={() => addToCart(product)}
                       >
-                        {/* Subtle gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-teal-500/0 group-hover:from-blue-500/5 group-hover:to-teal-500/5 transition-all duration-300 pointer-events-none"></div>
-                        <div className="relative">
-                          <img
-                            src={getImageUrl(product.image)}
-                            alt={product.itemName}
-                            className="w-20 h-20 object-cover rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300 ring-2 ring-slate-200 dark:ring-gray-600 group-hover:ring-blue-400"
-                            onError={(e) => {
-                              // Prevent infinite loop - only set placeholder once
-                              if (e.target.src !== e.target.baseURI + 'placeholder-product.png') {
-                                e.target.onerror = null; // Remove error handler to prevent loop
-                                e.target.src = '/placeholder-product.png';
-                              }
-                            }}
-                          />
+                        <img
+                          src={getImageUrl(product.image)}
+                          alt={product.itemName}
+                          className="w-16 h-16 object-cover rounded-lg border border-slate-200 dark:border-gray-600 group-hover:border-blue-400 transition-all"
+                          onError={(e) => {
+                            if (e.target.src !== e.target.baseURI + 'placeholder-product.png') {
+                              e.target.onerror = null;
+                              e.target.src = '/placeholder-product.png';
+                            }
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                            {product.itemName}
+                          </h3>
+                          <p className="text-xs text-slate-500 dark:text-gray-400">SKU: {product.skuCode}</p>
                         </div>
-                        <div className="flex-1 relative z-10">
-                          <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">{product.itemName}</h3>
-                          <p className="text-sm text-slate-500 dark:text-gray-400 font-medium">SKU: {product.skuCode}</p>
-                        </div>
-                        <div className="text-right relative z-10">
-                          <p className="text-xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 dark:from-blue-400 dark:to-teal-400 bg-clip-text text-transparent">${product.sellingPrice?.toFixed(2)}</p>
-                          <Badge variant={product.currentStock <= product.lowStockThreshold ? 'warning' : 'success'} size="sm" className="mt-1 shadow-sm">
-                            {product.currentStock} in stock
+                        <div className="text-right flex-shrink-0">
+                          <div className="flex items-center gap-2 justify-end mb-1">
+                            <Package className="w-4 h-4 text-slate-500" />
+                            <span className={`text-base font-bold ${product.currentStock > 0 ? 'text-slate-700 dark:text-slate-300' : 'text-red-600'}`}>
+                              {product.currentStock}
+                            </span>
+                          </div>
+                          <Badge variant={product.currentStock <= product.lowStockThreshold ? 'warning' : 'success'} size="sm">
+                            {product.unit || 'units'}
                           </Badge>
                         </div>
-                        <Button size="sm" className="shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 relative z-10">
+                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 flex-shrink-0">
                           <Plus className="w-4 h-4" />
                         </Button>
                       </div>
                     )
                   ))
                 ) : (
-                  <div className="col-span-full text-center py-24 bg-gradient-to-br from-slate-100 via-blue-50 to-purple-50 dark:from-gray-800 dark:via-gray-750 dark:to-gray-700 rounded-2xl border-2 border-dashed border-slate-300 dark:border-gray-600 shadow-inner">
-                    <div className="relative inline-block">
-                      <Package className="w-20 h-20 text-slate-400 dark:text-gray-500 mx-auto mb-4 animate-bounce" />
-                      <div className="absolute inset-0 bg-blue-400 blur-xl opacity-20 animate-pulse"></div>
-                    </div>
-                    <p className="text-xl font-bold text-slate-700 dark:text-gray-300 mb-2">No products found</p>
+                  <div className="col-span-full text-center py-20 bg-slate-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-slate-300 dark:border-gray-600">
+                    <Package className="w-16 h-16 text-slate-400 dark:text-gray-500 mx-auto mb-3" />
+                    <p className="text-lg font-semibold text-slate-700 dark:text-gray-300 mb-2">No products found</p>
                     <p className="text-sm text-slate-500 dark:text-gray-400 mb-4">Try adjusting your filters or search terms</p>
                     <button
                       onClick={() => {
                         setSearchTerm('');
                         setSelectedCategory('');
                       }}
-                      className="mt-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all"
                     >
                       Clear Filters
                     </button>
@@ -671,69 +811,72 @@ const PointOfSale = () => {
               </div>
 
               {/* Cart Items */}
-              <div className="space-y-3 mb-4 max-h-[350px] overflow-y-auto">
+              <div className="space-y-2 mb-4 max-h-[350px] overflow-y-auto">
                 {cart.length > 0 ? (
                   cart.map((item) => (
                     <div
                       key={item._id}
-                      className="relative flex items-center gap-3 p-3 bg-gradient-to-r from-slate-50 to-blue-50/50 dark:from-gray-800 dark:to-gray-750 rounded-xl border-2 border-slate-200 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-300 hover:shadow-lg group overflow-hidden"
+                      className="relative flex items-center gap-2 p-2.5 bg-slate-50 dark:bg-gray-800 rounded-lg border border-slate-200 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-200 group"
                     >
-                      {/* Subtle gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-teal-500/0 group-hover:from-blue-500/5 group-hover:to-teal-500/5 transition-all duration-300 pointer-events-none"></div>
-                      <div className="relative">
-                        <img
-                          src={getImageUrl(item.image)}
-                          alt={item.itemName}
-                          className="w-16 h-16 object-cover rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300 ring-2 ring-slate-200 dark:ring-gray-600"
-                          onError={(e) => {
-                            e.target.src = '/placeholder-product.png';
-                          }}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0 relative z-10">
-                        <p className="text-sm font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
+                      <img
+                        src={getImageUrl(item.image)}
+                        alt={item.itemName}
+                        className="w-14 h-14 object-cover rounded-lg border border-slate-200 dark:border-gray-600"
+                        onError={(e) => {
+                          e.target.src = '/placeholder-product.png';
+                        }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                           {item.itemName}
                         </p>
-                        <p className="text-xs text-slate-600 dark:text-gray-400 font-medium">${item.sellingPrice?.toFixed(2)} each</p>
-                        <p className="text-sm font-bold bg-gradient-to-r from-amber-600 to-orange-600 dark:from-amber-400 dark:to-orange-400 bg-clip-text text-transparent">
-                          Total: ${(item.sellingPrice * item.quantity).toFixed(2)}
+                        <p className="text-xs text-slate-600 dark:text-gray-400">${item.sellingPrice?.toFixed(2)} each</p>
+                        {item.purchaseAllocations && item.purchaseAllocations.length > 0 && (
+                          <div className="mt-1 space-y-0.5">
+                            {item.purchaseAllocations.map((alloc, idx) => (
+                              <div key={idx} className="text-xs text-slate-500 flex items-center gap-1">
+                                <Layers className="w-3 h-3" />
+                                <span>{alloc.quantity} from {new Date(alloc.purchaseDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <p className="text-sm font-bold text-blue-600 dark:text-blue-400 mt-0.5">
+                          ${(item.sellingPrice * item.quantity).toFixed(2)}
                         </p>
                       </div>
-                      <div className="flex items-center gap-1 relative z-10">
+                      <div className="flex items-center gap-1">
                         <button
                           onClick={() => updateQuantity(item._id, item.quantity - 1)}
-                          className="p-1.5 hover:bg-white dark:hover:bg-gray-600 rounded-lg transition-all hover:shadow-md hover:scale-110 duration-200"
+                          className="p-1 hover:bg-white dark:hover:bg-gray-600 rounded transition-all"
                         >
-                          <Minus className="w-4 h-4 text-slate-600 dark:text-gray-300" />
+                          <Minus className="w-3.5 h-3.5 text-slate-600 dark:text-gray-300" />
                         </button>
                         <input
                           type="number"
                           value={item.quantity}
                           onChange={(e) => updateQuantity(item._id, parseInt(e.target.value) || 1)}
-                          className="w-14 text-center font-bold bg-white dark:bg-gray-600 rounded-lg px-2 py-1.5 border-2 border-slate-300 dark:border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all"
+                          className="w-12 text-center text-sm font-semibold bg-white dark:bg-gray-600 rounded px-1.5 py-1 border border-slate-300 dark:border-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all"
                         />
                         <button
                           onClick={() => updateQuantity(item._id, item.quantity + 1)}
-                          className="p-1.5 hover:bg-white dark:hover:bg-gray-600 rounded-lg transition-all hover:shadow-md hover:scale-110 duration-200"
+                          className="p-1 hover:bg-white dark:hover:bg-gray-600 rounded transition-all"
                         >
-                          <Plus className="w-4 h-4 text-slate-600 dark:text-gray-300" />
+                          <Plus className="w-3.5 h-3.5 text-slate-600 dark:text-gray-300" />
                         </button>
                         <button
                           onClick={() => removeFromCart(item._id)}
-                          className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 rounded-lg transition-all ml-1 hover:shadow-md hover:scale-110 duration-200"
+                          className="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 rounded transition-all ml-0.5"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-12 bg-gradient-to-br from-slate-100 via-blue-50 to-purple-50 dark:from-gray-800 dark:via-gray-750 dark:to-gray-700 rounded-2xl border-2 border-dashed border-slate-300 dark:border-gray-600 shadow-inner">
-                    <div className="relative inline-block">
-                      <ShoppingCart className="w-16 h-16 text-slate-400 dark:text-blue-500 mx-auto mb-3 animate-bounce" />
-                      <div className="absolute inset-0 bg-blue-400 blur-xl opacity-20 animate-pulse"></div>
-                    </div>
-                    <p className="text-slate-600 dark:text-gray-300 text-sm font-bold">Cart is empty</p>
+                  <div className="text-center py-12 bg-slate-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-slate-300 dark:border-gray-600">
+                    <ShoppingCart className="w-12 h-12 text-slate-400 dark:text-gray-500 mx-auto mb-2" />
+                    <p className="text-slate-600 dark:text-gray-300 text-sm font-semibold">Cart is empty</p>
                     <p className="text-slate-500 dark:text-gray-400 text-xs mt-1">Add products to get started</p>
                   </div>
                 )}
@@ -742,31 +885,31 @@ const PointOfSale = () => {
               {/* Cart Summary */}
               {cart.length > 0 && (
                 <>
-                  <div className="border-t border-slate-200 dark:border-gray-700 pt-4 space-y-2 bg-gradient-to-br from-slate-50 to-blue-50/50 dark:from-gray-800 dark:to-gray-750 p-5 rounded-xl shadow-sm">
+                  <div className="border-t border-slate-200 dark:border-gray-700 pt-3 space-y-2 bg-slate-50 dark:bg-gray-800 p-3 rounded-lg">
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-600 dark:text-gray-400 font-semibold">Subtotal</span>
-                      <span className="font-bold text-slate-900 dark:text-white text-base">${calculateSubtotal.toFixed(2)}</span>
+                      <span className="text-slate-600 dark:text-gray-400 font-medium">Subtotal</span>
+                      <span className="font-semibold text-slate-900 dark:text-white">${calculateSubtotal.toFixed(2)}</span>
                     </div>
                     {discount.value > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-slate-600 dark:text-gray-400 flex items-center gap-1 font-semibold">
+                        <span className="text-slate-600 dark:text-gray-400 flex items-center gap-1 font-medium">
                           <Percent className="w-3 h-3" />
                           Discount
                         </span>
-                        <span className="font-bold bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent text-base">
+                        <span className="font-semibold text-green-600 dark:text-green-400">
                           -${calculateDiscount.toFixed(2)}
                         </span>
                       </div>
                     )}
-                    <div className="flex justify-between text-lg font-bold border-t-2 border-slate-200 dark:border-gray-600 pt-3 mt-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-750 dark:to-gray-700 -mx-5 px-5 py-3 rounded-b-xl">
+                    <div className="flex justify-between text-base font-bold border-t border-slate-200 dark:border-gray-600 pt-2 mt-2">
                       <span className="text-slate-900 dark:text-white">Total</span>
-                      <span className="text-2xl bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+                      <span className="text-xl text-blue-600 dark:text-blue-400">
                         ${calculateTotal.toFixed(2)}
                       </span>
                     </div>
                   </div>
 
-                  <Button onClick={handleCheckout} className="w-full mt-4 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 bg-gradient-to-r from-blue-600 via-blue-700 to-purple-600 hover:from-blue-700 hover:via-blue-800 hover:to-purple-700 text-white" size="lg">
+                  <Button onClick={handleCheckout} className="w-full mt-3 bg-blue-600 hover:bg-blue-700" size="lg">
                     <Receipt className="w-5 h-5 mr-2" />
                     Checkout
                   </Button>
@@ -786,7 +929,7 @@ const PointOfSale = () => {
           <div className="space-y-6">
             {/* Customer Details */}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+              <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                 <User className="w-5 h-5 text-blue-600" />
                 Customer Information
               </h3>
@@ -837,7 +980,7 @@ const PointOfSale = () => {
 
             {/* Coupon & Discount */}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+              <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                 <Tag className="w-5 h-5 text-blue-600" />
                 Coupon & Discount (Optional)
               </h3>
@@ -927,7 +1070,7 @@ const PointOfSale = () => {
 
             {/* Payment Method */}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+              <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                 <CreditCard className="w-5 h-5 text-blue-600" />
                 Payment Method
               </h3>
@@ -959,7 +1102,7 @@ const PointOfSale = () => {
 
             {/* Order Summary */}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+              <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                 <DollarSign className="w-5 h-5 text-blue-600" />
                 Order Summary
               </h3>
@@ -1055,6 +1198,248 @@ const PointOfSale = () => {
               </div>
             )}
           </div>
+        </Modal>
+
+        {/* Purchase Selection Modal */}
+        <Modal
+          isOpen={showPurchaseModal}
+          onClose={closePurchaseModal}
+          title="Select Purchase Batches"
+          size="lg"
+        >
+          {selectedProduct && (
+            <div className="space-y-4">
+              {/* Compact Product Header */}
+              <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <img
+                  src={getImageUrl(selectedProduct.image)}
+                  alt={selectedProduct.itemName}
+                  className="w-12 h-12 object-cover rounded-md"
+                />
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-base text-slate-900 truncate">{selectedProduct.itemName}</h3>
+                  <p className="text-xs text-slate-600">SKU: {selectedProduct.skuCode}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-slate-500">Selected</p>
+                  <p className="text-2xl font-bold text-blue-600">{getTotalAllocatedQuantity()}</p>
+                </div>
+              </div>
+
+              {/* Loading State */}
+              {loadingPurchases ? (
+                <div className="text-center py-8 bg-slate-50 rounded-lg">
+                  <LoadingSpinner size="md" />
+                  <p className="text-sm text-slate-600 mt-3">Loading purchases...</p>
+                </div>
+              ) : productPurchases.length > 0 ? (
+                <>
+                  {/* Compact Instructions */}
+                  <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <Layers className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                    <p className="text-xs text-blue-700">Check boxes to select purchase batches, then enter quantity. Mix multiple batches for FIFO management.</p>
+                  </div>
+
+                  {/* Compact Purchase List */}
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {productPurchases.map((purchase, index) => {
+                      const allocation = purchaseAllocations[purchase._id] || {};
+                      const formatDate = (date) => {
+                        if (!date) return 'N/A';
+                        return new Date(date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: '2-digit'
+                        });
+                      };
+
+                      return (
+                        <div
+                          key={purchase._id}
+                          className={`p-3 rounded-lg border-2 transition-all ${
+                            allocation.selected
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-slate-200 bg-white hover:border-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            {/* Checkbox */}
+                            <button
+                              onClick={() => togglePurchaseSelection(purchase._id)}
+                              className="flex-shrink-0"
+                            >
+                              {allocation.selected ? (
+                                <CheckSquare className="w-5 h-5 text-blue-600" />
+                              ) : (
+                                <Square className="w-5 h-5 text-slate-400" />
+                              )}
+                            </button>
+
+                            {/* Purchase Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1.5">
+                                <span className="text-xs text-slate-500">
+                                  <Calendar className="w-3 h-3 inline mr-1" />
+                                  {formatDate(purchase.purchaseDate || purchase.date)}
+                                </span>
+                                <span className="text-xs font-bold text-green-600">
+                                  ${purchase.sellingPrice?.toFixed(2) || '0.00'}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-4 text-xs">
+                                <div>
+                                  <span className="text-slate-500">Supplier:</span>
+                                  <span className="font-semibold text-slate-900 ml-1">
+                                    {purchase.supplier?.name || purchase.supplier || 'N/A'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-slate-500">Purchased:</span>
+                                  <span className="font-semibold text-slate-900 ml-1">
+                                    {purchase.quantity} {purchase.unit}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-slate-500">Available:</span>
+                                  <span className={`font-semibold ml-1 ${(purchase.remainingQuantity ?? purchase.quantity) > 5 ? 'text-green-600' : 'text-orange-600'}`}>
+                                    {purchase.remainingQuantity ?? purchase.quantity}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Quantity Controls */}
+                            <div className="flex-shrink-0">
+                              <div className="flex items-center gap-1 bg-white rounded-md border border-slate-300 p-1">
+                                <button
+                                  onClick={() => updateAllocationQuantity(purchase._id, allocation.quantity - 1)}
+                                  disabled={!allocation.selected || allocation.quantity <= 0}
+                                  className="p-1 hover:bg-slate-100 rounded disabled:opacity-30"
+                                >
+                                  <Minus className="w-3 h-3 text-slate-600" />
+                                </button>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max={allocation.maxQuantity}
+                                  value={allocation.quantity || ''}
+                                  onChange={(e) => updateAllocationQuantity(purchase._id, parseInt(e.target.value) || 0)}
+                                  disabled={!allocation.selected}
+                                  className="w-14 text-center text-sm font-bold bg-white border-0 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded disabled:text-slate-400"
+                                  placeholder="0"
+                                />
+                                <button
+                                  onClick={() => updateAllocationQuantity(purchase._id, allocation.quantity + 1)}
+                                  disabled={!allocation.selected || allocation.quantity >= allocation.maxQuantity}
+                                  className="p-1 hover:bg-slate-100 rounded disabled:opacity-30"
+                                >
+                                  <Plus className="w-3 h-3 text-slate-600" />
+                                </button>
+                              </div>
+                              <p className="text-xs text-center text-slate-500 mt-0.5">
+                                Max: {allocation.maxQuantity}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Quick Select Buttons - More Compact */}
+                          {allocation.selected && (
+                            <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-slate-200">
+                              <span className="text-xs text-slate-600 font-medium">Quick:</span>
+                              <button
+                                onClick={() => updateAllocationQuantity(purchase._id, Math.min(1, allocation.maxQuantity))}
+                                className="text-xs px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 rounded font-medium"
+                              >
+                                1
+                              </button>
+                              <button
+                                onClick={() => updateAllocationQuantity(purchase._id, Math.min(5, allocation.maxQuantity))}
+                                className="text-xs px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 rounded font-medium"
+                              >
+                                5
+                              </button>
+                              <button
+                                onClick={() => updateAllocationQuantity(purchase._id, Math.min(10, allocation.maxQuantity))}
+                                className="text-xs px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 rounded font-medium"
+                              >
+                                10
+                              </button>
+                              <button
+                                onClick={() => updateAllocationQuantity(purchase._id, allocation.maxQuantity)}
+                                className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium"
+                              >
+                                All ({allocation.maxQuantity})
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Compact Footer */}
+                  <div className="space-y-3">
+                    {/* Price Input */}
+                    <div className="flex items-center gap-3 p-3 bg-white rounded-lg border-2 border-blue-200">
+                      <div className="flex-1">
+                        <label className="block text-xs text-slate-600 font-medium mb-1">Selling Price (per unit)</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium">$</span>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={customPrice}
+                            onChange={(e) => setCustomPrice(parseFloat(e.target.value) || 0)}
+                            className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-semibold"
+                            placeholder="0.00"
+                          />
+                        </div>
+                      </div>
+                      <div className="text-right pt-5">
+                        <p className="text-xs text-slate-500">Total</p>
+                        <p className="text-lg font-bold text-blue-600">
+                          ${(customPrice * getTotalAllocatedQuantity()).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+                      <div>
+                        <p className="text-xs text-slate-500">Total Quantity</p>
+                        <p className="text-xl font-bold text-slate-700">{getTotalAllocatedQuantity()} units</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={closePurchaseModal}
+                          className="px-4"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={addToCartWithAllocations}
+                          disabled={getTotalAllocatedQuantity() === 0}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+                        >
+                          <ShoppingCart className="w-4 h-4 mr-2" />
+                          Add to Cart
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-12 bg-slate-50 rounded-lg border-2 border-dashed border-slate-300">
+                  <Package className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                  <p className="text-slate-700 font-semibold">No Purchase History</p>
+                  <p className="text-sm text-slate-500">This item has no available stock from purchases</p>
+                </div>
+              )}
+            </div>
+          )}
         </Modal>
       </div>
     </div>

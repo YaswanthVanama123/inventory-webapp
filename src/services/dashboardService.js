@@ -7,9 +7,21 @@ const dashboardService = {
   
   getDashboardData: async () => {
     try {
+      console.log('[DashboardService] Starting API call to /reports/dashboard');
+      console.log('[DashboardService] Base URL:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api');
+
       const response = await api.get('/reports/dashboard');
+
+      console.log('[DashboardService] API call successful, response:', response);
       return response;
     } catch (error) {
+      console.error('[DashboardService] API call failed:', error);
+      console.error('[DashboardService] Error details:', {
+        message: error.message,
+        code: error.code,
+        status: error.status,
+        response: error.response
+      });
       throw handleApiError(error, {
         network: 'Unable to load dashboard data. Please check your connection.',
         server: 'Failed to load dashboard. Please try again later.',

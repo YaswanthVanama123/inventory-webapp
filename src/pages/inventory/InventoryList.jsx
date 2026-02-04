@@ -387,7 +387,7 @@ const InventoryList = () => {
   // Component for displaying invoice items filtered by itemId (used in purchases tab)
   const InvoiceItemCards = ({ invoiceItems, itemId, itemName }) => {
     const filteredItems = invoiceItems.filter(
-      invoiceItem => invoiceItem.item?._id === itemId || invoiceItem.itemId === itemId
+      invoiceItem => invoiceItem.inventory?._id === itemId || invoiceItem.item?._id === itemId || invoiceItem.itemId === itemId
     );
 
     if (filteredItems.length === 0) {
@@ -406,11 +406,11 @@ const InventoryList = () => {
             className="bg-white rounded-lg border-2 border-emerald-200 p-3 hover:shadow-md hover:border-emerald-400 transition-all duration-200 transform hover:-translate-y-1"
           >
             {/* Product Image */}
-            {invoiceItem.item?.image ? (
+            {(invoiceItem.inventory?.image || invoiceItem.item?.image) ? (
               <div className="mb-2 rounded-md overflow-hidden bg-slate-100">
                 <img
-                  src={getImageUrl(invoiceItem.item.image)}
-                  alt={invoiceItem.item?.name || itemName}
+                  src={getImageUrl(invoiceItem.inventory?.image || invoiceItem.item?.image)}
+                  alt={invoiceItem.itemName || invoiceItem.item?.name || itemName}
                   className="w-full h-24 object-cover"
                   onError={(e) => {
                     e.target.src = 'https://via.placeholder.com/150?text=No+Image';
@@ -427,23 +427,23 @@ const InventoryList = () => {
 
             {/* Item Name */}
             <h6 className="text-xs font-semibold text-slate-800 mb-2 line-clamp-2 min-h-[2rem]">
-              {invoiceItem.item?.name || itemName}
+              {invoiceItem.itemName || invoiceItem.item?.name || itemName}
             </h6>
 
             {/* Item Details */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-500">Quantity:</span>
-                <span className="font-bold text-emerald-700">{invoiceItem.quantity}</span>
+                <span className="font-bold text-emerald-700">{invoiceItem.quantity} {invoiceItem.unit || ''}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-500">Unit Price:</span>
-                <span className="font-semibold text-slate-700">${invoiceItem.price?.toFixed(2) || '0.00'}</span>
+                <span className="font-semibold text-slate-700">${(invoiceItem.priceAtSale || invoiceItem.price || 0).toFixed(2)}</span>
               </div>
               <div className="pt-1.5 border-t border-emerald-100">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-medium text-slate-600">Subtotal:</span>
-                  <span className="font-bold text-emerald-600 text-sm">${invoiceItem.subtotal?.toFixed(2) || '0.00'}</span>
+                  <span className="font-bold text-emerald-600 text-sm">${(invoiceItem.subtotal || 0).toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -464,62 +464,61 @@ const InventoryList = () => {
     }
 
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-        {invoiceItems.map((invoiceItem, idx) => {
-          // Get item details from either the populated item object or use invoiceItem data directly
-          const itemName = invoiceItem.item?.name || invoiceItem.name || 'Unknown Item';
-          const itemImage = invoiceItem.item?.image || invoiceItem.image;
+      <div className="bg-white rounded-lg border border-emerald-200 overflow-hidden">
+        <table className="min-w-full">
+          <thead className="bg-emerald-100">
+            <tr>
+              <th className="px-4 py-2 text-left text-xs font-medium text-emerald-700">Item</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-emerald-700">SKU</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-emerald-700">Quantity</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-emerald-700">Unit Price</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-emerald-700">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-emerald-200">
+            {invoiceItems.map((invoiceItem, idx) => {
+              // Get item details - check inventory reference first (populated from backend)
+              const inventoryItem = invoiceItem.inventory || invoiceItem.item;
+              const itemName = invoiceItem.itemName || inventoryItem?.itemName || inventoryItem?.name || 'Unknown Item';
+              const itemImage = inventoryItem?.image;
+              const itemSku = invoiceItem.skuCode || inventoryItem?.skuCode || 'N/A';
 
-          return (
-            <div
-              key={idx}
-              className="bg-white rounded-lg border-2 border-emerald-200 p-3 hover:shadow-md hover:border-emerald-400 transition-all duration-200 transform hover:-translate-y-1"
-            >
-              {/* Product Image */}
-              {itemImage ? (
-                <div className="mb-2 rounded-md overflow-hidden bg-slate-100">
-                  <img
-                    src={getImageUrl(itemImage)}
-                    alt={itemName}
-                    className="w-full h-24 object-cover"
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/150?text=No+Image';
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="mb-2 rounded-md bg-emerald-50 h-24 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-              )}
-
-              {/* Item Name */}
-              <h6 className="text-xs font-semibold text-slate-800 mb-2 line-clamp-2 min-h-[2rem]">
-                {itemName}
-              </h6>
-
-              {/* Item Details */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Quantity:</span>
-                  <span className="font-bold text-emerald-700">{invoiceItem.quantity}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Unit Price:</span>
-                  <span className="font-semibold text-slate-700">${invoiceItem.price?.toFixed(2) || '0.00'}</span>
-                </div>
-                <div className="pt-1.5 border-t border-emerald-100">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-slate-600">Subtotal:</span>
-                    <span className="font-bold text-emerald-600 text-sm">${invoiceItem.subtotal?.toFixed(2) || '0.00'}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+              return (
+                <tr key={idx} className="hover:bg-emerald-50">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      {/* Product Image */}
+                      <div className="flex-shrink-0 h-12 w-12">
+                        {itemImage ? (
+                          <img
+                            src={getImageUrl(itemImage)}
+                            alt={itemName}
+                            className="h-12 w-12 rounded-lg object-cover"
+                            onError={(e) => {
+                              e.target.src = 'https://via.placeholder.com/48?text=No+Image';
+                            }}
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded-lg bg-emerald-100 flex items-center justify-center">
+                            <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      {/* Item Name */}
+                      <div className="text-sm font-medium text-slate-900">{itemName}</div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-slate-700 font-mono">{itemSku}</td>
+                  <td className="px-4 py-3 text-sm text-slate-700">{invoiceItem.quantity} {invoiceItem.unit || ''}</td>
+                  <td className="px-4 py-3 text-sm text-slate-700">${(invoiceItem.priceAtSale || invoiceItem.price || 0).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-sm font-semibold text-emerald-700">${invoiceItem.subtotal?.toFixed(2) || '0.00'}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     );
   };
@@ -905,6 +904,7 @@ const InventoryList = () => {
                                         <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Total Cost</th>
                                         <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Supplier</th>
                                         <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Remaining</th>
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Added By</th>
                                         {isAdmin && (
                                           <th className="px-4 py-2 text-center text-xs font-medium text-slate-600">Actions</th>
                                         )}
@@ -923,15 +923,32 @@ const InventoryList = () => {
                                               {purchase.remainingQuantity} {purchase.unit}
                                             </span>
                                           </td>
+                                          <td className="px-4 py-3 text-sm text-slate-700">
+                                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 rounded-md text-xs">
+                                              <svg className="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                              </svg>
+                                              {purchase.createdBy?.username || purchase.createdBy?.name || purchase.addedBy || 'N/A'}
+                                            </span>
+                                          </td>
                                           {isAdmin && (
                                             <td className="px-4 py-3 text-center">
-                                              <button
-                                                onClick={() => handleDeletePurchase(purchase, item._id)}
-                                                className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
-                                                title="Delete purchase"
-                                              >
-                                                <Trash2 className="w-4 h-4" />
-                                              </button>
+                                              {purchase.deletionStatus === 'pending' ? (
+                                                <div className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs">
+                                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                  </svg>
+                                                  Pending
+                                                </div>
+                                              ) : (
+                                                <button
+                                                  onClick={() => handleDeletePurchase(purchase, item._id)}
+                                                  className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                                                  title="Delete purchase"
+                                                >
+                                                  <Trash2 className="w-4 h-4" />
+                                                </button>
+                                              )}
                                             </td>
                                           )}
                                         </tr>
@@ -993,9 +1010,9 @@ const InventoryList = () => {
                                                 </button>
                                               </td>
                                               <td className="px-4 py-3 text-sm font-semibold text-green-700">{invoice.invoiceNumber}</td>
-                                              <td className="px-4 py-3 text-sm text-slate-700">{formatDate(invoice.date)}</td>
+                                              <td className="px-4 py-3 text-sm text-slate-700">{formatDate(invoice.invoiceDate)}</td>
                                               <td className="px-4 py-3 text-sm text-slate-700">{invoice.customer?.name || 'Walk-in'}</td>
-                                              <td className="px-4 py-3 text-sm font-semibold text-green-700">${invoice.total?.toFixed(2) || '0.00'}</td>
+                                              <td className="px-4 py-3 text-sm font-semibold text-green-700">${invoice.totalAmount?.toFixed(2) || '0.00'}</td>
                                               <td className="px-4 py-3 text-sm">
                                                 <Badge variant={invoice.status === 'paid' ? 'success' : invoice.status === 'pending' ? 'warning' : 'default'}>
                                                   {invoice.status || 'N/A'}
@@ -1158,15 +1175,30 @@ const InventoryList = () => {
                                               {purchase.remainingQuantity} {purchase.unit}
                                             </span>
                                           </div>
+                                          <div className="col-span-2">
+                                            <span className="text-slate-500">Added By:</span>
+                                            <span className="ml-1 text-slate-700 font-medium">
+                                              {purchase.createdBy?.username || purchase.createdBy?.name || purchase.addedBy || 'N/A'}
+                                            </span>
+                                          </div>
                                         </div>
                                         {isAdmin && (
-                                          <button
-                                            onClick={() => handleDeletePurchase(purchase, item._id)}
-                                            className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors flex-shrink-0"
-                                            title="Delete purchase"
-                                          >
-                                            <Trash2 className="w-4 h-4" />
-                                          </button>
+                                          purchase.deletionStatus === 'pending' ? (
+                                            <div className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs flex-shrink-0">
+                                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                              </svg>
+                                              Pending
+                                            </div>
+                                          ) : (
+                                            <button
+                                              onClick={() => handleDeletePurchase(purchase, item._id)}
+                                              className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors flex-shrink-0"
+                                              title="Delete purchase"
+                                            >
+                                              <Trash2 className="w-4 h-4" />
+                                            </button>
+                                          )
                                         )}
                                       </div>
                                     </div>
@@ -1212,7 +1244,7 @@ const InventoryList = () => {
                                             </div>
                                             <div>
                                               <span className="text-slate-500">Date:</span>
-                                              <span className="ml-1 text-slate-700">{formatDate(invoice.date)}</span>
+                                              <span className="ml-1 text-slate-700">{formatDate(invoice.invoiceDate)}</span>
                                             </div>
                                             <div className="col-span-2">
                                               <span className="text-slate-500">Customer:</span>
@@ -1220,7 +1252,7 @@ const InventoryList = () => {
                                             </div>
                                             <div>
                                               <span className="text-slate-500">Total:</span>
-                                              <span className="ml-1 font-bold text-green-600">${invoice.total?.toFixed(2)}</span>
+                                              <span className="ml-1 font-bold text-green-600">${invoice.totalAmount?.toFixed(2)}</span>
                                             </div>
                                           </div>
                                           <svg
@@ -1365,7 +1397,7 @@ const InventoryList = () => {
                           </Badge>
                         </div>
                         <p className="text-emerald-50 text-sm">
-                          {formatDate(invoice.date)}
+                          {formatDate(invoice.invoiceDate)}
                         </p>
                       </div>
 
@@ -1388,7 +1420,7 @@ const InventoryList = () => {
                             <div className="flex items-center justify-between">
                               <span className="text-base font-semibold text-slate-700">Total Amount:</span>
                               <span className="text-xl font-bold text-emerald-600">
-                                ${invoice.total?.toFixed(2) || '0.00'}
+                                ${invoice.totalAmount?.toFixed(2) || '0.00'}
                               </span>
                             </div>
                           </div>
@@ -1419,69 +1451,27 @@ const InventoryList = () => {
                           </svg>
                         </button>
 
+                        {/* View Invoice Button */}
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => navigate(`/invoices/${invoice._id}`)}
+                          className="w-full mt-2"
+                        >
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          View Invoice
+                        </Button>
+
                         {/* Expanded Items Section */}
                         {expandedInvoices[invoice._id] && invoice.items && invoice.items.length > 0 && (
                           <div className="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
                             <h5 className="text-xs font-semibold text-emerald-800 mb-3">
                               Items in this Invoice:
                             </h5>
-                            <div className="space-y-2 max-h-96 overflow-y-auto">
-                              {invoice.items.map((invoiceItem, idx) => (
-                                <div
-                                  key={idx}
-                                  className="bg-white rounded-lg border border-emerald-200 p-3 hover:shadow-md transition-all duration-200"
-                                >
-                                  {/* Product Image */}
-                                  {invoiceItem.item?.image ? (
-                                    <div className="mb-2 rounded-md overflow-hidden bg-slate-100">
-                                      <img
-                                        src={getImageUrl(invoiceItem.item.image)}
-                                        alt={invoiceItem.item?.name || 'Product'}
-                                        className="w-full h-20 object-cover"
-                                        onError={(e) => {
-                                          e.target.src = 'https://via.placeholder.com/150?text=No+Image';
-                                        }}
-                                      />
-                                    </div>
-                                  ) : (
-                                    <div className="mb-2 rounded-md bg-emerald-50 h-20 flex items-center justify-center">
-                                      <svg className="w-6 h-6 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                      </svg>
-                                    </div>
-                                  )}
-
-                                  {/* Item Name */}
-                                  <h6 className="text-xs font-semibold text-slate-800 mb-2 line-clamp-2">
-                                    {invoiceItem.item?.name || 'Unknown Item'}
-                                  </h6>
-
-                                  {/* Item Details */}
-                                  <div className="space-y-1">
-                                    <div className="flex items-center justify-between text-xs">
-                                      <span className="text-slate-500">Quantity:</span>
-                                      <span className="font-bold text-emerald-700">
-                                        {invoiceItem.quantity}
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-xs">
-                                      <span className="text-slate-500">Unit Price:</span>
-                                      <span className="font-semibold text-slate-700">
-                                        ${invoiceItem.price?.toFixed(2) || '0.00'}
-                                      </span>
-                                    </div>
-                                    <div className="pt-1 border-t border-emerald-100">
-                                      <div className="flex items-center justify-between text-xs">
-                                        <span className="font-medium text-slate-600">Subtotal:</span>
-                                        <span className="font-bold text-emerald-600">
-                                          ${invoiceItem.subtotal?.toFixed(2) || '0.00'}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
+                            <AllInvoiceItemCards invoiceItems={invoice.items} />
                           </div>
                         )}
                       </div>
@@ -1515,6 +1505,9 @@ const InventoryList = () => {
                         <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
                           Status
                         </th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-emerald-700 uppercase tracking-wider">
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-slate-200">
@@ -1538,25 +1531,35 @@ const InventoryList = () => {
                               <div className="text-sm font-semibold text-emerald-700">{invoice.invoiceNumber}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-slate-700">{formatDate(invoice.date)}</div>
+                              <div className="text-sm text-slate-700">{formatDate(invoice.invoiceDate)}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="text-sm text-slate-700">{invoice.customer?.name || 'Walk-in'}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-semibold text-emerald-700">${invoice.total?.toFixed(2) || '0.00'}</div>
+                              <div className="text-sm font-semibold text-emerald-700">${invoice.totalAmount?.toFixed(2) || '0.00'}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <Badge variant={invoice.status === 'paid' ? 'success' : invoice.status === 'pending' ? 'warning' : 'default'}>
                                 {invoice.status || 'N/A'}
                               </Badge>
                             </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => navigate(`/invoices/${invoice._id}`)}
+                                className="text-blue-600 hover:text-blue-800"
+                              >
+                                View
+                              </Button>
+                            </td>
                           </tr>
 
                           {/* Invoice Items Expanded Row */}
                           {expandedInvoices[invoice._id] && (
                             <tr>
-                              <td colSpan="6" className="px-6 py-4 bg-emerald-50">
+                              <td colSpan="7" className="px-6 py-4 bg-emerald-50">
                                 <div className="space-y-3">
                                   <h4 className="text-sm font-semibold text-emerald-800 mb-3">Items in this Invoice:</h4>
                                   <AllInvoiceItemCards invoiceItems={invoice.items} />

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
+import { ToastContext } from '../../contexts/ToastContext';
+import dashboardService from '../../services/dashboardService';
 import {
   Package,
   DollarSign,
@@ -136,81 +138,133 @@ const EnhancedStatCard = ({ title, value, subtitle, change, changeType, icon: Ic
 // Main Enhanced Dashboard Component
 const EnhancedDashboard = () => {
   const { user } = useContext(AuthContext);
+  const { showError } = useContext(ToastContext);
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [error, setError] = useState(null);
 
-  
-  const dashboardData = {
-    kpis: {
-      totalRevenue: 342580,
-      revenueChange: '+24.5%',
-      totalOrders: 1248,
-      ordersChange: '+12.8%',
-      avgOrderValue: 274.50,
-      avgOrderChange: '+8.3%',
-      inventoryValue: 125840,
-      inventoryChange: '-3.2%',
-      lowStock: 23,
-      lowStockChange: '-15%',
-      profitMargin: 32.4,
-      marginChange: '+2.1%',
-    },
+  // Fetch dashboard data from API
+  const fetchDashboardData = async () => {
+    console.log('EnhancedDashboard: Fetching data from API...');
+    setLoading(true);
+    setError(null);
 
-    revenueTrend: [
-      { month: 'Jul', revenue: 28500, orders: 104, profit: 9120 },
-      { month: 'Aug', revenue: 32100, orders: 117, profit: 10272 },
-      { month: 'Sep', revenue: 29800, orders: 109, profit: 9536 },
-      { month: 'Oct', revenue: 35200, orders: 128, profit: 11264 },
-      { month: 'Nov', revenue: 38900, orders: 142, profit: 12448 },
-      { month: 'Dec', revenue: 42300, orders: 154, profit: 13536 },
-      { month: 'Jan', revenue: 45600, orders: 166, profit: 14592 },
-    ],
+    try {
+      const response = await dashboardService.getDashboardData();
+      console.log('EnhancedDashboard: API response:', response);
 
-    inventoryTrend: [
-      { date: 'Week 1', electronics: 450, clothing: 320, food: 280, books: 180 },
-      { date: 'Week 2', electronics: 420, clothing: 340, food: 260, books: 175 },
-      { date: 'Week 3', electronics: 480, clothing: 310, food: 290, books: 190 },
-      { date: 'Week 4', electronics: 510, clothing: 350, food: 270, books: 185 },
-    ],
+      if (response.success && response.data) {
+        const { summary, categoryStats, recentActivity, topValueItems, salesTrend } = response.data;
 
-    topProducts: [
-      { name: 'iPhone 15 Pro', sales: 12500, units: 45, margin: 28 },
-      { name: 'Dell XPS 15', sales: 9800, units: 28, margin: 22 },
-      { name: 'Samsung TV 55"', sales: 8400, units: 21, margin: 18 },
-      { name: 'MacBook Air M2', sales: 7600, units: 19, margin: 24 },
-      { name: 'Sony Headphones', sales: 6200, units: 52, margin: 35 },
-    ],
+        // Transform backend data to match UI expectations
+        const transformedData = {
+          kpis: {
+            totalRevenue: summary.totalRevenue || 0,
+            revenueChange: `${summary.revenueChange >= 0 ? '+' : ''}${summary.revenueChange}%`,
+            totalOrders: summary.totalOrders || 0,
+            ordersChange: `${summary.ordersChange >= 0 ? '+' : ''}${summary.ordersChange}%`,
+            avgOrderValue: summary.avgOrderValue || 0,
+            avgOrderChange: '+0%', // Calculate if needed
+            inventoryValue: summary.totalValue || 0,
+            inventoryChange: '-0%', // Calculate if needed
+            lowStock: summary.lowStockCount || 0,
+            lowStockChange: `${summary.lowStockChange >= 0 ? '+' : ''}${summary.lowStockChange}%`,
+            profitMargin: summary.profitMargin || 0,
+            marginChange: `${summary.profitMarginChange >= 0 ? '+' : ''}${summary.profitMarginChange}%`,
+          },
 
-    categoryPerformance: [
-      { category: 'Electronics', sales: 42, profit: 35, inventory: 38, satisfaction: 85 },
-      { category: 'Clothing', sales: 35, profit: 28, inventory: 45, satisfaction: 78 },
-      { category: 'Food', sales: 28, profit: 22, inventory: 52, satisfaction: 92 },
-      { category: 'Books', sales: 18, profit: 15, inventory: 25, satisfaction: 88 },
-      { category: 'Home', sales: 32, profit: 30, inventory: 35, satisfaction: 82 },
-    ],
+          revenueTrend: salesTrend?.map(item => ({
+            month: item.month,
+            revenue: item.revenue || 0,
+            orders: item.orders || 0,
+            profit: item.profit || 0,
+          })) || [],
 
-    salesByChannel: [
-      { name: 'Online Store', value: 45, color: '#3B82F6' },
-      { name: 'In-Store', value: 32, color: '#10B981' },
-      { name: 'Mobile App', value: 18, color: '#6366F1' },
-      { name: 'Wholesale', value: 5, color: '#F59E0B' },
-    ],
+          categoryPerformance: categoryStats?.map(cat => ({
+            category: cat._id || cat.category || 'Unknown',
+            sales: cat.count || 0,
+            profit: 0, // Add calculation if available
+            inventory: cat.count || 0,
+            satisfaction: 80, // Placeholder
+          })) || [],
 
-    stockTurnover: [
-      { category: 'Electronics', turnover: 8.5 },
-      { category: 'Clothing', turnover: 12.3 },
-      { category: 'Food', turnover: 15.8 },
-      { category: 'Books', turnover: 6.2 },
-      { category: 'Home', turnover: 9.7 },
-    ],
+          topProducts: topValueItems?.slice(0, 5).map(item => ({
+            name: item.itemName,
+            sales: item.value || 0,
+            units: item.quantity || 0,
+            margin: 0, // Add calculation if available
+          })) || [],
+
+          // Placeholder data for features not yet implemented in backend
+          inventoryTrend: [
+            { date: 'Week 1', electronics: 0, clothing: 0, food: 0, books: 0 },
+          ],
+          salesByChannel: [
+            { name: 'POS', value: 100, color: '#3B82F6' },
+          ],
+          stockTurnover: [],
+        };
+
+        console.log('EnhancedDashboard: Transformed data:', transformedData);
+        setDashboardData(transformedData);
+      }
+    } catch (err) {
+      console.error('EnhancedDashboard: Error fetching data:', err);
+      setError(err.message || 'Failed to load dashboard data');
+      showError?.(err.message || 'Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // Fetch data on component mount
+  useEffect(() => {
+    console.log('EnhancedDashboard: Component mounted, fetching data...');
+    fetchDashboardData();
+  }, []);
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await fetchDashboardData();
     setRefreshing(false);
+  };
+
+  // Show loading state
+  if (loading && !dashboardData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <RefreshCw className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-slate-600">Loading dashboard data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Use fetched data or fallback to empty structure
+  const data = dashboardData || {
+    kpis: {
+      totalRevenue: 0,
+      revenueChange: '+0%',
+      totalOrders: 0,
+      ordersChange: '+0%',
+      avgOrderValue: 0,
+      avgOrderChange: '+0%',
+      inventoryValue: 0,
+      inventoryChange: '+0%',
+      lowStock: 0,
+      lowStockChange: '+0%',
+      profitMargin: 0,
+      marginChange: '+0%',
+    },
+    revenueTrend: [],
+    inventoryTrend: [],
+    topProducts: [],
+    categoryPerformance: [],
+    salesByChannel: [],
+    stockTurnover: [],
   };
 
   
@@ -255,9 +309,9 @@ const EnhancedDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <EnhancedStatCard
           title="Total Revenue"
-          value={`$${dashboardData.kpis.totalRevenue.toLocaleString()}`}
+          value={`$${data.kpis.totalRevenue.toLocaleString()}`}
           subtitle="This month"
-          change={dashboardData.kpis.revenueChange}
+          change={data.kpis.revenueChange}
           changeType="positive"
           icon={DollarSign}
           trend={revenueTrendMini}
@@ -265,9 +319,9 @@ const EnhancedDashboard = () => {
         />
         <EnhancedStatCard
           title="Total Orders"
-          value={dashboardData.kpis.totalOrders.toLocaleString()}
-          subtitle={`Avg: $${dashboardData.kpis.avgOrderValue}`}
-          change={dashboardData.kpis.ordersChange}
+          value={data.kpis.totalOrders.toLocaleString()}
+          subtitle={`Avg: $${data.kpis.avgOrderValue}`}
+          change={data.kpis.ordersChange}
           changeType="positive"
           icon={ShoppingCart}
           trend={revenueTrendMini}
@@ -275,18 +329,18 @@ const EnhancedDashboard = () => {
         />
         <EnhancedStatCard
           title="Low Stock Items"
-          value={dashboardData.kpis.lowStock}
+          value={data.kpis.lowStock}
           subtitle="Needs attention"
-          change={dashboardData.kpis.lowStockChange}
+          change={data.kpis.lowStockChange}
           changeType="positive"
           icon={AlertTriangle}
           color="amber"
         />
         <EnhancedStatCard
           title="Profit Margin"
-          value={`${dashboardData.kpis.profitMargin}%`}
+          value={`${data.kpis.profitMargin}%`}
           subtitle="Average margin"
-          change={dashboardData.kpis.marginChange}
+          change={data.kpis.marginChange}
           changeType="positive"
           icon={Target}
           trend={revenueTrendMini}
@@ -308,7 +362,7 @@ const EnhancedDashboard = () => {
         </div>
         <div className="h-96">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={dashboardData.revenueTrend}>
+            <AreaChart data={data.revenueTrend}>
             <defs>
               <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
@@ -374,7 +428,7 @@ const EnhancedDashboard = () => {
           </div>
           <div className="h-96">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={dashboardData.topProducts} layout="vertical">
+              <BarChart data={data.topProducts} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
               <XAxis type="number" stroke="#64748B" fontSize={12} tickFormatter={(value) => `$${value/1000}k`} />
               <YAxis type="category" dataKey="name" stroke="#64748B" fontSize={12} width={120} />
@@ -400,7 +454,7 @@ const EnhancedDashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
               <Pie
-                data={dashboardData.salesByChannel}
+                data={data.salesByChannel}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -410,7 +464,7 @@ const EnhancedDashboard = () => {
                 paddingAngle={0}
                 dataKey="value"
               >
-                {dashboardData.salesByChannel.map((entry, index) => (
+                {data.salesByChannel.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -421,7 +475,7 @@ const EnhancedDashboard = () => {
 
           {/* Channel Legend */}
           <div className="grid grid-cols-2 gap-3 mt-4">
-            {dashboardData.salesByChannel.map((channel, index) => (
+            {data.salesByChannel.map((channel, index) => (
               <div key={index} className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg">
                 <div
                   className="w-3 h-3 rounded-full"
@@ -445,7 +499,7 @@ const EnhancedDashboard = () => {
           </div>
           <div className="h-96">
             <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={dashboardData.categoryPerformance}>
+              <RadarChart data={data.categoryPerformance}>
               <PolarGrid stroke="#E2E8F0" />
               <PolarAngleAxis dataKey="category" stroke="#64748B" fontSize={12} />
               <PolarRadiusAxis stroke="#64748B" fontSize={11} />
@@ -480,7 +534,7 @@ const EnhancedDashboard = () => {
           </div>
           <div className="h-96">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={dashboardData.stockTurnover}>
+              <BarChart data={data.stockTurnover}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
               <XAxis dataKey="category" stroke="#64748B" fontSize={12} />
               <YAxis stroke="#64748B" fontSize={12} tickFormatter={(value) => `${value}x`} />

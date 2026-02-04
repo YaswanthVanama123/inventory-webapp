@@ -563,7 +563,7 @@ const CouponsAndPayments = () => {
           <form onSubmit={handleCouponSubmit} className="space-y-6">
             {/* Basic Info Section */}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
-              <h3 className="text-md font-semibold text-slate-900 dark:text-white mb-4">Basic Information</h3>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Basic Information</h3>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
@@ -599,7 +599,7 @@ const CouponsAndPayments = () => {
 
             {/* Discount Details Section */}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
-              <h3 className="text-md font-semibold text-slate-900 dark:text-white mb-4">Discount Details</h3>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Discount Details</h3>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Select
@@ -645,7 +645,7 @@ const CouponsAndPayments = () => {
 
             {/* Usage & Validity Section */}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
-              <h3 className="text-md font-semibold text-slate-900 dark:text-white mb-4">Usage & Validity</h3>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Usage & Validity</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   label="Usage Limit (Optional)"
@@ -696,7 +696,7 @@ const CouponsAndPayments = () => {
           <form onSubmit={handlePaymentSubmit} className="space-y-6">
             {/* Basic Info Section */}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
-              <h3 className="text-md font-semibold text-slate-900 dark:text-white mb-4">Basic Information</h3>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Basic Information</h3>
               <div className="space-y-4">
                 <Input
                   label="Name (Internal)"
@@ -725,7 +725,7 @@ const CouponsAndPayments = () => {
 
             {/* Settings Section */}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
-              <h3 className="text-md font-semibold text-slate-900 dark:text-white mb-4">Settings</h3>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Settings</h3>
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   label="Icon Name"

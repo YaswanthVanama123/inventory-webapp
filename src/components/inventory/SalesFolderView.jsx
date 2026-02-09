@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown, ShoppingCart } from 'lucide-react';
+import { ChevronRight, ChevronDown, ShoppingCart, Download } from 'lucide-react';
 import Badge from '../common/Badge';
+import Button from '../common/Button';
 import LoadingSpinner from '../common/LoadingSpinner';
 import api from '../../services/api';
 
 /**
- * SalesFolderView Component for Invoice Items
- * Groups items by item name/SKU and shows all invoice entries when expanded
+ * SalesFolderView Component for RouteStar Invoice Items
+ * Groups items by item name/SKU and shows all RouteStar invoice entries (pending and closed) when expanded
  */
 const SalesFolderView = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const SalesFolderView = () => {
   const [groupedItems, setGroupedItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch grouped items from invoices
+  // Fetch grouped items from RouteStar invoices (pending and closed)
   useEffect(() => {
     fetchGroupedItems();
   }, []);
@@ -23,14 +24,14 @@ const SalesFolderView = () => {
   const fetchGroupedItems = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/invoices/items/grouped');
+      const response = await api.get('/routestar/items/grouped');
       console.log('[SalesFolderView] API response:', response);
       // Axios interceptor already unwraps response.data, so we access response.data.items directly
       const items = response.data?.items || [];
       console.log('[SalesFolderView] Parsed items:', items.length, 'items');
       setGroupedItems(items);
     } catch (err) {
-      console.error('Error fetching grouped invoice items:', err);
+      console.error('Error fetching grouped RouteStar invoice items:', err);
       setGroupedItems([]);
     } finally {
       setLoading(false);
@@ -42,6 +43,32 @@ const SalesFolderView = () => {
       ...prev,
       [sku]: !prev[sku]
     }));
+  };
+
+  const handleDownloadItemNames = () => {
+    // Extract unique item names and clean them
+    const uniqueNames = groupedItems.map(item => {
+      // Get the name and replace any tabs, commas, or newlines with spaces
+      let cleanName = item.name || '';
+      cleanName = cleanName.replace(/[\t\r\n,]/g, ' ');
+      // Remove multiple spaces
+      cleanName = cleanName.replace(/\s+/g, ' ').trim();
+      return cleanName;
+    });
+
+    // Create CSV content (just item names, one per line)
+    const csvContent = uniqueNames.join('\n');
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `sales-items-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
 
   const formatCurrency = (amount) => {
@@ -66,23 +93,24 @@ const SalesFolderView = () => {
 
   const getStatusVariant = (status) => {
     const statusMap = {
-      'draft': 'secondary',
-      'sent': 'info',
-      'paid': 'success',
-      'overdue': 'danger',
-      'cancelled': 'danger'
+      'Completed': 'success',
+      'Closed': 'success',
+      'Pending': 'warning',
+      'Cancelled': 'danger'
     };
     return statusMap[status] || 'secondary';
   };
 
-  const getPaymentStatusVariant = (status) => {
-    const statusMap = {
-      'paid': 'success',
+  const getInvoiceTypeVariant = (type) => {
+    const typeMap = {
       'pending': 'warning',
-      'failed': 'danger',
-      'refunded': 'info'
+      'closed': 'success'
     };
-    return statusMap[status] || 'warning';
+    return typeMap[type] || 'secondary';
+  };
+
+  const getStockStatusVariant = (processed) => {
+    return processed ? 'success' : 'warning';
   };
 
   if (loading) {
@@ -99,7 +127,7 @@ const SalesFolderView = () => {
         <ShoppingCart className="w-16 h-16 mx-auto text-emerald-300 mb-4" />
         <p className="text-slate-900 font-semibold text-lg mb-2">No sales recorded yet</p>
         <p className="text-sm text-slate-500">
-          Sales will appear here once you create invoices
+          Sales will appear here once you sync RouteStar invoices
         </p>
       </div>
     );
@@ -107,6 +135,21 @@ const SalesFolderView = () => {
 
   return (
     <div className="space-y-3">
+      {/* Download Button */}
+      {groupedItems.length > 0 && (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownloadItemNames}
+            className="flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Download Item Names
+          </Button>
+        </div>
+      )}
+
       {groupedItems.map((group) => {
         const isExpanded = expandedItems[group.sku];
 
@@ -194,6 +237,9 @@ const SalesFolderView = () => {
                             Invoice #
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider">
+                            Type
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider">
                             Date
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider">
@@ -203,19 +249,16 @@ const SalesFolderView = () => {
                             Quantity
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider">
-                            Unit Price
+                            Rate
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider">
-                            Subtotal
+                            Amount
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider">
                             Status
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider">
-                            Payment
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider">
-                            Actions
+                            Stock
                           </th>
                         </tr>
                       </thead>
@@ -227,33 +270,34 @@ const SalesFolderView = () => {
                               className="hover:bg-emerald-50 transition-colors"
                             >
                               <td className="px-6 py-4">
-                                <button
-                                  onClick={() => navigate(`/invoices/${invoice.invoiceId}`)}
-                                  className="font-mono text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
-                                >
+                                <span className="font-mono text-sm font-medium text-emerald-600">
                                   {invoice.invoiceNumber}
-                                </button>
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                <Badge variant={getInvoiceTypeVariant(invoice.invoiceType)} size="sm">
+                                  {invoice.invoiceType || 'N/A'}
+                                </Badge>
                               </td>
                               <td className="px-6 py-4 text-sm text-slate-700">
                                 {formatFullDate(invoice.invoiceDate)}
                               </td>
                               <td className="px-6 py-4">
-                                <div className="text-sm">
-                                  <div className="font-medium text-slate-900">{invoice.customerName}</div>
-                                  <div className="text-slate-500 text-xs">{invoice.customerEmail}</div>
+                                <div className="text-sm font-medium text-slate-900">
+                                  {invoice.customerName || 'N/A'}
                                 </div>
                               </td>
                               <td className="px-6 py-4">
                                 <span className="text-base font-bold text-slate-900">
-                                  {invoice.quantity} {invoice.unit}
+                                  {invoice.quantity}
                                 </span>
                               </td>
                               <td className="px-6 py-4 text-sm font-medium text-slate-900">
-                                {formatCurrency(invoice.priceAtSale)}
+                                {formatCurrency(invoice.rate)}
                               </td>
                               <td className="px-6 py-4">
                                 <span className="text-base font-semibold text-green-600">
-                                  {formatCurrency(invoice.subtotal)}
+                                  {formatCurrency(invoice.amount)}
                                 </span>
                               </td>
                               <td className="px-6 py-4">
@@ -262,17 +306,9 @@ const SalesFolderView = () => {
                                 </Badge>
                               </td>
                               <td className="px-6 py-4">
-                                <Badge variant={getPaymentStatusVariant(invoice.paymentStatus)} size="sm">
-                                  {invoice.paymentStatus || 'pending'}
+                                <Badge variant={getStockStatusVariant(invoice.stockProcessed)} size="sm">
+                                  {invoice.stockProcessed ? 'Processed' : 'Pending'}
                                 </Badge>
-                              </td>
-                              <td className="px-6 py-4">
-                                <button
-                                  onClick={() => navigate(`/invoices/${invoice.invoiceId}`)}
-                                  className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
-                                >
-                                  View Invoice
-                                </button>
                               </td>
                             </tr>
                           );
@@ -280,7 +316,7 @@ const SalesFolderView = () => {
                       </tbody>
                       <tfoot className="bg-emerald-100 border-t-2 border-emerald-300">
                         <tr>
-                          <td colSpan="3" className="px-6 py-3 text-right text-sm font-semibold text-emerald-700">
+                          <td colSpan="4" className="px-6 py-3 text-right text-sm font-semibold text-emerald-700">
                             Totals:
                           </td>
                           <td className="px-6 py-3">
@@ -296,7 +332,7 @@ const SalesFolderView = () => {
                               {formatCurrency(group.totalValue)}
                             </span>
                           </td>
-                          <td colSpan="3"></td>
+                          <td colSpan="2"></td>
                         </tr>
                       </tfoot>
                     </table>

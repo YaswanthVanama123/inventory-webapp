@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Package, Eye } from 'lucide-react';
+import { ChevronRight, ChevronDown, Package, Eye, Download } from 'lucide-react';
 import Badge from '../common/Badge';
 import Button from '../common/Button';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -44,6 +44,32 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
       ...prev,
       [sku]: !prev[sku]
     }));
+  };
+
+  const handleDownloadItemNames = () => {
+    // Extract unique item names and clean them
+    const uniqueNames = groupedItems.map(item => {
+      // Get the name and replace any tabs, commas, or newlines with spaces
+      let cleanName = item.name || '';
+      cleanName = cleanName.replace(/[\t\r\n,]/g, ' ');
+      // Remove multiple spaces
+      cleanName = cleanName.replace(/\s+/g, ' ').trim();
+      return cleanName;
+    });
+
+    // Create CSV content (just item names, one per line)
+    const csvContent = uniqueNames.join('\n');
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `purchase-items-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
 
   const formatCurrency = (amount) => {
@@ -108,6 +134,21 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
 
   return (
     <div className="space-y-3">
+      {/* Download Button */}
+      {groupedItems.length > 0 && (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownloadItemNames}
+            className="flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Download Item Names
+          </Button>
+        </div>
+      )}
+
       {groupedItems.map((group) => {
         const isExpanded = expandedItems[group.sku];
 

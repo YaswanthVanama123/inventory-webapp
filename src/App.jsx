@@ -23,6 +23,10 @@ const InventoryList = lazy(() => import('./pages/inventory/InventoryList'));
 const InventoryForm = lazy(() => import('./pages/inventory/InventoryForm'));
 const InventoryDetail = lazy(() => import('./pages/inventory/InventoryDetail'));
 const Stock = lazy(() => import('./pages/inventory/Stock'));
+const OrdersList = lazy(() => import('./pages/orders/OrdersList'));
+const OrderDetail = lazy(() => import('./pages/orders/OrderDetail'));
+const PendingInvoices = lazy(() => import('./pages/routestar/PendingInvoices'));
+const ClosedInvoices = lazy(() => import('./pages/routestar/ClosedInvoices'));
 const PointOfSale = lazy(() => import('./pages/pos/PointOfSale'));
 const Categories = lazy(() => import('./pages/categories/Categories'));
 const Units = lazy(() => import('./pages/units/Units'));
@@ -160,6 +164,26 @@ function App() {
                   }
                 />
                 <Route
+                  path="/orders"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <OrdersList />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/orders/:orderNumber"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <OrderDetail />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
                   path="/inventory/new"
                   element={
                     <ErrorBoundary>
@@ -265,6 +289,26 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute requireAdmin>
                         <InvoiceDetail />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/invoices/routestar/pending"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <PendingInvoices />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/invoices/routestar/closed"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <ClosedInvoices />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

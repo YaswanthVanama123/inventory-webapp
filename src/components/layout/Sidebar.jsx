@@ -154,6 +154,12 @@ const PackageIcon = () => (
   </svg>
 );
 
+const ClipboardListIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+  </svg>
+);
+
 // Menu items configuration
 const adminMenuItems = [
   {
@@ -196,12 +202,19 @@ const adminMenuItems = [
     icon: PackageIcon
   },
   {
+    label: 'Orders',
+    path: '/orders',
+    icon: ClipboardListIcon
+  },
+  {
     label: 'Invoices',
     path: '/invoices',
     icon: InvoicesIcon,
     submenu: [
       { label: 'View All', path: '/invoices', icon: ListIcon },
       { label: 'Create New', path: '/invoices/new', icon: AddIcon },
+      { label: 'Pending (RouteStar)', path: '/invoices/routestar/pending', icon: ListIcon },
+      { label: 'Closed (RouteStar)', path: '/invoices/routestar/closed', icon: ListIcon },
     ]
   },
   {

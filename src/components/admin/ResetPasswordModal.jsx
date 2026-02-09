@@ -6,7 +6,7 @@ import Input from '../common/Input';
 import Button from '../common/Button';
 import Alert from '../common/Alert';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5001/api';
 
 const ResetPasswordModal = ({ isOpen, onClose, user }) => {
   const [formData, setFormData] = useState({

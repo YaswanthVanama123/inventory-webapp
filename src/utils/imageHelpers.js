@@ -24,7 +24,7 @@ export const getImageUrl = (image) => {
 
   
   if (path.startsWith('/uploads')) {
-    const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
+    const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5001';
     return `${backendUrl}${path}`;
   }
 

@@ -8,7 +8,7 @@ This service layer provides a clean, organized interface to communicate with the
 
 ## Base Configuration
 
-**Base URL:** `http://localhost:5000/api`
+**Base URL:** `http://localhost:5001/api`
 
 All services use a centralized Axios instance configured in `api.js` with:
 - JWT token authentication (automatic from localStorage)
@@ -683,7 +683,7 @@ client/src/services/
 3. File downloads are handled automatically for PDF/CSV/Excel exports
 4. All promises reject with formatted error objects
 5. Response data is automatically extracted (no need to access response.data.data)
-6. Services require the backend API to be running at http://localhost:5000
+6. Services require the backend API to be running at http://localhost:5001
 
 ---
 

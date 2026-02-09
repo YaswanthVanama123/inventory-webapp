@@ -8,7 +8,7 @@ const dashboardService = {
   getDashboardData: async () => {
     try {
       console.log('[DashboardService] Starting API call to /reports/dashboard');
-      console.log('[DashboardService] Base URL:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api');
+      console.log('[DashboardService] Base URL:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api');
 
       const response = await api.get('/reports/dashboard');
 

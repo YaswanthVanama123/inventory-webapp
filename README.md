@@ -48,7 +48,7 @@ A modern SEO analytics dashboard built with React, TailwindCSS, and Recharts.
 
 4. Update the `.env` file with your API URL:
    ```
-   REACT_APP_API_URL=http://localhost:5000/api
+   REACT_APP_API_URL=http://localhost:5001/api
    REACT_APP_ENV=development
    ```
 
@@ -97,7 +97,7 @@ client/
 
 Create a `.env` file in the root of the client directory with the following variables:
 
-- `REACT_APP_API_URL` - Backend API URL (default: http://localhost:5000/api)
+- `REACT_APP_API_URL` - Backend API URL (default: http://localhost:5001/api)
 - `REACT_APP_ENV` - Environment (development/production)
 
 ## Code Quality

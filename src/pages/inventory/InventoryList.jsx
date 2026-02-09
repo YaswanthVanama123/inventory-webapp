@@ -12,6 +12,8 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import Modal from '../../components/common/Modal';
 import AddPurchaseModal from '../../components/inventory/AddPurchaseModal';
+import FolderView from '../../components/inventory/FolderView';
+import SalesFolderView from '../../components/inventory/SalesFolderView';
 import { Trash2, ShoppingBag, ShoppingCart, ChevronRight } from 'lucide-react';
 
 const InventoryList = () => {
@@ -37,7 +39,7 @@ const InventoryList = () => {
 
   
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
@@ -48,7 +50,7 @@ const InventoryList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [categories, setCategories] = useState([]);
-  const [viewMode, setViewMode] = useState('table');
+  const [viewMode, setViewMode] = useState('folder');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -105,11 +107,15 @@ const InventoryList = () => {
 
 
   // Fetch data based on filters and pagination, but only for the purchases tab
+  // Skip fetching for folder view as it handles its own data
   useEffect(() => {
-    if (activeTab === 'purchases') {
+    if (activeTab === 'purchases' && viewMode !== 'folder') {
       fetchInventoryItems();
+    } else if (activeTab === 'purchases' && viewMode === 'folder') {
+      // Folder view has its own loading state, so set parent loading to false
+      setLoading(false);
     }
-  }, [debouncedSearchTerm, selectedCategory, statusFilter, sortBy, sortOrder, currentPage, itemsPerPage, activeTab]);
+  }, [debouncedSearchTerm, selectedCategory, statusFilter, sortBy, sortOrder, currentPage, itemsPerPage, activeTab, viewMode]);
 
   // Fetch data based on search and pagination for the sells tab
   useEffect(() => {
@@ -547,8 +553,9 @@ const InventoryList = () => {
     { value: 'adequate', label: 'Adequate Stock' },
   ];
 
-  
-  if (loading && items.length === 0) {
+
+  // Only show initial loading spinner for table/card views, not folder view
+  if (loading && items.length === 0 && viewMode !== 'folder') {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" text="Loading inventory..." />
@@ -628,7 +635,7 @@ const InventoryList = () => {
               fullWidth
             />
 
-            {}
+            {/* View Mode Toggle */}
             <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('table')}
@@ -638,6 +645,7 @@ const InventoryList = () => {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
                 aria-label="Table view"
+                title="Table View"
               >
                 <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -650,9 +658,25 @@ const InventoryList = () => {
                     ? 'bg-blue-600 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
+                aria-label="Card view"
+                title="Card View"
               >
                 <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setViewMode('folder')}
+                className={`flex-1 px-3 py-1.5 rounded font-medium transition-all duration-200 ${
+                  viewMode === 'folder'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+                aria-label="Folder view"
+                title="Folder View"
+              >
+                <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                 </svg>
               </button>
             </div>
@@ -726,7 +750,15 @@ const InventoryList = () => {
       {activeTab === 'purchases' ? (
         // Purchases Tab Content - Show Inventory Items
         <>
-          {loading ? (
+          {/* Folder View - Handles its own loading and data */}
+          {viewMode === 'folder' ? (
+            <FolderView
+              items={items}
+              isAdmin={isAdmin}
+              onDeleteItem={handleDelete}
+              getImageUrl={getImageUrl}
+            />
+          ) : loading ? (
             <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
               <LoadingSpinner size="lg" text="Loading inventory..." className="mx-auto" />
             </div>
@@ -755,8 +787,8 @@ const InventoryList = () => {
             </div>
           ) : (
             <>
-              {/* Table View */}
-              {viewMode === 'table' && (
+          {/* Table View */}
+          {viewMode === 'table' && (
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-slate-200">
@@ -1333,265 +1365,28 @@ const InventoryList = () => {
             </div>
           )}
 
-          {/* Pagination */}
-          <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageSizeChange={handlePageSizeChange}
-              pageSizeOptions={[10, 20, 50, 100]}
-              showPageSize={true}
-              showResultCount={true}
-            />
-          </div>
-        </>
-      )}
-      </>
-      ) : activeTab === 'sells' ? (
-        // Sells Tab Content - Show Invoices
-        <>
-          {loadingInvoices ? (
-            <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
-              <LoadingSpinner size="lg" text="Loading invoices..." className="mx-auto" />
-            </div>
-          ) : invoices.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200">
-              <EmptyState
-                icon={
-                  <ShoppingCart className="w-20 h-20 text-emerald-300" />
-                }
-                title="No sales recorded yet"
-                description="Sales will appear here once you create invoices"
+          {/* Pagination - Only show for table and card views */}
+          {viewMode !== 'folder' && (
+            <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageSizeChange={handlePageSizeChange}
+                pageSizeOptions={[10, 20, 50, 100]}
+                showPageSize={true}
+                showResultCount={true}
               />
             </div>
-          ) : (
-            <>
-              {/* Card View for Sells */}
-              {viewMode === 'card' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                  {invoices.map((invoice) => (
-                    <div
-                      key={invoice._id}
-                      className="bg-white rounded-lg shadow-sm border border-emerald-200 overflow-hidden hover:shadow-lg transition-all duration-200 hover:border-emerald-400"
-                    >
-                      {/* Invoice Header */}
-                      <div className="bg-gradient-to-r from-emerald-500 to-green-600 p-4 text-white">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-lg font-bold">
-                            {invoice.invoiceNumber}
-                          </h3>
-                          <Badge
-                            variant={
-                              invoice.status === 'paid'
-                                ? 'success'
-                                : invoice.status === 'pending'
-                                ? 'warning'
-                                : 'default'
-                            }
-                            className="bg-white text-emerald-700 border-white"
-                          >
-                            {invoice.status || 'N/A'}
-                          </Badge>
-                        </div>
-                        <p className="text-emerald-50 text-sm">
-                          {formatDate(invoice.invoiceDate)}
-                        </p>
-                      </div>
-
-                      {/* Invoice Details */}
-                      <div className="p-4">
-                        <div className="space-y-3 mb-4">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-slate-500">Customer:</span>
-                            <span className="text-sm font-medium text-slate-900">
-                              {invoice.customer?.name || 'Walk-in'}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-slate-500">Items:</span>
-                            <span className="text-sm font-medium text-slate-900">
-                              {invoice.items?.length || 0}
-                            </span>
-                          </div>
-                          <div className="pt-3 border-t border-emerald-100">
-                            <div className="flex items-center justify-between">
-                              <span className="text-base font-semibold text-slate-700">Total Amount:</span>
-                              <span className="text-xl font-bold text-emerald-600">
-                                ${invoice.totalAmount?.toFixed(2) || '0.00'}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Expand/Collapse Button */}
-                        <button
-                          onClick={() => toggleInvoiceExpand(invoice._id)}
-                          className="w-full px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 text-emerald-600 bg-emerald-50 hover:bg-emerald-100"
-                        >
-                          <span>
-                            {expandedInvoices[invoice._id] ? 'Hide' : 'View'} Invoice Items
-                          </span>
-                          <svg
-                            className={`w-4 h-4 transition-transform ${
-                              expandedInvoices[invoice._id] ? 'rotate-180' : ''
-                            }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </button>
-
-                        {/* View Invoice Button */}
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => navigate(`/invoices/${invoice._id}`)}
-                          className="w-full mt-2"
-                        >
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                          View Invoice
-                        </Button>
-
-                        {/* Expanded Items Section */}
-                        {expandedInvoices[invoice._id] && invoice.items && invoice.items.length > 0 && (
-                          <div className="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                            <h5 className="text-xs font-semibold text-emerald-800 mb-3">
-                              Items in this Invoice:
-                            </h5>
-                            <AllInvoiceItemCards invoiceItems={invoice.items} />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Table View for Sells */}
-              {viewMode === 'table' && (
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-slate-200">
-                    <thead className="bg-emerald-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider w-12">
-
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                          Invoice #
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                          Customer
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                          Total
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-emerald-700 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-slate-200">
-                      {invoices.map((invoice) => (
-                        <React.Fragment key={invoice._id}>
-                          <tr className="hover:bg-emerald-50 transition-colors">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <button
-                                onClick={() => toggleInvoiceExpand(invoice._id)}
-                                className="p-1 hover:bg-emerald-200 rounded transition-colors"
-                                title={expandedInvoices[invoice._id] ? "Collapse items" : "Expand items"}
-                              >
-                                <ChevronRight
-                                  className={`w-5 h-5 text-emerald-600 transition-transform ${
-                                    expandedInvoices[invoice._id] ? 'rotate-90' : ''
-                                  }`}
-                                />
-                              </button>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-semibold text-emerald-700">{invoice.invoiceNumber}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-slate-700">{formatDate(invoice.invoiceDate)}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-slate-700">{invoice.customer?.name || 'Walk-in'}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-semibold text-emerald-700">${invoice.totalAmount?.toFixed(2) || '0.00'}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <Badge variant={invoice.status === 'paid' ? 'success' : invoice.status === 'pending' ? 'warning' : 'default'}>
-                                {invoice.status || 'N/A'}
-                              </Badge>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => navigate(`/invoices/${invoice._id}`)}
-                                className="text-blue-600 hover:text-blue-800"
-                              >
-                                View
-                              </Button>
-                            </td>
-                          </tr>
-
-                          {/* Invoice Items Expanded Row */}
-                          {expandedInvoices[invoice._id] && (
-                            <tr>
-                              <td colSpan="7" className="px-6 py-4 bg-emerald-50">
-                                <div className="space-y-3">
-                                  <h4 className="text-sm font-semibold text-emerald-800 mb-3">Items in this Invoice:</h4>
-                                  <AllInvoiceItemCards invoiceItems={invoice.items} />
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              )}
-
-              {/* Pagination for Invoices */}
-              <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                  totalItems={invoices.length}
-                  itemsPerPage={itemsPerPage}
-                  onPageSizeChange={handlePageSizeChange}
-                  pageSizeOptions={[10, 20, 50, 100]}
-                  showPageSize={true}
-                  showResultCount={true}
-                />
-              </div>
+          )}
             </>
           )}
         </>
+      ) : activeTab === 'sells' ? (
+        // Sells Tab Content - Show Sales Folder View
+        <SalesFolderView />
       ) : null}
 
       {/* Delete Confirmation Modal */}

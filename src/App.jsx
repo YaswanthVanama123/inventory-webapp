@@ -27,6 +27,7 @@ const OrdersList = lazy(() => import('./pages/orders/OrdersList'));
 const OrderDetail = lazy(() => import('./pages/orders/OrderDetail'));
 const PendingInvoices = lazy(() => import('./pages/routestar/PendingInvoices'));
 const ClosedInvoices = lazy(() => import('./pages/routestar/ClosedInvoices'));
+const RouteStarInvoiceDetail = lazy(() => import('./pages/routestar/RouteStarInvoiceDetail'));
 const PointOfSale = lazy(() => import('./pages/pos/PointOfSale'));
 const Categories = lazy(() => import('./pages/categories/Categories'));
 const Units = lazy(() => import('./pages/units/Units'));
@@ -309,6 +310,16 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute requireAdmin>
                         <ClosedInvoices />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/invoices/routestar/:invoiceNumber"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <RouteStarInvoiceDetail />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

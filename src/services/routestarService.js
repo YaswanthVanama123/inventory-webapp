@@ -116,6 +116,63 @@ export const syncInvoiceDetails = async (invoiceNumber) => {
 };
 
 /**
+ * Sync pending invoices with details (keeps browser open)
+ */
+export const syncPendingInvoicesWithDetails = async (limit = 0, direction = 'new') => {
+  try {
+    const response = await api.post('/routestar/sync/pending-with-details',
+      { limit, direction },
+      {
+        timeout: 0, // No timeout - allow as long as needed
+        retry: false // Disable automatic retries
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error('Error syncing pending invoices with details:', error);
+    throw error;
+  }
+};
+
+/**
+ * Sync closed invoices with details (keeps browser open)
+ */
+export const syncClosedInvoicesWithDetails = async (limit = 0, direction = 'new') => {
+  try {
+    const response = await api.post('/routestar/sync/closed-with-details',
+      { limit, direction },
+      {
+        timeout: 0, // No timeout - allow as long as needed
+        retry: false // Disable automatic retries
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error('Error syncing closed invoices with details:', error);
+    throw error;
+  }
+};
+
+/**
+ * Sync all invoice details (for invoices without line items)
+ */
+export const syncAllInvoiceDetails = async (limit = 0) => {
+  try {
+    const response = await api.post('/routestar/sync/all-details',
+      { limit },
+      {
+        timeout: 0, // No timeout - allow as long as needed
+        retry: false // Disable automatic retries
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error('Error syncing all invoice details:', error);
+    throw error;
+  }
+};
+
+/**
  * Process stock movements for invoices
  */
 export const processStockMovements = async () => {

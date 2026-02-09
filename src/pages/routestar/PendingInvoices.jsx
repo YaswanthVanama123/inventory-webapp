@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
-import { getInvoices, syncPendingInvoices, getInvoiceRange, deleteAllPendingInvoices } from '../../services/routestarService';
+import { getInvoices, syncPendingInvoices, syncPendingInvoicesWithDetails, syncAllInvoiceDetails, getInvoiceRange, deleteAllPendingInvoices } from '../../services/routestarService';
 import SearchBar from '../../components/common/SearchBar';
 import Select from '../../components/common/Select';
 import Button from '../../components/common/Button';
@@ -21,6 +21,8 @@ const PendingInvoices = () => {
   const [syncing, setSyncing] = useState(false);
   const [syncingNew, setSyncingNew] = useState(false);
   const [syncingOld, setSyncingOld] = useState(false);
+  const [syncingAll, setSyncingAll] = useState(false);
+  const [syncingDetails, setSyncingDetails] = useState(false);
   const [invoiceRange, setInvoiceRange] = useState({ highest: null, lowest: null, totalInvoices: 0 });
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -151,6 +153,59 @@ const PendingInvoices = () => {
       showError(err.message || 'Failed to sync old invoices');
     } finally {
       setSyncingOld(false);
+      setSyncing(false);
+    }
+  };
+
+  const handleSyncAll = async () => {
+    if (!isAdmin) {
+      showError('Only administrators can sync invoices');
+      return;
+    }
+
+    setSyncingAll(true);
+    setSyncing(true);
+    try {
+      // Use combined endpoint to keep browser open
+      const response = await syncPendingInvoicesWithDetails(0, 'new');
+      if (response.success) {
+        const invoices = response.data.invoices || {};
+        const details = response.data.details || {};
+        const totalInvoices = (invoices.created || 0) + (invoices.updated || 0);
+        const totalDetails = details.synced || 0;
+
+        showSuccess(`Synced ${totalInvoices} invoices (${invoices.created || 0} created, ${invoices.updated || 0} updated) and ${totalDetails} details`);
+        fetchInvoices();
+        fetchInvoiceRange();
+      }
+    } catch (err) {
+      console.error('Error syncing all invoices:', err);
+      showError(err.message || 'Failed to sync all invoices');
+    } finally {
+      setSyncingAll(false);
+      setSyncing(false);
+    }
+  };
+
+  const handleSyncDetails = async () => {
+    if (!isAdmin) {
+      showError('Only administrators can sync invoice details');
+      return;
+    }
+
+    setSyncingDetails(true);
+    setSyncing(true);
+    try {
+      const response = await syncAllInvoiceDetails(0); // 0 = sync all invoices without details
+      if (response.success) {
+        showSuccess(`Synced details for ${response.data.synced || 0} invoices (${response.data.skipped || 0} skipped)`);
+        fetchInvoices();
+      }
+    } catch (err) {
+      console.error('Error syncing invoice details:', err);
+      showError(err.message || 'Failed to sync invoice details');
+    } finally {
+      setSyncingDetails(false);
       setSyncing(false);
     }
   };
@@ -346,6 +401,58 @@ const PendingInvoices = () => {
                 </Button>
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                   Fetch older invoices (lower than #{invoiceRange.lowest || '...'})
+                </div>
+              </div>
+              <div className="relative group">
+                <Button
+                  onClick={handleSyncAll}
+                  disabled={syncing}
+                  variant="success"
+                  className="whitespace-nowrap"
+                  title="Fetch all invoices from RouteStar"
+                >
+                  {syncingAll ? (
+                    <>
+                      <LoadingSpinner size="sm" className="mr-2" />
+                      Syncing All...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Sync All
+                    </>
+                  )}
+                </Button>
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                  Fetch all invoices and their details (2 steps)
+                </div>
+              </div>
+              <div className="relative group">
+                <Button
+                  onClick={handleSyncDetails}
+                  disabled={syncing}
+                  variant="info"
+                  className="whitespace-nowrap"
+                  title="Fetch detailed line items for invoices"
+                >
+                  {syncingDetails ? (
+                    <>
+                      <LoadingSpinner size="sm" className="mr-2" />
+                      Syncing...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Sync Details
+                    </>
+                  )}
+                </Button>
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                  Fetch line items for invoices without details
                 </div>
               </div>
               <Button

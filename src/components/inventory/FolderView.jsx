@@ -136,7 +136,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
     <div className="space-y-3">
       {/* Download Button */}
       {groupedItems.length > 0 && (
-        <div className="flex justify-end">
+        <div className="flex justify-end mb-4">
           <Button
             variant="outline"
             size="sm"
@@ -155,25 +155,25 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
         return (
           <div
             key={group.sku}
-            className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200 hover:shadow-md transition-shadow"
+            className="bg-white rounded-lg shadow-sm overflow-hidden border border-blue-200 hover:shadow-md transition-shadow"
           >
             {/* Item Folder Header */}
             <div
-              className="flex items-center gap-4 p-4 cursor-pointer hover:bg-slate-50 transition-colors"
+              className="flex items-center gap-4 p-4 cursor-pointer hover:bg-blue-50 transition-colors"
               onClick={() => toggleItemFolder(group.sku)}
             >
               {/* Expand/Collapse Icon */}
               <button
-                className="flex-shrink-0 p-1.5 hover:bg-slate-200 rounded transition-colors"
+                className="flex-shrink-0 p-1.5 hover:bg-blue-200 rounded transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleItemFolder(group.sku);
                 }}
               >
                 {isExpanded ? (
-                  <ChevronDown className="w-5 h-5 text-slate-600" />
+                  <ChevronDown className="w-5 h-5 text-blue-600" />
                 ) : (
-                  <ChevronRight className="w-5 h-5 text-slate-600" />
+                  <ChevronRight className="w-5 h-5 text-blue-600" />
                 )}
               </button>
 
@@ -199,7 +199,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
               {/* Aggregated Stats */}
               <div className="hidden lg:flex items-center gap-6 mr-2">
                 <div className="text-right">
-                  <p className="text-xs text-slate-500 uppercase font-medium mb-1">Total Quantity</p>
+                  <p className="text-xs text-slate-500 uppercase font-medium mb-1">Total Ordered</p>
                   <p className="text-lg font-bold text-slate-900">
                     {group.totalQuantity}
                   </p>
@@ -221,7 +221,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
 
             {/* Expanded: Show All Order Entries */}
             {isExpanded && (
-              <div className="border-t border-slate-200 bg-slate-50">
+              <div className="border-t border-blue-200 bg-blue-50">
                 {group.orders.length === 0 ? (
                   <div className="p-8 text-center text-slate-500">
                     <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -230,44 +230,44 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
-                      <thead className="bg-slate-100 border-b border-slate-200">
+                      <thead className="bg-blue-100 border-b border-blue-200">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
                             Order #
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
                             PO Number
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
                             Order Date
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
                             Vendor
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
                             Quantity
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
                             Unit Price
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
                             Line Total
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
                             Status
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
                             Stock
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-200 bg-white">
+                      <tbody className="divide-y divide-blue-200 bg-white">
                         {group.orders.map((order, index) => {
                           const stockStatus = getStockStatus(order.stockProcessed);
                           return (
                             <tr
                               key={`${order.orderNumber}-${index}`}
-                              className="hover:bg-slate-50 transition-colors"
+                              className="hover:bg-blue-50 transition-colors"
                             >
                               <td className="px-6 py-4">
                                 <span className="font-mono text-sm font-medium text-blue-600">
@@ -314,9 +314,9 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                           );
                         })}
                       </tbody>
-                      <tfoot className="bg-slate-100 border-t-2 border-slate-300">
+                      <tfoot className="bg-blue-100 border-t-2 border-blue-300">
                         <tr>
-                          <td colSpan="4" className="px-6 py-3 text-right text-sm font-semibold text-slate-700">
+                          <td colSpan="4" className="px-6 py-3 text-right text-sm font-semibold text-blue-700">
                             Totals:
                           </td>
                           <td className="px-6 py-3">
@@ -324,7 +324,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                               {group.orders.reduce((sum, order) => sum + order.qty, 0)}
                             </span>
                           </td>
-                          <td className="px-6 py-3 text-sm font-medium text-slate-700">
+                          <td className="px-6 py-3 text-sm font-medium text-blue-700">
                             Avg: {formatCurrency(group.avgUnitPrice)}
                           </td>
                           <td className="px-6 py-3">

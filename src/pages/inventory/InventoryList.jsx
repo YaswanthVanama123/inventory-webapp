@@ -14,7 +14,8 @@ import Modal from '../../components/common/Modal';
 import AddPurchaseModal from '../../components/inventory/AddPurchaseModal';
 import FolderView from '../../components/inventory/FolderView';
 import SalesFolderView from '../../components/inventory/SalesFolderView';
-import { Trash2, ShoppingBag, ShoppingCart, ChevronRight } from 'lucide-react';
+import StockReconciliationView from '../../components/inventory/StockReconciliationView';
+import { Trash2, ShoppingBag, ShoppingCart, ChevronRight, Package } from 'lucide-react';
 
 const InventoryList = () => {
   const navigate = useNavigate();
@@ -69,7 +70,7 @@ const InventoryList = () => {
   const [deletingPurchase, setDeletingPurchase] = useState(false);
 
   // Tabs system for viewing purchases vs sales - initialize from URL
-  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'purchases');
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'stock');
   const [expandedSales, setExpandedSales] = useState({});
   const [sales, setSales] = useState({});
   const [loadingSales, setLoadingSales] = useState({});
@@ -95,7 +96,7 @@ const InventoryList = () => {
     if (sortBy !== 'name') params.sortBy = sortBy;
     if (sortOrder !== 'asc') params.sortOrder = sortOrder;
     if (currentPage > 1) params.page = currentPage.toString();
-    if (activeTab !== 'purchases') params.tab = activeTab;
+    if (activeTab !== 'stock') params.tab = activeTab;
 
     setSearchParams(params, { replace: true });
   }, [debouncedSearchTerm, selectedCategory, statusFilter, sortBy, sortOrder, currentPage, activeTab, setSearchParams]);
@@ -592,121 +593,138 @@ const InventoryList = () => {
       {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="space-y-4">
-          {}
-          <div className="w-full">
-            <SearchBar
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              placeholder="Search by item name, SKU, or category..."
-              fullWidth
-              loading={loading && searchTerm !== debouncedSearchTerm}
-            />
-          </div>
+          {/* Show search and filters only for purchases tab */}
+          {activeTab === 'purchases' && (
+            <>
+              {}
+              <div className="w-full">
+                <SearchBar
+                  value={searchTerm}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  placeholder="Search by item name, SKU, or category..."
+                  fullWidth
+                  loading={loading && searchTerm !== debouncedSearchTerm}
+                />
+              </div>
 
-          {}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {}
-            <Select
-              name="category"
-              value={selectedCategory}
-              onChange={handleCategoryChange}
-              options={categoryOptions}
-              placeholder="All Categories"
-              fullWidth
-            />
+              {}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                {}
+                <Select
+                  name="category"
+                  value={selectedCategory}
+                  onChange={handleCategoryChange}
+                  options={categoryOptions}
+                  placeholder="All Categories"
+                  fullWidth
+                />
 
-            {}
-            <Select
-              name="status"
-              value={statusFilter}
-              onChange={handleStatusFilterChange}
-              options={statusOptions}
-              placeholder="All Items"
-              fullWidth
-            />
+                {}
+                <Select
+                  name="status"
+                  value={statusFilter}
+                  onChange={handleStatusFilterChange}
+                  options={statusOptions}
+                  placeholder="All Items"
+                  fullWidth
+                />
 
-            {}
-            <Select
-              name="sort"
-              value={`${sortBy}-${sortOrder}`}
-              onChange={handleSortChange}
-              options={sortOptions}
-              placeholder="Sort by..."
-              fullWidth
-            />
+                {}
+                <Select
+                  name="sort"
+                  value={`${sortBy}-${sortOrder}`}
+                  onChange={handleSortChange}
+                  options={sortOptions}
+                  placeholder="Sort by..."
+                  fullWidth
+                />
 
-            {/* View Mode Toggle */}
-            <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1">
-              <button
-                onClick={() => setViewMode('table')}
-                className={`flex-1 px-3 py-1.5 rounded font-medium transition-all duration-200 ${
-                  viewMode === 'table'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-                aria-label="Table view"
-                title="Table View"
-              >
-                <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setViewMode('card')}
-                className={`flex-1 px-3 py-1.5 rounded font-medium transition-all duration-200 ${
-                  viewMode === 'card'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-                aria-label="Card view"
-                title="Card View"
-              >
-                <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setViewMode('folder')}
-                className={`flex-1 px-3 py-1.5 rounded font-medium transition-all duration-200 ${
-                  viewMode === 'folder'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-                aria-label="Folder view"
-                title="Folder View"
-              >
-                <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg>
-              </button>
-            </div>
+                {/* View Mode Toggle */}
+                <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('table')}
+                    className={`flex-1 px-3 py-1.5 rounded font-medium transition-all duration-200 ${
+                      viewMode === 'table'
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                    aria-label="Table view"
+                    title="Table View"
+                  >
+                    <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('card')}
+                    className={`flex-1 px-3 py-1.5 rounded font-medium transition-all duration-200 ${
+                      viewMode === 'card'
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                    aria-label="Card view"
+                    title="Card View"
+                  >
+                    <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('folder')}
+                    className={`flex-1 px-3 py-1.5 rounded font-medium transition-all duration-200 ${
+                      viewMode === 'folder'
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                    aria-label="Folder view"
+                    title="Folder View"
+                  >
+                    <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                    </svg>
+                  </button>
+                </div>
 
-            {/* Clear Filters Button */}
-            {(searchTerm || selectedCategory || statusFilter) && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCategory('');
-                  setStatusFilter('');
-                  setCurrentPage(1);
-                }}
-                className="whitespace-nowrap"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Clear Filters
-              </Button>
-            )}
-          </div>
+                {/* Clear Filters Button */}
+                {(searchTerm || selectedCategory || statusFilter) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setSelectedCategory('');
+                      setStatusFilter('');
+                      setCurrentPage(1);
+                    }}
+                    className="whitespace-nowrap"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
       {/* Tabs Component */}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
-        <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1 max-w-md">
+        <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1 max-w-2xl">
+          <button
+            onClick={() => setActiveTab('stock')}
+            className={`flex-1 px-4 py-2 rounded font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+              activeTab === 'stock'
+                ? 'bg-slate-600 text-white'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+            aria-label="Stock tab"
+          >
+            <Package className="w-5 h-5" />
+            <span>Stock</span>
+          </button>
           <button
             onClick={() => setActiveTab('purchases')}
             className={`flex-1 px-4 py-2 rounded font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
@@ -747,7 +765,10 @@ const InventoryList = () => {
       )}
 
       {/* Content based on active tab */}
-      {activeTab === 'purchases' ? (
+      {activeTab === 'stock' ? (
+        // Stock Reconciliation Tab - Unified view
+        <StockReconciliationView />
+      ) : activeTab === 'purchases' ? (
         // Purchases Tab Content - Show Inventory Items
         <>
           {/* Folder View - Handles its own loading and data */}

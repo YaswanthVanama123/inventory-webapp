@@ -284,7 +284,7 @@ const employeeMenuItems = [
   },
 ];
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
   const { user, isAdmin, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -297,7 +297,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     navigate('/login');
   };
 
-  
+
   const toggleSubmenu = (label) => {
     setExpandedMenus((prev) => ({
       ...prev,
@@ -325,15 +325,19 @@ const Sidebar = ({ isOpen, onClose }) => {
     });
   }, [location.pathname, isAdmin]);
 
-  
+
   useEffect(() => {
     const checkScreenSize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
 
-      
-      if (mobile) {
+
+      if (mobile && isCollapsed) {
         setIsCollapsed(false);
+        // Notify parent that sidebar is no longer collapsed
+        if (onToggleCollapse) {
+          onToggleCollapse(false);
+        }
       }
     };
 
@@ -341,7 +345,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     window.addEventListener('resize', checkScreenSize);
 
     return () => window.removeEventListener('resize', checkScreenSize);
-  }, []);
+  }, [isCollapsed, onToggleCollapse]);
 
   
   useEffect(() => {
@@ -353,10 +357,15 @@ const Sidebar = ({ isOpen, onClose }) => {
   
   const menuItems = isAdmin ? adminMenuItems : employeeMenuItems;
 
-  
+
   const handleToggleCollapse = () => {
     if (!isMobile) {
-      setIsCollapsed(!isCollapsed);
+      const newCollapsedState = !isCollapsed;
+      setIsCollapsed(newCollapsedState);
+      // Notify parent component
+      if (onToggleCollapse) {
+        onToggleCollapse(newCollapsedState);
+      }
     }
   };
 

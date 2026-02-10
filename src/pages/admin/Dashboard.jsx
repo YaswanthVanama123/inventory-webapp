@@ -236,9 +236,10 @@ const Dashboard = () => {
       console.log('Response data:', response.data);
 
       if (response.success && response.data) {
-        const { summary, categoryStats, recentActivity, topValueItems, salesTrend } = response.data;
+        const { summary, categoryStats, recentActivity, topSellingItems, salesTrend } = response.data;
         console.log('Summary data:', summary);
         console.log('Sales trend:', salesTrend);
+        console.log('Top selling items:', topSellingItems);
 
         // Transform backend data to frontend format
         const transformedData = {
@@ -251,6 +252,11 @@ const Dashboard = () => {
             ordersChange: summary.ordersChange || 0,
             lowStockChange: summary.lowStockChange || 0,
             profitMarginChange: summary.profitMarginChange || 0,
+            // Purchase order statistics from CustomerConnect automation
+            totalPurchaseAmount: summary.totalPurchaseAmount || 0,
+            totalPurchaseOrders: summary.totalPurchaseOrders || 0,
+            avgPurchaseValue: summary.avgPurchaseValue || 0,
+            dataSource: summary.dataSource || 'manual',
           },
           salesTrend: salesTrend?.map(trend => ({
             month: trend.month,
@@ -269,7 +275,7 @@ const Dashboard = () => {
             time: formatTimeAgo(activity.timestamp),
             type: activity.action?.toLowerCase() || 'update',
           })) || [],
-          topValueItems: topValueItems || [],
+          topSellingItems: topSellingItems || [],
         };
 
         console.log('Transformed data:', transformedData);
@@ -379,40 +385,82 @@ const Dashboard = () => {
         </Card>
       )}
 
-      {/* Stats Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <StatCard
-          title="Total Revenue"
-          value={formatCurrency(stats.totalRevenue)}
-          change={`${stats.revenueChange > 0 ? '+' : ''}${stats.revenueChange}%`}
-          changeType={stats.revenueChange >= 0 ? 'positive' : 'negative'}
-          icon={DollarSign}
-          loading={loading}
-        />
-        <StatCard
-          title="Total Orders"
-          value={stats.totalOrders?.toLocaleString() || '0'}
-          change={`${stats.ordersChange > 0 ? '+' : ''}${stats.ordersChange}%`}
-          changeType={stats.ordersChange >= 0 ? 'positive' : 'negative'}
-          icon={FileText}
-          loading={loading}
-        />
-        <StatCard
-          title="Low Stock Items"
-          value={stats.lowStockItems?.toLocaleString() || '0'}
-          change={`${stats.lowStockChange}%`}
-          changeType={stats.lowStockChange >= 0 ? 'positive' : 'negative'}
-          icon={AlertTriangle}
-          loading={loading}
-        />
-        <StatCard
-          title="Profit Margin"
-          value={`${stats.profitMargin}%`}
-          change={`${stats.profitMarginChange > 0 ? '+' : ''}${stats.profitMarginChange}%`}
-          changeType={stats.profitMarginChange >= 0 ? 'positive' : 'negative'}
-          icon={TrendingUp}
-          loading={loading}
-        />
+      {/* Stats Cards Grid - Sales Data (RouteStar) */}
+      <div>
+        <h2 className="text-lg font-semibold text-gray-900 mb-3">
+          Sales Analytics (RouteStar)
+          {stats.dataSource === 'automation' && (
+            <span className="ml-2 text-xs font-normal text-green-600 bg-green-50 px-2 py-1 rounded">
+              Automation Data
+            </span>
+          )}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <StatCard
+            title="Total Revenue"
+            value={formatCurrency(stats.totalRevenue)}
+            change={`${stats.revenueChange > 0 ? '+' : ''}${stats.revenueChange}%`}
+            changeType={stats.revenueChange >= 0 ? 'positive' : 'negative'}
+            icon={DollarSign}
+            loading={loading}
+          />
+          <StatCard
+            title="Total Orders"
+            value={stats.totalOrders?.toLocaleString() || '0'}
+            change={`${stats.ordersChange > 0 ? '+' : ''}${stats.ordersChange}%`}
+            changeType={stats.ordersChange >= 0 ? 'positive' : 'negative'}
+            icon={FileText}
+            loading={loading}
+          />
+          <StatCard
+            title="Low Stock Items"
+            value={stats.lowStockItems?.toLocaleString() || '0'}
+            change={`${stats.lowStockChange}%`}
+            changeType={stats.lowStockChange >= 0 ? 'positive' : 'negative'}
+            icon={AlertTriangle}
+            loading={loading}
+          />
+          <StatCard
+            title="Profit Margin"
+            value={`${stats.profitMargin}%`}
+            change={`${stats.profitMarginChange > 0 ? '+' : ''}${stats.profitMarginChange}%`}
+            changeType={stats.profitMarginChange >= 0 ? 'positive' : 'negative'}
+            icon={TrendingUp}
+            loading={loading}
+          />
+        </div>
+      </div>
+
+      {/* Stats Cards Grid - Purchase Data (CustomerConnect) */}
+      <div>
+        <h2 className="text-lg font-semibold text-gray-900 mb-3">
+          Purchase Analytics (CustomerConnect)
+          {stats.dataSource === 'automation' && (
+            <span className="ml-2 text-xs font-normal text-blue-600 bg-blue-50 px-2 py-1 rounded">
+              Automation Data
+            </span>
+          )}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          <StatCard
+            title="Total Purchase Amount"
+            value={formatCurrency(stats.totalPurchaseAmount)}
+            icon={ShoppingCart}
+            loading={loading}
+          />
+          <StatCard
+            title="Purchase Orders"
+            value={stats.totalPurchaseOrders?.toLocaleString() || '0'}
+            icon={Package}
+            loading={loading}
+          />
+          <StatCard
+            title="Avg Purchase Value"
+            value={formatCurrency(stats.avgPurchaseValue)}
+            icon={DollarSign}
+            loading={loading}
+          />
+        </div>
       </div>
 
       {/* Charts Section */}
@@ -540,8 +588,15 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <Card className="p-6">
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Quick Stats</h2>
-            <p className="text-sm text-gray-500">Top value items</p>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Top Selling Items
+              {stats.dataSource === 'automation' && (
+                <span className="ml-2 text-xs font-normal text-green-600 bg-green-50 px-2 py-1 rounded">
+                  Automation Data
+                </span>
+              )}
+            </h2>
+            <p className="text-sm text-gray-500">Based on actual sales revenue (last 180 days)</p>
           </div>
           {loading ? (
             <div className="animate-pulse space-y-3">
@@ -549,9 +604,9 @@ const Dashboard = () => {
                 <div key={i} className="h-12 bg-gray-200 rounded"></div>
               ))}
             </div>
-          ) : data.topValueItems && data.topValueItems.length > 0 ? (
+          ) : data.topSellingItems && data.topSellingItems.length > 0 ? (
             <div className="space-y-3">
-              {data.topValueItems.map((item, index) => (
+              {data.topSellingItems.map((item, index) => (
                 <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">{item.itemName}</p>
@@ -559,7 +614,9 @@ const Dashboard = () => {
                   </div>
                   <div className="text-right ml-2">
                     <p className="text-sm font-semibold text-gray-900">{formatCurrency(item.value)}</p>
-                    <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                    <p className="text-xs text-gray-500">
+                      Sold: {item.quantity} {item.orderCount && `(${item.orderCount} orders)`}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -567,7 +624,7 @@ const Dashboard = () => {
           ) : (
             <div className="text-center py-12">
               <DollarSign className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-500">No items available</p>
+              <p className="text-gray-500">No sales data available</p>
             </div>
           )}
         </Card>

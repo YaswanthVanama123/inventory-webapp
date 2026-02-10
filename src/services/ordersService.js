@@ -165,6 +165,21 @@ export const deleteAllOrders = async () => {
   }
 };
 
+/**
+ * Delete orders by order numbers
+ */
+export const deleteBulkOrdersByNumbers = async (orderNumbers) => {
+  try {
+    const response = await api.post('/customerconnect/orders/bulk-delete-by-numbers', {
+      orderNumbers
+    });
+    return response;
+  } catch (error) {
+    console.error('Error deleting orders by numbers:', error);
+    throw error;
+  }
+};
+
 export default {
   getOrders,
   getOrderByNumber,
@@ -176,4 +191,5 @@ export default {
   processStockMovements,
   fullSync,
   deleteAllOrders,
+  deleteBulkOrdersByNumbers,
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
-import { getOrders, syncOrders, getOrderRange, deleteAllOrders } from '../../services/ordersService';
+import { getOrders, syncOrders, getOrderRange, deleteAllOrders, deleteBulkOrdersByNumbers } from '../../services/ordersService';
 import SearchBar from '../../components/common/SearchBar';
 import Select from '../../components/common/Select';
 import Button from '../../components/common/Button';
@@ -32,7 +32,7 @@ const OrdersList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-  const [syncLimit, setSyncLimit] = useState(100);
+  const [syncLimit, setSyncLimit] = useState(0); // 0 = auto-detect (sync only new orders)
   const [showSyncOptions, setShowSyncOptions] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -117,8 +117,11 @@ const OrdersList = () => {
     try {
       const response = await syncOrders(limit, 'new');
       if (response.success) {
-        const limitText = isUnlimited ? 'all' : limit;
-        showSuccess(`Synced ${response.data.created || 0} new orders (${limitText} requested, newer than #${orderRange.highest || 'N/A'})`);
+        const { created = 0, updated = 0, skipped = 0, total = 0 } = response.data;
+        const limitText = isUnlimited ? 'AUTO (new orders only)' : limit;
+        showSuccess(
+          `Synced: ${created} new, ${updated} updated, ${skipped} skipped | Limit: ${limitText} | Range: #${orderRange.highest || 'N/A'}+`
+        );
         fetchOrders();
         fetchOrderRange();
       }
@@ -146,8 +149,11 @@ const OrdersList = () => {
     try {
       const response = await syncOrders(limit, 'old');
       if (response.success) {
-        const limitText = isUnlimited ? 'all' : limit;
-        showSuccess(`Synced ${response.data.created || 0} old orders (${limitText} requested, older than #${orderRange.lowest || 'N/A'})`);
+        const { created = 0, updated = 0, skipped = 0, total = 0 } = response.data;
+        const limitText = isUnlimited ? 'AUTO (all available)' : limit;
+        showSuccess(
+          `Synced: ${created} new, ${updated} updated, ${skipped} skipped | Limit: ${limitText} | Range: <#${orderRange.lowest || 'N/A'}`
+        );
         fetchOrders();
         fetchOrderRange();
       }
@@ -293,26 +299,16 @@ const OrdersList = () => {
 
     setDeletingBulk(true);
     try {
-      // Make API call to delete selected orders
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/customerconnect/orders/bulk-delete-by-numbers`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ orderNumbers: selectedOrders })
-      });
+      const response = await deleteBulkOrdersByNumbers(selectedOrders);
 
-      const data = await response.json();
-
-      if (data.success) {
-        showSuccess(`Successfully deleted ${data.data.deletedCount} order(s)`);
+      if (response.success) {
+        showSuccess(`Successfully deleted ${response.data.deletedCount} order(s)`);
         setShowBulkDeleteModal(false);
         setSelectedOrders([]);
         fetchOrders();
         fetchOrderRange();
       } else {
-        throw new Error(data.message || 'Failed to delete orders');
+        throw new Error(response.message || 'Failed to delete orders');
       }
     } catch (err) {
       console.error('Error deleting orders:', err);
@@ -433,17 +429,24 @@ const OrdersList = () => {
                     value={syncLimit}
                     onChange={(e) => setSyncLimit(e.target.value)}
                     className="w-32 px-3 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="100"
+                    placeholder="0"
                   />
                   <span className="text-sm text-slate-600 dark:text-gray-400">
-                    orders per sync (0 = unlimited)
+                    orders per sync (0 = auto-detect new orders)
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-gray-500 mt-2">
-                  Set to 0 or leave empty to fetch all available orders. Higher numbers may take longer.
+                  0 (recommended): Only syncs NEW orders since your last sync. Skips existing orders with details already stored.
                 </p>
               </div>
               <div className="flex gap-2 flex-wrap">
+                <Button
+                  onClick={() => setSyncLimit(0)}
+                  variant="secondary"
+                  size="sm"
+                >
+                  Auto (0)
+                </Button>
                 <Button
                   onClick={() => setSyncLimit(50)}
                   variant="secondary"

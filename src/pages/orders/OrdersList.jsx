@@ -36,6 +36,9 @@ const OrdersList = () => {
   const [showSyncOptions, setShowSyncOptions] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [selectedOrders, setSelectedOrders] = useState([]);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [deletingBulk, setDeletingBulk] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -256,6 +259,66 @@ const OrdersList = () => {
       });
     } catch {
       return 'Invalid Date';
+    }
+  };
+
+  const handleCheckboxChange = (orderNumber) => {
+    setSelectedOrders(prev => {
+      if (prev.includes(orderNumber)) {
+        return prev.filter(num => num !== orderNumber);
+      } else {
+        return [...prev, orderNumber];
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedOrders.length === orders.length) {
+      setSelectedOrders([]);
+    } else {
+      setSelectedOrders(orders.map(order => order.orderNumber));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedOrders.length === 0) {
+      showError('Please select orders to delete');
+      return;
+    }
+    setShowBulkDeleteModal(true);
+  };
+
+  const confirmBulkDelete = async () => {
+    if (selectedOrders.length === 0) return;
+
+    setDeletingBulk(true);
+    try {
+      // Make API call to delete selected orders
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/customerconnect/orders/bulk-delete-by-numbers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ orderNumbers: selectedOrders })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showSuccess(`Successfully deleted ${data.data.deletedCount} order(s)`);
+        setShowBulkDeleteModal(false);
+        setSelectedOrders([]);
+        fetchOrders();
+        fetchOrderRange();
+      } else {
+        throw new Error(data.message || 'Failed to delete orders');
+      }
+    } catch (err) {
+      console.error('Error deleting orders:', err);
+      showError(err.message || 'Failed to delete orders');
+    } finally {
+      setDeletingBulk(false);
     }
   };
 
@@ -551,10 +614,48 @@ const OrdersList = () => {
           />
         ) : (
           <>
+            {/* Bulk Actions Toolbar */}
+            {isAdmin && orders.length > 0 && (
+              <div className="border-b border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-700 px-6 py-3">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedOrders.length === orders.length && orders.length > 0}
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-medium text-slate-700 dark:text-gray-300">
+                      Select All ({selectedOrders.length}/{orders.length})
+                    </span>
+                  </label>
+
+                  {selectedOrders.length > 0 && (
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={handleBulkDelete}
+                      className="flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Delete Selected ({selectedOrders.length})
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-50 dark:bg-gray-700 border-b border-slate-200 dark:border-gray-600">
                   <tr>
+                    {isAdmin && (
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-gray-300 uppercase tracking-wider w-12">
+                        <span className="sr-only">Select</span>
+                      </th>
+                    )}
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-gray-300 uppercase tracking-wider">
                       Order Number
                     </th>
@@ -582,12 +683,26 @@ const OrdersList = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-gray-700">
-                  {orders.map((order) => (
-                    <tr
-                      key={order._id}
-                      className="hover:bg-slate-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-                      onClick={() => handleViewOrder(order.orderNumber)}
-                    >
+                  {orders.map((order) => {
+                    const isSelected = selectedOrders.includes(order.orderNumber);
+                    return (
+                      <tr
+                        key={order._id}
+                        className={`hover:bg-slate-50 dark:hover:bg-gray-700 cursor-pointer transition-colors ${
+                          isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                        }`}
+                        onClick={() => handleViewOrder(order.orderNumber)}
+                      >
+                        {isAdmin && (
+                          <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleCheckboxChange(order.orderNumber)}
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                            />
+                          </td>
+                        )}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-slate-900 dark:text-white">
                           #{order.orderNumber}
@@ -649,7 +764,8 @@ const OrdersList = () => {
                         </button>
                       </td>
                     </tr>
-                  ))}
+                  );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -730,6 +846,92 @@ const OrdersList = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                   Delete All Orders
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Bulk Delete Confirmation Modal */}
+      <Modal
+        isOpen={showBulkDeleteModal}
+        onClose={() => {
+          if (!deletingBulk) {
+            setShowBulkDeleteModal(false);
+          }
+        }}
+        title="Delete Selected Orders"
+      >
+        <div className="space-y-4">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <div className="flex items-start">
+              <svg className="w-6 h-6 text-red-600 dark:text-red-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <h3 className="text-sm font-semibold text-red-800 dark:text-red-300 mb-1">
+                  Warning: This action cannot be undone!
+                </h3>
+                <p className="text-sm text-red-700 dark:text-red-400">
+                  You are about to permanently delete <strong>{selectedOrders.length}</strong> selected order{selectedOrders.length !== 1 ? 's' : ''}.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm text-slate-700 dark:text-gray-300 font-medium">
+              Selected Orders:
+            </p>
+            <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 max-h-60 overflow-y-auto">
+              <ul className="space-y-1">
+                {selectedOrders.map(orderNumber => {
+                  const order = orders.find(o => o.orderNumber === orderNumber);
+                  return (
+                    <li key={orderNumber} className="text-sm text-slate-700 dark:text-gray-300">
+                      <span className="font-semibold">#{orderNumber}</span>
+                      {order && (
+                        <>
+                          <span className="text-slate-500 dark:text-gray-400 ml-2">
+                            - {order.vendor?.name || 'N/A'}
+                          </span>
+                          <span className="text-slate-500 dark:text-gray-400 ml-2">
+                            ({formatCurrency(order.total)})
+                          </span>
+                        </>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 mt-6">
+            <Button
+              onClick={() => setShowBulkDeleteModal(false)}
+              variant="secondary"
+              disabled={deletingBulk}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmBulkDelete}
+              variant="danger"
+              disabled={deletingBulk}
+            >
+              {deletingBulk ? (
+                <>
+                  <LoadingSpinner size="sm" className="mr-2" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Delete Selected Orders
                 </>
               )}
             </Button>

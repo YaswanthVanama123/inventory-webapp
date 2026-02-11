@@ -33,7 +33,7 @@ const PendingInvoices = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-  const [syncLimit, setSyncLimit] = useState(100);
+  const [syncLimit, setSyncLimit] = useState(0); // 0 = auto-detect (sync only new invoices)
   const [showSyncOptions, setShowSyncOptions] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -115,8 +115,11 @@ const PendingInvoices = () => {
     try {
       const response = await syncPendingInvoices(limit, 'new');
       if (response.success) {
-        const limitText = isUnlimited ? 'all' : limit;
-        showSuccess(`Synced ${response.data.synced || 0} new pending invoices (${limitText} requested, newer than #${invoiceRange.highest || 'N/A'})`);
+        const { created = 0, updated = 0, skipped = 0 } = response.data;
+        const limitText = isUnlimited ? 'AUTO (new invoices only)' : limit;
+        showSuccess(
+          `Synced: ${created} new, ${updated} updated, ${skipped} skipped | Limit: ${limitText} | Range: #${invoiceRange.highest || 'N/A'}+`
+        );
         fetchInvoices();
         fetchInvoiceRange();
       }
@@ -143,8 +146,11 @@ const PendingInvoices = () => {
     try {
       const response = await syncPendingInvoices(limit, 'old');
       if (response.success) {
-        const limitText = isUnlimited ? 'all' : limit;
-        showSuccess(`Synced ${response.data.synced || 0} old pending invoices (${limitText} requested, older than #${invoiceRange.lowest || 'N/A'})`);
+        const { created = 0, updated = 0, skipped = 0 } = response.data;
+        const limitText = isUnlimited ? 'AUTO (all available)' : limit;
+        showSuccess(
+          `Synced: ${created} new, ${updated} updated, ${skipped} skipped | Limit: ${limitText} | Range: <#${invoiceRange.lowest || 'N/A'}`
+        );
         fetchInvoices();
         fetchInvoiceRange();
       }
@@ -487,21 +493,21 @@ const PendingInvoices = () => {
                     value={syncLimit}
                     onChange={(e) => setSyncLimit(e.target.value)}
                     className="w-32 px-3 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="100"
+                    placeholder="0"
                   />
                   <span className="text-sm text-slate-600 dark:text-gray-400">
-                    invoices per sync (0 = unlimited)
+                    invoices per sync (0 = auto-detect new invoices)
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-gray-500 mt-2">
-                  Set to 0 to fetch all available pending invoices. Higher numbers may take longer.
+                  0 (recommended): Only syncs NEW invoices since your last sync. Higher numbers fetch that many invoices regardless.
                 </p>
               </div>
               <div className="flex gap-2 flex-wrap">
+                <Button onClick={() => setSyncLimit(0)} variant="secondary" size="sm">Auto (0)</Button>
                 <Button onClick={() => setSyncLimit(50)} variant="secondary" size="sm">50</Button>
                 <Button onClick={() => setSyncLimit(100)} variant="secondary" size="sm">100</Button>
                 <Button onClick={() => setSyncLimit(500)} variant="secondary" size="sm">500</Button>
-                <Button onClick={() => setSyncLimit(0)} variant="secondary" size="sm">All</Button>
               </div>
             </div>
 

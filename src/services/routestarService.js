@@ -236,6 +236,21 @@ export const deleteAllClosedInvoices = async () => {
   }
 };
 
+/**
+ * Delete closed invoices by invoice numbers
+ */
+export const deleteBulkClosedInvoicesByNumbers = async (invoiceNumbers) => {
+  try {
+    const response = await api.post('/routestar/invoices/bulk-delete-by-numbers', {
+      invoiceNumbers
+    });
+    return response;
+  } catch (error) {
+    console.error('Error deleting invoices by numbers:', error);
+    throw error;
+  }
+};
+
 export default {
   getInvoices,
   getInvoiceByNumber,
@@ -248,4 +263,5 @@ export default {
   fullSync,
   deleteAllPendingInvoices,
   deleteAllClosedInvoices,
+  deleteBulkClosedInvoicesByNumbers,
 };

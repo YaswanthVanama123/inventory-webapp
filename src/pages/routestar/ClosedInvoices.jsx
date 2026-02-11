@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
-import { getInvoices, syncClosedInvoices, syncClosedInvoicesWithDetails, syncAllInvoiceDetails, getInvoiceRange, deleteAllClosedInvoices } from '../../services/routestarService';
+import { getInvoices, syncClosedInvoices, syncClosedInvoicesWithDetails, syncAllInvoiceDetails, getInvoiceRange, deleteAllClosedInvoices, deleteBulkClosedInvoicesByNumbers } from '../../services/routestarService';
 import SearchBar from '../../components/common/SearchBar';
 import Select from '../../components/common/Select';
 import Button from '../../components/common/Button';
@@ -33,10 +33,13 @@ const ClosedInvoices = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-  const [syncLimit, setSyncLimit] = useState(100);
+  const [syncLimit, setSyncLimit] = useState(0); // 0 = auto-detect (sync only new invoices)
   const [showSyncOptions, setShowSyncOptions] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [selectedInvoices, setSelectedInvoices] = useState([]);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [deletingBulk, setDeletingBulk] = useState(false);
 
   useEffect(() => {
     fetchInvoices();
@@ -115,8 +118,11 @@ const ClosedInvoices = () => {
     try {
       const response = await syncClosedInvoices(limit, 'new');
       if (response.success) {
-        const limitText = isUnlimited ? 'all' : limit;
-        showSuccess(`Synced ${response.data.synced || 0} new closed invoices (${limitText} requested, newer than #${invoiceRange.highest || 'N/A'})`);
+        const { created = 0, updated = 0, skipped = 0 } = response.data;
+        const limitText = isUnlimited ? 'AUTO (new invoices only)' : limit;
+        showSuccess(
+          `Synced: ${created} new, ${updated} updated, ${skipped} skipped | Limit: ${limitText} | Range: #${invoiceRange.highest || 'N/A'}+`
+        );
         fetchInvoices();
         fetchInvoiceRange();
       }
@@ -143,8 +149,11 @@ const ClosedInvoices = () => {
     try {
       const response = await syncClosedInvoices(limit, 'old');
       if (response.success) {
-        const limitText = isUnlimited ? 'all' : limit;
-        showSuccess(`Synced ${response.data.synced || 0} old closed invoices (${limitText} requested, older than #${invoiceRange.lowest || 'N/A'})`);
+        const { created = 0, updated = 0, skipped = 0 } = response.data;
+        const limitText = isUnlimited ? 'AUTO (all available)' : limit;
+        showSuccess(
+          `Synced: ${created} new, ${updated} updated, ${skipped} skipped | Limit: ${limitText} | Range: <#${invoiceRange.lowest || 'N/A'}`
+        );
         fetchInvoices();
         fetchInvoiceRange();
       }
@@ -308,6 +317,56 @@ const ClosedInvoices = () => {
       });
     } catch {
       return 'Invalid Date';
+    }
+  };
+
+  const handleCheckboxChange = (invoiceNumber) => {
+    setSelectedInvoices(prev => {
+      if (prev.includes(invoiceNumber)) {
+        return prev.filter(num => num !== invoiceNumber);
+      } else {
+        return [...prev, invoiceNumber];
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedInvoices.length === invoices.length) {
+      setSelectedInvoices([]);
+    } else {
+      setSelectedInvoices(invoices.map(invoice => invoice.invoiceNumber));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedInvoices.length === 0) {
+      showError('Please select invoices to delete');
+      return;
+    }
+    setShowBulkDeleteModal(true);
+  };
+
+  const confirmBulkDelete = async () => {
+    if (selectedInvoices.length === 0) return;
+
+    setDeletingBulk(true);
+    try {
+      const response = await deleteBulkClosedInvoicesByNumbers(selectedInvoices);
+
+      if (response.success) {
+        showSuccess(`Successfully deleted ${response.data.deletedCount} invoice(s)`);
+        setShowBulkDeleteModal(false);
+        setSelectedInvoices([]);
+        fetchInvoices();
+        fetchInvoiceRange();
+      } else {
+        throw new Error(response.message || 'Failed to delete invoices');
+      }
+    } catch (err) {
+      console.error('Error deleting invoices:', err);
+      showError(err.message || 'Failed to delete invoices');
+    } finally {
+      setDeletingBulk(false);
     }
   };
 
@@ -487,21 +546,21 @@ const ClosedInvoices = () => {
                     value={syncLimit}
                     onChange={(e) => setSyncLimit(e.target.value)}
                     className="w-32 px-3 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="100"
+                    placeholder="0"
                   />
                   <span className="text-sm text-slate-600 dark:text-gray-400">
-                    invoices per sync (0 = unlimited)
+                    invoices per sync (0 = auto-detect new invoices)
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-gray-500 mt-2">
-                  Set to 0 to fetch all available closed invoices. Higher numbers may take longer.
+                  0 (recommended): Only syncs NEW invoices since your last sync. Higher numbers fetch that many invoices regardless.
                 </p>
               </div>
               <div className="flex gap-2 flex-wrap">
+                <Button onClick={() => setSyncLimit(0)} variant="secondary" size="sm">Auto (0)</Button>
                 <Button onClick={() => setSyncLimit(50)} variant="secondary" size="sm">50</Button>
                 <Button onClick={() => setSyncLimit(100)} variant="secondary" size="sm">100</Button>
                 <Button onClick={() => setSyncLimit(500)} variant="secondary" size="sm">500</Button>
-                <Button onClick={() => setSyncLimit(0)} variant="secondary" size="sm">All</Button>
               </div>
             </div>
 
@@ -702,10 +761,48 @@ const ClosedInvoices = () => {
           />
         ) : (
           <>
+            {/* Bulk Actions Toolbar */}
+            {isAdmin && invoices.length > 0 && (
+              <div className="border-b border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-700 px-6 py-3">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedInvoices.length === invoices.length && invoices.length > 0}
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-medium text-slate-700 dark:text-gray-300">
+                      Select All ({selectedInvoices.length}/{invoices.length})
+                    </span>
+                  </label>
+
+                  {selectedInvoices.length > 0 && (
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={handleBulkDelete}
+                      className="flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Delete Selected ({selectedInvoices.length})
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-50 dark:bg-gray-700 border-b border-slate-200 dark:border-gray-600">
                   <tr>
+                    {isAdmin && (
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-gray-300 uppercase tracking-wider w-12">
+                        <span className="sr-only">Select</span>
+                      </th>
+                    )}
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-gray-300 uppercase tracking-wider">
                       Invoice #
                     </th>
@@ -730,12 +827,26 @@ const ClosedInvoices = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-gray-700">
-                  {invoices.map((invoice) => (
-                    <tr
-                      key={invoice._id}
-                      className="hover:bg-slate-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-                      onClick={() => handleViewInvoice(invoice.invoiceNumber)}
-                    >
+                  {invoices.map((invoice) => {
+                    const isSelected = selectedInvoices.includes(invoice.invoiceNumber);
+                    return (
+                      <tr
+                        key={invoice._id}
+                        className={`hover:bg-slate-50 dark:hover:bg-gray-700 cursor-pointer transition-colors ${
+                          isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                        }`}
+                        onClick={() => handleViewInvoice(invoice.invoiceNumber)}
+                      >
+                        {isAdmin && (
+                          <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleCheckboxChange(invoice.invoiceNumber)}
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                            />
+                          </td>
+                        )}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-slate-900 dark:text-white">
                           #{invoice.invoiceNumber}
@@ -790,7 +901,8 @@ const ClosedInvoices = () => {
                         </button>
                       </td>
                     </tr>
-                  ))}
+                  );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -809,6 +921,104 @@ const ClosedInvoices = () => {
           </>
         )}
       </div>
+
+      {/* Bulk Delete Confirmation Modal */}
+      {showBulkDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+                <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                  Delete Selected Invoices
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-gray-400">
+                  This action cannot be undone
+                </p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
+                <div className="flex items-start">
+                  <svg className="w-6 h-6 text-red-600 dark:text-red-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div>
+                    <h3 className="text-sm font-semibold text-red-800 dark:text-red-300 mb-1">
+                      Warning: This action cannot be undone!
+                    </h3>
+                    <p className="text-sm text-red-700 dark:text-red-400">
+                      You are about to permanently delete <strong>{selectedInvoices.length}</strong> selected invoice{selectedInvoices.length !== 1 ? 's' : ''}.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-sm text-slate-700 dark:text-gray-300 font-medium">
+                  Selected Invoices:
+                </p>
+                <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 max-h-60 overflow-y-auto">
+                  <ul className="space-y-1">
+                    {selectedInvoices.map(invoiceNumber => {
+                      const invoice = invoices.find(inv => inv.invoiceNumber === invoiceNumber);
+                      return (
+                        <li key={invoiceNumber} className="text-sm text-slate-700 dark:text-gray-300">
+                          <span className="font-semibold">#{invoiceNumber}</span>
+                          {invoice && (
+                            <>
+                              <span className="text-slate-500 dark:text-gray-400 ml-2">
+                                - {invoice.customer?.name || 'N/A'}
+                              </span>
+                              <span className="text-slate-500 dark:text-gray-400 ml-2">
+                                ({formatCurrency(invoice.total)})
+                              </span>
+                            </>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <Button
+                onClick={() => setShowBulkDeleteModal(false)}
+                variant="secondary"
+                disabled={deletingBulk}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={confirmBulkDelete}
+                variant="danger"
+                disabled={deletingBulk}
+              >
+                {deletingBulk ? (
+                  <>
+                    <LoadingSpinner size="sm" className="mr-2" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete Selected Invoices
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

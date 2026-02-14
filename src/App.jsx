@@ -29,6 +29,7 @@ const PendingInvoices = lazy(() => import('./pages/routestar/PendingInvoices'));
 const ClosedInvoices = lazy(() => import('./pages/routestar/ClosedInvoices'));
 const RouteStarInvoiceDetail = lazy(() => import('./pages/routestar/RouteStarInvoiceDetail'));
 const ModelCategoryMapping = lazy(() => import('./pages/routestar/ModelCategoryMapping'));
+const RouteStarItemsList = lazy(() => import('./pages/routestar/RouteStarItemsList'));
 const PointOfSale = lazy(() => import('./pages/pos/PointOfSale'));
 const Categories = lazy(() => import('./pages/categories/Categories'));
 const Units = lazy(() => import('./pages/units/Units'));
@@ -333,6 +334,18 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute requireAdmin>
                         <ModelCategoryMapping />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+
+                {/* Protected Routes - RouteStar Items List (Admin only) */}
+                <Route
+                  path="/routestar/items"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <RouteStarItemsList />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

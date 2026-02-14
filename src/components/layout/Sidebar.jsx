@@ -229,6 +229,11 @@ const adminMenuItems = [
     icon: LinkIcon
   },
   {
+    label: 'RouteStar Items',
+    path: '/routestar/items',
+    icon: PackageIcon
+  },
+  {
     label: 'Approvals',
     path: '/approvals',
     icon: CheckCircleIcon

@@ -4,6 +4,7 @@ import { modelCategoryService } from '../../services/modelCategoryService';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Select from '../../components/common/Select';
+import SearchableSelect from '../../components/common/SearchableSelect';
 import Card from '../../components/common/Card';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Badge from '../../components/common/Badge';
@@ -191,7 +192,7 @@ const ModelCategoryMapping = () => {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
           <div className="text-3xl font-bold">{stats.total}</div>
           <div className="text-sm opacity-90">Total Models</div>
@@ -203,6 +204,10 @@ const ModelCategoryMapping = () => {
         <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white">
           <div className="text-3xl font-bold">{stats.unmapped}</div>
           <div className="text-sm opacity-90">Unmapped</div>
+        </Card>
+        <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+          <div className="text-3xl font-bold">{routeStarItems.length}</div>
+          <div className="text-sm opacity-90">RouteStar Items Available</div>
         </Card>
       </div>
 
@@ -342,18 +347,48 @@ const ModelCategoryMapping = () => {
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <Select
+                      <SearchableSelect
                         value={record.categoryItemId || ''}
-                        onChange={(e) => handleCategoryChange(record.modelNumber, e.target.value)}
+                        onChange={(categoryItemId) => handleCategoryChange(record.modelNumber, categoryItemId)}
+                        options={routeStarItems}
+                        placeholder={
+                          routeStarItems.length === 0
+                            ? 'Loading items...'
+                            : `Select category (${routeStarItems.length} available)`
+                        }
+                        searchPlaceholder="Search items..."
+                        getOptionValue={(item) => item._id}
+                        getOptionLabel={(item) => {
+                          let label = item.itemName;
+                          if (item.itemParent) label += ` - ${item.itemParent}`;
+                          if (item.description) {
+                            const shortDesc = item.description.substring(0, 50);
+                            label += ` | ${shortDesc}${item.description.length > 50 ? '...' : ''}`;
+                          }
+                          return label;
+                        }}
+                        renderOption={(item) => (
+                          <div className="flex flex-col">
+                            <span className="font-medium text-gray-900 dark:text-white">
+                              {item.itemName}
+                            </span>
+                            {(item.itemParent || item.description) && (
+                              <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                {item.itemParent && <span className="font-medium">{item.itemParent}</span>}
+                                {item.itemParent && item.description && ' • '}
+                                {item.description && (
+                                  <span className="truncate block">
+                                    {item.description.substring(0, 80)}
+                                    {item.description.length > 80 ? '...' : ''}
+                                  </span>
+                                )}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        emptyMessage="No items found. Try a different search."
                         className="w-full"
-                      >
-                        <option value="">Select category</option>
-                        {routeStarItems.map(item => (
-                          <option key={item._id} value={item._id}>
-                            {item.itemName}{item.itemParent ? ` (${item.itemParent})` : ''}
-                          </option>
-                        ))}
-                      </Select>
+                      />
                     </td>
                     <td className="px-6 py-4">
                       <Input

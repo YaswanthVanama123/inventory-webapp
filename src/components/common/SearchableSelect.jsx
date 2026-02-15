@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { MagnifyingGlassIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-/**
- * SearchableSelect Component
- * A dropdown with search functionality
- */
+
+
+
+
 const SearchableSelect = ({
   value,
   onChange,
@@ -25,7 +25,7 @@ const SearchableSelect = ({
   const containerRef = useRef(null);
   const searchInputRef = useRef(null);
 
-  // Filter options based on search term
+  
   useEffect(() => {
     if (!searchTerm) {
       setFilteredOptions(options);
@@ -39,7 +39,7 @@ const SearchableSelect = ({
     }
   }, [searchTerm, options, getOptionLabel]);
 
-  // Close dropdown when clicking outside
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -52,7 +52,7 @@ const SearchableSelect = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Focus search input when dropdown opens
+  
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
       searchInputRef.current.focus();
@@ -81,7 +81,7 @@ const SearchableSelect = ({
     setSearchTerm('');
   };
 
-  // Get the selected option for display
+  
   const selectedOption = options.find(option => {
     const optionValue = getOptionValue ? getOptionValue(option) : option.value || option;
     return optionValue === value;
@@ -93,7 +93,7 @@ const SearchableSelect = ({
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
-      {/* Selected value display */}
+      {}
       <button
         type="button"
         onClick={handleToggle}
@@ -125,10 +125,10 @@ const SearchableSelect = ({
         </div>
       </button>
 
-      {/* Dropdown */}
+      {}
       {isOpen && (
         <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-80 overflow-hidden">
-          {/* Search input */}
+          {}
           <div className="p-2 border-b border-gray-200 dark:border-gray-700">
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -143,7 +143,7 @@ const SearchableSelect = ({
             </div>
           </div>
 
-          {/* Options list */}
+          {}
           <div className="overflow-y-auto max-h-64">
             {filteredOptions.length === 0 ? (
               <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">

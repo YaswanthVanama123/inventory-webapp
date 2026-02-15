@@ -47,17 +47,17 @@ const ErrorThrower = ({ shouldThrow, errorType = 'render' }) => {
   );
 };
 
-/**
- * Error Boundary Demo Page
- * Demonstrates different error boundary scenarios
- */
+
+
+
+
 const ErrorBoundaryDemo = () => {
   const [scenario, setScenario] = useState(null);
   const [key, setKey] = useState(0);
 
   const resetScenario = () => {
     setScenario(null);
-    setKey(key + 1); // Force remount of error boundary
+    setKey(key + 1); 
   };
 
   const scenarios = [
@@ -162,7 +162,7 @@ const ErrorBoundaryDemo = () => {
           </div>
         </Card>
 
-        {/* Active Scenario */}
+        {}
         {scenario && (
           <Card title="Test Result" className="mb-6">
             <div className="mb-4">
@@ -171,7 +171,7 @@ const ErrorBoundaryDemo = () => {
               </Button>
             </div>
 
-            {/* Render selected scenario with ErrorBoundary */}
+            {}
             {scenarios.map((s) => {
               if (s.id !== scenario) return null;
 
@@ -191,7 +191,7 @@ const ErrorBoundaryDemo = () => {
           </Card>
         )}
 
-        {/* Working Component (No Errors) */}
+        {}
         <Card title="Working Component" className="mb-6">
           <p className="text-gray-600 dark:text-gray-400 mb-4">
             This component is wrapped in an ErrorBoundary but works normally:

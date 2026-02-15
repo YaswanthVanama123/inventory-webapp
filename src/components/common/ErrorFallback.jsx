@@ -44,7 +44,7 @@ const ErrorFallback = ({
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"//www.w3.org/2000/svg"
+        xmlns="http://www.w3.org/2000/svg"
       >
         <path
           strokeLinecap="round"
@@ -60,7 +60,7 @@ const ErrorFallback = ({
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"//www.w3.org/2000/svg"
+        xmlns="http://www.w3.org/2000/svg"
       >
         <path
           strokeLinecap="round"
@@ -102,14 +102,14 @@ const ErrorFallback = ({
     <div
       className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm ${sizeStyles[size].container} ${className}`}
     >
-      {/* Error Icon */}
+      {}
       <div className="flex justify-center mb-4">
         <div className={`${sizeStyles[size].icon} bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center`}>
           {icons[icon] || icons.alert}
         </div>
       </div>
 
-      {/* Error Message */}
+      {}
       <div className="text-center mb-4">
         <h3 className={`${sizeStyles[size].title} font-semibold text-gray-900 dark:text-white mb-2`}>
           {title}
@@ -119,7 +119,7 @@ const ErrorFallback = ({
         </p>
       </div>
 
-      {/* Action Buttons */}
+      {}
       {(showReload || showRetry) && (
         <div className="flex flex-col sm:flex-row gap-2 justify-center">
           {showRetry && onRetry && (
@@ -129,7 +129,7 @@ const ErrorFallback = ({
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"//www.w3.org/2000/svg"
+                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   strokeLinecap="round"
@@ -153,7 +153,7 @@ const ErrorFallback = ({
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"//www.w3.org/2000/svg"
+                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   strokeLinecap="round"

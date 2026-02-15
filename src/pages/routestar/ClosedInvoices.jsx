@@ -33,7 +33,7 @@ const ClosedInvoices = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-  const [syncLimit, setSyncLimit] = useState(0); // 0 = auto-detect (sync only new invoices)
+  const [syncLimit, setSyncLimit] = useState(0); 
   const [showSyncOptions, setShowSyncOptions] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -175,7 +175,7 @@ const ClosedInvoices = () => {
     setSyncingAll(true);
     setSyncing(true);
     try {
-      // Use combined endpoint to keep browser open
+      
       const response = await syncClosedInvoicesWithDetails(0, 'new');
       if (response.success) {
         const invoices = response.data.invoices || {};
@@ -205,7 +205,7 @@ const ClosedInvoices = () => {
     setSyncingDetails(true);
     setSyncing(true);
     try {
-      const response = await syncAllInvoiceDetails(0); // 0 = sync all invoices without details
+      const response = await syncAllInvoiceDetails(0); 
       if (response.success) {
         showSuccess(`Synced details for ${response.data.synced || 0} invoices (${response.data.skipped || 0} skipped)`);
         fetchInvoices();
@@ -380,7 +380,7 @@ const ClosedInvoices = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -531,7 +531,7 @@ const ClosedInvoices = () => {
           )}
         </div>
 
-        {/* Sync Options Panel */}
+        {}
         {isAdmin && showSyncOptions && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -564,7 +564,7 @@ const ClosedInvoices = () => {
               </div>
             </div>
 
-            {/* Danger Zone */}
+            {}
             <div className="border-t border-blue-200 dark:border-blue-800 mt-4 pt-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
@@ -591,7 +591,7 @@ const ClosedInvoices = () => {
           </div>
         )}
 
-        {/* Delete Confirmation Modal */}
+        {}
         {showDeleteConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
@@ -655,7 +655,7 @@ const ClosedInvoices = () => {
         )}
       </div>
 
-      {/* Filters */}
+      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <SearchBar
@@ -718,7 +718,7 @@ const ClosedInvoices = () => {
         </div>
       </div>
 
-      {/* Stats */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <p className="text-sm text-slate-600 dark:text-gray-400">Total Closed</p>
@@ -740,7 +740,7 @@ const ClosedInvoices = () => {
         </div>
       </div>
 
-      {/* Invoices Table */}
+      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         {invoices.length === 0 ? (
           <EmptyState
@@ -761,7 +761,7 @@ const ClosedInvoices = () => {
           />
         ) : (
           <>
-            {/* Bulk Actions Toolbar */}
+            {}
             {isAdmin && invoices.length > 0 && (
               <div className="border-b border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-700 px-6 py-3">
                 <div className="flex items-center justify-between">
@@ -907,7 +907,7 @@ const ClosedInvoices = () => {
               </table>
             </div>
 
-            {/* Pagination */}
+            {}
             <div className="border-t border-slate-200 dark:border-gray-700">
               <Pagination
                 currentPage={currentPage}
@@ -922,7 +922,7 @@ const ClosedInvoices = () => {
         )}
       </div>
 
-      {/* Bulk Delete Confirmation Modal */}
+      {}
       {showBulkDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">

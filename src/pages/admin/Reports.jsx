@@ -36,7 +36,7 @@ const Card = ({ children, className = '' }) => {
   );
 };
 
-// Report Type Card Component
+
 const ReportCard = ({
   icon: Icon,
   title,
@@ -72,7 +72,7 @@ const ReportCard = ({
           <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
         </div>
 
-        {/* Action Buttons */}
+        {}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-4 border-t border-gray-100">
           <button
             onClick={onView}
@@ -135,7 +135,7 @@ const QuickStat = ({ icon: Icon, label, value, change, changeType }) => {
   );
 };
 
-// Recent Reports List Component
+
 const RecentReportsList = ({ reports, loading, onViewReport }) => {
   if (loading) {
     return (
@@ -207,7 +207,7 @@ const RecentReportsList = ({ reports, loading, onViewReport }) => {
   );
 };
 
-// Filter Bar Component
+
 const FilterBar = ({ dateRange, setDateRange, reportType, setReportType }) => {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -245,7 +245,7 @@ const FilterBar = ({ dateRange, setDateRange, reportType, setReportType }) => {
   );
 };
 
-// Main Reports Component
+
 const Reports = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -255,7 +255,7 @@ const Reports = () => {
   const [quickStats, setQuickStats] = useState(null);
   const [recentReports, setRecentReports] = useState([]);
 
-  // Fetch quick stats
+  
   const fetchQuickStats = async () => {
     setLoading(true);
     try {
@@ -275,14 +275,14 @@ const Reports = () => {
       setQuickStats(data);
     } catch (err) {
       console.error('Error fetching stats:', err);
-      // Use mock data for development
+      
       setQuickStats(getMockStats());
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch recent reports
+  
   const fetchRecentReports = async () => {
     try {
       const token = localStorage.getItem('authToken');
@@ -301,7 +301,7 @@ const Reports = () => {
       setRecentReports(data);
     } catch (err) {
       console.error('Error fetching recent reports:', err);
-      // Use mock data for development
+      
       setRecentReports(getMockRecentReports());
     }
   };
@@ -311,7 +311,7 @@ const Reports = () => {
     fetchRecentReports();
   }, [dateRange]);
 
-  // Mock data for development
+  
   const getMockStats = () => ({
     totalSales: { value: '$125,840', change: '+12.5%', changeType: 'positive' },
     totalInventory: { value: '$84,320', change: '+5.2%', changeType: 'positive' },
@@ -363,7 +363,7 @@ const Reports = () => {
     },
   ];
 
-  // Report configurations
+  
   const reportTypes = [
     {
       id: 'sales',
@@ -427,14 +427,14 @@ const Reports = () => {
     },
   ];
 
-  // Handle report actions
+  
   const handleViewReport = (reportId) => {
     const report = reportTypes.find(r => r.id === reportId);
     if (report && report.path) {
       navigate(report.path);
     } else {
       console.log(`Viewing report: ${reportId}`);
-      // TODO: Implement navigation to detailed report page
+      
     }
   };
 
@@ -498,7 +498,7 @@ const Reports = () => {
 
   const handleViewRecentReport = (report) => {
     console.log('Viewing recent report:', report);
-    // TODO: Implement navigation to specific report
+    
   };
 
   const handleRefresh = () => {
@@ -510,7 +510,7 @@ const Reports = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+      {}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 md:p-8 text-white">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
@@ -533,7 +533,7 @@ const Reports = () => {
         </div>
       </div>
 
-      {/* Quick Stats Overview */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <QuickStat
           icon={TrendingUp}
@@ -565,7 +565,7 @@ const Reports = () => {
         />
       </div>
 
-      {/* Filter Bar */}
+      {}
       <Card className="p-4">
         <FilterBar
           dateRange={dateRange}
@@ -575,7 +575,7 @@ const Reports = () => {
         />
       </Card>
 
-      {/* Report Type Cards Grid */}
+      {}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-900">Available Reports</h2>
@@ -600,7 +600,7 @@ const Reports = () => {
         </div>
       </div>
 
-      {/* Recent Reports Section */}
+      {}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -620,7 +620,7 @@ const Reports = () => {
         />
       </Card>
 
-      {/* Help Section */}
+      {}
       <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
           <div className="p-3 bg-blue-100 rounded-lg">

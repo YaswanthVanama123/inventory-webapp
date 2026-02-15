@@ -99,37 +99,27 @@ function AppWithNavbar() {
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-gray-50">
-          {}
           <Navbar />
 
-          {}
           <main className="pt-16">
             <Routes>
-              {}
               <Route path="/dashboard" element={<Dashboard />} />
 
-              {/* Admin Routes */}
               <Route path="/users" element={<Users />} />
               <Route path="/analytics" element={<Analytics />} />
 
-              {/* Shared Routes */}
               <Route path="/reports" element={<Reports />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/profile" element={<Profile />} />
 
-              {/* Employee Routes */}
               <Route path="/tasks" element={<Tasks />} />
 
-              {/* Search */}
               <Route path="/search" element={<SearchResults />} />
 
-              {/* Auth */}
               <Route path="/login" element={<Login />} />
 
-              {/* Default redirect */}
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-              {/* 404 Not Found */}
               <Route
                 path="*"
                 element={
@@ -147,9 +137,9 @@ function AppWithNavbar() {
   );
 }
 
-/**
- * Alternative: With Protected Routes
- */
+
+
+
 import { useAuth } from '../../hooks/useAuth';
 
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
@@ -191,10 +181,8 @@ function AppWithProtectedRoutes() {
 
           <main className="pt-16">
             <Routes>
-              {/* Public Routes */}
               <Route path="/login" element={<Login />} />
 
-              {/* Protected Routes - All authenticated users */}
               <Route
                 path="/dashboard"
                 element={
@@ -220,7 +208,6 @@ function AppWithProtectedRoutes() {
                 }
               />
 
-              {/* Admin Only Routes */}
               <Route
                 path="/users"
                 element={
@@ -246,7 +233,6 @@ function AppWithProtectedRoutes() {
                 }
               />
 
-              {/* Employee Routes */}
               <Route
                 path="/tasks"
                 element={
@@ -256,7 +242,6 @@ function AppWithProtectedRoutes() {
                 }
               />
 
-              {/* Search */}
               <Route
                 path="/search"
                 element={
@@ -266,10 +251,8 @@ function AppWithProtectedRoutes() {
                 }
               />
 
-              {/* Default redirect */}
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-              {/* 404 */}
               <Route
                 path="*"
                 element={
@@ -287,9 +270,6 @@ function AppWithProtectedRoutes() {
   );
 }
 
-/**
- * Alternative: With Container/Max Width
- */
 function AppWithContainer() {
   return (
     <AuthProvider>
@@ -297,7 +277,6 @@ function AppWithContainer() {
         <div className="min-h-screen bg-gray-50">
           <Navbar />
 
-          {/* Container with max-width for content */}
           <main className="pt-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <Routes>
@@ -320,8 +299,6 @@ function AppWithContainer() {
   );
 }
 
-// Export the desired version
 export default AppWithNavbar;
 
-// Named exports for different implementations
 export { AppWithProtectedRoutes, AppWithContainer };

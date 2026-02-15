@@ -10,9 +10,9 @@ const Dashboard = () => {
         <p className="text-slate-600">Welcome to your inventory management dashboard</p>
       </div>
 
-      {/* Stats Grid */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Stat Card 1 */}
+        {}
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
@@ -48,7 +48,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Stat Card 3 */}
+        {}
         <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
@@ -66,7 +66,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Stat Card 4 */}
+        {}
         <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
@@ -85,7 +85,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Recent Activity */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <h2 className="text-xl font-semibold text-slate-900 mb-4">Recent Activity</h2>
         <div className="space-y-4">

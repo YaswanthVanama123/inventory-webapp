@@ -75,7 +75,7 @@ const Pagination = ({
             </div>
           )}
 
-          {/* Page Size Selector */}
+          {}
           {showPageSize && onPageSizeChange && (
             <div className="flex items-center gap-2">
               <label htmlFor="page-size" className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">

@@ -44,7 +44,7 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
           </div>
         </div>
 
-        {/* Error Code */}
+        {}
         <div>
           <h1 className="text-6xl font-bold text-gray-900 dark:text-white">
             403
@@ -76,7 +76,6 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
           )}
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
           <Button
             onClick={handleGoBack}
@@ -145,7 +144,6 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
           </Button>
         </div>
 
-        {/* Additional Help Text */}
         <p className="text-xs text-gray-500 dark:text-gray-500 mt-6">
           If you believe this is a mistake, please contact your administrator.
         </p>

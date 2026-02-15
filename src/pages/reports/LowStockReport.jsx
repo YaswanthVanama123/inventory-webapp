@@ -79,7 +79,7 @@ const LowStockReport = () => {
 
   const handleOrderNow = async (itemId, itemName) => {
     if (window.confirm(`Do you want to order ${itemName}?`)) {
-      // Here you would typically integrate with your ordering system
+      
       alert('Order functionality will be implemented based on your ordering workflow');
     }
   };
@@ -259,7 +259,7 @@ const LowStockReport = () => {
             />
           </div>
 
-          {/* Priority Filter */}
+          {}
           <div>
             <select
               value={filterPriority}
@@ -376,13 +376,13 @@ const LowStockReport = () => {
         </div>
       </div>
 
-      {/* Mobile Card View */}
+      {}
       <div className="lg:hidden space-y-4">
         {filteredItems.map((item, index) => {
           const priority = getPriorityLevel(item.currentStock, item.minStock, item.reorderPoint);
           return (
             <div key={index} className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
-              {/* Header */}
+              {}
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <h3 className="font-semibold text-slate-900">{item.itemName}</h3>
@@ -392,7 +392,7 @@ const LowStockReport = () => {
                 {getPriorityBadge(priority)}
               </div>
 
-              {/* Stock Level */}
+              {}
               <div className="mb-3 p-3 bg-slate-50 rounded-lg">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm text-slate-700">Stock Level</span>
@@ -419,7 +419,7 @@ const LowStockReport = () => {
                 </div>
               </div>
 
-              {/* Supplier Info */}
+              {}
               {item.supplier && (
                 <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
                   <p className="text-sm font-semibold text-blue-900 mb-2">Supplier</p>
@@ -439,7 +439,7 @@ const LowStockReport = () => {
                 </div>
               )}
 
-              {/* Action Button */}
+              {}
               <button
                 onClick={() => handleOrderNow(item._id, item.itemName)}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -452,7 +452,7 @@ const LowStockReport = () => {
         })}
       </div>
 
-      {/* Empty State */}
+      {}
       {filteredItems.length === 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-12 text-center">
           <Package className="w-16 h-16 text-slate-300 mx-auto mb-4" />

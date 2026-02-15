@@ -37,7 +37,7 @@ const TailwindDemo = () => {
         </div>
       </section>
 
-      {/* Cards Section */}
+      {}
       <section className="section bg-dark-50">
         <div className="container-custom">
           <h2 className="text-center mb-8">Card Components</h2>
@@ -67,7 +67,7 @@ const TailwindDemo = () => {
         </div>
       </section>
 
-      {/* Alerts Section */}
+      {}
       <section className="section">
         <div className="container-custom">
           <h2 className="text-center mb-8">Alert Messages</h2>
@@ -88,7 +88,7 @@ const TailwindDemo = () => {
         </div>
       </section>
 
-      {/* Badges Section */}
+      {}
       <section className="section bg-dark-50">
         <div className="container-custom">
           <h2 className="text-center mb-8">Badge Components</h2>
@@ -142,7 +142,7 @@ const TailwindDemo = () => {
         </div>
       </section>
 
-      {/* Gradient Text Section */}
+      {}
       <section className="section bg-dark-50">
         <div className="container-custom text-center">
           <h2 className="text-gradient-primary mb-4">
@@ -155,7 +155,7 @@ const TailwindDemo = () => {
         </div>
       </section>
 
-      {/* Loading Spinner Section */}
+      {}
       <section className="section">
         <div className="container-custom">
           <h2 className="text-center mb-8">Loading States</h2>

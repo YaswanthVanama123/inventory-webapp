@@ -166,7 +166,7 @@ const LinkIcon = () => (
   </svg>
 );
 
-// Menu items configuration
+
 const adminMenuItems = [
   {
     label: 'Dashboard',
@@ -355,7 +355,7 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
 
       if (mobile && isCollapsed) {
         setIsCollapsed(false);
-        // Notify parent that sidebar is no longer collapsed
+        
         if (onToggleCollapse) {
           onToggleCollapse(false);
         }
@@ -383,7 +383,7 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
     if (!isMobile) {
       const newCollapsedState = !isCollapsed;
       setIsCollapsed(newCollapsedState);
-      // Notify parent component
+      
       if (onToggleCollapse) {
         onToggleCollapse(newCollapsedState);
       }
@@ -416,9 +416,9 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
       {}
       <div className={overlayClasses} onClick={onClose} />
 
-      {/* Sidebar */}
+      {}
       <aside className={sidebarClasses}>
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200 dark:border-gray-700">
           {(!isCollapsed || isMobile) && (
             <div className="flex items-center space-x-3">
@@ -431,7 +431,7 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
             </div>
           )}
 
-          {/* Close button (mobile) */}
+          {}
           {isMobile && (
             <button
               onClick={onClose}
@@ -442,7 +442,7 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
             </button>
           )}
 
-          {/* Collapse button (desktop) */}
+          {}
           {!isMobile && (
             <button
               onClick={handleToggleCollapse}
@@ -475,7 +475,7 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
           </div>
         )}
 
-        {/* User avatar only (collapsed) */}
+        {}
         {user && isCollapsed && !isMobile && (
           <div className="px-4 py-4 border-b border-slate-200 dark:border-gray-700 flex justify-center">
             <div className="w-10 h-10 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center">
@@ -536,7 +536,7 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
                           <Icon />
                         </span>
 
-                        {/* Label and chevron */}
+                        {}
                         {(!isCollapsed || isMobile) && (
                           <>
                             <span className="font-medium text-sm flex-1 truncate text-left">
@@ -549,14 +549,14 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
                         )}
                       </button>
 
-                      {/* Submenu items */}
+                      {}
                       {(!isCollapsed || isMobile) && isExpanded && (
                         <ul className="mt-1 ml-4 space-y-1">
                           {item.submenu.map((subItem) => {
                             const SubIcon = subItem.icon;
                             const subItemPath = subItem.path.split('?')[0];
 
-                            // Check if submenu path matches
+                            
                             const isSubActive = location.pathname === subItemPath ||
                                                (location.pathname.startsWith(subItemPath + '/') && subItemPath !== '/');
 
@@ -605,7 +605,7 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
                         <Icon />
                       </span>
 
-                      {/* Label */}
+                      {}
                       {(!isCollapsed || isMobile) && (
                         <span className="font-medium text-sm flex-1 truncate">
                           {item.label}
@@ -649,9 +649,9 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
   );
 };
 
-// Mobile menu toggle button component
+
 export const MobileMenuButton = ({ onClick, isOpen }) => {
-  // Hide button when sidebar is open
+  
   if (isOpen) return null;
 
   return (

@@ -10,11 +10,11 @@ const Stock = () => {
   const { showSuccess, showError } = useContext(ToastContext);
 
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('use'); // 'use' or 'sell'
+  const [activeTab, setActiveTab] = useState('use'); 
   const [useStockData, setUseStockData] = useState({ items: [], totals: {} });
   const [sellStockData, setSellStockData] = useState({ items: [], totals: {} });
 
-  // Folder/subfolder state
+  
   const [expandedCategories, setExpandedCategories] = useState(new Set());
   const [expandedSKUs, setExpandedSKUs] = useState(new Set());
   const [categorySkuData, setCategorySkuData] = useState({});
@@ -45,22 +45,22 @@ const Stock = () => {
     const newExpanded = new Set(expandedCategories);
 
     if (newExpanded.has(categoryName)) {
-      // Collapse category
+      
       newExpanded.delete(categoryName);
       setExpandedCategories(newExpanded);
     } else {
-      // Expand category
+      
       newExpanded.add(categoryName);
       setExpandedCategories(newExpanded);
 
-      // Fetch SKU data if not already loaded
+      
       if (!categorySkuData[categoryName]) {
         try {
           const newLoadingCategories = new Set(loadingCategories);
           newLoadingCategories.add(categoryName);
           setLoadingCategories(newLoadingCategories);
 
-          // Use different endpoint based on active tab
+          
           const response = activeTab === 'use'
             ? await stockService.getCategorySKUs(categoryName)
             : await stockService.getCategorySales(categoryName);
@@ -104,7 +104,7 @@ const Stock = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -124,13 +124,13 @@ const Stock = () => {
         </Button>
       </div>
 
-      {/* Tabs */}
+      {}
       <Card>
         <div className="flex border-b border-gray-200 dark:border-gray-700">
           <button
             onClick={() => {
               setActiveTab('use');
-              // Clear cached data when switching tabs
+              
               setExpandedCategories(new Set());
               setExpandedSKUs(new Set());
               setCategorySkuData({});
@@ -147,7 +147,7 @@ const Stock = () => {
           <button
             onClick={() => {
               setActiveTab('sell');
-              // Clear cached data when switching tabs
+              
               setExpandedCategories(new Set());
               setExpandedSKUs(new Set());
               setCategorySkuData({});
@@ -164,7 +164,7 @@ const Stock = () => {
         </div>
       </Card>
 
-      {/* Statistics Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {activeTab === 'use' ? (
           <>
@@ -209,7 +209,7 @@ const Stock = () => {
         )}
       </div>
 
-      {/* Data Table */}
+      {}
       <Card>
         {currentData.items.length === 0 ? (
           <div className="text-center py-12">
@@ -270,7 +270,7 @@ const Stock = () => {
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                 {currentData.items.map((item, index) => (
                   <React.Fragment key={item.categoryName}>
-                    {/* Category Row (Level 1 - Folder) */}
+                    {}
                     <tr
                       className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                       onClick={() => handleCategoryClick(item.categoryName)}
@@ -340,7 +340,7 @@ const Stock = () => {
                       )}
                     </tr>
 
-                    {/* SKU Rows (Level 2 - Subfolders) */}
+                    {}
                     {expandedCategories.has(item.categoryName) && (
                       <>
                         {loadingCategories.has(item.categoryName) ? (
@@ -398,11 +398,11 @@ const Stock = () => {
                                 </td>
                               </tr>
 
-                              {/* History Table (Level 3 - Content) */}
+                              {}
                               {expandedSKUs.has(sku.sku) && (
                                 <>
                                   {activeTab === 'sell' && (
-                                    /* Stock Summary Row for Sell Stock */
+                                    
                                     <tr className="bg-indigo-50 dark:bg-indigo-900/20">
                                       <td colSpan="5" className="px-16 py-3">
                                         <div className="grid grid-cols-4 gap-4 text-sm">
@@ -428,7 +428,7 @@ const Stock = () => {
                                   )}
 
                                   {(activeTab === 'use' && sku.purchaseHistory && sku.purchaseHistory.length > 0) && (
-                                    /* Purchase History for Use Stock */
+                                    
                                     <tr>
                                       <td colSpan="5" className="px-0 py-0">
                                         <div className="bg-white dark:bg-gray-900 border-l-4 border-blue-300 dark:border-blue-700 ml-16">
@@ -506,7 +506,7 @@ const Stock = () => {
 
                                   {activeTab === 'sell' && (
                                     <>
-                                      {/* Purchase History Section */}
+                                      {}
                                       {sku.purchaseHistory && sku.purchaseHistory.length > 0 && (
                                         <tr>
                                           <td colSpan="5" className="px-0 py-0">
@@ -584,7 +584,7 @@ const Stock = () => {
                                         </tr>
                                       )}
 
-                                      {/* Sales History Section */}
+                                      {}
                                       {sku.salesHistory && sku.salesHistory.length > 0 && (
                                         <tr>
                                           <td colSpan="5" className="px-0 py-0">
@@ -722,7 +722,7 @@ const Stock = () => {
         )}
       </Card>
 
-      {/* Info Box */}
+      {}
       <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
         <div className="flex items-start gap-3">
           <ArchiveBoxIcon className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />

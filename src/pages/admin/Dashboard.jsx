@@ -45,7 +45,7 @@ const Card = ({ children, className = '' }) => {
   );
 };
 
-// Stat Card Component
+
 const StatCard = ({ title, value, change, changeType, icon: Icon, loading }) => {
   const isPositive = changeType === 'positive';
   const ChangeIcon = isPositive ? TrendingUp : TrendingDown;
@@ -99,7 +99,7 @@ const ChartSkeleton = () => (
   </div>
 );
 
-// Recent Activity Table Component
+
 const RecentActivityTable = ({ activities, loading }) => {
   if (loading) {
     return (
@@ -170,7 +170,7 @@ const RecentActivityTable = ({ activities, loading }) => {
   );
 };
 
-// Quick Actions Component
+
 const QuickActions = () => {
   const actions = [
     { icon: Plus, label: 'Add Item', color: 'bg-blue-600 hover:bg-blue-700', path: '/items/new' },
@@ -197,7 +197,7 @@ const QuickActions = () => {
   );
 };
 
-// Error State Component
+
 const ErrorState = ({ message, onRetry }) => (
   <div className="text-center py-12">
     <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
@@ -213,7 +213,7 @@ const ErrorState = ({ message, onRetry }) => (
   </div>
 );
 
-// Main Dashboard Component
+
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
   const { showError } = useContext(ToastContext);
@@ -221,7 +221,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch dashboard data
+  
   const fetchDashboardData = async () => {
     console.log('fetchDashboardData called - starting API request...');
     setLoading(true);
@@ -241,7 +241,7 @@ const Dashboard = () => {
         console.log('Sales trend:', salesTrend);
         console.log('Top selling items:', topSellingItems);
 
-        // Transform backend data to frontend format
+        
         const transformedData = {
           stats: {
             totalRevenue: summary.totalRevenue || 0,
@@ -252,7 +252,7 @@ const Dashboard = () => {
             ordersChange: summary.ordersChange || 0,
             lowStockChange: summary.lowStockChange || 0,
             profitMarginChange: summary.profitMarginChange || 0,
-            // Purchase order statistics from CustomerConnect automation
+            
             totalPurchaseAmount: summary.totalPurchaseAmount || 0,
             totalPurchaseOrders: summary.totalPurchaseOrders || 0,
             avgPurchaseValue: summary.avgPurchaseValue || 0,
@@ -292,13 +292,13 @@ const Dashboard = () => {
     }
   };
 
-  // Helper function to get consistent colors for categories
+  
   const getColorForIndex = (index) => {
     const colors = ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EF4444', '#EC4899', '#14B8A6', '#6B7280'];
     return colors[index % colors.length];
   };
 
-  // Helper function to format activity descriptions
+  
   const formatActivityDescription = (activity) => {
     const action = activity.action || '';
     const resource = activity.resource || '';
@@ -316,7 +316,7 @@ const Dashboard = () => {
     }
   };
 
-  // Helper function to format time ago
+  
   const formatTimeAgo = (timestamp) => {
     if (!timestamp) return 'Unknown';
 
@@ -344,7 +344,7 @@ const Dashboard = () => {
   const categoryDistribution = data.categoryDistribution || [];
   const recentActivities = data.recentActivities || [];
 
-  // Format currency
+  
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -356,7 +356,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Header */}
+      {}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 md:p-8 text-white">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
@@ -378,14 +378,14 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Error State */}
+      {}
       {error && !dashboardData && (
         <Card className="p-6">
           <ErrorState message={error} onRetry={fetchDashboardData} />
         </Card>
       )}
 
-      {/* Stats Cards Grid - Sales Data (RouteStar) */}
+      {}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-3">
           Sales Analytics (RouteStar)
@@ -431,7 +431,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Stats Cards Grid - Purchase Data (CustomerConnect) */}
+      {}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-3">
           Purchase Analytics (CustomerConnect)
@@ -463,9 +463,9 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Charts Section */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        {/* Revenue & Profit Trend */}
+        {}
         <Card className="p-6">
           {loading ? (
             <ChartSkeleton />
@@ -521,7 +521,7 @@ const Dashboard = () => {
           )}
         </Card>
 
-        {/* Category Distribution Chart */}
+        {}
         <Card className="p-6">
           {loading ? (
             <ChartSkeleton />
@@ -562,7 +562,7 @@ const Dashboard = () => {
                 </ResponsiveContainer>
               </div>
 
-              {/* Legend */}
+              {}
               <div className="grid grid-cols-2 gap-2 mt-4">
                 {categoryDistribution.map((category, index) => (
                   <div key={index} className="flex items-center gap-2">
@@ -584,7 +584,7 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Quick Stats or Info Card */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <Card className="p-6">
           <div className="mb-6">
@@ -629,7 +629,7 @@ const Dashboard = () => {
           )}
         </Card>
 
-        {/* Quick Actions */}
+        {}
         <Card className="p-6">
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
@@ -639,7 +639,7 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Recent Activity */}
+      {}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>

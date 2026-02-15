@@ -246,7 +246,7 @@ const ImageUpload = ({
         />
 
         <div className="space-y-3">
-          {/* Upload Icon */}
+          {}
           <div className="flex justify-center">
             <div
               className={`
@@ -278,7 +278,7 @@ const ImageUpload = ({
             </div>
           </div>
 
-          {/* Upload Text */}
+          {}
           <div>
             <p className="text-base font-medium text-gray-700 dark:text-gray-300">
               {isDragging ? (
@@ -304,7 +304,7 @@ const ImageUpload = ({
         </div>
       </div>
 
-      {/* Upload Progress */}
+      {}
       {showProgress && Object.keys(uploadProgress).length > 0 && (
         <div className="space-y-2">
           {Object.entries(uploadProgress).map(([fileName, progress]) => (
@@ -350,7 +350,7 @@ const ImageUpload = ({
                   }
                 `}
               >
-                {/* Image */}
+                {}
                 <div className="aspect-square bg-gray-100 dark:bg-gray-700">
                   <img
                     src={preview.url}
@@ -359,7 +359,7 @@ const ImageUpload = ({
                   />
                 </div>
 
-                {/* Primary Badge */}
+                {}
                 {primaryImageIndex === index && (
                   <div className="absolute top-2 left-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md">
                     <span className="flex items-center gap-1">
@@ -375,14 +375,14 @@ const ImageUpload = ({
                   </div>
                 )}
 
-                {/* File Info */}
+                {}
                 {preview.file && (
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 text-center truncate">
                     {getFileSizeDisplay(preview.size)}
                   </div>
                 )}
 
-                {/* Hover Actions */}
+                {}
                 <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2">
                   {primaryImageIndex !== index && (
                     <button
@@ -435,7 +435,7 @@ const ImageUpload = ({
         </div>
       )}
 
-      {/* Empty State */}
+      {}
       {previews.length === 0 && Object.keys(uploadProgress).length === 0 && (
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
           <svg

@@ -32,7 +32,7 @@ const OrdersList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-  const [syncLimit, setSyncLimit] = useState(0); // 0 = auto-detect (sync only new orders)
+  const [syncLimit, setSyncLimit] = useState(0); 
   const [showSyncOptions, setShowSyncOptions] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -108,7 +108,7 @@ const OrdersList = () => {
       return;
     }
 
-    // Use 0 to represent unlimited (Infinity doesn't serialize in JSON)
+    
     const limit = syncLimit === 0 || syncLimit === '' ? 0 : parseInt(syncLimit);
     const isUnlimited = limit === 0;
 
@@ -140,7 +140,7 @@ const OrdersList = () => {
       return;
     }
 
-    // Use 0 to represent unlimited (Infinity doesn't serialize in JSON)
+    
     const limit = syncLimit === 0 || syncLimit === '' ? 0 : parseInt(syncLimit);
     const isUnlimited = limit === 0;
 
@@ -328,7 +328,7 @@ const OrdersList = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -414,7 +414,7 @@ const OrdersList = () => {
           )}
         </div>
 
-        {/* Sync Options Panel */}
+        {}
         {isAdmin && showSyncOptions && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -478,7 +478,7 @@ const OrdersList = () => {
               </div>
             </div>
 
-            {/* Danger Zone */}
+            {}
             <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
               <div className="flex items-center justify-between">
                 <div>
@@ -506,7 +506,7 @@ const OrdersList = () => {
         )}
       </div>
 
-      {/* Filters */}
+      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <SearchBar
@@ -574,7 +574,7 @@ const OrdersList = () => {
         </div>
       </div>
 
-      {/* Stats */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <p className="text-sm text-slate-600 dark:text-gray-400">Total Orders</p>
@@ -596,7 +596,7 @@ const OrdersList = () => {
         </div>
       </div>
 
-      {/* Orders Table */}
+      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         {orders.length === 0 ? (
           <EmptyState
@@ -617,7 +617,7 @@ const OrdersList = () => {
           />
         ) : (
           <>
-            {/* Bulk Actions Toolbar */}
+            {}
             {isAdmin && orders.length > 0 && (
               <div className="border-b border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-700 px-6 py-3">
                 <div className="flex items-center justify-between">
@@ -773,7 +773,7 @@ const OrdersList = () => {
               </table>
             </div>
 
-            {/* Pagination */}
+            {}
             <div className="border-t border-slate-200 dark:border-gray-700">
               <Pagination
                 currentPage={currentPage}
@@ -788,7 +788,7 @@ const OrdersList = () => {
         )}
       </div>
 
-      {/* Delete Confirmation Modal */}
+      {}
       <Modal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -856,7 +856,7 @@ const OrdersList = () => {
         </div>
       </Modal>
 
-      {/* Bulk Delete Confirmation Modal */}
+      {}
       <Modal
         isOpen={showBulkDeleteModal}
         onClose={() => {

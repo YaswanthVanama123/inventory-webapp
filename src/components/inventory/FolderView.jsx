@@ -8,10 +8,10 @@ import Modal from '../common/Modal';
 import { ToastContext } from '../../contexts/ToastContext';
 import api from '../../services/api';
 
-/**
- * FolderView Component for CustomerConnect Orders
- * Groups items by item name/SKU and shows all order entries when expanded
- */
+
+
+
+
 const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useContext(ToastContext);
@@ -23,7 +23,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Fetch grouped items from CustomerConnect
+  
   useEffect(() => {
     fetchGroupedItems();
   }, []);
@@ -33,7 +33,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
     try {
       const response = await api.get('/customerconnect/items/grouped');
       console.log('[FolderView] API response:', response);
-      // Axios interceptor already unwraps response.data, so we access response.data.items directly
+      
       const items = response.data?.items || [];
       console.log('[FolderView] Parsed items:', items.length, 'items');
       setGroupedItems(items);
@@ -53,20 +53,20 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
   };
 
   const handleDownloadItemNames = () => {
-    // Extract unique item names and clean them
+    
     const uniqueNames = groupedItems.map(item => {
-      // Get the name and replace any tabs, commas, or newlines with spaces
+      
       let cleanName = item.name || '';
       cleanName = cleanName.replace(/[\t\r\n,]/g, ' ');
-      // Remove multiple spaces
+      
       cleanName = cleanName.replace(/\s+/g, ' ').trim();
       return cleanName;
     });
 
-    // Create CSV content (just item names, one per line)
+    
     const csvContent = uniqueNames.join('\n');
 
-    // Create blob and download
+    
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -149,7 +149,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
 
     setDeleting(true);
     try {
-      // Delete orders by SKU
+      
       await api.post('/customerconnect/orders/bulk-delete', {
         skus: selectedItems
       });
@@ -158,7 +158,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
       setDeleteModalOpen(false);
       setSelectedItems([]);
 
-      // Refresh the list
+      
       fetchGroupedItems();
     } catch (err) {
       console.error('Error deleting items:', err);
@@ -190,11 +190,11 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
 
   return (
     <div className="space-y-3">
-      {/* Action Toolbar */}
+      {}
       {groupedItems.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-4 border border-blue-200">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            {/* Left side: Select All Checkbox */}
+            {}
             {isAdmin && (
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -223,7 +223,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
               </div>
             )}
 
-            {/* Right side: Download Button */}
+            {}
             <Button
               variant="outline"
               size="sm"
@@ -248,9 +248,9 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
               isSelected ? 'border-blue-500 shadow-md' : 'border-blue-200 hover:shadow-md'
             }`}
           >
-            {/* Item Folder Header */}
+            {}
             <div className="flex items-center gap-4 p-4">
-              {/* Checkbox (Admin Only) */}
+              {}
               {isAdmin && (
                 <div className="flex-shrink-0">
                   <input
@@ -265,7 +265,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                 </div>
               )}
 
-              {/* Expand/Collapse Icon */}
+              {}
               <button
                 className="flex-shrink-0 p-1.5 hover:bg-blue-200 rounded transition-colors"
                 onClick={(e) => {
@@ -280,7 +280,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                 )}
               </button>
 
-              {/* Package Icon */}
+              {}
               <div
                 className="flex-shrink-0 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -290,7 +290,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                 </div>
               </div>
 
-              {/* Item Name & Info */}
+              {}
               <div
                 className="flex-1 min-w-0 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -305,7 +305,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                 </p>
               </div>
 
-              {/* Aggregated Stats */}
+              {}
               <div
                 className="hidden lg:flex items-center gap-6 mr-2 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -331,7 +331,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
               </div>
             </div>
 
-            {/* Expanded: Show All Order Entries */}
+            {}
             {isExpanded && (
               <div className="border-t border-blue-200 bg-blue-50">
                 {group.orders.length === 0 ? (
@@ -456,7 +456,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
         );
       })}
 
-      {/* Bulk Delete Confirmation Modal */}
+      {}
       <Modal
         isOpen={deleteModalOpen}
         onClose={() => {

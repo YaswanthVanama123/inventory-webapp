@@ -69,7 +69,7 @@ const InventoryList = () => {
   const [purchaseToDelete, setPurchaseToDelete] = useState(null);
   const [deletingPurchase, setDeletingPurchase] = useState(false);
 
-  // Tabs system for viewing purchases vs sales - initialize from URL
+  
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'stock');
   const [expandedSales, setExpandedSales] = useState({});
   const [sales, setSales] = useState({});
@@ -107,25 +107,25 @@ const InventoryList = () => {
   }, []);
 
 
-  // Fetch data based on filters and pagination, but only for the purchases tab
-  // Skip fetching for folder view as it handles its own data
+  
+  
   useEffect(() => {
     if (activeTab === 'purchases' && viewMode !== 'folder') {
       fetchInventoryItems();
     } else if (activeTab === 'purchases' && viewMode === 'folder') {
-      // Folder view has its own loading state, so set parent loading to false
+      
       setLoading(false);
     }
   }, [debouncedSearchTerm, selectedCategory, statusFilter, sortBy, sortOrder, currentPage, itemsPerPage, activeTab, viewMode]);
 
-  // Fetch data based on search and pagination for the sells tab
+  
   useEffect(() => {
     if (activeTab === 'sells') {
       fetchInvoices();
     }
   }, [debouncedSearchTerm, currentPage, itemsPerPage, activeTab]);
 
-  // Clear errors when switching tabs
+  
   useEffect(() => {
     setError(null);
   }, [activeTab]);
@@ -275,7 +275,7 @@ const InventoryList = () => {
   };
 
   const toggleExpand = async (itemId) => {
-    // Only used for purchases tab
+    
     if (activeTab !== 'purchases') return;
 
     const isExpanded = expandedItems[itemId];
@@ -285,7 +285,7 @@ const InventoryList = () => {
       [itemId]: !prev[itemId]
     }));
 
-    // Fetch purchases data
+    
     if (!isExpanded && !purchases[itemId]) {
       await fetchPurchasesForItem(itemId);
     }
@@ -349,7 +349,7 @@ const InventoryList = () => {
       showSuccess('Purchase deletion request submitted for approval');
       setDeletePurchaseModalOpen(false);
       setPurchaseToDelete(null);
-      // Refresh purchase list for this item
+      
       fetchPurchasesForItem(purchaseToDelete.itemId);
     } catch (err) {
       console.error('Error deleting purchase:', err);
@@ -391,7 +391,7 @@ const InventoryList = () => {
     return variants[category] || 'default';
   };
 
-  // Component for displaying invoice items filtered by itemId (used in purchases tab)
+  
   const InvoiceItemCards = ({ invoiceItems, itemId, itemName }) => {
     const filteredItems = invoiceItems.filter(
       invoiceItem => invoiceItem.inventory?._id === itemId || invoiceItem.item?._id === itemId || invoiceItem.itemId === itemId
@@ -412,7 +412,7 @@ const InventoryList = () => {
             key={idx}
             className="bg-white rounded-lg border-2 border-emerald-200 p-3 hover:shadow-md hover:border-emerald-400 transition-all duration-200 transform hover:-translate-y-1"
           >
-            {/* Product Image */}
+            {}
             {(invoiceItem.inventory?.image || invoiceItem.item?.image) ? (
               <div className="mb-2 rounded-md overflow-hidden bg-slate-100">
                 <img
@@ -432,12 +432,12 @@ const InventoryList = () => {
               </div>
             )}
 
-            {/* Item Name */}
+            {}
             <h6 className="text-xs font-semibold text-slate-800 mb-2 line-clamp-2 min-h-[2rem]">
               {invoiceItem.itemName || invoiceItem.item?.name || itemName}
             </h6>
 
-            {/* Item Details */}
+            {}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-500">Quantity:</span>
@@ -460,7 +460,7 @@ const InventoryList = () => {
     );
   };
 
-  // Component for displaying ALL invoice items without filtering (used in sells tab)
+  
   const AllInvoiceItemCards = ({ invoiceItems }) => {
     if (!invoiceItems || invoiceItems.length === 0) {
       return (
@@ -484,7 +484,7 @@ const InventoryList = () => {
           </thead>
           <tbody className="divide-y divide-emerald-200">
             {invoiceItems.map((invoiceItem, idx) => {
-              // Get item details - check inventory reference first (populated from backend)
+              
               const inventoryItem = invoiceItem.inventory || invoiceItem.item;
               const itemName = invoiceItem.itemName || inventoryItem?.itemName || inventoryItem?.name || 'Unknown Item';
               const itemImage = inventoryItem?.image;
@@ -494,7 +494,7 @@ const InventoryList = () => {
                 <tr key={idx} className="hover:bg-emerald-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      {/* Product Image */}
+                      {}
                       <div className="flex-shrink-0 h-12 w-12">
                         {itemImage ? (
                           <img
@@ -513,7 +513,7 @@ const InventoryList = () => {
                           </div>
                         )}
                       </div>
-                      {/* Item Name */}
+                      {}
                       <div className="text-sm font-medium text-slate-900">{itemName}</div>
                     </div>
                   </td>
@@ -555,7 +555,7 @@ const InventoryList = () => {
   ];
 
 
-  // Only show initial loading spinner for table/card views, not folder view
+  
   if (loading && items.length === 0 && viewMode !== 'folder') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -566,7 +566,7 @@ const InventoryList = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -593,7 +593,7 @@ const InventoryList = () => {
       {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="space-y-4">
-          {/* Show search and filters only for purchases tab */}
+          {}
           {activeTab === 'purchases' && (
             <>
               {}
@@ -639,7 +639,7 @@ const InventoryList = () => {
                   fullWidth
                 />
 
-                {/* View Mode Toggle */}
+                {}
                 <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1">
                   <button
                     onClick={() => setViewMode('table')}
@@ -685,7 +685,7 @@ const InventoryList = () => {
                   </button>
                 </div>
 
-                {/* Clear Filters Button */}
+                {}
                 {(searchTerm || selectedCategory || statusFilter) && (
                   <Button
                     variant="outline"
@@ -710,7 +710,7 @@ const InventoryList = () => {
         </div>
       </div>
 
-      {/* Tabs Component */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1 max-w-2xl">
           <button
@@ -752,7 +752,7 @@ const InventoryList = () => {
         </div>
       </div>
 
-      {/* Error State */}
+      {}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-center gap-3">
@@ -764,14 +764,14 @@ const InventoryList = () => {
         </div>
       )}
 
-      {/* Content based on active tab */}
+      {}
       {activeTab === 'stock' ? (
-        // Stock Reconciliation Tab - Unified view
+        
         <StockReconciliationView />
       ) : activeTab === 'purchases' ? (
-        // Purchases Tab Content - Show Inventory Items
+        
         <>
-          {/* Folder View - Handles its own loading and data */}
+          {}
           {viewMode === 'folder' ? (
             <FolderView
               items={items}
@@ -808,7 +808,7 @@ const InventoryList = () => {
             </div>
           ) : (
             <>
-          {/* Table View */}
+          {}
           {viewMode === 'table' && (
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
               <div className="overflow-x-auto">
@@ -936,7 +936,7 @@ const InventoryList = () => {
                         </td>
                       </tr>
 
-                      {/* Purchases Expanded Row */}
+                      {}
                       {activeTab === 'purchases' && expandedItems[item._id] && (
                         <tr>
                           <td colSpan="5" className="px-6 py-4 bg-slate-50">
@@ -1019,7 +1019,7 @@ const InventoryList = () => {
                         </tr>
                       )}
 
-                      {/* Sales Expanded Row */}
+                      {}
                       {activeTab === 'sells' && expandedSales[item._id] && (
                         <tr>
                           <td colSpan="5" className="px-6 py-4 bg-slate-50">
@@ -1112,7 +1112,7 @@ const InventoryList = () => {
             </div>
           )}
 
-          {/* Card View (Mobile-friendly) */}
+          {}
           {viewMode === 'card' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {items.map((item) => (
@@ -1120,7 +1120,7 @@ const InventoryList = () => {
                   key={item._id}
                   className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow duration-200"
                 >
-                  {/* Image */}
+                  {}
                   <div className="aspect-square bg-slate-100 relative">
                     {item.image ? (
                       <img
@@ -1140,7 +1140,7 @@ const InventoryList = () => {
                     )}
                   </div>
 
-                  {/* Content */}
+                  {}
                   <div className="p-4">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="text-lg font-semibold text-slate-900 line-clamp-1">
@@ -1164,7 +1164,7 @@ const InventoryList = () => {
                       </div>
                     </div>
 
-                    {/* Expand button to view history based on active tab */}
+                    {}
                     <button
                       onClick={() => toggleExpand(item._id)}
                       className={`w-full mb-3 px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 ${
@@ -1184,10 +1184,10 @@ const InventoryList = () => {
                       </svg>
                     </button>
 
-                    {/* History Expanded Section - Conditional based on activeTab */}
+                    {}
                     {expandedItems[item._id] && (
                       <>
-                        {/* Purchase History */}
+                        {}
                         {activeTab === 'purchases' && (
                           <div className="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
                             {loadingPurchases[item._id] ? (
@@ -1266,7 +1266,7 @@ const InventoryList = () => {
                           </div>
                         )}
 
-                        {/* Sales History */}
+                        {}
                         {activeTab === 'sells' && (
                           <div className="mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
                             {loadingSales[item._id] ? (
@@ -1281,7 +1281,7 @@ const InventoryList = () => {
                                     const compoundKey = `${item._id}-${invoice._id}`;
                                     return (
                                     <div key={invoice._id} className="bg-white rounded border border-green-200 overflow-hidden">
-                                      {/* Invoice Summary Card */}
+                                      {}
                                       <button
                                         onClick={() => setExpandedSales(prev => ({
                                           ...prev,
@@ -1319,7 +1319,7 @@ const InventoryList = () => {
                                         </div>
                                       </button>
 
-                                      {/* Expanded Items Sold */}
+                                      {}
                                       {expandedSales[compoundKey] && invoice.items && (
                                         <div className="px-3 pb-3 pt-2 bg-emerald-50 border-t border-emerald-200">
                                           <div className="text-xs font-semibold text-emerald-800 mb-2">Items Sold:</div>
@@ -1348,7 +1348,7 @@ const InventoryList = () => {
                       </>
                     )}
 
-                    {/* Actions */}
+                    {}
                     <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
@@ -1386,7 +1386,7 @@ const InventoryList = () => {
             </div>
           )}
 
-          {/* Pagination - Only show for table and card views */}
+          {}
           {viewMode !== 'folder' && (
             <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
               <Pagination
@@ -1406,11 +1406,11 @@ const InventoryList = () => {
           )}
         </>
       ) : activeTab === 'sells' ? (
-        // Sells Tab Content - Show Sales Folder View
+        
         <SalesFolderView />
       ) : null}
 
-      {/* Delete Confirmation Modal */}
+      {}
       <Modal
         isOpen={deleteModalOpen}
         onClose={() => {
@@ -1514,7 +1514,7 @@ const InventoryList = () => {
         onSuccess={handlePurchaseSuccess}
       />
 
-      {/* Delete Purchase Confirmation Modal */}
+      {}
       <Modal
         isOpen={deletePurchaseModalOpen}
         onClose={() => {

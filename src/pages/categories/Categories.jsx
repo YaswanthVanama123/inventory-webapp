@@ -143,14 +143,12 @@ const Categories = () => {
           </p>
         </div>
 
-        {/* Add Button */}
         <div className="mb-6">
           <Button onClick={handleAdd} variant="primary">
             + Add Category
           </Button>
         </div>
 
-        {/* Categories Table */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
           {categories.length === 0 ? (
             <div className="text-center py-12">
@@ -213,7 +211,6 @@ const Categories = () => {
           )}
         </div>
 
-        {/* Modal */}
         <Modal
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}

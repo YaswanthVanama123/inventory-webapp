@@ -114,7 +114,7 @@ const Toast = ({ message, type = 'info', onClose }) => {
         {message}
       </div>
 
-      {/* Close Button */}
+      {}
       <button
         onClick={handleClose}
         className={`

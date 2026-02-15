@@ -208,7 +208,7 @@ const UserProfile = () => {
         <p className="text-slate-600">Manage your account settings and preferences</p>
       </div>
 
-      {/* Alert Messages */}
+      {}
       {message.text && (
         <Alert variant={message.type} dismissible onDismiss={() => setMessage({ type: '', text: '' })}>
           {message.text}
@@ -240,13 +240,13 @@ const UserProfile = () => {
           </nav>
         </div>
 
-        {/* Tab Content */}
+        {}
         <div className="p-6 sm:p-8">
-          {/* Profile Information Tab */}
+          {}
           {activeTab === 'profile' && (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-200">
-                {/* Avatar */}
+                {}
                 <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
                   {getUserInitials()}
                 </div>
@@ -299,7 +299,7 @@ const UserProfile = () => {
             </div>
           )}
 
-          {/* Change Password Tab */}
+          {}
           {activeTab === 'password' && (
             <div className="max-w-2xl">
               <div className="mb-6">
@@ -341,7 +341,7 @@ const UserProfile = () => {
                   }
                 />
 
-                {/* Password Strength Indicator */}
+                {}
                 {passwordForm.newPassword && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
@@ -439,7 +439,7 @@ const UserProfile = () => {
             </div>
           )}
 
-          {/* Preferences Tab */}
+          {}
           {activeTab === 'preferences' && (
             <div className="max-w-2xl">
               <div className="mb-6">
@@ -448,7 +448,7 @@ const UserProfile = () => {
               </div>
 
               <form onSubmit={handlePreferencesSave} className="space-y-6">
-                {/* Email Notifications Toggle */}
+                {}
                 <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
                   <div className="flex-1">
                     <label htmlFor="emailNotifications" className="text-sm font-medium text-slate-900 block">
@@ -484,7 +484,7 @@ const UserProfile = () => {
                   </div>
                 </div>
 
-                {/* Language Selector */}
+                {}
                 <div className="space-y-2">
                   <label htmlFor="language" className="block text-sm font-medium text-slate-700">
                     Language
@@ -507,7 +507,7 @@ const UserProfile = () => {
                   </select>
                 </div>
 
-                {/* Timezone Selector */}
+                {}
                 <div className="space-y-2">
                   <label htmlFor="timezone" className="block text-sm font-medium text-slate-700">
                     Timezone

@@ -59,13 +59,13 @@ const Modal = ({
         onClick={handleOverlayClick}
       />
 
-      {/* Modal Container */}
+      {}
       <div className="flex min-h-screen items-end sm:items-center justify-center p-0 sm:p-4">
         <div
           className={`relative bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-lg shadow-xl w-full ${sizes[size]} transform transition-all max-h-[90vh] sm:max-h-[85vh] flex flex-col ${className}`}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
+          {}
           {(title || showCloseButton) && (
             <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
               {title && (
@@ -100,7 +100,7 @@ const Modal = ({
             </div>
           )}
 
-          {/* Body */}
+          {}
           <div className="p-4 sm:p-6 overflow-y-auto flex-1">
             {children}
           </div>

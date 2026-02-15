@@ -126,7 +126,7 @@ const RouteStarInvoiceDetail = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -185,11 +185,11 @@ const RouteStarInvoiceDetail = () => {
         </div>
       </div>
 
-      {/* Invoice Information */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Customer & Invoice Info */}
+        {}
         <div className="lg:col-span-2 space-y-6">
-          {/* Customer Information */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
               Customer Information
@@ -216,7 +216,7 @@ const RouteStarInvoiceDetail = () => {
             </div>
           </div>
 
-          {/* Additional Information */}
+          {}
           {(invoice.assignedTo || invoice.signedBy || invoice.serviceNotes || invoice.invoiceMemo) && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -268,9 +268,9 @@ const RouteStarInvoiceDetail = () => {
           )}
         </div>
 
-        {/* Invoice Summary */}
+        {}
         <div className="space-y-6">
-          {/* Invoice Details */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
               Invoice Details
@@ -305,7 +305,7 @@ const RouteStarInvoiceDetail = () => {
             </div>
           </div>
 
-          {/* Invoice Total */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
               Invoice Total
@@ -336,7 +336,7 @@ const RouteStarInvoiceDetail = () => {
         </div>
       </div>
 
-      {/* Line Items */}
+      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -449,7 +449,7 @@ const RouteStarInvoiceDetail = () => {
         )}
       </div>
 
-      {/* Metadata */}
+      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
           Sync Information

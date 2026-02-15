@@ -22,7 +22,7 @@ const SalesReport = () => {
     loadData();
   }, []);
 
-  // Filter items when search text changes
+  
   useEffect(() => {
     if (searchText) {
       const filtered = items.filter(item =>
@@ -70,7 +70,7 @@ const SalesReport = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -90,7 +90,7 @@ const SalesReport = () => {
         </Button>
       </div>
 
-      {/* Statistics Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
           <div className="flex items-center gap-2">
@@ -130,7 +130,7 @@ const SalesReport = () => {
         </Card>
       </div>
 
-      {/* Search Filter */}
+      {}
       <Card>
         <div className="relative">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -144,7 +144,7 @@ const SalesReport = () => {
         </div>
       </Card>
 
-      {/* Data Table */}
+      {}
       <Card>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -186,7 +186,7 @@ const SalesReport = () => {
               ) : (
                 filteredItems.map((item, index) => (
                   <React.Fragment key={item._id}>
-                    {/* Item Row (Folder) */}
+                    {}
                     <tr
                       className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                       onClick={() => handleItemClick(item._id)}
@@ -235,7 +235,7 @@ const SalesReport = () => {
                       </td>
                     </tr>
 
-                    {/* Invoice Details Table (Expanded) */}
+                    {}
                     {expandedItems.has(item._id) && (
                       <tr>
                         <td colSpan="8" className="px-0 py-0">
@@ -343,7 +343,7 @@ const SalesReport = () => {
         </div>
       </Card>
 
-      {/* Info Box */}
+      {}
       <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
         <div className="flex items-start gap-3">
           <ChartBarIcon className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />

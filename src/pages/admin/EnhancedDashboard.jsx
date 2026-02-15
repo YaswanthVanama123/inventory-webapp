@@ -65,7 +65,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-// Enhanced Stat Card with hover animation
+
 const EnhancedStatCard = ({ title, value, subtitle, change, changeType, icon: Icon, trend, color = 'blue' }) => {
   const isPositive = changeType === 'positive';
   const ChangeIcon = isPositive ? TrendingUp : TrendingDown;
@@ -108,7 +108,7 @@ const EnhancedStatCard = ({ title, value, subtitle, change, changeType, icon: Ic
           </div>
         )}
 
-        {/* Mini sparkline trend */}
+        {}
         {trend && (
           <div className="mt-3 h-8">
             <ResponsiveContainer width="100%" height="100%">
@@ -135,7 +135,7 @@ const EnhancedStatCard = ({ title, value, subtitle, change, changeType, icon: Ic
   );
 };
 
-// Main Enhanced Dashboard Component
+
 const EnhancedDashboard = () => {
   const { user } = useContext(AuthContext);
   const { showError } = useContext(ToastContext);
@@ -145,7 +145,7 @@ const EnhancedDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [error, setError] = useState(null);
 
-  // Fetch dashboard data from API
+  
   const fetchDashboardData = async () => {
     console.log('EnhancedDashboard: Fetching data from API...');
     setLoading(true);
@@ -158,7 +158,7 @@ const EnhancedDashboard = () => {
       if (response.success && response.data) {
         const { summary, categoryStats, recentActivity, topValueItems, salesTrend } = response.data;
 
-        // Transform backend data to match UI expectations
+        
         const transformedData = {
           kpis: {
             totalRevenue: summary.totalRevenue || 0,
@@ -166,9 +166,9 @@ const EnhancedDashboard = () => {
             totalOrders: summary.totalOrders || 0,
             ordersChange: `${summary.ordersChange >= 0 ? '+' : ''}${summary.ordersChange}%`,
             avgOrderValue: summary.avgOrderValue || 0,
-            avgOrderChange: '+0%', // Calculate if needed
+            avgOrderChange: '+0%', 
             inventoryValue: summary.totalValue || 0,
-            inventoryChange: '-0%', // Calculate if needed
+            inventoryChange: '-0%', 
             lowStock: summary.lowStockCount || 0,
             lowStockChange: `${summary.lowStockChange >= 0 ? '+' : ''}${summary.lowStockChange}%`,
             profitMargin: summary.profitMargin || 0,
@@ -185,19 +185,19 @@ const EnhancedDashboard = () => {
           categoryPerformance: categoryStats?.map(cat => ({
             category: cat._id || cat.category || 'Unknown',
             sales: cat.count || 0,
-            profit: 0, // Add calculation if available
+            profit: 0, 
             inventory: cat.count || 0,
-            satisfaction: 80, // Placeholder
+            satisfaction: 80, 
           })) || [],
 
           topProducts: topValueItems?.slice(0, 5).map(item => ({
             name: item.itemName,
             sales: item.value || 0,
             units: item.quantity || 0,
-            margin: 0, // Add calculation if available
+            margin: 0, 
           })) || [],
 
-          // Placeholder data for features not yet implemented in backend
+          
           inventoryTrend: [
             { date: 'Week 1', electronics: 0, clothing: 0, food: 0, books: 0 },
           ],
@@ -219,7 +219,7 @@ const EnhancedDashboard = () => {
     }
   };
 
-  // Fetch data on component mount
+  
   useEffect(() => {
     console.log('EnhancedDashboard: Component mounted, fetching data...');
     fetchDashboardData();
@@ -231,7 +231,7 @@ const EnhancedDashboard = () => {
     setRefreshing(false);
   };
 
-  // Show loading state
+  
   if (loading && !dashboardData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -243,7 +243,7 @@ const EnhancedDashboard = () => {
     );
   }
 
-  // Use fetched data or fallback to empty structure
+  
   const data = dashboardData || {
     kpis: {
       totalRevenue: 0,
@@ -305,7 +305,6 @@ const EnhancedDashboard = () => {
         </div>
       </div>
 
-      {/* Key Performance Indicators */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <EnhancedStatCard
           title="Total Revenue"
@@ -348,7 +347,6 @@ const EnhancedDashboard = () => {
         />
       </div>
 
-      {/* Revenue & Profit Trend Chart */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-300">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -418,9 +416,7 @@ const EnhancedDashboard = () => {
         </div>
       </div>
 
-      {/* Top Products & Sales Channels */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Products Bar Chart */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-300">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-slate-900">Top Selling Products</h2>
@@ -444,7 +440,6 @@ const EnhancedDashboard = () => {
           </div>
         </div>
 
-        {/* Sales by Channel Pie Chart */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-300">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-slate-900">Sales by Channel</h2>
@@ -473,7 +468,6 @@ const EnhancedDashboard = () => {
           </ResponsiveContainer>
           </div>
 
-          {/* Channel Legend */}
           <div className="grid grid-cols-2 gap-3 mt-4">
             {data.salesByChannel.map((channel, index) => (
               <div key={index} className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg">
@@ -489,9 +483,7 @@ const EnhancedDashboard = () => {
         </div>
       </div>
 
-      {/* Category Performance Radar & Stock Turnover */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Category Performance Radar Chart */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-300">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-slate-900">Category Performance</h2>
@@ -526,7 +518,6 @@ const EnhancedDashboard = () => {
           </div>
         </div>
 
-        {/* Stock Turnover Rate */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-300">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-slate-900">Stock Turnover Rate</h2>
@@ -551,7 +542,6 @@ const EnhancedDashboard = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <button
           onClick={() => navigate('/inventory/new')}

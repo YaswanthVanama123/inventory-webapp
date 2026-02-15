@@ -292,7 +292,7 @@ const InvoiceList = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -329,9 +329,9 @@ const InvoiceList = () => {
             />
           </div>
 
-          {/* Filters Row */}
+          {}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Status Filter */}
+            {}
             <Select
               name="status"
               value={statusFilter}
@@ -370,7 +370,7 @@ const InvoiceList = () => {
             />
           </div>
 
-          {/* Clear Filters & View Mode */}
+          {}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             {hasActiveFilters && (
               <Button
@@ -527,7 +527,7 @@ const InvoiceList = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex items-center justify-end gap-2">
-                            {/* View Button */}
+                            {}
                             <button
                               onClick={() => handleView(invoice._id)}
                               className="text-blue-600 hover:text-blue-800 p-1 rounded-lg hover:bg-blue-50 transition-colors"
@@ -539,7 +539,7 @@ const InvoiceList = () => {
                               </svg>
                             </button>
 
-                            {/* Download PDF Button */}
+                            {}
                             <button
                               onClick={() => handleDownloadPDF(invoice._id, invoice.invoiceNumber)}
                               className="text-green-600 hover:text-green-800 p-1 rounded-lg hover:bg-green-50 transition-colors"
@@ -550,7 +550,7 @@ const InvoiceList = () => {
                               </svg>
                             </button>
 
-                            {/* Email Button */}
+                            {}
                             <button
                               onClick={() => handleEmailClick(invoice)}
                               className="text-teal-600 hover:text-teal-800 p-1 rounded-lg hover:bg-teal-50 transition-colors"
@@ -561,7 +561,7 @@ const InvoiceList = () => {
                               </svg>
                             </button>
 
-                            {/* Edit Button (Admin only) */}
+                            {}
                             {isAdmin && (
                               <button
                                 onClick={() => handleEdit(invoice._id)}
@@ -574,7 +574,7 @@ const InvoiceList = () => {
                               </button>
                             )}
 
-                            {/* Delete Button (Admin only) */}
+                            {}
                             {isAdmin && (
                               <button
                                 onClick={() => handleDelete(invoice._id, invoice.invoiceNumber)}
@@ -596,7 +596,7 @@ const InvoiceList = () => {
             </div>
           )}
 
-          {/* Card View (Mobile-friendly) */}
+          {}
           {viewMode === 'card' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {invoices.map((invoice) => (
@@ -604,7 +604,7 @@ const InvoiceList = () => {
                   key={invoice._id}
                   className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow duration-200"
                 >
-                  {/* Card Header */}
+                  {}
                   <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 text-white">
                     <div className="flex items-center justify-between">
                       <div className="font-mono text-lg font-semibold">
@@ -620,9 +620,9 @@ const InvoiceList = () => {
                     </div>
                   </div>
 
-                  {/* Card Content */}
+                  {}
                   <div className="p-4 space-y-3">
-                    {/* Customer */}
+                    {}
                     <div>
                       <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Customer</div>
                       <div className="text-sm font-semibold text-gray-900">
@@ -633,7 +633,7 @@ const InvoiceList = () => {
                       )}
                     </div>
 
-                    {/* Date & Amount */}
+                    {}
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Date</div>
@@ -647,7 +647,7 @@ const InvoiceList = () => {
                       </div>
                     </div>
 
-                    {/* Payment Status */}
+                    {}
                     <div>
                       <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Payment Status</div>
                       <Badge variant={getPaymentStatusBadgeVariant(invoice.paymentStatus)} size="sm">
@@ -656,10 +656,10 @@ const InvoiceList = () => {
                     </div>
                   </div>
 
-                  {/* Card Actions */}
+                  {}
                   <div className="border-t border-gray-200 bg-gray-50 p-3">
                     <div className="flex items-center justify-between gap-2">
-                      {/* Left Actions */}
+                      {}
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleView(invoice._id)}
@@ -693,7 +693,7 @@ const InvoiceList = () => {
                         </button>
                       </div>
 
-                      {/* Right Actions (Admin only) */}
+                      {}
                       {isAdmin && (
                         <div className="flex items-center gap-2">
                           <button
@@ -724,7 +724,7 @@ const InvoiceList = () => {
             </div>
           )}
 
-          {/* Pagination */}
+          {}
           <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
             <Pagination
               currentPage={currentPage}
@@ -741,7 +741,7 @@ const InvoiceList = () => {
         </>
       )}
 
-      {/* Email Modal */}
+      {}
       <Modal
         isOpen={emailModalOpen}
         onClose={() => setEmailModalOpen(false)}
@@ -802,7 +802,7 @@ const InvoiceList = () => {
         </div>
       </Modal>
 
-      {/* Delete Confirmation Modal */}
+      {}
       <Modal
         isOpen={deleteModalOpen}
         onClose={() => {

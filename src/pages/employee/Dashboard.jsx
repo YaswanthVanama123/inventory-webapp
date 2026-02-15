@@ -199,7 +199,7 @@ const EmployeeDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Welcome Section */}
+        {}
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             Welcome back, {user?.fullName || user?.username}!
@@ -209,7 +209,6 @@ const EmployeeDashboard = () => {
           </p>
         </div>
 
-        {/* Error Alert */}
         {error && (
           <div className="mb-6">
             <Alert
@@ -220,9 +219,7 @@ const EmployeeDashboard = () => {
           </div>
         )}
 
-        {/* Quick Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          {/* Total Items Card */}
           <Card
             padding="normal"
             hover
@@ -259,7 +256,6 @@ const EmployeeDashboard = () => {
             </p>
           </Card>
 
-          {/* Low Stock Items Card */}
           <Card
             padding="normal"
             hover
@@ -328,7 +324,6 @@ const EmployeeDashboard = () => {
             </p>
           </Card>
 
-          {/* Items Updated Today Card */}
           <Card
             padding="normal"
             className="sm:col-span-2 lg:col-span-1 hover:shadow-lg transition-shadow"
@@ -364,11 +359,9 @@ const EmployeeDashboard = () => {
           </Card>
         </div>
 
-        {/* Quick Stock Update Section */}
         <Card title="Quick Stock Update" className="mb-6 sm:mb-8">
           <form onSubmit={handleQuickStockUpdate} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Item Selection */}
               <div className="lg:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Select Item
@@ -403,7 +396,6 @@ const EmployeeDashboard = () => {
                 </select>
               </div>
 
-              {/* Action Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Action
@@ -420,7 +412,6 @@ const EmployeeDashboard = () => {
                 </select>
               </div>
 
-              {/* Quantity Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Quantity
@@ -437,7 +428,6 @@ const EmployeeDashboard = () => {
               </div>
             </div>
 
-            {/* Reason Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Reason (Optional)
@@ -452,7 +442,6 @@ const EmployeeDashboard = () => {
               />
             </div>
 
-            {/* Action Buttons */}
             <div className="flex gap-3">
               <button
                 type="submit"
@@ -485,9 +474,7 @@ const EmployeeDashboard = () => {
           </form>
         </Card>
 
-        {/* Two Column Layout for Lists */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
-          {/* Low Stock Alerts */}
           <Card title="Low Stock Alerts" className="h-fit">
             {lowStockItems.length === 0 ? (
               <div className="text-center py-12">
@@ -554,7 +541,6 @@ const EmployeeDashboard = () => {
             )}
           </Card>
 
-          {/* Recent Inventory Changes */}
           <Card title="Recent Inventory Changes" className="h-fit">
             {recentActivity.length === 0 ? (
               <div className="text-center py-12">
@@ -605,7 +591,6 @@ const EmployeeDashboard = () => {
           </Card>
         </div>
 
-        {/* Recent Stock Updates Table */}
         <Card title="Recent Stock Updates" className="mb-6 sm:mb-8">
           {recentUpdates.length === 0 ? (
             <div className="text-center py-12">
@@ -755,7 +740,6 @@ const EmployeeDashboard = () => {
           )}
         </Card>
 
-        {/* Quick Access Buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <button
             onClick={handleUpdateStock}

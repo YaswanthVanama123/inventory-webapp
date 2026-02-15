@@ -54,7 +54,7 @@ const InventoryForm = () => {
     skuCode: '',
     description: '',
     category: '',
-    unit: 'pieces', // Unit of measurement
+    unit: 'pieces', 
     tags: [],
 
     images: [],
@@ -382,7 +382,7 @@ const InventoryForm = () => {
         break;
 
       case 1:
-        // Images step - no required validation
+        
         break;
 
       default:
@@ -602,7 +602,7 @@ const InventoryForm = () => {
           )}
         </div>
 
-        {/* Progress Indicator */}
+        {}
         <div className="mb-6 sm:mb-8 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
           <div className="flex items-center justify-between min-w-max sm:min-w-0">
             {steps.map((step, index) => (
@@ -819,12 +819,12 @@ const InventoryForm = () => {
               </div>
             )}
 
-            {/* Step 1: Images */}
+            {}
             {currentStep === 1 && (
               <div
                 className="space-y-6"
                 onClick={(e) => {
-                  // Prevent any clicks in the images section from bubbling to form
+                  
                   e.stopPropagation();
                 }}
               >
@@ -832,7 +832,7 @@ const InventoryForm = () => {
                   Images
                 </h2>
 
-                {/* Upload Button */}
+                {}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
                     Upload Images
@@ -841,7 +841,7 @@ const InventoryForm = () => {
                     <label
                       className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
                       onClick={(e) => {
-                        // Prevent label click from bubbling up and triggering form submission
+                        
                         e.stopPropagation();
                       }}
                     >
@@ -905,7 +905,7 @@ const InventoryForm = () => {
                             </div>
                           )}
 
-                          {/* Action Buttons */}
+                          {}
                           <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                             {formData.primaryImageIndex !== index && (
                               <button

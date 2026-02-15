@@ -72,10 +72,10 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
   return <MainLayout>{children}</MainLayout>;
 };
 
-/**
- * Dashboard Route Component
- * Renders different dashboards based on user role
- */
+
+
+
+
 const DashboardRoute = () => {
   const { isAdmin, loading } = React.useContext(AuthContext);
 
@@ -147,7 +147,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Inventory (all authenticated users) */}
+                {}
                 <Route
                   path="/inventory"
                   element={
@@ -219,7 +219,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Point of Sale (all authenticated users) */}
+                {}
                 <Route
                   path="/pos"
                   element={
@@ -231,7 +231,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Categories (Admin only) */}
+                {}
                 <Route
                   path="/categories"
                   element={
@@ -243,7 +243,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Units (Admin only) */}
+                {}
                 <Route
                   path="/units"
                   element={
@@ -255,7 +255,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Coupons & Payments (Admin only) */}
+                {}
                 <Route
                   path="/coupons"
                   element={
@@ -267,7 +267,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Invoices (Admin only) */}
+                {}
                 <Route
                   path="/invoices"
                   element={
@@ -329,7 +329,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Model Mapping (Admin only) */}
+                {}
                 <Route
                   path="/routestar/model-mapping"
                   element={
@@ -341,7 +341,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Item Name Alias Mapping (Admin only) */}
+                {}
                 <Route
                   path="/routestar/item-alias-mapping"
                   element={
@@ -353,7 +353,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - RouteStar Items List (Admin only) */}
+                {}
                 <Route
                   path="/routestar/items"
                   element={
@@ -365,7 +365,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - RouteStar Sales Report (Admin only) */}
+                {}
                 <Route
                   path="/routestar/sales-report"
                   element={
@@ -377,7 +377,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Approvals (Admin only) */}
+                {}
                 <Route
                   path="/approvals"
                   element={
@@ -389,7 +389,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Users (Admin only) */}
+                {}
                 <Route
                   path="/users"
                   element={
@@ -421,7 +421,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Reports (Admin only) */}
+                {}
                 <Route
                   path="/reports"
                   element={
@@ -453,7 +453,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Settings (Admin only) */}
+                {}
                 <Route
                   path="/settings"
                   element={
@@ -465,7 +465,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Toast Demo */}
+                {}
                 <Route
                   path="/toast-demo"
                   element={
@@ -477,7 +477,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Error Boundary Demo */}
+                {}
                 <Route
                   path="/error-boundary-demo"
                   element={
@@ -489,7 +489,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Trash (Admin only) */}
+                {}
                 <Route
                   path="/trash"
                   element={
@@ -501,7 +501,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Employee Activities (Admin only) */}
+                {}
                 <Route
                   path="/activities"
                   element={
@@ -513,7 +513,7 @@ function App() {
                   }
                 />
 
-                {/* Protected Routes - Profile (all authenticated users) */}
+                {}
                 <Route
                   path="/profile"
                   element={
@@ -525,7 +525,7 @@ function App() {
                   }
                 />
 
-                {/* 404 Not Found */}
+                {}
                 <Route
                   path="*"
                   element={

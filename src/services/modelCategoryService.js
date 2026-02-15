@@ -1,7 +1,7 @@
 import api from './api';
 
 export const modelCategoryService = {
-  // Get all unique model numbers from orders
+  
   async getUniqueModels() {
     try {
       const response = await api.get('/model-category/unique-models');
@@ -11,7 +11,7 @@ export const modelCategoryService = {
     }
   },
 
-  // Get all RouteStar items for dropdown
+  
   async getRouteStarItems() {
     try {
       const response = await api.get('/model-category/routestar-items');
@@ -21,7 +21,7 @@ export const modelCategoryService = {
     }
   },
 
-  // Save/update mapping
+  
   async saveMapping(data) {
     try {
       const response = await api.post('/model-category/mapping', data);
@@ -31,7 +31,7 @@ export const modelCategoryService = {
     }
   },
 
-  // Delete mapping
+  
   async deleteMapping(modelNumber) {
     try {
       const response = await api.delete(`/model-category/mapping/${modelNumber}`);
@@ -41,7 +41,7 @@ export const modelCategoryService = {
     }
   },
 
-  // Get all mappings
+  
   async getAllMappings() {
     try {
       const response = await api.get('/model-category/mappings');

@@ -1,13 +1,13 @@
 import api from './api';
 
-/**
- * RouteStar Service
- * Handles API calls for RouteStar invoices (sales)
- */
 
-/**
- * Get all invoices with filters and pagination
- */
+
+
+
+
+
+
+
 export const getInvoices = async (params = {}) => {
   try {
     const response = await api.get('/routestar/invoices', { params });
@@ -18,9 +18,9 @@ export const getInvoices = async (params = {}) => {
   }
 };
 
-/**
- * Get a specific invoice by invoice number
- */
+
+
+
 export const getInvoiceByNumber = async (invoiceNumber) => {
   try {
     const response = await api.get(`/routestar/invoices/${invoiceNumber}`);
@@ -31,9 +31,9 @@ export const getInvoiceByNumber = async (invoiceNumber) => {
   }
 };
 
-/**
- * Get invoice statistics
- */
+
+
+
 export const getInvoiceStats = async (params = {}) => {
   try {
     const response = await api.get('/routestar/stats', { params });
@@ -44,9 +44,9 @@ export const getInvoiceStats = async (params = {}) => {
   }
 };
 
-/**
- * Get invoice range (highest and lowest invoice numbers)
- */
+
+
+
 export const getInvoiceRange = async (invoiceType = null) => {
   try {
     const params = invoiceType ? { invoiceType } : {};
@@ -58,16 +58,16 @@ export const getInvoiceRange = async (invoiceType = null) => {
   }
 };
 
-/**
- * Sync pending invoices from RouteStar portal
- */
+
+
+
 export const syncPendingInvoices = async (limit = 0, direction = 'new') => {
   try {
     const response = await api.post('/routestar/sync/pending',
       { limit, direction },
       {
-        timeout: 0, // No timeout - allow as long as needed
-        retry: false // Disable automatic retries
+        timeout: 0, 
+        retry: false 
       }
     );
     return response;
@@ -77,16 +77,16 @@ export const syncPendingInvoices = async (limit = 0, direction = 'new') => {
   }
 };
 
-/**
- * Sync closed invoices from RouteStar portal
- */
+
+
+
 export const syncClosedInvoices = async (limit = 0, direction = 'new') => {
   try {
     const response = await api.post('/routestar/sync/closed',
       { limit, direction },
       {
-        timeout: 0, // No timeout - allow as long as needed
-        retry: false // Disable automatic retries
+        timeout: 0, 
+        retry: false 
       }
     );
     return response;
@@ -96,16 +96,16 @@ export const syncClosedInvoices = async (limit = 0, direction = 'new') => {
   }
 };
 
-/**
- * Sync invoice details for a specific invoice
- */
+
+
+
 export const syncInvoiceDetails = async (invoiceNumber) => {
   try {
     const response = await api.post(`/routestar/sync/details/${invoiceNumber}`,
       {},
       {
-        timeout: 0, // No timeout - allow as long as needed
-        retry: false // Disable automatic retries
+        timeout: 0, 
+        retry: false 
       }
     );
     return response;
@@ -115,16 +115,16 @@ export const syncInvoiceDetails = async (invoiceNumber) => {
   }
 };
 
-/**
- * Sync pending invoices with details (keeps browser open)
- */
+
+
+
 export const syncPendingInvoicesWithDetails = async (limit = 0, direction = 'new') => {
   try {
     const response = await api.post('/routestar/sync/pending-with-details',
       { limit, direction },
       {
-        timeout: 0, // No timeout - allow as long as needed
-        retry: false // Disable automatic retries
+        timeout: 0, 
+        retry: false 
       }
     );
     return response;
@@ -134,16 +134,16 @@ export const syncPendingInvoicesWithDetails = async (limit = 0, direction = 'new
   }
 };
 
-/**
- * Sync closed invoices with details (keeps browser open)
- */
+
+
+
 export const syncClosedInvoicesWithDetails = async (limit = 0, direction = 'new') => {
   try {
     const response = await api.post('/routestar/sync/closed-with-details',
       { limit, direction },
       {
-        timeout: 0, // No timeout - allow as long as needed
-        retry: false // Disable automatic retries
+        timeout: 0, 
+        retry: false 
       }
     );
     return response;
@@ -153,16 +153,16 @@ export const syncClosedInvoicesWithDetails = async (limit = 0, direction = 'new'
   }
 };
 
-/**
- * Sync all invoice details (for invoices without line items)
- */
+
+
+
 export const syncAllInvoiceDetails = async (limit = 0) => {
   try {
     const response = await api.post('/routestar/sync/all-details',
       { limit },
       {
-        timeout: 0, // No timeout - allow as long as needed
-        retry: false // Disable automatic retries
+        timeout: 0, 
+        retry: false 
       }
     );
     return response;
@@ -172,16 +172,16 @@ export const syncAllInvoiceDetails = async (limit = 0) => {
   }
 };
 
-/**
- * Process stock movements for invoices
- */
+
+
+
 export const processStockMovements = async () => {
   try {
     const response = await api.post('/routestar/sync/stock',
       {},
       {
-        timeout: 0, // No timeout - allow as long as needed
-        retry: false // Disable automatic retries
+        timeout: 0, 
+        retry: false 
       }
     );
     return response;
@@ -191,16 +191,16 @@ export const processStockMovements = async () => {
   }
 };
 
-/**
- * Full sync (pending + closed + stock)
- */
+
+
+
 export const fullSync = async (options = {}) => {
   try {
     const response = await api.post('/routestar/sync/full',
       options,
       {
-        timeout: 0, // No timeout - allow as long as needed
-        retry: false // Disable automatic retries
+        timeout: 0, 
+        retry: false 
       }
     );
     return response;
@@ -210,9 +210,9 @@ export const fullSync = async (options = {}) => {
   }
 };
 
-/**
- * Delete all pending invoices
- */
+
+
+
 export const deleteAllPendingInvoices = async () => {
   try {
     const response = await api.delete('/routestar/invoices/pending/all');
@@ -223,9 +223,9 @@ export const deleteAllPendingInvoices = async () => {
   }
 };
 
-/**
- * Delete all closed invoices
- */
+
+
+
 export const deleteAllClosedInvoices = async () => {
   try {
     const response = await api.delete('/routestar/invoices/closed/all');
@@ -236,9 +236,9 @@ export const deleteAllClosedInvoices = async () => {
   }
 };
 
-/**
- * Delete closed invoices by invoice numbers
- */
+
+
+
 export const deleteBulkClosedInvoicesByNumbers = async (invoiceNumbers) => {
   try {
     const response = await api.post('/routestar/invoices/bulk-delete-by-numbers', {

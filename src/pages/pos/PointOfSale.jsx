@@ -59,7 +59,7 @@ const PointOfSale = () => {
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
 
-  // Purchase Selection Modal
+  
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productPurchases, setProductPurchases] = useState([]);
@@ -69,7 +69,7 @@ const PointOfSale = () => {
 
 
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return null; // Return null if no image
+    if (!imagePath) return null; 
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
@@ -104,7 +104,7 @@ const PointOfSale = () => {
       const productsData = productsRes?.data?.items || [];
       const categoriesData = categoriesRes?.data?.categories || [];
 
-      // Show all products (don't filter by stock)
+      
       setProducts(productsData);
       setFilteredProducts(productsData);
       setCategories(categoriesData);
@@ -135,19 +135,19 @@ const PointOfSale = () => {
     setFilteredProducts(filtered);
   }, [searchTerm, selectedCategory, products]);
 
-  // Fetch purchases for a product
+  
   const fetchProductPurchases = async (productId) => {
     setLoadingPurchases(true);
     try {
       const response = await api.get(`/inventory/${productId}/purchases`);
       const purchases = response.data?.data?.purchases || response.data?.purchases || [];
 
-      // Filter only purchases with remaining quantity
+      
       const availablePurchases = purchases.filter(p => (p.remainingQuantity ?? p.quantity) > 0);
 
       setProductPurchases(availablePurchases);
 
-      // Initialize allocations
+      
       const initialAllocations = {};
       availablePurchases.forEach(purchase => {
         initialAllocations[purchase._id] = {
@@ -166,7 +166,7 @@ const PointOfSale = () => {
     }
   };
 
-  // Open purchase selection modal
+  
   const openPurchaseModal = async (product) => {
     setSelectedProduct(product);
     setCustomPrice(product.sellingPrice || 0);
@@ -174,7 +174,7 @@ const PointOfSale = () => {
     await fetchProductPurchases(product._id);
   };
 
-  // Close purchase selection modal
+  
   const closePurchaseModal = () => {
     if (!loadingPurchases) {
       setShowPurchaseModal(false);
@@ -185,7 +185,7 @@ const PointOfSale = () => {
     }
   };
 
-  // Handle purchase selection toggle
+  
   const togglePurchaseSelection = (purchaseId) => {
     setPurchaseAllocations(prev => ({
       ...prev,
@@ -197,7 +197,7 @@ const PointOfSale = () => {
     }));
   };
 
-  // Handle allocation quantity change
+  
   const updateAllocationQuantity = (purchaseId, quantity) => {
     const allocation = purchaseAllocations[purchaseId];
     const validQuantity = Math.max(0, Math.min(quantity, allocation.maxQuantity));
@@ -212,12 +212,12 @@ const PointOfSale = () => {
     }));
   };
 
-  // Calculate total quantity from allocations
+  
   const getTotalAllocatedQuantity = () => {
     return Object.values(purchaseAllocations).reduce((sum, alloc) => sum + (alloc.selected ? alloc.quantity : 0), 0);
   };
 
-  // Add to cart with purchase allocations
+  
   const addToCartWithAllocations = () => {
     const totalQty = getTotalAllocatedQuantity();
 
@@ -226,7 +226,7 @@ const PointOfSale = () => {
       return;
     }
 
-    // Get selected allocations
+    
     const selectedAllocations = Object.entries(purchaseAllocations)
       .filter(([_, alloc]) => alloc.selected && alloc.quantity > 0)
       .map(([purchaseId, alloc]) => {
@@ -239,11 +239,11 @@ const PointOfSale = () => {
         };
       });
 
-    // Check if item already in cart
+    
     const existingItem = cart.find((item) => item._id === selectedProduct._id);
 
     if (existingItem) {
-      // Merge allocations
+      
       const mergedAllocations = [...(existingItem.purchaseAllocations || [])];
 
       selectedAllocations.forEach(newAlloc => {
@@ -285,7 +285,7 @@ const PointOfSale = () => {
       showSuccess(`${selectedProduct.itemName} added to cart`);
     }
 
-    // Close modal and reset
+    
     setShowPurchaseModal(false);
     setSelectedProduct(null);
     setProductPurchases([]);
@@ -295,7 +295,7 @@ const PointOfSale = () => {
 
 
   const addToCart = useCallback((product) => {
-    // Open purchase selection modal instead of directly adding
+    
     openPurchaseModal(product);
   }, []);
 
@@ -483,7 +483,7 @@ const PointOfSale = () => {
           unitPrice: item.sellingPrice,
           taxRate: 0,
           discount: 0,
-          purchaseAllocations: item.purchaseAllocations || [], // Include which purchases to deduct from
+          purchaseAllocations: item.purchaseAllocations || [], 
         })),
         amounts: {
           subtotal: subtotal,
@@ -584,10 +584,10 @@ const PointOfSale = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-8">
-          {/* Products Section */}
+          {}
           <div className="lg:col-span-7">
             <Card padding="lg" className="h-full shadow-sm border border-slate-200 dark:border-gray-700">
-              {/* Search and Filters */}
+              {}
               <div className="mb-6 space-y-4">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
@@ -629,7 +629,7 @@ const PointOfSale = () => {
                   </div>
                 </div>
 
-                {/* Active filters */}
+                {}
                 {(searchTerm || selectedCategory) && (
                   <div className="flex items-center gap-3 flex-wrap bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-750 p-5 rounded-xl border-2 border-blue-200 dark:border-gray-700 shadow-sm">
                     <span className="text-sm font-bold text-slate-700 dark:text-gray-300 flex items-center gap-2">
@@ -667,7 +667,7 @@ const PointOfSale = () => {
                 )}
               </div>
 
-              {/* Products Grid/List */}
+              {}
               <div className={`max-h-[600px] overflow-y-auto ${
                 viewMode === 'grid'
                   ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3'
@@ -782,7 +782,7 @@ const PointOfSale = () => {
             </Card>
           </div>
 
-          {/* Cart Section */}
+          {}
           <div className="lg:col-span-3">
             <Card padding="lg" className="sticky top-4 shadow-sm border border-slate-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200 dark:border-gray-700">
@@ -810,7 +810,7 @@ const PointOfSale = () => {
                 )}
               </div>
 
-              {/* Cart Items */}
+              {}
               <div className="space-y-2 mb-4 max-h-[350px] overflow-y-auto">
                 {cart.length > 0 ? (
                   cart.map((item) => (
@@ -882,7 +882,7 @@ const PointOfSale = () => {
                 )}
               </div>
 
-              {/* Cart Summary */}
+              {}
               {cart.length > 0 && (
                 <>
                   <div className="border-t border-slate-200 dark:border-gray-700 pt-3 space-y-2 bg-slate-50 dark:bg-gray-800 p-3 rounded-lg">
@@ -919,7 +919,7 @@ const PointOfSale = () => {
           </div>
         </div>
 
-        {/* Checkout Modal */}
+        {}
         <Modal
           isOpen={showCheckoutModal}
           onClose={() => !processingCheckout && setShowCheckoutModal(false)}
@@ -927,7 +927,7 @@ const PointOfSale = () => {
           size="lg"
         >
           <div className="space-y-6">
-            {/* Customer Details */}
+            {}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
               <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                 <User className="w-5 h-5 text-blue-600" />
@@ -978,14 +978,14 @@ const PointOfSale = () => {
               </div>
             </div>
 
-            {/* Coupon & Discount */}
+            {}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
               <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                 <Tag className="w-5 h-5 text-blue-600" />
                 Coupon & Discount (Optional)
               </h3>
 
-              {/* Coupon Code Section */}
+              {}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Apply Coupon Code
@@ -1030,7 +1030,7 @@ const PointOfSale = () => {
                 )}
               </div>
 
-              {/* Manual Discount Section */}
+              {}
               {!appliedCoupon && (
                 <>
                   <div className="relative mb-4">
@@ -1068,7 +1068,7 @@ const PointOfSale = () => {
               )}
             </div>
 
-            {/* Payment Method */}
+            {}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
               <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                 <CreditCard className="w-5 h-5 text-blue-600" />
@@ -1086,7 +1086,7 @@ const PointOfSale = () => {
               </Select>
             </div>
 
-            {/* Notes */}
+            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Notes (Optional)
@@ -1100,7 +1100,7 @@ const PointOfSale = () => {
               />
             </div>
 
-            {/* Order Summary */}
+            {}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
               <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                 <DollarSign className="w-5 h-5 text-blue-600" />
@@ -1131,7 +1131,7 @@ const PointOfSale = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
+            {}
             <div className="flex gap-4 pt-4 border-t border-slate-200 dark:border-gray-700">
               <Button
                 variant="outline"
@@ -1153,7 +1153,7 @@ const PointOfSale = () => {
           </div>
         </Modal>
 
-        {/* Saved Carts Modal */}
+        {}
         <Modal
           isOpen={showSavedCarts}
           onClose={() => setShowSavedCarts(false)}
@@ -1200,7 +1200,7 @@ const PointOfSale = () => {
           </div>
         </Modal>
 
-        {/* Purchase Selection Modal */}
+        {}
         <Modal
           isOpen={showPurchaseModal}
           onClose={closePurchaseModal}
@@ -1209,7 +1209,7 @@ const PointOfSale = () => {
         >
           {selectedProduct && (
             <div className="space-y-4">
-              {/* Compact Product Header */}
+              {}
               <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
                 <img
                   src={getImageUrl(selectedProduct.image)}
@@ -1226,7 +1226,7 @@ const PointOfSale = () => {
                 </div>
               </div>
 
-              {/* Loading State */}
+              {}
               {loadingPurchases ? (
                 <div className="text-center py-8 bg-slate-50 rounded-lg">
                   <LoadingSpinner size="md" />
@@ -1234,13 +1234,13 @@ const PointOfSale = () => {
                 </div>
               ) : productPurchases.length > 0 ? (
                 <>
-                  {/* Compact Instructions */}
+                  {}
                   <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <Layers className="w-4 h-4 text-blue-600 flex-shrink-0" />
                     <p className="text-xs text-blue-700">Check boxes to select purchase batches, then enter quantity. Mix multiple batches for FIFO management.</p>
                   </div>
 
-                  {/* Compact Purchase List */}
+                  {}
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {productPurchases.map((purchase, index) => {
                       const allocation = purchaseAllocations[purchase._id] || {};
@@ -1263,7 +1263,7 @@ const PointOfSale = () => {
                           }`}
                         >
                           <div className="flex items-center gap-3">
-                            {/* Checkbox */}
+                            {}
                             <button
                               onClick={() => togglePurchaseSelection(purchase._id)}
                               className="flex-shrink-0"
@@ -1275,7 +1275,7 @@ const PointOfSale = () => {
                               )}
                             </button>
 
-                            {/* Purchase Info */}
+                            {}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1.5">
                                 <span className="text-xs text-slate-500">
@@ -1309,7 +1309,7 @@ const PointOfSale = () => {
                               </div>
                             </div>
 
-                            {/* Quantity Controls */}
+                            {}
                             <div className="flex-shrink-0">
                               <div className="flex items-center gap-1 bg-white rounded-md border border-slate-300 p-1">
                                 <button
@@ -1343,7 +1343,7 @@ const PointOfSale = () => {
                             </div>
                           </div>
 
-                          {/* Quick Select Buttons - More Compact */}
+                          {}
                           {allocation.selected && (
                             <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-slate-200">
                               <span className="text-xs text-slate-600 font-medium">Quick:</span>
@@ -1378,9 +1378,9 @@ const PointOfSale = () => {
                     })}
                   </div>
 
-                  {/* Compact Footer */}
+                  {}
                   <div className="space-y-3">
-                    {/* Price Input */}
+                    {}
                     <div className="flex items-center gap-3 p-3 bg-white rounded-lg border-2 border-blue-200">
                       <div className="flex-1">
                         <label className="block text-xs text-slate-600 font-medium mb-1">Selling Price (per unit)</label>
@@ -1405,7 +1405,7 @@ const PointOfSale = () => {
                       </div>
                     </div>
 
-                    {/* Action Buttons */}
+                    {}
                     <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
                       <div>
                         <p className="text-xs text-slate-500">Total Quantity</p>

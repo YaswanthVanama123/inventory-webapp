@@ -24,17 +24,17 @@ const ModelCategoryMapping = () => {
   const [pendingChanges, setPendingChanges] = useState(new Set());
   const [stats, setStats] = useState({ total: 0, mapped: 0, unmapped: 0 });
 
-  // Load data on mount
+  
   useEffect(() => {
     loadData();
   }, []);
 
-  // Update filtered models when search or filter changes
+  
   useEffect(() => {
     filterModels();
   }, [models, searchText, filterStatus]);
 
-  // Update statistics
+  
   useEffect(() => {
     updateStats();
   }, [models]);
@@ -65,7 +65,7 @@ const ModelCategoryMapping = () => {
   const filterModels = () => {
     let filtered = [...models];
 
-    // Apply search filter - search across model number, order item name, and mapped item name
+    
     if (searchText) {
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter(m =>
@@ -75,7 +75,7 @@ const ModelCategoryMapping = () => {
       );
     }
 
-    // Apply status filter
+    
     if (filterStatus === 'mapped') {
       filtered = filtered.filter(m => m.categoryItemName);
     } else if (filterStatus === 'unmapped') {
@@ -181,7 +181,7 @@ const ModelCategoryMapping = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Model Category Mapping
@@ -191,7 +191,7 @@ const ModelCategoryMapping = () => {
         </p>
       </div>
 
-      {/* Statistics Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
           <div className="text-3xl font-bold">{stats.total}</div>
@@ -211,7 +211,7 @@ const ModelCategoryMapping = () => {
         </Card>
       </div>
 
-      {/* Filters and Actions */}
+      {}
       <Card>
         <div className="flex flex-col lg:flex-row justify-between gap-4">
           <div className="flex flex-wrap gap-2">
@@ -264,7 +264,7 @@ const ModelCategoryMapping = () => {
         </div>
       </Card>
 
-      {/* Table */}
+      {}
       <Card>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">

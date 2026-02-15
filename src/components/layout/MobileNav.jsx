@@ -111,7 +111,7 @@ const MobileNav = () => {
           <div className="w-12 h-1.5 bg-slate-300 rounded-full" />
         </div>
 
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between px-6 pb-3 border-b border-slate-200">
           <h3 className="text-lg font-semibold text-slate-900">More Options</h3>
           <button
@@ -151,14 +151,14 @@ const MobileNav = () => {
         </nav>
       </div>
 
-      {/* Bottom Navigation Bar */}
+      {}
       <nav
         className="fixed bottom-0 left-0 right-0 z-30 md:hidden bg-white border-t border-slate-200 shadow-lg"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         aria-label="Mobile navigation"
       >
         <div className="flex items-center justify-around px-2 pt-2 pb-1">
-          {/* Dynamic Navigation Items */}
+          {}
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = isActiveRoute(item.path);
@@ -178,12 +178,12 @@ const MobileNav = () => {
                   }
                 `}
               >
-                {/* Active indicator dot */}
+                {}
                 {isActive && (
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full" />
                 )}
 
-                {/* Icon with scale animation */}
+                {}
                 <div
                   className={`
                     transition-all duration-200
@@ -196,7 +196,7 @@ const MobileNav = () => {
                   />
                 </div>
 
-                {/* Label */}
+                {}
                 <span
                   className={`
                     mt-1 text-xs font-medium truncate w-full text-center
@@ -207,7 +207,7 @@ const MobileNav = () => {
                   {item.label}
                 </span>
 
-                {/* Background highlight on active */}
+                {}
                 {isActive && (
                   <div className="absolute inset-0 bg-blue-50 rounded-xl -z-10 scale-95" />
                 )}
@@ -215,7 +215,7 @@ const MobileNav = () => {
             );
           })}
 
-          {/* More Menu Button */}
+          {}
           <button
             onClick={toggleMoreMenu}
             className={`
@@ -231,12 +231,12 @@ const MobileNav = () => {
             aria-label="More options"
             aria-expanded={isMoreMenuOpen}
           >
-            {/* Active indicator dot */}
+            {}
             {isMoreMenuActive && (
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full" />
             )}
 
-            {/* Icon with scale and rotation animation */}
+            {}
             <div
               className={`
                 transition-all duration-200
@@ -256,7 +256,7 @@ const MobileNav = () => {
               )}
             </div>
 
-            {/* Label */}
+            {}
             <span
               className={`
                 mt-1 text-xs font-medium truncate w-full text-center
@@ -267,7 +267,7 @@ const MobileNav = () => {
               More
             </span>
 
-            {/* Background highlight on active */}
+            {}
             {(isMoreMenuActive || isMoreMenuOpen) && (
               <div className="absolute inset-0 bg-blue-50 rounded-xl -z-10 scale-95" />
             )}

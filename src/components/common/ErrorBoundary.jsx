@@ -94,7 +94,7 @@ class ErrorBoundary extends React.Component {
                 </div>
               </div>
 
-              {/* Error Message */}
+              {}
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                   Oops! Something went wrong
@@ -113,14 +113,14 @@ class ErrorBoundary extends React.Component {
                       Error Details (Development Mode)
                     </summary>
 
-                    {/* Error Name and Message */}
+                    {}
                     <div className="mb-4">
                       <p className="font-mono text-sm text-red-800 dark:text-red-400 font-semibold">
                         {this.state.error.name}: {this.state.error.message}
                       </p>
                     </div>
 
-                    {/* Error Stack */}
+                    {}
                     {this.state.error.stack && (
                       <div className="mb-4">
                         <h4 className="font-semibold text-sm text-red-900 dark:text-red-300 mb-2">
@@ -147,7 +147,7 @@ class ErrorBoundary extends React.Component {
                 </div>
               )}
 
-              {/* Action Buttons */}
+              {}
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button
                   variant="primary"
@@ -209,7 +209,7 @@ class ErrorBoundary extends React.Component {
                 )}
               </div>
 
-              {/* Error Count (Development) */}
+              {}
               {process.env.NODE_ENV === 'development' && this.state.errorCount > 1 && (
                 <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
                   Error occurred {this.state.errorCount} times
@@ -221,7 +221,7 @@ class ErrorBoundary extends React.Component {
       );
     }
 
-    // No error, render children normally
+    
     return this.props.children;
   }
 }

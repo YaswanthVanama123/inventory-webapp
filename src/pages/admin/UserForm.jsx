@@ -336,7 +336,7 @@ const UserForm = () => {
           </p>
         </div>
 
-        {/* Alert */}
+        {}
         {alert && (
           <div className="mb-6">
             <Alert
@@ -349,9 +349,9 @@ const UserForm = () => {
           </div>
         )}
 
-        {/* Form */}
+        {}
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6">
-          {/* Username */}
+          {}
           <Input
             label="Username"
             name="username"
@@ -368,7 +368,7 @@ const UserForm = () => {
             readOnly={isEditMode}
           />
 
-          {/* Email */}
+          {}
           <Input
             label="Email"
             name="email"
@@ -399,7 +399,7 @@ const UserForm = () => {
             disabled={loading}
           />
 
-          {/* Password */}
+          {}
           <div>
             <div className="relative">
               <Input
@@ -491,7 +491,7 @@ const UserForm = () => {
             )}
           </div>
 
-          {/* Confirm Password */}
+          {}
           <div>
             <div className="relative">
               <Input
@@ -519,7 +519,7 @@ const UserForm = () => {
             </div>
           </div>
 
-          {/* Role */}
+          {}
           <Select
             label="Role"
             name="role"
@@ -537,7 +537,7 @@ const UserForm = () => {
             helperText="Admin has full access, Employee has limited access"
           />
 
-          {/* Active Status */}
+          {}
           <div className="flex items-center gap-3">
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -560,7 +560,7 @@ const UserForm = () => {
             </div>
           </div>
 
-          {/* Form Actions */}
+          {}
           <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-gray-200">
             <Button
               type="button"
@@ -585,7 +585,7 @@ const UserForm = () => {
           </div>
         </form>
 
-        {/* Additional Info for Edit Mode */}
+        {}
         {isEditMode && (
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-start gap-3">

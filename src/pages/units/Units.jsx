@@ -143,14 +143,12 @@ const Units = () => {
           </p>
         </div>
 
-        {/* Add Button */}
         <div className="mb-6">
           <Button onClick={handleAdd} variant="primary">
             + Add Unit
           </Button>
         </div>
 
-        {/* Units Table */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
           {units.length === 0 ? (
             <div className="text-center py-12">
@@ -213,7 +211,6 @@ const Units = () => {
           )}
         </div>
 
-        {/* Modal */}
         <Modal
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}

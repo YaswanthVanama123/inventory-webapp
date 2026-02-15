@@ -125,9 +125,9 @@ const Login = () => {
       <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] opacity-20"></div>
 
       <div className="max-w-md w-full space-y-6 relative z-10">
-        {/* Login Card */}
+        {}
         <div className="bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
-          {/* Top accent bar */}
+          {}
           <div className="h-2 bg-gradient-to-r from-blue-600 to-blue-500"></div>
 
           <div className="p-8 sm:p-10">
@@ -156,7 +156,7 @@ const Login = () => {
             </p>
           </div>
 
-          {/* Login Type Tabs */}
+          {}
           <div className="flex rounded-lg bg-slate-100 p-1 mb-6">
             <button
               type="button"
@@ -366,7 +366,7 @@ const Login = () => {
               )}
             </div>
 
-            {/* Remember Me Checkbox */}
+            {}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input
@@ -396,7 +396,7 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Submit Button */}
+            {}
             <div>
               <button
                 type="submit"
@@ -449,7 +449,7 @@ const Login = () => {
             </div>
           </form>
 
-          {/* Footer */}
+          {}
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-600">
               Don't have an account?{' '}
@@ -462,11 +462,8 @@ const Login = () => {
             </p>
           </div>
         </div>
-        {/* End of padding wrapper (p-8 sm:p-10) */}
       </div>
-      {/* End of Login Card (bg-white) */}
 
-      {/* Additional Info */}
       <div className="text-center">
         <p className="text-xs text-slate-500">
           Protected by enterprise-grade security
@@ -476,7 +473,7 @@ const Login = () => {
 
     <style>{`
       .bg-grid-slate-100 {
-        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23cbd5e1' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http:
       }
     `}</style>
   </div>

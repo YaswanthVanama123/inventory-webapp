@@ -51,7 +51,7 @@ const Card = ({ children, className = '' }) => {
   );
 };
 
-// Summary Stat Card Component
+
 const StatCard = ({ title, value, icon: Icon, iconColor, loading }) => {
   if (loading) {
     return (
@@ -82,7 +82,7 @@ const StatCard = ({ title, value, icon: Icon, iconColor, loading }) => {
   );
 };
 
-// Priority Badge Component
+
 const PriorityBadge = ({ priority }) => {
   const colors = PRIORITY_COLORS[priority] || PRIORITY_COLORS.Low;
 
@@ -113,7 +113,7 @@ const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
           <PriorityBadge priority={item.priority} />
         </div>
 
-        {/* Stock Info */}
+        {}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <p className="text-xs text-gray-500 mb-1">Current Stock</p>
@@ -199,7 +199,7 @@ const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
           </div>
         )}
 
-        {/* Actions */}
+        {}
         <div className="flex gap-2 pt-3 border-t border-gray-100">
           <button
             onClick={() => onEmailSupplier(item)}
@@ -394,14 +394,14 @@ const LowStockReport = () => {
           </div>
         </div>
 
-        {/* Stats Skeleton */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
           {[...Array(5)].map((_, i) => (
             <StatCard key={i} loading={true} />
           ))}
         </div>
 
-        {/* Content Skeleton */}
+        {}
         <Card className="p-6">
           <div className="animate-pulse space-y-4">
             <div className="h-10 bg-gray-200 rounded w-full"></div>
@@ -412,7 +412,7 @@ const LowStockReport = () => {
     );
   }
 
-  // Error state
+  
   if (error && !data) {
     return (
       <div className="space-y-6">
@@ -441,7 +441,7 @@ const LowStockReport = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-lg shadow-lg p-6 md:p-8 text-white">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
@@ -461,7 +461,7 @@ const LowStockReport = () => {
         </div>
       </div>
 
-      {/* Summary Stats */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
         <StatCard
           title="Total Low Stock Items"
@@ -495,12 +495,12 @@ const LowStockReport = () => {
         />
       </div>
 
-      {/* Filters and Actions */}
+      {}
       <Card className="p-6">
         <div className="space-y-4">
-          {/* Search and Action Buttons */}
+          {}
           <div className="flex flex-col sm:flex-row gap-3">
-            {/* Search */}
+            {}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -512,7 +512,7 @@ const LowStockReport = () => {
               />
             </div>
 
-            {/* Action Buttons */}
+            {}
             <div className="flex gap-2">
               <button
                 onClick={() => setShowFilters(!showFilters)}
@@ -541,10 +541,10 @@ const LowStockReport = () => {
             </div>
           </div>
 
-          {/* Filter Dropdowns */}
+          {}
           {showFilters && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-gray-200">
-              {/* Category Filter */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Category
@@ -561,7 +561,7 @@ const LowStockReport = () => {
                 </select>
               </div>
 
-              {/* Priority Filter */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Priority
@@ -578,7 +578,7 @@ const LowStockReport = () => {
                 </select>
               </div>
 
-              {/* Supplier Filter */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Supplier
@@ -595,7 +595,7 @@ const LowStockReport = () => {
                 </select>
               </div>
 
-              {/* Clear Filters */}
+              {}
               {hasActiveFilters && (
                 <div className="sm:col-span-3 flex justify-end">
                   <button
@@ -612,7 +612,7 @@ const LowStockReport = () => {
         </div>
       </Card>
 
-      {/* Items Display */}
+      {}
       {filteredItems.length === 0 ? (
         <Card className="p-12">
           <div className="text-center">
@@ -638,7 +638,7 @@ const LowStockReport = () => {
         </Card>
       ) : (
         <>
-          {/* Mobile Card View */}
+          {}
           <div className="grid grid-cols-1 gap-4 lg:hidden">
             {filteredItems.map(item => (
               <ItemCard
@@ -650,7 +650,7 @@ const LowStockReport = () => {
             ))}
           </div>
 
-          {/* Desktop Table View */}
+          {}
           <Card className="hidden lg:block overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -679,12 +679,12 @@ const LowStockReport = () => {
                 <tbody className="divide-y divide-gray-100">
                   {filteredItems.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                      {/* Priority */}
+                      {}
                       <td className="py-4 px-4">
                         <PriorityBadge priority={item.priority} />
                       </td>
 
-                      {/* Item Details */}
+                      {}
                       <td className="py-4 px-4">
                         <div>
                           <p className="font-semibold text-gray-900">{item.itemName}</p>
@@ -693,7 +693,7 @@ const LowStockReport = () => {
                         </div>
                       </td>
 
-                      {/* Stock Status */}
+                      {}
                       <td className="py-4 px-4">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
@@ -711,7 +711,7 @@ const LowStockReport = () => {
                         </div>
                       </td>
 
-                      {/* Supplier */}
+                      {}
                       <td className="py-4 px-4">
                         <div className="space-y-1">
                           <p className="font-medium text-gray-900">{item.supplier.name}</p>
@@ -737,7 +737,7 @@ const LowStockReport = () => {
                         </div>
                       </td>
 
-                      {/* Order Details */}
+                      {}
                       <td className="py-4 px-4">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
@@ -761,7 +761,7 @@ const LowStockReport = () => {
                         </div>
                       </td>
 
-                      {/* Actions */}
+                      {}
                       <td className="py-4 px-4">
                         <div className="flex items-center justify-end gap-2">
                           <button
@@ -787,7 +787,7 @@ const LowStockReport = () => {
             </div>
           </Card>
 
-          {/* Results Summary */}
+          {}
           <div className="flex items-center justify-between text-sm text-gray-600">
             <p>
               Showing {filteredItems.length} of {data?.items?.length || 0} items

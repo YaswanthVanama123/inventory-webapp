@@ -49,7 +49,7 @@ export const DashboardWithMultipleErrorBoundaries = () => {
     <div className="container">
       <h1>Dashboard</h1>
 
-      {/* Stats Section */}
+      {}
       <ErrorBoundary
         errorMessage="Unable to load statistics"
         fallback={
@@ -63,7 +63,7 @@ export const DashboardWithMultipleErrorBoundaries = () => {
         <StatsSection />
       </ErrorBoundary>
 
-      {/* Recent Activity Section */}
+      {}
       <ErrorBoundary
         errorMessage="Unable to load recent activity"
         fallback={
@@ -77,7 +77,7 @@ export const DashboardWithMultipleErrorBoundaries = () => {
         <RecentActivitySection />
       </ErrorBoundary>
 
-      {/* Charts Section */}
+      {}
       <ErrorBoundary
         errorMessage="Unable to load charts"
         fallback={
@@ -128,7 +128,7 @@ export const NestedErrorBoundaries = () => {
       <h1>Complex Page Layout</h1>
 
       <div className="grid grid-cols-2 gap-4">
-        {/* Left Column */}
+        {}
         <div>
           <ErrorBoundary>
             <Sidebar />
@@ -142,7 +142,7 @@ export const NestedErrorBoundaries = () => {
             <MainContent />
           </ErrorBoundary>
 
-          {/* Comments Section (separate boundary) */}
+          {}
           <ErrorBoundary
             fallback={
               <ErrorFallback
@@ -166,7 +166,7 @@ export const ConditionalErrorBoundary = ({ isComplexView }) => {
     <div className="container">
       <h1>Dynamic View</h1>
 
-      {/* Only wrap complex view with error boundary */}
+      {}
       {isComplexView ? (
         <ErrorBoundary>
           <ComplexView />
@@ -178,7 +178,7 @@ export const ConditionalErrorBoundary = ({ isComplexView }) => {
   );
 };
 
-// Example 7: Error boundary with retry mechanism
+
 export const ErrorBoundaryWithRetry = () => {
   const [retryCount, setRetryCount] = React.useState(0);
 

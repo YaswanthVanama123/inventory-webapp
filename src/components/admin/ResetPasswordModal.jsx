@@ -216,7 +216,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
       closeOnOverlayClick={!loading}
     >
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* User Info */}
+        {}
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-sm text-blue-900">
             Resetting password for: <span className="font-semibold">{user?.fullName || user?.username}</span>
@@ -226,7 +226,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
           </p>
         </div>
 
-        {/* Alert */}
+        {}
         {alert && (
           <Alert
             variant={alert.type}
@@ -329,7 +329,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
           )}
         </div>
 
-        {/* Confirm Password */}
+        {}
         <div className="relative">
           <Input
             label="Confirm Password"
@@ -355,7 +355,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
           </button>
         </div>
 
-        {/* Password Match Indicator */}
+        {}
         {formData.confirmPassword && (
           <div className="flex items-center gap-2 text-sm">
             {formData.newPassword === formData.confirmPassword ? (
@@ -372,7 +372,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
           </div>
         )}
 
-        {/* Security Notice */}
+        {}
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />

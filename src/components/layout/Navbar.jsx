@@ -129,7 +129,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation Links */}
+          {}
           <div className="hidden md:flex items-center space-x-1">
             {navigationLinks.map((link) => (
               <Link
@@ -146,9 +146,9 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Right Side - Search, Notifications, User Menu */}
+          {}
           <div className="flex items-center space-x-4">
-            {/* Search Bar - Hidden on mobile */}
+            {}
             <form onSubmit={handleSearch} className="hidden lg:block">
               <div className="relative">
                 <input
@@ -174,7 +174,7 @@ const Navbar = () => {
               </div>
             </form>
 
-            {/* Notifications */}
+            {}
             <div className="relative">
               <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors relative">
                 <svg
@@ -316,7 +316,7 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
+            {}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
@@ -355,11 +355,11 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {}
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-gray-200 bg-white">
           <div className="px-4 py-3 space-y-1">
-            {/* Mobile Search */}
+            {}
             <form onSubmit={handleSearch} className="mb-3">
               <div className="relative">
                 <input
@@ -385,7 +385,7 @@ const Navbar = () => {
               </div>
             </form>
 
-            {/* Mobile Navigation Links */}
+            {}
             {navigationLinks.map((link) => (
               <Link
                 key={link.path}

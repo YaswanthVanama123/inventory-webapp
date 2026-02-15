@@ -247,7 +247,7 @@ const UserList = () => {
     );
   }
 
-  // Loading state
+  
   if (loading && users.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -258,7 +258,7 @@ const UserList = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -289,9 +289,9 @@ const UserList = () => {
             />
           </div>
 
-          {/* Filters Row */}
+          {}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Role Filter */}
+            {}
             <Select
               name="role"
               value={roleFilter}
@@ -325,7 +325,7 @@ const UserList = () => {
               </Button>
             )}
 
-            {/* View Mode Toggle */}
+            {}
             <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('table')}
@@ -533,7 +533,7 @@ const UserList = () => {
             </div>
           )}
 
-          {/* Card View (Mobile-friendly) */}
+          {}
           {viewMode === 'card' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {paginatedUsers.map((user) => (
@@ -542,7 +542,7 @@ const UserList = () => {
                   className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer"
                   onClick={() => handleViewUser(user._id)}
                 >
-                  {/* Header */}
+                  {}
                   <div className="bg-slate-50 p-6 border-b border-slate-200">
                     <div className="flex items-center justify-center">
                       <div className="h-20 w-20 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-2xl">
@@ -551,7 +551,7 @@ const UserList = () => {
                     </div>
                   </div>
 
-                  {/* Content */}
+                  {}
                   <div className="p-4">
                     <div className="text-center mb-4">
                       <h3 className="text-lg font-semibold text-slate-900">{user.fullName || 'N/A'}</h3>
@@ -581,7 +581,7 @@ const UserList = () => {
                       </div>
                     </div>
 
-                    {/* Actions */}
+                    {}
                     <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2">
                         <Button
@@ -632,7 +632,7 @@ const UserList = () => {
             </div>
           )}
 
-          {/* Pagination */}
+          {}
           <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
             <Pagination
               currentPage={currentPage}
@@ -649,14 +649,14 @@ const UserList = () => {
         </>
       )}
 
-      {/* Reset Password Modal */}
+      {}
       <ResetPasswordModal
         isOpen={showResetPasswordModal}
         onClose={handleResetPasswordClose}
         user={selectedUser}
       />
 
-      {/* Delete Confirmation Modal */}
+      {}
       <Modal
         isOpen={showDeleteModal}
         onClose={() => {

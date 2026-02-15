@@ -202,7 +202,7 @@ const Settings = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="flex items-center justify-between">
           <div>
@@ -370,7 +370,7 @@ const Settings = () => {
         )}
       </div>
 
-      {/* Category Modal */}
+      {}
       <Modal
         isOpen={categoryModalOpen}
         onClose={() => !categoryModalLoading && setCategoryModalOpen(false)}

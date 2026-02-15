@@ -5,15 +5,15 @@ import Button from '../common/Button';
 import LoadingSpinner from '../common/LoadingSpinner';
 import api from '../../services/api';
 
-/**
- * StockReconciliationView Component
- * Shows unified stock view by mapping purchases to sales
- */
+
+
+
+
 const StockReconciliationView = () => {
   const [stockItems, setStockItems] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // all, in_stock, out_of_stock, oversold
+  const [filter, setFilter] = useState('all'); 
 
   useEffect(() => {
     fetchStockReconciliation();
@@ -39,7 +39,7 @@ const StockReconciliationView = () => {
   };
 
   const handleDownloadStockReport = () => {
-    // Create CSV content
+    
     const headers = 'SKU,Item Name,Purchased Qty,Avg Purchase Price,Sold Qty,Avg Sale Price,Current Stock,Status,Profit Margin %';
     const rows = filteredItems.map(item => {
       const cleanName = (item.name || '').replace(/[\t\r\n,]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -58,7 +58,7 @@ const StockReconciliationView = () => {
 
     const csvContent = [headers, ...rows].join('\n');
 
-    // Download
+    
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -125,7 +125,7 @@ const StockReconciliationView = () => {
 
   return (
     <div className="space-y-4">
-      {/* Summary Cards */}
+      {}
       {summary && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
@@ -170,10 +170,10 @@ const StockReconciliationView = () => {
         </div>
       )}
 
-      {/* Filters and Download */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          {/* Filter Buttons */}
+          {}
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setFilter('all')}
@@ -217,7 +217,7 @@ const StockReconciliationView = () => {
             </button>
           </div>
 
-          {/* Download Button */}
+          {}
           <Button
             variant="outline"
             size="sm"
@@ -230,7 +230,7 @@ const StockReconciliationView = () => {
         </div>
       </div>
 
-      {/* Stock Table */}
+      {}
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full">

@@ -20,7 +20,7 @@ const RouteStarItemsList = () => {
   const [filters, setFilters] = useState({ itemParents: [], types: [] });
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 50, pages: 0 });
 
-  // Filter states
+  
   const [searchText, setSearchText] = useState('');
   const [selectedParent, setSelectedParent] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
@@ -28,12 +28,12 @@ const RouteStarItemsList = () => {
   const [filterForUse, setFilterForUse] = useState(false);
   const [filterForSell, setFilterForSell] = useState(false);
 
-  // Load data on mount and when filters change
+  
   useEffect(() => {
     loadData();
   }, [pagination.page, selectedParent, selectedType, selectedCategory, filterForUse, filterForSell]);
 
-  // Debounce search
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       if (pagination.page === 1) {
@@ -86,14 +86,14 @@ const RouteStarItemsList = () => {
         [flagType]: !currentValue
       });
 
-      // Update local state
+      
       setItems(prevItems =>
         prevItems.map(item =>
           item._id === itemId ? { ...item, [flagType]: updatedItem[flagType] } : item
         )
       );
 
-      // Reload stats
+      
       const statsData = await routeStarItemsService.getStats();
       setStats(statsData);
 
@@ -109,7 +109,7 @@ const RouteStarItemsList = () => {
         itemCategory: newCategory
       });
 
-      // Update local state
+      
       setItems(prevItems =>
         prevItems.map(item =>
           item._id === itemId ? { ...item, itemCategory: updatedItem.itemCategory } : item
@@ -136,7 +136,7 @@ const RouteStarItemsList = () => {
       const result = await routeStarItemsService.deleteAllItems();
       showSuccess(result.message);
 
-      // Reload data
+      
       await loadData();
     } catch (error) {
       showError('Failed to delete items: ' + error.message);
@@ -162,10 +162,10 @@ const RouteStarItemsList = () => {
       const result = await routeStarItemsService.syncItems();
       showSuccess(`Sync completed! Fetched: ${result.total}, Created: ${result.created}, Updated: ${result.updated}`);
 
-      // Reload data
+      
       await loadData();
     } catch (error) {
-      // Handle specific error for sync already in progress
+      
       if (error.response && error.response.status === 409) {
         showError('Another sync is already in progress. Please wait for it to complete.');
       } else {
@@ -182,7 +182,7 @@ const RouteStarItemsList = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           RouteStar Items List
@@ -192,7 +192,7 @@ const RouteStarItemsList = () => {
         </p>
       </div>
 
-      {/* Statistics Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
           <div className="text-3xl font-bold">{stats.total}</div>
@@ -216,11 +216,11 @@ const RouteStarItemsList = () => {
         </Card>
       </div>
 
-      {/* Filters */}
+      {}
       <Card>
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Search */}
+            {}
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <Input
@@ -232,7 +232,7 @@ const RouteStarItemsList = () => {
               />
             </div>
 
-            {/* Item Parent Filter */}
+            {}
             <Select
               value={selectedParent}
               onChange={(e) => setSelectedParent(e.target.value)}
@@ -243,7 +243,7 @@ const RouteStarItemsList = () => {
               ))}
             </Select>
 
-            {/* Type Filter */}
+            {}
             <Select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
@@ -254,7 +254,7 @@ const RouteStarItemsList = () => {
               ))}
             </Select>
 
-            {/* Item Category Filter */}
+            {}
             <Select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -265,7 +265,7 @@ const RouteStarItemsList = () => {
             </Select>
           </div>
 
-          {/* Action Buttons */}
+          {}
           <div className="flex flex-wrap gap-2">
             <Button
               variant="secondary"
@@ -295,7 +295,7 @@ const RouteStarItemsList = () => {
             </Button>
           </div>
 
-          {/* Flag Filters */}
+          {}
           <div className="flex gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -319,7 +319,7 @@ const RouteStarItemsList = () => {
         </div>
       </Card>
 
-      {/* Table */}
+      {}
       <Card>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -421,7 +421,7 @@ const RouteStarItemsList = () => {
           </table>
         </div>
 
-        {/* Pagination */}
+        {}
         {pagination.pages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
@@ -441,7 +441,7 @@ const RouteStarItemsList = () => {
                 <div className="flex gap-1">
                   {[...Array(pagination.pages)].map((_, i) => {
                     const page = i + 1;
-                    // Show first page, last page, current page, and pages around current
+                    
                     if (
                       page === 1 ||
                       page === pagination.pages ||

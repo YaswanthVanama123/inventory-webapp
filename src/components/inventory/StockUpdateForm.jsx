@@ -68,7 +68,7 @@ const StockUpdateForm = ({
     { value: 'set', label: 'Set Stock' },
   ];
 
-  // Calculate preview stock when action or quantity changes
+  
   useEffect(() => {
     const qty = parseInt(formData.quantity) || 0;
     const currentStock = item?.currentStock || 0;
@@ -95,7 +95,7 @@ const StockUpdateForm = ({
     const newErrors = {};
     const qty = parseInt(formData.quantity);
 
-    // Validate quantity
+    
     if (!formData.quantity) {
       newErrors.quantity = 'Quantity is required';
     } else if (qty <= 0) {
@@ -104,7 +104,7 @@ const StockUpdateForm = ({
       newErrors.quantity = 'Quantity must be a whole number';
     }
 
-    // Validate remove action doesn't exceed available stock
+    
     if (formData.action === 'remove' && qty > (item?.currentStock || 0)) {
       newErrors.quantity = `Cannot remove more than available stock (${item?.currentStock || 0})`;
     }
@@ -235,7 +235,7 @@ const StockUpdateForm = ({
         )}
       </div>
 
-      {/* Alert Messages */}
+      {}
       {alert && (
         <div className="mb-4">
           <Alert variant={alert.variant} dismissible onDismiss={() => setAlert(null)}>
@@ -244,9 +244,9 @@ const StockUpdateForm = ({
         </div>
       )}
 
-      {/* Form */}
+      {}
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Action Selector */}
+        {}
         <div>
           <Select
             label="Action"
@@ -259,7 +259,7 @@ const StockUpdateForm = ({
           />
         </div>
 
-        {/* Action Visual Indicator */}
+        {}
         <div
           className={`p-4 rounded-lg border-2 flex items-center gap-3 transition-all duration-200 ${currentAction.bgColor} ${currentAction.borderColor}`}
         >
@@ -293,7 +293,7 @@ const StockUpdateForm = ({
           />
         </div>
 
-        {/* Stock Preview */}
+        {}
         {formData.quantity && (
           <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
             <div className="flex items-center justify-between">
@@ -352,7 +352,7 @@ const StockUpdateForm = ({
           </div>
         )}
 
-        {/* Reason Textarea */}
+        {}
         <div>
           <label
             htmlFor="reason"
@@ -386,7 +386,7 @@ const StockUpdateForm = ({
           </p>
         </div>
 
-        {/* Action Buttons */}
+        {}
         <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
           {onCancel && (
             <Button
@@ -423,7 +423,7 @@ const StockUpdateForm = ({
         </div>
       </form>
 
-      {/* Help Text */}
+      {}
       <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
         <div className="flex gap-2">
           <svg

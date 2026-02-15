@@ -90,7 +90,7 @@ const Trash = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-gray-900">
       <div className="container mx-auto px-6 lg:px-8 py-8 max-w-[1800px]">
-        {/* Header */}
+        {}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
             <div className="bg-gradient-to-br from-red-500 to-red-600 p-3 rounded-xl shadow-md">
@@ -119,7 +119,7 @@ const Trash = () => {
                 />
               </div>
 
-              {/* Filter */}
+              {}
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
@@ -132,7 +132,7 @@ const Trash = () => {
               </select>
             </div>
 
-            {/* Empty Trash Button */}
+            {}
             {deletedItems.length > 0 && (
               <Button
                 variant="danger"
@@ -146,7 +146,7 @@ const Trash = () => {
           </div>
         </Card>
 
-        {/* Deleted Items List */}
+        {}
         {filteredItems.length === 0 ? (
           <Card padding="lg" className="text-center py-20 border border-slate-200 dark:border-gray-700">
             <Trash2 className="w-20 h-20 text-slate-400 dark:text-gray-500 mx-auto mb-4" />
@@ -211,7 +211,7 @@ const Trash = () => {
           </div>
         )}
 
-        {/* Warning Note */}
+        {}
         <Card padding="lg" className="mt-8 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
           <div className="flex gap-3">
             <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />

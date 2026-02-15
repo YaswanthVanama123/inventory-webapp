@@ -333,7 +333,7 @@ const CouponsAndPayments = () => {
               </Card>
             </div>
 
-            {/* Add Coupon Button */}
+            {}
             <div className="mb-6">
               <Button
                 onClick={() => {
@@ -457,10 +457,10 @@ const CouponsAndPayments = () => {
           </>
         )}
 
-        {/* Payment Types Tab */}
+        {}
         {activeTab === 'payments' && (
           <>
-            {/* Add Payment Type Button */}
+            {}
             <div className="mb-6">
               <Button
                 onClick={() => {
@@ -474,7 +474,7 @@ const CouponsAndPayments = () => {
               </Button>
             </div>
 
-            {/* Payment Types List */}
+            {}
             {loadingPayments ? (
               <LoadingSpinner />
             ) : paymentTypes.length === 0 ? (
@@ -550,7 +550,7 @@ const CouponsAndPayments = () => {
           </>
         )}
 
-        {/* Coupon Modal */}
+        {}
         <Modal
           isOpen={showCouponModal}
           onClose={() => {
@@ -561,7 +561,7 @@ const CouponsAndPayments = () => {
           size="lg"
         >
           <form onSubmit={handleCouponSubmit} className="space-y-6">
-            {/* Basic Info Section */}
+            {}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Basic Information</h3>
               <div className="space-y-4">
@@ -597,7 +597,7 @@ const CouponsAndPayments = () => {
               </div>
             </div>
 
-            {/* Discount Details Section */}
+            {}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Discount Details</h3>
               <div className="space-y-4">
@@ -643,7 +643,7 @@ const CouponsAndPayments = () => {
               </div>
             </div>
 
-            {/* Usage & Validity Section */}
+            {}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Usage & Validity</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -684,7 +684,7 @@ const CouponsAndPayments = () => {
           </form>
         </Modal>
 
-        {/* Payment Type Modal */}
+        {}
         <Modal
           isOpen={showPaymentModal}
           onClose={() => {
@@ -694,7 +694,7 @@ const CouponsAndPayments = () => {
           title={editingPayment ? 'Edit Payment Type' : 'Add Payment Type'}
         >
           <form onSubmit={handlePaymentSubmit} className="space-y-6">
-            {/* Basic Info Section */}
+            {}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Basic Information</h3>
               <div className="space-y-4">
@@ -723,7 +723,7 @@ const CouponsAndPayments = () => {
               </div>
             </div>
 
-            {/* Settings Section */}
+            {}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Settings</h3>
               <div className="grid grid-cols-2 gap-4">

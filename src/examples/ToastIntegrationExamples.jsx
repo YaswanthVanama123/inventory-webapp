@@ -348,7 +348,7 @@ function CopyToClipboard() {
 }
 
 export {
-  // Export all example components for reference
+  
   LoginPage,
   InventoryList,
   InvoiceForm,

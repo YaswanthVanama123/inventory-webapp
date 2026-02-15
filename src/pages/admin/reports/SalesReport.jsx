@@ -44,7 +44,7 @@ const Card = ({ children, className = '' }) => {
   );
 };
 
-// Summary Card Component
+
 const SummaryCard = ({ title, value, change, changeType, icon: Icon, loading, prefix = '', suffix = '' }) => {
   const isPositive = changeType === 'positive';
   const ChangeIcon = isPositive ? TrendingUp : TrendingDown;
@@ -100,7 +100,7 @@ const ChartSkeleton = () => (
   </div>
 );
 
-// Error State Component
+
 const ErrorState = ({ message, onRetry }) => (
   <div className="text-center py-12">
     <AlertCircle className="w-12 h-12 md:w-16 md:h-16 text-red-500 mx-auto mb-4" />
@@ -133,7 +133,7 @@ const CustomTooltip = ({ active, payload, label, prefix = '', suffix = '' }) => 
   return null;
 };
 
-// Payment Status Badge Component
+
 const PaymentStatusBadge = ({ status }) => {
   const statusConfig = {
     paid: { color: 'bg-green-100 text-green-800', icon: CheckCircle, label: 'Paid' },
@@ -153,7 +153,7 @@ const PaymentStatusBadge = ({ status }) => {
   );
 };
 
-// Main Sales Report Component
+
 const SalesReport = () => {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -376,14 +376,14 @@ const SalesReport = () => {
         </div>
       </div>
 
-      {/* Filters */}
+      {}
       <Card className="p-4 md:p-6">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-5 h-5 text-gray-600" />
           <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Date Range */}
+          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Calendar className="w-4 h-4 inline mr-1" />
@@ -409,7 +409,7 @@ const SalesReport = () => {
             />
           </div>
 
-          {/* Category Filter */}
+          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Filter className="w-4 h-4 inline mr-1" />
@@ -428,7 +428,7 @@ const SalesReport = () => {
             </select>
           </div>
 
-          {/* Group By */}
+          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Group By
@@ -447,14 +447,14 @@ const SalesReport = () => {
         </div>
       </Card>
 
-      {/* Error State */}
+      {}
       {error && !reportData && (
         <Card className="p-6">
           <ErrorState message={error} onRetry={fetchSalesReport} />
         </Card>
       )}
 
-      {/* Summary Cards */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <SummaryCard
           title="Total Sales"
@@ -493,9 +493,9 @@ const SalesReport = () => {
         />
       </div>
 
-      {/* Charts Section */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        {/* Sales Trend Chart */}
+        {}
         <Card className="p-4 md:p-6">
           {loading ? (
             <ChartSkeleton />
@@ -586,7 +586,7 @@ const SalesReport = () => {
           )}
         </Card>
 
-        {/* Category Breakdown Chart */}
+        {}
         <Card className="p-4 md:p-6">
           {loading ? (
             <ChartSkeleton />
@@ -634,7 +634,7 @@ const SalesReport = () => {
                 </ResponsiveContainer>
               </div>
 
-              {/* Legend */}
+              {}
               <div className="grid grid-cols-2 gap-2 mt-4">
                 {categoryBreakdown.map((category, index) => (
                   <div key={index} className="flex items-center gap-2">
@@ -651,7 +651,7 @@ const SalesReport = () => {
         </Card>
       </div>
 
-      {/* Payment Status Breakdown */}
+      {}
       <Card className="p-4 md:p-6">
         <div className="mb-4">
           <h2 className="text-base md:text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -688,7 +688,7 @@ const SalesReport = () => {
         )}
       </Card>
 
-      {/* Recent Invoices Table */}
+      {}
       <Card className="p-4 md:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
           <div>

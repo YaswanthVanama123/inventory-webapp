@@ -1,13 +1,13 @@
 import api from './api';
 
-/**
- * Orders Service
- * Handles API calls for CustomerConnect orders
- */
 
-/**
- * Get all orders with filters and pagination
- */
+
+
+
+
+
+
+
 export const getOrders = async (params = {}) => {
   try {
     const response = await api.get('/customerconnect/orders', { params });
@@ -18,9 +18,9 @@ export const getOrders = async (params = {}) => {
   }
 };
 
-/**
- * Get a specific order by order number
- */
+
+
+
 export const getOrderByNumber = async (orderNumber) => {
   try {
     const response = await api.get(`/customerconnect/orders/${orderNumber}`);
@@ -31,9 +31,9 @@ export const getOrderByNumber = async (orderNumber) => {
   }
 };
 
-/**
- * Get order statistics
- */
+
+
+
 export const getOrderStats = async (params = {}) => {
   try {
     const response = await api.get('/customerconnect/stats', { params });
@@ -44,9 +44,9 @@ export const getOrderStats = async (params = {}) => {
   }
 };
 
-/**
- * Get order range (highest and lowest order numbers)
- */
+
+
+
 export const getOrderRange = async () => {
   try {
     const response = await api.get('/customerconnect/order-range');
@@ -57,16 +57,16 @@ export const getOrderRange = async () => {
   }
 };
 
-/**
- * Sync orders from CustomerConnect portal
- */
+
+
+
 export const syncOrders = async (limit = 100, direction = 'new') => {
   try {
     const response = await api.post('/customerconnect/sync/orders',
       { limit, direction },
       {
-        timeout: 0, // No timeout - allow as long as needed
-        retry: false // Disable automatic retries
+        timeout: 0, 
+        retry: false 
       }
     );
     return response;
@@ -76,16 +76,16 @@ export const syncOrders = async (limit = 100, direction = 'new') => {
   }
 };
 
-/**
- * Sync order details for a specific order
- */
+
+
+
 export const syncOrderDetails = async (orderNumber) => {
   try {
     const response = await api.post(`/customerconnect/sync/details/${orderNumber}`,
       {},
       {
-        timeout: 0, // No timeout - allow as long as needed
-        retry: false // Disable automatic retries
+        timeout: 0, 
+        retry: false 
       }
     );
     return response;
@@ -95,16 +95,16 @@ export const syncOrderDetails = async (orderNumber) => {
   }
 };
 
-/**
- * Sync all order details
- */
+
+
+
 export const syncAllOrderDetails = async (limit = 50) => {
   try {
     const response = await api.post('/customerconnect/sync/all-details',
       { limit },
       {
-        timeout: 0, // No timeout - allow as long as needed
-        retry: false // Disable automatic retries
+        timeout: 0, 
+        retry: false 
       }
     );
     return response;
@@ -114,16 +114,16 @@ export const syncAllOrderDetails = async (limit = 50) => {
   }
 };
 
-/**
- * Process stock movements for orders
- */
+
+
+
 export const processStockMovements = async () => {
   try {
     const response = await api.post('/customerconnect/sync/stock',
       {},
       {
-        timeout: 0, // No timeout - allow as long as needed
-        retry: false // Disable automatic retries
+        timeout: 0, 
+        retry: false 
       }
     );
     return response;
@@ -133,16 +133,16 @@ export const processStockMovements = async () => {
   }
 };
 
-/**
- * Full sync (orders + details + stock)
- */
+
+
+
 export const fullSync = async (options = {}) => {
   try {
     const response = await api.post('/customerconnect/sync/full',
       options,
       {
-        timeout: 0, // No timeout - allow as long as needed
-        retry: false // Disable automatic retries
+        timeout: 0, 
+        retry: false 
       }
     );
     return response;
@@ -152,9 +152,9 @@ export const fullSync = async (options = {}) => {
   }
 };
 
-/**
- * Delete all orders
- */
+
+
+
 export const deleteAllOrders = async () => {
   try {
     const response = await api.delete('/customerconnect/orders/all');
@@ -165,9 +165,9 @@ export const deleteAllOrders = async () => {
   }
 };
 
-/**
- * Delete orders by order numbers
- */
+
+
+
 export const deleteBulkOrdersByNumbers = async (orderNumbers) => {
   try {
     const response = await api.post('/customerconnect/orders/bulk-delete-by-numbers', {

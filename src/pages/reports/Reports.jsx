@@ -109,7 +109,7 @@ const Reports = () => {
             <p className="text-slate-600">View and analyze business reports</p>
           </div>
 
-          {/* Date Range Selector */}
+          {}
           <div className="flex flex-wrap items-center gap-2">
             <Calendar className="w-5 h-5 text-slate-400" />
             <input
@@ -151,7 +151,7 @@ const Reports = () => {
         </div>
       </div>
 
-      {/* Quick Stats */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm p-6 text-white">
           <div className="flex items-center justify-between mb-2">
@@ -206,9 +206,9 @@ const Reports = () => {
         </div>
       </div>
 
-      {/* Preview Charts */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Sales Trend Preview */}
+        {}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-900">Sales Trend (7 Days)</h2>
@@ -295,7 +295,7 @@ const Reports = () => {
         </div>
       </div>
 
-      {/* Report Cards */}
+      {}
       <div>
         <h2 className="text-xl font-semibold text-slate-900 mb-4">Detailed Reports</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -319,7 +319,7 @@ const Reports = () => {
             );
           })}
 
-          {/* Additional Report Placeholder */}
+          {}
           <div className="bg-slate-50 rounded-lg border-2 border-dashed border-slate-300 p-6 flex flex-col items-center justify-center text-center cursor-not-allowed opacity-60">
             <BarChart3 className="w-12 h-12 text-slate-400 mb-3" />
             <h3 className="text-lg font-semibold text-slate-700 mb-2">More Reports</h3>
@@ -328,7 +328,7 @@ const Reports = () => {
         </div>
       </div>
 
-      {/* Low Stock Alert */}
+      {}
       {lowStock.count > 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
           <div className="flex items-start gap-4">

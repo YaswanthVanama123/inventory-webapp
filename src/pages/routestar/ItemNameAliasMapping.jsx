@@ -28,12 +28,12 @@ const ItemNameAliasMapping = () => {
   const [searchText, setSearchText] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
-  // Bulk mapping state
+  
   const [selectedItems, setSelectedItems] = useState(new Set());
   const [showBulkMapModal, setShowBulkMapModal] = useState(false);
   const [bulkCanonicalName, setBulkCanonicalName] = useState('');
 
-  // Quick map state
+  
   const [showQuickMapModal, setShowQuickMapModal] = useState(false);
   const [quickMapItem, setQuickMapItem] = useState(null);
   const [quickCanonicalName, setQuickCanonicalName] = useState('');
@@ -41,7 +41,7 @@ const ItemNameAliasMapping = () => {
   const [quickMapSearchText, setQuickMapSearchText] = useState('');
   const [existingMapping, setExistingMapping] = useState(null);
 
-  // Modal state
+  
   const [showModal, setShowModal] = useState(false);
   const [editingMapping, setEditingMapping] = useState(null);
   const [modalData, setModalData] = useState({
@@ -51,12 +51,12 @@ const ItemNameAliasMapping = () => {
     autoMerge: true
   });
 
-  // Load data on mount
+  
   useEffect(() => {
     loadData();
   }, []);
 
-  // Update filtered items when search or filter changes
+  
   useEffect(() => {
     filterItems();
   }, [uniqueItems, searchText, filterStatus]);
@@ -101,7 +101,7 @@ const ItemNameAliasMapping = () => {
   const filterItems = () => {
     let filtered = [...uniqueItems];
 
-    // Apply search filter
+    
     if (searchText) {
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter(item =>
@@ -110,7 +110,7 @@ const ItemNameAliasMapping = () => {
       );
     }
 
-    // Apply status filter
+    
     if (filterStatus === 'mapped') {
       filtered = filtered.filter(item => item.isMapped);
     } else if (filterStatus === 'unmapped') {
@@ -167,7 +167,7 @@ const ItemNameAliasMapping = () => {
   };
 
   const saveMapping = async () => {
-    // Validation
+    
     if (!modalData.canonicalName.trim()) {
       showError('Canonical name is required');
       return;
@@ -225,20 +225,20 @@ const ItemNameAliasMapping = () => {
     setQuickCanonicalName(itemName);
     setQuickMapSearchText('');
 
-    // Check if this item is already mapped
+    
     const currentMapping = mappings.find(m =>
       m.aliases.some(a => a.name === itemName)
     );
 
     if (currentMapping) {
-      // Item is already mapped - load existing mapping
+      
       setExistingMapping(currentMapping);
       setQuickCanonicalName(currentMapping.canonicalName);
-      // Pre-select all items in this mapping
+      
       const aliasNames = new Set(currentMapping.aliases.map(a => a.name));
       setQuickMapSelectedItems(aliasNames);
     } else {
-      // New mapping - just pre-select the clicked item
+      
       setExistingMapping(null);
       setQuickMapSelectedItems(new Set([itemName]));
     }
@@ -249,7 +249,7 @@ const ItemNameAliasMapping = () => {
   const toggleQuickMapItem = (itemName) => {
     const newSelected = new Set(quickMapSelectedItems);
 
-    // Don't allow unselecting the main item
+    
     if (itemName === quickMapItem && newSelected.has(itemName) && newSelected.size === 1) {
       showWarning('You must select at least the current item');
       return;
@@ -277,12 +277,12 @@ const ItemNameAliasMapping = () => {
     try {
       setSaving(true);
 
-      // If updating existing mapping, delete it first
+      
       if (existingMapping) {
         await routeStarItemAliasService.deleteMapping(existingMapping._id);
       }
 
-      // Create new mapping with all selected items
+      
       await routeStarItemAliasService.saveMapping({
         canonicalName: quickCanonicalName.trim(),
         aliases: Array.from(quickMapSelectedItems),
@@ -305,14 +305,14 @@ const ItemNameAliasMapping = () => {
     }
   };
 
-  // Filter items for quick map modal
+  
   const getFilteredItemsForQuickMap = () => {
     return uniqueItems.filter(item => {
-      // Exclude already mapped items (unless they're in the current mapping being edited)
+      
       if (item.isMapped && !existingMapping) return false;
       if (item.isMapped && existingMapping && item.canonicalName !== existingMapping.canonicalName) return false;
 
-      // Apply search filter
+      
       if (quickMapSearchText) {
         const searchLower = quickMapSearchText.toLowerCase();
         return item.itemName.toLowerCase().includes(searchLower) ||
@@ -322,7 +322,7 @@ const ItemNameAliasMapping = () => {
     });
   };
 
-  // Bulk mapping functions
+  
   const toggleItemSelection = (itemName) => {
     const newSelected = new Set(selectedItems);
     if (newSelected.has(itemName)) {
@@ -348,7 +348,7 @@ const ItemNameAliasMapping = () => {
       showWarning('Please select at least one item');
       return;
     }
-    // Suggest canonical name based on first selected item
+    
     const firstItem = Array.from(selectedItems)[0];
     setBulkCanonicalName(firstItem);
     setShowBulkMapModal(true);
@@ -386,7 +386,7 @@ const ItemNameAliasMapping = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Item Name Alias Mapping
@@ -399,7 +399,7 @@ const ItemNameAliasMapping = () => {
         </p>
       </div>
 
-      {/* Statistics Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
           <div className="text-3xl font-bold">{stats.totalUniqueItems}</div>
@@ -419,7 +419,7 @@ const ItemNameAliasMapping = () => {
         </Card>
       </div>
 
-      {/* Filters and Actions */}
+      {}
       <Card>
         <div className="flex flex-col lg:flex-row justify-between gap-4">
           <div className="flex flex-wrap gap-2">
@@ -496,7 +496,7 @@ const ItemNameAliasMapping = () => {
         </div>
       </Card>
 
-      {/* Existing Mappings */}
+      {}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Existing Mappings ({mappings.length})
@@ -577,7 +577,7 @@ const ItemNameAliasMapping = () => {
         </div>
       </Card>
 
-      {/* Unmapped Items List */}
+      {}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Item Names ({filteredItems.length})
@@ -711,7 +711,7 @@ const ItemNameAliasMapping = () => {
         </div>
       </Card>
 
-      {/* Create/Edit Mapping Modal */}
+      {}
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
@@ -719,7 +719,7 @@ const ItemNameAliasMapping = () => {
         size="lg"
       >
         <div className="space-y-4">
-          {/* Canonical Name */}
+          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Canonical Name <span className="text-red-500">*</span>
@@ -736,7 +736,7 @@ const ItemNameAliasMapping = () => {
             </p>
           </div>
 
-          {/* Aliases */}
+          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Aliases <span className="text-red-500">*</span>
@@ -772,7 +772,7 @@ const ItemNameAliasMapping = () => {
             </p>
           </div>
 
-          {/* Description */}
+          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Description (Optional)
@@ -786,7 +786,7 @@ const ItemNameAliasMapping = () => {
             />
           </div>
 
-          {/* Auto Merge Checkbox */}
+          {}
           <div className="flex items-center">
             <input
               type="checkbox"
@@ -800,7 +800,7 @@ const ItemNameAliasMapping = () => {
             </label>
           </div>
 
-          {/* Actions */}
+          {}
           <div className="flex justify-end gap-2 mt-6">
             <Button variant="secondary" onClick={() => setShowModal(false)}>
               Cancel
@@ -812,7 +812,7 @@ const ItemNameAliasMapping = () => {
         </div>
       </Modal>
 
-      {/* Bulk Map Modal */}
+      {}
       <Modal
         isOpen={showBulkMapModal}
         onClose={() => setShowBulkMapModal(false)}
@@ -863,7 +863,7 @@ const ItemNameAliasMapping = () => {
         </div>
       </Modal>
 
-      {/* Quick Map Modal */}
+      {}
       <Modal
         isOpen={showQuickMapModal}
         onClose={() => setShowQuickMapModal(false)}
@@ -871,7 +871,7 @@ const ItemNameAliasMapping = () => {
         size="xl"
       >
         <div className="space-y-4">
-          {/* Current Item Info */}
+          {}
           <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded">
             <p className="text-sm text-blue-800 dark:text-blue-300">
               <strong>Main Item:</strong> {quickMapItem}
@@ -883,7 +883,7 @@ const ItemNameAliasMapping = () => {
             )}
           </div>
 
-          {/* Canonical Name */}
+          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Canonical Name (Master Name) <span className="text-red-500">*</span>
@@ -900,7 +900,7 @@ const ItemNameAliasMapping = () => {
             </p>
           </div>
 
-          {/* Selected Items Summary */}
+          {}
           <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded">
             <p className="text-sm font-medium text-green-800 dark:text-green-300 mb-2">
               Selected Items ({quickMapSelectedItems.size}):
@@ -914,7 +914,7 @@ const ItemNameAliasMapping = () => {
             </div>
           </div>
 
-          {/* Search Items */}
+          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Select Items to Group Together
@@ -931,7 +931,7 @@ const ItemNameAliasMapping = () => {
             </div>
           </div>
 
-          {/* Items List with Checkboxes */}
+          {}
           <div className="border border-gray-200 dark:border-gray-700 rounded-lg max-h-96 overflow-y-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
@@ -990,7 +990,7 @@ const ItemNameAliasMapping = () => {
             </table>
           </div>
 
-          {/* Actions */}
+          {}
           <div className="flex justify-between items-center pt-4 border-t">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {quickMapSelectedItems.size} item(s) selected

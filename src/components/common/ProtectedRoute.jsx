@@ -41,7 +41,7 @@ const ProtectedRoute = ({ element, allowedRoles = [] }) => {
     return <UnauthorizedPage userRole={userRole} requiredRoles={allowedRoles} />;
   }
 
-  // User is authenticated and has required role
+  
   return element;
 };
 

@@ -612,7 +612,7 @@ const InvoiceForm = () => {
             </div>
           </div>
 
-          {/* Section 3: Items Section */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
               <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -909,7 +909,7 @@ const InvoiceForm = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <Button
               type="button"

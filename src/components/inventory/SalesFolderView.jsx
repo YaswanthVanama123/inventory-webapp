@@ -9,10 +9,10 @@ import { ToastContext } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 
-/**
- * SalesFolderView Component for RouteStar Invoice Items
- * Groups items by item name/SKU and shows all RouteStar invoice entries (pending and closed) when expanded
- */
+
+
+
+
 const SalesFolderView = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
@@ -24,7 +24,7 @@ const SalesFolderView = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Fetch grouped items from RouteStar invoices (pending and closed)
+  
   useEffect(() => {
     fetchGroupedItems();
   }, []);
@@ -34,7 +34,7 @@ const SalesFolderView = () => {
     try {
       const response = await api.get('/routestar/items/grouped');
       console.log('[SalesFolderView] API response:', response);
-      // Axios interceptor already unwraps response.data, so we access response.data.items directly
+      
       const items = response.data?.items || [];
       console.log('[SalesFolderView] Parsed items:', items.length, 'items');
       setGroupedItems(items);
@@ -54,20 +54,20 @@ const SalesFolderView = () => {
   };
 
   const handleDownloadItemNames = () => {
-    // Extract unique item names and clean them
+    
     const uniqueNames = groupedItems.map(item => {
-      // Get the name and replace any tabs, commas, or newlines with spaces
+      
       let cleanName = item.name || '';
       cleanName = cleanName.replace(/[\t\r\n,]/g, ' ');
-      // Remove multiple spaces
+      
       cleanName = cleanName.replace(/\s+/g, ' ').trim();
       return cleanName;
     });
 
-    // Create CSV content (just item names, one per line)
+    
     const csvContent = uniqueNames.join('\n');
 
-    // Create blob and download
+    
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -152,7 +152,7 @@ const SalesFolderView = () => {
 
     setDeleting(true);
     try {
-      // Delete invoices by SKU
+      
       await api.post('/routestar/invoices/bulk-delete', {
         skus: selectedItems
       });
@@ -161,7 +161,7 @@ const SalesFolderView = () => {
       setDeleteModalOpen(false);
       setSelectedItems([]);
 
-      // Refresh the list
+      
       fetchGroupedItems();
     } catch (err) {
       console.error('Error deleting items:', err);
@@ -193,11 +193,11 @@ const SalesFolderView = () => {
 
   return (
     <div className="space-y-3">
-      {/* Action Toolbar */}
+      {}
       {groupedItems.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-4 border border-emerald-200">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            {/* Left side: Select All Checkbox */}
+            {}
             {isAdmin && (
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -226,7 +226,7 @@ const SalesFolderView = () => {
               </div>
             )}
 
-            {/* Right side: Download Button */}
+            {}
             <Button
               variant="outline"
               size="sm"
@@ -251,9 +251,9 @@ const SalesFolderView = () => {
               isSelected ? 'border-emerald-500 shadow-md' : 'border-emerald-200 hover:shadow-md'
             }`}
           >
-            {/* Item Folder Header */}
+            {}
             <div className="flex items-center gap-4 p-4">
-              {/* Checkbox (Admin Only) */}
+              {}
               {isAdmin && (
                 <div className="flex-shrink-0">
                   <input
@@ -268,7 +268,7 @@ const SalesFolderView = () => {
                 </div>
               )}
 
-              {/* Expand/Collapse Icon */}
+              {}
               <button
                 className="flex-shrink-0 p-1.5 hover:bg-emerald-200 rounded transition-colors"
                 onClick={(e) => {
@@ -283,7 +283,7 @@ const SalesFolderView = () => {
                 )}
               </button>
 
-              {/* Shopping Cart Icon */}
+              {}
               <div
                 className="flex-shrink-0 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -293,7 +293,7 @@ const SalesFolderView = () => {
                 </div>
               </div>
 
-              {/* Item Name & Info */}
+              {}
               <div
                 className="flex-1 min-w-0 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -308,7 +308,7 @@ const SalesFolderView = () => {
                 </p>
               </div>
 
-              {/* Aggregated Stats */}
+              {}
               <div
                 className="hidden lg:flex items-center gap-6 mr-2 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -334,7 +334,7 @@ const SalesFolderView = () => {
               </div>
             </div>
 
-            {/* Expanded: Show All Invoice Entries */}
+            {}
             {isExpanded && (
               <div className="border-t border-emerald-200 bg-emerald-50">
                 {group.invoices.length === 0 ? (
@@ -458,7 +458,7 @@ const SalesFolderView = () => {
         );
       })}
 
-      {/* Bulk Delete Confirmation Modal */}
+      {}
       <Modal
         isOpen={deleteModalOpen}
         onClose={() => {

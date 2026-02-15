@@ -234,6 +234,11 @@ const adminMenuItems = [
     icon: PackageIcon
   },
   {
+    label: 'Sales Report',
+    path: '/routestar/sales-report',
+    icon: ChartIcon
+  },
+  {
     label: 'Approvals',
     path: '/approvals',
     icon: CheckCircleIcon

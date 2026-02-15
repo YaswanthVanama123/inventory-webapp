@@ -1,1088 +1,742 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../contexts/AuthContext';
+import React, { useState, useEffect, useContext } from 'react';
 import { ToastContext } from '../../contexts/ToastContext';
-import api from '../../services/api';
-import SearchBar from '../../components/common/SearchBar';
+import stockService from '../../services/stockService';
 import Button from '../../components/common/Button';
+import Card from '../../components/common/Card';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import EmptyState from '../../components/common/EmptyState';
-import Badge from '../../components/common/Badge';
-import {
-  Package,
-  ChevronRight,
-  ShoppingBag,
-  ShoppingCart,
-  TrendingUp,
-  TrendingDown,
-  Hash,
-  Tag,
-  CheckCircle,
-  CheckCircle2,
-  AlertCircle,
-  XCircle,
-  DollarSign,
-  AlertTriangle,
-  Download,
-  RefreshCw,
-  MoreVertical,
-  Eye,
-  Plus,
-  History,
-  ChevronDown,
-  ChevronUp,
-  ChevronsDown,
-  ChevronsUp,
-  Info,
-} from 'lucide-react';
+import { ArchiveBoxIcon, ShoppingCartIcon, ShoppingBagIcon, ArrowPathIcon, ArrowTrendingUpIcon, CurrencyDollarIcon, ChevronRightIcon, ChevronDownIcon, FolderIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
 const Stock = () => {
-  const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
-  const { showSuccess, showError, showInfo } = useContext(ToastContext);
-  const tableRef = useRef(null);
+  const { showSuccess, showError } = useContext(ToastContext);
 
-  // State management
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [expandedItems, setExpandedItems] = useState({});
-  const [purchases, setPurchases] = useState({});
-  const [sales, setSales] = useState({});
-  const [loadingPurchases, setLoadingPurchases] = useState({});
-  const [loadingSales, setLoadingSales] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
-  const [lastRefresh, setLastRefresh] = useState(new Date());
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
-  const [hoveredRow, setHoveredRow] = useState(null);
-  const [activeMenu, setActiveMenu] = useState(null);
-  const [focusedRowIndex, setFocusedRowIndex] = useState(-1);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('use'); // 'use' or 'sell'
+  const [useStockData, setUseStockData] = useState({ items: [], totals: {} });
+  const [sellStockData, setSellStockData] = useState({ items: [], totals: {} });
 
-  // Functions
-  const fetchInventoryItems = async (showRefreshIndicator = false) => {
-    if (showRefreshIndicator) {
-      setRefreshing(true);
-    } else {
-      setLoading(true);
-    }
-    try {
-      const response = await api.get('/inventory');
-      setItems(response.data.items || response.data || []);
-      setLastRefresh(new Date());
-      if (showRefreshIndicator) {
-        showSuccess('Inventory data refreshed successfully');
-      }
-    } catch (error) {
-      console.error('Error fetching inventory items:', error);
-      showError('Failed to load inventory items');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  const handleRefresh = () => {
-    fetchInventoryItems(true);
-  };
-
-  const toggleItemExpand = async (itemId) => {
-    const isCurrentlyExpanded = expandedItems[itemId];
-
-    setExpandedItems((prev) => ({
-      ...prev,
-      [itemId]: !isCurrentlyExpanded,
-    }));
-
-    // Fetch data when expanding - fetch both purchases and sales
-    if (!isCurrentlyExpanded) {
-      const purchasePromise = !purchases[itemId] ? fetchPurchasesForItem(itemId) : Promise.resolve();
-      const salesPromise = !sales[itemId] ? fetchSalesForItem(itemId) : Promise.resolve();
-      await Promise.all([purchasePromise, salesPromise]);
-    }
-  };
-
-  const expandAll = async () => {
-    const newExpandedState = {};
-    filteredItems.forEach(item => {
-      newExpandedState[item._id] = true;
-    });
-    setExpandedItems(newExpandedState);
-
-    // Fetch data for all items
-    filteredItems.forEach(item => {
-      if (!purchases[item._id]) {
-        fetchPurchasesForItem(item._id);
-      }
-      if (!sales[item._id]) {
-        fetchSalesForItem(item._id);
-      }
-    });
-
-    showInfo('Expanding all items...');
-  };
-
-  const collapseAll = () => {
-    setExpandedItems({});
-    showInfo('Collapsed all items');
-  };
-
-  const fetchPurchasesForItem = async (itemId) => {
-    setLoadingPurchases((prev) => ({ ...prev, [itemId]: true }));
-    try {
-      const response = await api.get(`/inventory/${itemId}/purchases`);
-      const purchaseData = response.data?.data?.purchases || response.data?.purchases || [];
-      setPurchases((prev) => ({
-        ...prev,
-        [itemId]: purchaseData,
-      }));
-    } catch (error) {
-      console.error('Error fetching purchases:', error);
-      showError('Failed to load purchase history');
-      setPurchases((prev) => ({ ...prev, [itemId]: [] }));
-    } finally {
-      setLoadingPurchases((prev) => ({ ...prev, [itemId]: false }));
-    }
-  };
-
-  const fetchSalesForItem = async (itemId) => {
-    setLoadingSales((prev) => ({ ...prev, [itemId]: true }));
-    try {
-      const response = await api.get(`/inventory/${itemId}/sales`);
-      const salesData = response.data?.data?.sales || response.data?.sales || [];
-      setSales((prev) => ({
-        ...prev,
-        [itemId]: salesData,
-      }));
-    } catch (error) {
-      console.error('Error fetching sales:', error);
-      showError('Failed to load sales history');
-      setSales((prev) => ({ ...prev, [itemId]: [] }));
-    } finally {
-      setLoadingSales((prev) => ({ ...prev, [itemId]: false }));
-    }
-  };
-
-  // Combine purchases and sales into a single array sorted by date (descending)
-  const getCombinedEntries = (itemId) => {
-    const purchaseList = purchases[itemId] || [];
-    const salesList = sales[itemId] || [];
-
-    // Map purchases to a common format
-    const purchaseEntries = purchaseList.map(purchase => ({
-      type: 'purchase',
-      date: purchase.purchaseDate || purchase.date,
-      quantity: purchase.quantity,
-      remainingQuantity: purchase.remainingQuantity,
-      price: purchase.purchasePrice || purchase.pricePerUnit || purchase.unitPrice || 0,
-      totalCost: purchase.totalCost || (purchase.quantity * (purchase.purchasePrice || purchase.pricePerUnit || purchase.unitPrice || 0)),
-      supplier: purchase.supplier?.name || purchase.supplier || purchase.supplierName,
-      unit: purchase.unit,
-      addedBy: purchase.createdBy?.username || purchase.createdBy?.name || purchase.addedBy || 'N/A',
-      data: purchase,
-    }));
-
-    // Map sales to a common format
-    const salesEntries = salesList.map(sale => ({
-      type: 'sale',
-      date: sale.date || sale.saleDate || sale.invoiceDate,
-      quantity: sale.quantity,
-      price: sale.price || sale.salePrice || sale.unitPrice || 0,
-      total: sale.total || sale.subtotal || sale.totalAmount,
-      customer: sale.customer?.name || sale.customer || sale.customerName || 'Walk-in Customer',
-      invoiceNumber: sale.invoiceNumber,
-      addedBy: sale.createdBy?.username || sale.createdBy?.name || sale.addedBy || 'N/A',
-      data: sale,
-    }));
-
-    // Combine and sort by date (descending - newest first)
-    const combined = [...purchaseEntries, ...salesEntries].sort((a, b) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
-      return dateB - dateA; // Descending order
-    });
-
-    return combined;
-  };
-
-  const formatDate = (date) => {
-    if (!date) return 'N/A';
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  const formatTime = (date) => {
-    return new Date(date).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return null;
-    if (imagePath.startsWith('http')) return imagePath;
-    const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5001';
-    if (imagePath.startsWith('/uploads')) {
-      return `${backendUrl}${imagePath}`;
-    }
-    return imagePath;
-  };
-
-  // Export to CSV functionality
-  const exportToCSV = () => {
-    try {
-      const headers = ['Item Name', 'SKU', 'Category', 'Current Stock', 'Min Stock', 'Unit', 'Status'];
-      const csvData = sortedItems.map(item => {
-        const currentStock = item.currentStock ?? item.quantity ?? 0;
-        const minStock = item.minStock ?? item.minStockLevel ?? item.lowStockThreshold ?? 10;
-        const stockStatus = getStockStatus(currentStock, minStock);
-
-        return [
-          item.name || '',
-          item.skuCode || item.sku || '',
-          item.category || 'Uncategorized',
-          currentStock,
-          minStock,
-          item.unit || 'units',
-          stockStatus.label
-        ];
-      });
-
-      const csvContent = [
-        headers.join(','),
-        ...csvData.map(row => row.map(cell => `"${cell}"`).join(','))
-      ].join('\n');
-
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `stock-inventory-${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      showSuccess('Stock data exported successfully');
-    } catch (error) {
-      console.error('Error exporting CSV:', error);
-      showError('Failed to export data');
-    }
-  };
-
-  // Sorting functionality
-  const handleSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
-  };
-
-  const getSortedItems = (items) => {
-    if (!sortConfig.key) return items;
-
-    return [...items].sort((a, b) => {
-      let aValue, bValue;
-
-      switch (sortConfig.key) {
-        case 'name':
-          aValue = a.name?.toLowerCase() || '';
-          bValue = b.name?.toLowerCase() || '';
-          break;
-        case 'sku':
-          aValue = (a.skuCode || a.sku || '').toLowerCase();
-          bValue = (b.skuCode || b.sku || '').toLowerCase();
-          break;
-        case 'category':
-          aValue = a.category?.toLowerCase() || '';
-          bValue = b.category?.toLowerCase() || '';
-          break;
-        case 'currentStock':
-          aValue = a.currentStock ?? a.quantity ?? 0;
-          bValue = b.currentStock ?? b.quantity ?? 0;
-          break;
-        case 'minStock':
-          aValue = a.minStock ?? a.minStockLevel ?? a.lowStockThreshold ?? 10;
-          bValue = b.minStock ?? b.minStockLevel ?? b.lowStockThreshold ?? 10;
-          break;
-        case 'status':
-          const statusA = getStockStatus(
-            a.currentStock ?? a.quantity ?? 0,
-            a.minStock ?? a.minStockLevel ?? a.lowStockThreshold ?? 10
-          );
-          const statusB = getStockStatus(
-            b.currentStock ?? b.quantity ?? 0,
-            b.minStock ?? b.minStockLevel ?? b.lowStockThreshold ?? 10
-          );
-          aValue = statusA.label;
-          bValue = statusB.label;
-          break;
-        default:
-          return 0;
-      }
-
-      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-
-        {/* Summary Dashboard - Metrics Cards */}
-        {!loading && items.length > 0 && (
-          <div className="mb-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-
-              {/* Card 1: Total Items */}
-              <div className="group relative bg-white rounded-xl border-2 border-blue-200 hover:border-blue-400 transition-all duration-300 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 opacity-50"></div>
-                <div className="relative p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg border border-blue-700 group-hover:scale-110 transition-transform duration-300">
-                      <Package className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-slate-600 uppercase tracking-wide">Total Items</p>
-                    <p className="text-3xl font-bold text-slate-900">{metrics.totalItems}</p>
-                    <p className="text-xs text-slate-500 mt-2">Inventory items tracked</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 2: Total Stock Value */}
-              <div className="group relative bg-white rounded-xl border-2 border-green-200 hover:border-green-400 transition-all duration-300 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-50 opacity-50"></div>
-                <div className="relative p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg border border-green-700 group-hover:scale-110 transition-transform duration-300">
-                      <DollarSign className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-slate-600 uppercase tracking-wide">Total Stock Value</p>
-                    <p className="text-3xl font-bold text-slate-900">${metrics.totalStockValue.toFixed(2)}</p>
-                    <p className="text-xs text-slate-500 mt-2">Total inventory worth</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 3: Low Stock Items */}
-              <div className="group relative bg-white rounded-xl border-2 border-amber-200 hover:border-amber-400 transition-all duration-300 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-50 to-orange-50 opacity-50"></div>
-                <div className="relative p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg border border-amber-700 group-hover:scale-110 transition-transform duration-300">
-                      <AlertTriangle className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-slate-600 uppercase tracking-wide">Low Stock Items</p>
-                    <p className="text-3xl font-bold text-amber-600">{metrics.lowStockCount}</p>
-                    <p className="text-xs text-slate-500 mt-2">Items below threshold</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 4: Out of Stock */}
-              <div className="group relative bg-white rounded-xl border-2 border-red-200 hover:border-red-400 transition-all duration-300 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-rose-50 opacity-50"></div>
-                <div className="relative p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg border border-red-700 group-hover:scale-110 transition-transform duration-300">
-                      <XCircle className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-slate-600 uppercase tracking-wide">Out of Stock</p>
-                    <p className="text-3xl font-bold text-red-600">{metrics.outOfStockCount}</p>
-                    <p className="text-xs text-slate-500 mt-2">Items with zero quantity</p>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        )}
-      return 0;
-    });
-  };
-
-  // Filter items based on search term
-  const filteredItems = items.filter(item =>
-    item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.sku?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.skuCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.category?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Apply sorting
-  const sortedItems = getSortedItems(filteredItems);
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      // Ignore if user is typing in an input
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        return;
-      }
-
-      switch (e.key) {
-        case 'ArrowDown':
-          e.preventDefault();
-          setFocusedRowIndex(prev =>
-            Math.min(prev + 1, sortedItems.length - 1)
-          );
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          setFocusedRowIndex(prev => Math.max(prev - 1, 0));
-          break;
-        case 'Enter':
-          e.preventDefault();
-          if (focusedRowIndex >= 0 && sortedItems[focusedRowIndex]) {
-            toggleItemExpand(sortedItems[focusedRowIndex]._id);
-          }
-          break;
-        case 'Escape':
-          e.preventDefault();
-          collapseAll();
-          setFocusedRowIndex(-1);
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [focusedRowIndex, sortedItems]);
-
-  // Scroll focused row into view
-  useEffect(() => {
-    if (focusedRowIndex >= 0 && tableRef.current) {
-      const rows = tableRef.current.querySelectorAll('tbody tr[data-row-index]');
-      if (rows[focusedRowIndex]) {
-        rows[focusedRowIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    }
-  }, [focusedRowIndex]);
+  // Folder/subfolder state
+  const [expandedCategories, setExpandedCategories] = useState(new Set());
+  const [expandedSKUs, setExpandedSKUs] = useState(new Set());
+  const [categorySkuData, setCategorySkuData] = useState({});
+  const [loadingCategories, setLoadingCategories] = useState(new Set());
 
   useEffect(() => {
-    fetchInventoryItems();
+    loadData();
   }, []);
 
-  // Get stock status with color coding
-  const getStockStatus = (currentStock, minStock) => {
-    if (currentStock <= 0) {
-      return {
-        label: 'Out of Stock',
-        variant: 'danger',
-        color: 'text-red-600',
-        tooltip: 'Stock depleted - requires immediate restocking',
-        icon: XCircle,
-        bgColor: 'bg-red-100',
-        borderColor: 'border-red-300'
-      };
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const response = await stockService.getStockSummary();
+
+      setUseStockData(response.useStock || { items: [], totals: {} });
+      setSellStockData(response.sellStock || { items: [], totals: {} });
+
+      showSuccess('Stock data loaded successfully');
+    } catch (error) {
+      console.error('Error loading stock data:', error);
+      showError('Failed to load stock data: ' + error.message);
+    } finally {
+      setLoading(false);
     }
-    if (currentStock <= minStock) {
-      return {
-        label: 'Low Stock',
-        variant: 'warning',
-        color: 'text-amber-600',
-        tooltip: `Stock level is at or below minimum threshold of ${minStock} units`,
-        icon: AlertCircle,
-        bgColor: 'bg-amber-100',
-        borderColor: 'border-amber-300'
-      };
+  };
+
+  const handleCategoryClick = async (categoryName) => {
+    const newExpanded = new Set(expandedCategories);
+
+    if (newExpanded.has(categoryName)) {
+      // Collapse category
+      newExpanded.delete(categoryName);
+      setExpandedCategories(newExpanded);
+    } else {
+      // Expand category
+      newExpanded.add(categoryName);
+      setExpandedCategories(newExpanded);
+
+      // Fetch SKU data if not already loaded
+      if (!categorySkuData[categoryName]) {
+        try {
+          const newLoadingCategories = new Set(loadingCategories);
+          newLoadingCategories.add(categoryName);
+          setLoadingCategories(newLoadingCategories);
+
+          // Use different endpoint based on active tab
+          const response = activeTab === 'use'
+            ? await stockService.getCategorySKUs(categoryName)
+            : await stockService.getCategorySales(categoryName);
+
+          setCategorySkuData(prev => ({
+            ...prev,
+            [categoryName]: response.skus || []
+          }));
+
+          newLoadingCategories.delete(categoryName);
+          setLoadingCategories(newLoadingCategories);
+        } catch (error) {
+          console.error('Error loading category data:', error);
+          showError(`Failed to load category data: ${error.message}`);
+
+          const newLoadingCategories = new Set(loadingCategories);
+          newLoadingCategories.delete(categoryName);
+          setLoadingCategories(newLoadingCategories);
+        }
+      }
     }
-    return {
-      label: 'In Stock',
-      variant: 'success',
-      color: 'text-green-600',
-      tooltip: 'Stock levels are healthy',
-      icon: CheckCircle,
-      bgColor: 'bg-green-100',
-      borderColor: 'border-green-300'
-    };
   };
 
-  // Quick action handlers
-  const handleViewDetails = (itemId) => {
-    navigate(`/inventory/${itemId}`);
-  };
+  const handleSKUClick = (skuId) => {
+    const newExpanded = new Set(expandedSKUs);
 
-  const handleAddPurchase = (itemId) => {
-    navigate(`/purchases/new?itemId=${itemId}`);
-  };
-
-  const handleViewHistory = (itemId) => {
-    toggleItemExpand(itemId);
-    setActiveMenu(null);
-  };
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => setActiveMenu(null);
-    if (activeMenu) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
+    if (newExpanded.has(skuId)) {
+      newExpanded.delete(skuId);
+    } else {
+      newExpanded.add(skuId);
     }
-  }, [activeMenu]);
 
-  const SortableHeader = ({ column, label, className = "" }) => (
-    <th
-      scope="col"
-      className={`px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider cursor-pointer hover:bg-slate-200 transition-colors ${className}`}
-      onClick={() => handleSort(column)}
-      title={`Click to sort by ${label}`}
-    >
-      <div className="flex items-center gap-2">
-        <span>{label}</span>
-        {sortConfig.key === column && (
-          <span className="text-blue-600">
-            {sortConfig.direction === 'asc' ? (
-              <ChevronUp className="w-4 h-4" />
-            ) : (
-              <ChevronDown className="w-4 h-4" />
-            )}
-          </span>
-        )}
-      </div>
-    </th>
-  );
-
-  const QuickActionsMenu = ({ item, onClose }) => {
-    const isAdmin = user?.role === 'admin' || user?.role === 'Admin';
-
-    return (
-      <div className="absolute right-0 top-8 mt-2 w-48 bg-white rounded-lg border-2 border-slate-300 py-1 z-50 animate-fadeIn">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleViewDetails(item._id);
-            onClose();
-          }}
-          className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-blue-50 flex items-center gap-2 transition-colors"
-          title="View detailed information about this item"
-        >
-          <Eye className="w-4 h-4 text-blue-600" />
-          View Details
-        </button>
-
-        {isAdmin && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAddPurchase(item._id);
-              onClose();
-            }}
-            className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-green-50 flex items-center gap-2 transition-colors"
-            title="Add a new purchase for this item (Admin only)"
-          >
-            <Plus className="w-4 h-4 text-green-600" />
-            Add Purchase
-          </button>
-        )}
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleViewHistory(item._id);
-            onClose();
-          }}
-          className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-indigo-50 flex items-center gap-2 transition-colors"
-          title="Expand to view purchase and sales history"
-        >
-          <History className="w-4 h-4 text-indigo-600" />
-          View History
-        </button>
-      </div>
-    );
+    setExpandedSKUs(newExpanded);
   };
+
+  const currentData = activeTab === 'use' ? useStockData : sellStockData;
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 py-6 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Page Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between gap-3 mb-2">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl border border-blue-700">
-                <Package className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Stock Overview</h1>
-                <p className="text-sm text-slate-500 mt-1">Monitor inventory levels and track stock movements</p>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRefresh}
-                disabled={refreshing}
-                className="flex items-center gap-2"
-                title="Refresh inventory data"
-              >
-                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-                <span className="hidden sm:inline">Refresh</span>
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={exportToCSV}
-                disabled={sortedItems.length === 0}
-                className="flex items-center gap-2"
-                title="Export current view to CSV file"
-              >
-                <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Export</span>
-              </Button>
-            </div>
-          </div>
-
-          {/* Last Refresh Info */}
-          <div className="flex items-center gap-2 text-xs text-slate-500 mt-2">
-            <Info className="w-3 h-3" />
-            <span>Last updated: {formatDate(lastRefresh)} at {formatTime(lastRefresh)}</span>
-          </div>
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Stock Management
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            View stock summary by category for purchases and sales
+          </p>
         </div>
+        <Button
+          variant="secondary"
+          onClick={loadData}
+          size="sm"
+        >
+          <ArrowPathIcon className="w-4 h-4 mr-2" />
+          Refresh
+        </Button>
+      </div>
 
-        {/* Keyboard Shortcuts Info */}
-        <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
-          <div className="flex items-start gap-2">
-            <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="text-xs text-blue-800">
-              <span className="font-semibold">Keyboard shortcuts:</span>{' '}
-              <kbd className="px-1.5 py-0.5 bg-white rounded border border-blue-300 font-mono">↑↓</kbd> Navigate rows,{' '}
-              <kbd className="px-1.5 py-0.5 bg-white rounded border border-blue-300 font-mono">Enter</kbd> Expand/Collapse,{' '}
-              <kbd className="px-1.5 py-0.5 bg-white rounded border border-blue-300 font-mono">Esc</kbd> Collapse all
-            </div>
-          </div>
+      {/* Tabs */}
+      <Card>
+        <div className="flex border-b border-gray-200 dark:border-gray-700">
+          <button
+            onClick={() => {
+              setActiveTab('use');
+              // Clear cached data when switching tabs
+              setExpandedCategories(new Set());
+              setExpandedSKUs(new Set());
+              setCategorySkuData({});
+            }}
+            className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
+              activeTab === 'use'
+                ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+            }`}
+          >
+            <ShoppingCartIcon className="w-5 h-5" />
+            Use Stock (Purchases)
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('sell');
+              // Clear cached data when switching tabs
+              setExpandedCategories(new Set());
+              setExpandedSKUs(new Set());
+              setCategorySkuData({});
+            }}
+            className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
+              activeTab === 'sell'
+                ? 'border-b-2 border-green-500 text-green-600 dark:text-green-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+            }`}
+          >
+            <ShoppingBagIcon className="w-5 h-5" />
+            Sell Stock (Sales)
+          </button>
         </div>
+      </Card>
 
-        {/* Search Bar */}
-        <div className="mb-6">
-          <SearchBar
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by name, SKU, or category..."
-          />
-        </div>
-
-        {/* Loading State */}
-        {loading && (
-          <div className="flex justify-center items-center py-20">
-            <LoadingSpinner size="lg" />
-          </div>
-        )}
-
-        {/* Empty State */}
-        {!loading && sortedItems.length === 0 && (
-          <div className="bg-white rounded-xl border-2 border-slate-200 p-8">
-            <EmptyState
-              icon={<Package className="w-20 h-20 text-slate-300" />}
-              title={searchTerm ? "No items match your search" : "No inventory items found"}
-              description={searchTerm ? "Try adjusting your search terms" : "Start by adding items to your inventory"}
-            />
-          </div>
-        )}
-
-        {/* Items Table Container */}
-        {!loading && sortedItems.length > 0 && (
-          <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden">
-            {/* Table Actions Bar */}
-            <div className="bg-slate-50 border-b border-slate-200 px-6 py-3 flex items-center justify-between">
-              <div className="text-sm text-slate-600">
-                Showing <span className="font-semibold text-slate-900">{sortedItems.length}</span> items
-              </div>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {activeTab === 'use' ? (
+          <>
+            <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+              <div className="text-3xl font-bold">{currentData.totals.categoryCount || 0}</div>
+              <div className="text-sm opacity-90">Total Categories</div>
+            </Card>
+            <Card className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white">
               <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={expandAll}
-                  className="flex items-center gap-2"
-                  title="Expand all item details to show purchase and sales history"
-                >
-                  <ChevronsDown className="w-4 h-4" />
-                  Expand All
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={collapseAll}
-                  className="flex items-center gap-2"
-                  title="Collapse all expanded item details"
-                >
-                  <ChevronsUp className="w-4 h-4" />
-                  Collapse All
-                </Button>
+                <ArrowTrendingUpIcon className="w-6 h-6" />
+                <div>
+                  <div className="text-3xl font-bold">{currentData.totals.totalQuantity || 0}</div>
+                  <div className="text-sm opacity-90">Total Quantity</div>
+                </div>
               </div>
-            </div>
+            </Card>
+            <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+              <div className="flex items-center gap-2">
+                <CurrencyDollarIcon className="w-6 h-6" />
+                <div>
+                  <div className="text-3xl font-bold">${(currentData.totals.totalValue || 0).toFixed(2)}</div>
+                  <div className="text-sm opacity-90">Total Value</div>
+                </div>
+              </div>
+            </Card>
+          </>
+        ) : (
+          <>
+            <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+              <div className="text-3xl font-bold">{currentData.totals.totalPurchased || 0}</div>
+              <div className="text-sm opacity-90">Total Purchased</div>
+            </Card>
+            <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
+              <div className="text-3xl font-bold">{currentData.totals.totalSold || 0}</div>
+              <div className="text-sm opacity-90">Total Sold</div>
+            </Card>
+            <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+              <div className="text-3xl font-bold">{currentData.totals.stockRemaining || 0}</div>
+              <div className="text-sm opacity-90">Stock Remaining</div>
+            </Card>
+          </>
+        )}
+      </div>
 
-            {/* Mobile Scroll Hint */}
-            <div className="block sm:hidden bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 text-xs text-slate-600 text-center border-b border-slate-200">
-              Swipe left to see more
-            </div>
-
-            {/* Table Wrapper with Horizontal Scroll */}
-            <div className="overflow-x-auto" ref={tableRef}>
-              <table className="min-w-full divide-y divide-slate-200">
-                {/* Sticky Table Header */}
-                <thead className="bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 sticky top-0 z-10 shadow-sm">
-                  <tr>
-                    <th scope="col" className="w-12 px-4 py-4 text-left">
-                      <span className="sr-only">Expand</span>
-                    </th>
-                    <SortableHeader column="name" label="Item" />
-                    <SortableHeader column="sku" label="SKU" />
-                    <SortableHeader column="category" label="Category" />
-                    <SortableHeader column="currentStock" label="Current Stock" className="text-center" />
-                    <SortableHeader column="minStock" label="Min Stock" className="text-center" />
-                    <SortableHeader column="status" label="Status" className="text-center" />
-                    <th scope="col" className="w-16 px-4 py-4 text-center">
-                      <span className="sr-only">Actions</span>
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody className="bg-white divide-y divide-slate-200">
-                  {sortedItems.map((item, index) => {
-                    const currentStock = item.currentStock ?? item.quantity ?? 0;
-                    const minStock = item.minStock ?? item.minStockLevel ?? item.lowStockThreshold ?? 10;
-                    const stockStatus = getStockStatus(currentStock, minStock);
-                    const isExpanded = expandedItems[item._id];
-                    const isFocused = focusedRowIndex === index;
-                    const isHovered = hoveredRow === item._id;
-
-                    return (
-                      <React.Fragment key={item._id}>
-                        {/* Main Item Row with Zebra Striping */}
-                        <tr
-                          data-row-index={index}
-                          onMouseEnter={() => setHoveredRow(item._id)}
-                          onMouseLeave={() => setHoveredRow(null)}
-                          onClick={() => setFocusedRowIndex(index)}
-                          className={`
-                            transition-all duration-200 group
-                            ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}
-                            hover:bg-blue-50/50
-                            ${isExpanded ? 'bg-blue-50/30' : ''}
-                            ${isFocused ? 'ring-2 ring-blue-500 ring-inset' : ''}
-                          `}
-                        >
-                          {/* Expand Button */}
-                          <td className="px-4 py-4">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleItemExpand(item._id);
-                              }}
-                              disabled={loadingPurchases[item._id] || loadingSales[item._id]}
-                              className="group p-2 hover:bg-blue-100 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                              aria-label={isExpanded ? "Collapse details" : "Expand details"}
-                              aria-expanded={isExpanded}
-                              title={isExpanded ? "Collapse details" : "Expand to view purchase & sales history"}
-                            >
-                              <ChevronRight
-                                className={`
-                                  w-5 h-5 text-slate-400 group-hover:text-blue-600
-                                  transition-all duration-300 ease-out
-                                  ${isExpanded ? 'rotate-90 text-blue-600' : 'rotate-0'}
-                                  ${(loadingPurchases[item._id] || loadingSales[item._id]) ? 'animate-pulse' : ''}
-                                `}
-                              />
-                            </button>
-                          </td>
-
-                          {/* Item with Image */}
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="flex-shrink-0 h-14 w-14">
-                                {item.image ? (
-                                  <img
-                                    src={getImageUrl(item.image)}
-                                    alt={item.name}
-                                    className="h-14 w-14 rounded-xl object-cover ring-2 ring-slate-200"
-                                    onError={(e) => {
-                                      e.target.src = 'https://via.placeholder.com/56?text=No+Image';
-                                    }}
-                                    title={item.name}
-                                  />
-                                ) : (
-                                  <div
-                                    className="h-14 w-14 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center ring-2 ring-slate-200"
-                                    title="No image available"
-                                  >
-                                    <Package className="w-7 h-7 text-slate-400" />
-                                  </div>
-                                )}
-                              </div>
-                              <div className="ml-4 max-w-xs">
-                                <div className="text-sm font-semibold text-slate-900 truncate">{item.name}</div>
-                                {item.description && (
-                                  <div className="text-xs text-slate-500 truncate mt-0.5" title={item.description}>
-                                    {item.description}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* SKU Code */}
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div
-                              className="text-sm text-slate-700 font-mono bg-slate-100 px-3 py-1 rounded-md inline-flex items-center gap-1"
-                              title="Stock Keeping Unit identifier"
-                            >
-                              <Hash className="w-3 h-3 text-slate-400" />
-                              {item.skuCode || item.sku || 'N/A'}
-                            </div>
-                          </td>
-
-                          {/* Category Badge */}
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <Badge
-                              variant="info"
-                              className="text-xs inline-flex items-center gap-1"
-                              title="Item category classification"
-                            >
-                              <Tag className="w-3 h-3" />
-                              {item.category || 'Uncategorized'}
-                            </Badge>
-                          </td>
-
-                          {/* Current Stock */}
+      {/* Data Table */}
+      <Card>
+        {currentData.items.length === 0 ? (
+          <div className="text-center py-12">
+            <ArchiveBoxIcon className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              No {activeTab === 'use' ? 'purchase' : 'sales'} data available
+            </p>
+            <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">
+              {activeTab === 'use'
+                ? 'Orders with mapped categories will appear here'
+                : 'Invoices with mapped categories will appear here'}
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    #
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Category Name
+                  </th>
+                  {activeTab === 'use' ? (
+                    <>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Total Quantity
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Item Count
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Total Value
+                      </th>
+                    </>
+                  ) : (
+                    <>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Purchased
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Sold
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Stock Remaining
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Orders / Invoices
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Total Value
+                      </th>
+                    </>
+                  )}
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                {currentData.items.map((item, index) => (
+                  <React.Fragment key={item.categoryName}>
+                    {/* Category Row (Level 1 - Folder) */}
+                    <tr
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                      onClick={() => handleCategoryClick(item.categoryName)}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                        {index + 1}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          {expandedCategories.has(item.categoryName) ? (
+                            <ChevronDownIcon className="w-4 h-4 mr-2 text-gray-500" />
+                          ) : (
+                            <ChevronRightIcon className="w-4 h-4 mr-2 text-gray-500" />
+                          )}
+                          <FolderIcon className={`w-5 h-5 mr-3 ${activeTab === 'use' ? 'text-blue-500' : 'text-green-500'}`} />
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {item.categoryName}
+                          </span>
+                        </div>
+                      </td>
+                      {activeTab === 'use' ? (
+                        <>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <div
-                              className="text-lg font-bold text-slate-900"
-                              title={`Current stock level: ${currentStock} ${item.unit || 'units'}`}
-                            >
-                              {currentStock}
-                            </div>
-                            <div className="text-xs text-slate-500 mt-0.5">
-                              {item.unit || 'units'}
-                            </div>
+                            <span className="text-lg font-bold text-gray-900 dark:text-white">
+                              {item.totalQuantity}
+                            </span>
                           </td>
-
-                          {/* Min Stock */}
                           <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <div
-                              className="text-sm font-medium text-slate-600"
-                              title={`Minimum stock threshold: ${minStock} ${item.unit || 'units'}`}
-                            >
-                              {minStock}
-                            </div>
-                            <div className="text-xs text-slate-500 mt-0.5">
-                              {item.unit || 'units'}
-                            </div>
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                              {item.itemCount}
+                            </span>
                           </td>
-
-                          {/* Status Badge */}
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                              ${item.totalValue.toFixed(2)}
+                            </span>
+                          </td>
+                        </>
+                      ) : (
+                        <>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <div title={stockStatus.tooltip}>
-                              <Badge variant={stockStatus.variant} className="text-xs font-semibold">
-                                {stockStatus.label}
-                              </Badge>
-                            </div>
-                            {currentStock <= minStock && currentStock > 0 && (
-                              <div
-                                className="flex items-center justify-center gap-1 mt-1"
-                                title="Stock level is below minimum threshold - reorder recommended"
-                              >
-                                <TrendingDown className="w-3 h-3 text-amber-500" />
-                                <span className="text-xs text-amber-600">Alert</span>
-                              </div>
-                            )}
-                            {currentStock <= 0 && (
-                              <div
-                                className="flex items-center justify-center gap-1 mt-1"
-                                title="Critical: Stock completely depleted - immediate action required"
-                              >
-                                <TrendingDown className="w-3 h-3 text-red-500" />
-                                <span className="text-xs text-red-600">Critical</span>
-                              </div>
-                            )}
+                            <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                              {item.totalPurchased || 0}
+                            </span>
                           </td>
-
-                          {/* Quick Actions Menu */}
-                          <td className="px-4 py-4 whitespace-nowrap text-center relative">
-                            <div className={`transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setActiveMenu(activeMenu === item._id ? null : item._id);
-                                }}
-                                className="p-1.5 hover:bg-slate-200 rounded-lg transition-colors"
-                                title="Quick actions menu - View details, add purchase, or view history"
-                              >
-                                <MoreVertical className="w-4 h-4 text-slate-600" />
-                              </button>
-                              {activeMenu === item._id && (
-                                <QuickActionsMenu
-                                  item={item}
-                                  onClose={() => setActiveMenu(null)}
-                                />
-                              )}
-                            </div>
+                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                            <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                              {item.totalSold || 0}
+                            </span>
                           </td>
-                        </tr>
+                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                            <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                              {item.stockRemaining || 0}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                              {item.itemCount || 0} / {item.invoiceCount || 0}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                              ${(item.totalPurchaseValue || 0).toFixed(2)}
+                            </span>
+                          </td>
+                        </>
+                      )}
+                    </tr>
 
-                        {/* Expanded Section: Combined Entries (Purchases & Sales) */}
-                        {isExpanded && (
+                    {/* SKU Rows (Level 2 - Subfolders) */}
+                    {expandedCategories.has(item.categoryName) && (
+                      <>
+                        {loadingCategories.has(item.categoryName) ? (
                           <tr>
-                            <td colSpan="8" className="px-6 py-4 bg-slate-50">
-                              {(loadingPurchases[item._id] || loadingSales[item._id]) ? (
-                                <div className="text-center py-4">
-                                  <LoadingSpinner size="sm" text="Loading entries..." />
-                                </div>
-                              ) : (() => {
-                                const combinedEntries = getCombinedEntries(item._id);
-                                return combinedEntries.length > 0 ? (
-                                  <div className="space-y-2">
-                                    <h4 className="text-sm font-semibold text-slate-700 mb-3">Transaction History (All Entries)</h4>
-                                    <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-                                      <table className="min-w-full">
-                                        <thead className="bg-slate-100">
-                                          <tr>
-                                            <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Type</th>
-                                            <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Date</th>
-                                            <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Quantity</th>
-                                            <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Price/Unit</th>
-                                            <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Total</th>
-                                            <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Party</th>
-                                            <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Added By</th>
-                                            <th className="px-4 py-2 text-left text-xs font-medium text-slate-600">Details</th>
-                                          </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-200">
-                                          {combinedEntries.map((entry, idx) => (
-                                            <tr key={`${entry.type}-${idx}`} className="hover:bg-slate-50">
-                                              <td className="px-4 py-3 text-sm">
-                                                <Badge variant={entry.type === 'purchase' ? 'info' : 'success'} className="text-xs">
-                                                  {entry.type === 'purchase' ? (
-                                                    <span className="flex items-center gap-1">
-                                                      <TrendingUp className="w-3 h-3" />
-                                                      Purchase
-                                                    </span>
-                                                  ) : (
-                                                    <span className="flex items-center gap-1">
-                                                      <TrendingDown className="w-3 h-3" />
-                                                      Sale
-                                                    </span>
-                                                  )}
-                                                </Badge>
-                                              </td>
-                                              <td className="px-4 py-3 text-sm text-slate-700">{formatDate(entry.date)}</td>
-                                              <td className="px-4 py-3 text-sm text-slate-700">
-                                                {entry.quantity} {entry.unit || item.unit}
-                                              </td>
-                                              <td className="px-4 py-3 text-sm text-slate-700">
-                                                ${entry.price.toFixed(2)}
-                                              </td>
-                                              <td className="px-4 py-3 text-sm font-semibold text-slate-900">
-                                                ${entry.type === 'purchase'
-                                                  ? entry.totalCost.toFixed(2)
-                                                  : (entry.total || (entry.quantity * entry.price)).toFixed(2)
-                                                }
-                                              </td>
-                                              <td className="px-4 py-3 text-sm text-slate-700">
-                                                {entry.type === 'purchase' ? entry.supplier : entry.customer}
-                                              </td>
-                                              <td className="px-4 py-3 text-sm text-slate-700">
-                                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 rounded-md text-xs">
-                                                  <svg className="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                                  </svg>
-                                                  {entry.addedBy}
-                                                </span>
-                                              </td>
-                                              <td className="px-4 py-3 text-sm">
-                                                {entry.type === 'purchase' ? (
-                                                  <span className={`font-semibold ${(entry.remainingQuantity ?? entry.quantity) === 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                                    Remaining: {entry.remainingQuantity ?? entry.quantity} {entry.unit || item.unit}
-                                                  </span>
-                                                ) : (
-                                                  entry.invoiceNumber && (
-                                                    <span className="text-xs text-slate-600">
-                                                      Invoice: {entry.invoiceNumber}
-                                                    </span>
-                                                  )
-                                                )}
-                                              </td>
-                                            </tr>
-                                          ))}
-                                        </tbody>
-                                      </table>
+                            <td colSpan="5" className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                              <div className="flex items-center justify-center">
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500 mr-2"></div>
+                                Loading SKUs...
+                              </div>
+                            </td>
+                          </tr>
+                        ) : categorySkuData[item.categoryName] && categorySkuData[item.categoryName].length > 0 ? (
+                          categorySkuData[item.categoryName].map((sku) => (
+                            <React.Fragment key={sku.sku}>
+                              <tr
+                                className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                                onClick={() => handleSKUClick(sku.sku)}
+                              >
+                                <td className="px-6 py-4 whitespace-nowrap"></td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div className="flex items-center pl-8">
+                                    {expandedSKUs.has(sku.sku) ? (
+                                      <ChevronDownIcon className="w-4 h-4 mr-2 text-gray-500" />
+                                    ) : (
+                                      <ChevronRightIcon className="w-4 h-4 mr-2 text-gray-500" />
+                                    )}
+                                    <DocumentTextIcon className={`w-4 h-4 mr-2 ${activeTab === 'use' ? 'text-blue-400' : 'text-green-400'}`} />
+                                    <div>
+                                      <div className="font-medium text-gray-900 dark:text-white text-sm">
+                                        {sku.sku}
+                                      </div>
+                                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        {sku.itemName}
+                                      </div>
                                     </div>
                                   </div>
-                                ) : (
-                                  <div className="text-center py-4 text-slate-500">
-                                    No transactions recorded yet.
-                                  </div>
-                                );
-                              })()}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                                    {activeTab === 'use' ? sku.totalQuantity : sku.totalPurchased}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                  <span className="text-xs text-gray-600 dark:text-gray-400">
+                                    {activeTab === 'use'
+                                      ? `${(sku.purchaseHistory || []).length} orders`
+                                      : `${(sku.purchaseHistory || []).length} orders | ${(sku.salesHistory || []).length} invoices`
+                                    }
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-right">
+                                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                                    ${activeTab === 'use' ? sku.totalValue.toFixed(2) : sku.totalPurchaseValue.toFixed(2)}
+                                  </span>
+                                </td>
+                              </tr>
+
+                              {/* History Table (Level 3 - Content) */}
+                              {expandedSKUs.has(sku.sku) && (
+                                <>
+                                  {activeTab === 'sell' && (
+                                    /* Stock Summary Row for Sell Stock */
+                                    <tr className="bg-indigo-50 dark:bg-indigo-900/20">
+                                      <td colSpan="5" className="px-16 py-3">
+                                        <div className="grid grid-cols-4 gap-4 text-sm">
+                                          <div>
+                                            <div className="text-xs text-gray-600 dark:text-gray-400">Total Purchased</div>
+                                            <div className="font-bold text-blue-600 dark:text-blue-400">{sku.totalPurchased || 0} units</div>
+                                          </div>
+                                          <div>
+                                            <div className="text-xs text-gray-600 dark:text-gray-400">Total Sold</div>
+                                            <div className="font-bold text-green-600 dark:text-green-400">{sku.totalSold || 0} units</div>
+                                          </div>
+                                          <div>
+                                            <div className="text-xs text-gray-600 dark:text-gray-400">Remaining Stock</div>
+                                            <div className="font-bold text-purple-600 dark:text-purple-400">{(sku.totalPurchased || 0) - (sku.totalSold || 0)} units</div>
+                                          </div>
+                                          <div>
+                                            <div className="text-xs text-gray-600 dark:text-gray-400">Net Value</div>
+                                            <div className="font-bold text-gray-900 dark:text-white">${((sku.totalSalesValue || 0) - (sku.totalPurchaseValue || 0)).toFixed(2)}</div>
+                                          </div>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )}
+
+                                  {(activeTab === 'use' && sku.purchaseHistory && sku.purchaseHistory.length > 0) && (
+                                    /* Purchase History for Use Stock */
+                                    <tr>
+                                      <td colSpan="5" className="px-0 py-0">
+                                        <div className="bg-white dark:bg-gray-900 border-l-4 border-blue-300 dark:border-blue-700 ml-16">
+                                          <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 font-semibold text-sm">
+                                            Purchase History
+                                          </div>
+                                          <div className="overflow-x-auto">
+                                            <table className="min-w-full">
+                                              <thead className="bg-blue-50 dark:bg-blue-900/20">
+                                                <tr>
+                                                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                    Order Number
+                                                  </th>
+                                                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                    Order Date
+                                                  </th>
+                                                  <th className="px-4 py-2 text-center text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                    Quantity
+                                                  </th>
+                                                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                    Unit Price
+                                                  </th>
+                                                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                    Line Total
+                                                  </th>
+                                                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                    Vendor
+                                                  </th>
+                                                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                    Status
+                                                  </th>
+                                                </tr>
+                                              </thead>
+                                              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                                                {sku.purchaseHistory.map((record, recordIndex) => (
+                                                  <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                                    <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
+                                                      {record.orderNumber}
+                                                    </td>
+                                                    <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                      {record.orderDate ? new Date(record.orderDate).toLocaleDateString() : '-'}
+                                                    </td>
+                                                    <td className="px-4 py-2 text-center text-xs font-medium text-gray-900 dark:text-white">
+                                                      {record.quantity}
+                                                    </td>
+                                                    <td className="px-4 py-2 text-right text-xs text-gray-900 dark:text-white">
+                                                      ${(record.unitPrice || 0).toFixed(2)}
+                                                    </td>
+                                                    <td className="px-4 py-2 text-right text-xs font-semibold text-gray-900 dark:text-white">
+                                                      ${(record.lineTotal || 0).toFixed(2)}
+                                                    </td>
+                                                    <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                      {record.vendor || '-'}
+                                                    </td>
+                                                    <td className="px-4 py-2 text-xs">
+                                                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                                        record.status === 'Complete'
+                                                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                                          : record.status === 'Processing'
+                                                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                                                          : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400'
+                                                      }`}>
+                                                        {record.status}
+                                                      </span>
+                                                    </td>
+                                                  </tr>
+                                                ))}
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )}
+
+                                  {activeTab === 'sell' && (
+                                    <>
+                                      {/* Purchase History Section */}
+                                      {sku.purchaseHistory && sku.purchaseHistory.length > 0 && (
+                                        <tr>
+                                          <td colSpan="5" className="px-0 py-0">
+                                            <div className="bg-white dark:bg-gray-900 border-l-4 border-blue-300 dark:border-blue-700 ml-16">
+                                              <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 font-semibold text-sm flex items-center gap-2">
+                                                <ShoppingCartIcon className="w-4 h-4" />
+                                                Purchase History ({sku.purchaseHistory.length} orders)
+                                              </div>
+                                              <div className="overflow-x-auto">
+                                                <table className="min-w-full">
+                                                  <thead className="bg-blue-50 dark:bg-blue-900/20">
+                                                    <tr>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Order Number
+                                                      </th>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Order Date
+                                                      </th>
+                                                      <th className="px-4 py-2 text-center text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Quantity
+                                                      </th>
+                                                      <th className="px-4 py-2 text-right text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Unit Price
+                                                      </th>
+                                                      <th className="px-4 py-2 text-right text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Line Total
+                                                      </th>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Vendor
+                                                      </th>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Status
+                                                      </th>
+                                                    </tr>
+                                                  </thead>
+                                                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                                                    {sku.purchaseHistory.map((record, recordIndex) => (
+                                                      <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                                        <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
+                                                          {record.orderNumber}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                          {record.orderDate ? new Date(record.orderDate).toLocaleDateString() : '-'}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-center text-xs font-medium text-gray-900 dark:text-white">
+                                                          {record.quantity}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-right text-xs text-gray-900 dark:text-white">
+                                                          ${(record.unitPrice || 0).toFixed(2)}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-right text-xs font-semibold text-gray-900 dark:text-white">
+                                                          ${(record.lineTotal || 0).toFixed(2)}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                          {record.vendor || '-'}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-xs">
+                                                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                                            record.status === 'Complete'
+                                                              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                                              : record.status === 'Processing'
+                                                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                                                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400'
+                                                          }`}>
+                                                            {record.status}
+                                                          </span>
+                                                        </td>
+                                                      </tr>
+                                                    ))}
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      )}
+
+                                      {/* Sales History Section */}
+                                      {sku.salesHistory && sku.salesHistory.length > 0 && (
+                                        <tr>
+                                          <td colSpan="5" className="px-0 py-0">
+                                            <div className="bg-white dark:bg-gray-900 border-l-4 border-green-300 dark:border-green-700 ml-16 mt-2">
+                                              <div className="px-4 py-2 bg-green-100 dark:bg-green-900/30 font-semibold text-sm flex items-center gap-2">
+                                                <ShoppingBagIcon className="w-4 h-4" />
+                                                Sales History ({sku.salesHistory.length} invoices)
+                                              </div>
+                                              <div className="overflow-x-auto">
+                                                <table className="min-w-full">
+                                                  <thead className="bg-green-50 dark:bg-green-900/20">
+                                                    <tr>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Invoice Number
+                                                      </th>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Invoice Date
+                                                      </th>
+                                                      <th className="px-4 py-2 text-center text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Quantity
+                                                      </th>
+                                                      <th className="px-4 py-2 text-right text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Rate
+                                                      </th>
+                                                      <th className="px-4 py-2 text-right text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Amount
+                                                      </th>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Customer
+                                                      </th>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Status
+                                                      </th>
+                                                    </tr>
+                                                  </thead>
+                                                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                                                    {sku.salesHistory.map((record, recordIndex) => (
+                                                      <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                                        <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
+                                                          {record.invoiceNumber}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                          {record.invoiceDate ? new Date(record.invoiceDate).toLocaleDateString() : '-'}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-center text-xs font-medium text-gray-900 dark:text-white">
+                                                          {record.quantity}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-right text-xs text-gray-900 dark:text-white">
+                                                          ${(record.rate || 0).toFixed(2)}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-right text-xs font-semibold text-gray-900 dark:text-white">
+                                                          ${(record.amount || 0).toFixed(2)}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                          {record.customer || '-'}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-xs">
+                                                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                                            record.status === 'Completed' || record.status === 'Closed'
+                                                              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                                              : record.status === 'Pending'
+                                                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400'
+                                                          }`}>
+                                                            {record.status}
+                                                          </span>
+                                                        </td>
+                                                      </tr>
+                                                    ))}
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      )}
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </React.Fragment>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={activeTab === 'use' ? '5' : '7'} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                              No SKUs mapped to this category
                             </td>
                           </tr>
                         )}
-                      </React.Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                      </>
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+              <tfoot className="bg-gray-50 dark:bg-gray-800">
+                <tr className="font-bold">
+                  <td colSpan="2" className="px-6 py-4 text-right text-sm text-gray-900 dark:text-white uppercase">
+                    Total:
+                  </td>
+                  {activeTab === 'use' ? (
+                    <>
+                      <td className="px-6 py-4 text-center text-lg text-gray-900 dark:text-white">
+                        {currentData.totals.totalQuantity || 0}
+                      </td>
+                      <td className="px-6 py-4 text-center text-sm text-gray-900 dark:text-white">
+                        {currentData.items.reduce((sum, item) => sum + (item.itemCount || 0), 0)}
+                      </td>
+                      <td className="px-6 py-4 text-right text-lg text-gray-900 dark:text-white">
+                        ${(currentData.totals.totalValue || 0).toFixed(2)}
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="px-6 py-4 text-center text-lg text-blue-600 dark:text-blue-400">
+                        {currentData.totals.totalPurchased || 0}
+                      </td>
+                      <td className="px-6 py-4 text-center text-lg text-green-600 dark:text-green-400">
+                        {currentData.totals.totalSold || 0}
+                      </td>
+                      <td className="px-6 py-4 text-center text-lg text-purple-600 dark:text-purple-400">
+                        {currentData.totals.stockRemaining || 0}
+                      </td>
+                      <td className="px-6 py-4 text-center text-sm text-gray-900 dark:text-white">
+                        {currentData.items.reduce((sum, item) => sum + (item.itemCount || 0), 0)} / {currentData.items.reduce((sum, item) => sum + (item.invoiceCount || 0), 0)}
+                      </td>
+                      <td className="px-6 py-4 text-right text-lg text-gray-900 dark:text-white">
+                        ${(currentData.totals.totalPurchaseValue || 0).toFixed(2)}
+                      </td>
+                    </>
+                  )}
+                </tr>
+              </tfoot>
+            </table>
           </div>
         )}
-      </div>
+      </Card>
 
-      {/* Custom Styles for Animations and Scrollbar */}
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(226, 232, 240, 0.3);
-          border-radius: 4px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(148, 163, 184, 0.5);
-          border-radius: 4px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(100, 116, 139, 0.7);
-        }
-
-        /* Ensure table is accessible on mobile */
-        @media (max-width: 640px) {
-          table {
-            min-width: 800px;
-          }
-        }
-
-        /* Keyboard shortcut styling */
-        kbd {
-          font-size: 0.75rem;
-          font-weight: 600;
-        }
-      `}</style>
+      {/* Info Box */}
+      <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+        <div className="flex items-start gap-3">
+          <ArchiveBoxIcon className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+          <div className="text-sm text-blue-800 dark:text-blue-300">
+            <p className="font-semibold mb-1">About Stock Categories:</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li><strong>Use Stock:</strong> Items for internal use - shows purchase history from orders for tracking purposes</li>
+              <li><strong>Sell Stock:</strong> Resale inventory - shows both purchase history (orders) AND sales history (invoices) to track inventory flow</li>
+              <li><strong>Folder Structure:</strong> Click on a category to view mapped SKUs, then click on a SKU to view detailed history</li>
+              <li><strong>Inventory Tracking:</strong> For Sell Stock, you can see Total Purchased, Total Sold, and Remaining Stock for each SKU</li>
+            </ul>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 };

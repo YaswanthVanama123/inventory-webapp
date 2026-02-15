@@ -44,6 +44,14 @@ const routeStarItemsService = {
   syncItems: async () => {
     const response = await api.post('/routestar-items/sync');
     return response.data;
+  },
+
+  /**
+   * Get sales report for all items
+   */
+  getSalesReport: async () => {
+    const response = await api.get('/routestar-items/sales-report');
+    return response.data;
   }
 };
 

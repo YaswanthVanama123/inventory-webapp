@@ -360,6 +360,7 @@ const ModelCategoryMapping = () => {
                         getOptionValue={(item) => item._id}
                         getOptionLabel={(item) => {
                           let label = item.itemName;
+                          if (item.mergedCount > 1) label += ` (${item.mergedCount} merged)`;
                           if (item.itemParent) label += ` - ${item.itemParent}`;
                           if (item.description) {
                             const shortDesc = item.description.substring(0, 50);
@@ -369,9 +370,16 @@ const ModelCategoryMapping = () => {
                         }}
                         renderOption={(item) => (
                           <div className="flex flex-col">
-                            <span className="font-medium text-gray-900 dark:text-white">
-                              {item.itemName}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-900 dark:text-white">
+                                {item.itemName}
+                              </span>
+                              {item.mergedCount > 1 && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                  {item.mergedCount} merged
+                                </span>
+                              )}
+                            </div>
                             {(item.itemParent || item.description) && (
                               <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                 {item.itemParent && <span className="font-medium">{item.itemParent}</span>}
@@ -382,6 +390,12 @@ const ModelCategoryMapping = () => {
                                     {item.description.length > 80 ? '...' : ''}
                                   </span>
                                 )}
+                              </span>
+                            )}
+                            {item.variations && item.variations.length > 1 && (
+                              <span className="text-xs text-gray-400 dark:text-gray-500 mt-1 truncate" title={item.variations.join(', ')}>
+                                Variations: {item.variations.slice(0, 3).join(', ')}
+                                {item.variations.length > 3 && ` +${item.variations.length - 3} more`}
                               </span>
                             )}
                           </div>

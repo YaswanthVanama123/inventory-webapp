@@ -338,6 +338,9 @@ const RouteStarItemsList = () => {
                   Description
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Item Category
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -354,7 +357,7 @@ const RouteStarItemsList = () => {
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                  <td colSpan="9" className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                     No items found
                   </td>
                 </tr>
@@ -365,15 +368,33 @@ const RouteStarItemsList = () => {
                       {(pagination.page - 1) * pagination.limit + index + 1}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="font-medium text-gray-900 dark:text-white">
-                        {item.itemName}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {item.itemName}
+                        </span>
+                        {item.mergedCount > 1 && (
+                          <Badge
+                            variant="info"
+                            className="text-xs"
+                            title={`Merged from: ${item.variations.join(', ')}`}
+                          >
+                            {item.mergedCount} merged
+                          </Badge>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       {item.itemParent || '-'}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
                       {item.description || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {item.isMapped ? (
+                        <Badge variant="success">Mapped</Badge>
+                      ) : (
+                        <Badge variant="warning">Unmapped</Badge>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <select

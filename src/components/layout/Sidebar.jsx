@@ -229,6 +229,11 @@ const adminMenuItems = [
     icon: LinkIcon
   },
   {
+    label: 'Item Alias Mapping',
+    path: '/routestar/item-alias-mapping',
+    icon: LinkIcon
+  },
+  {
     label: 'RouteStar Items',
     path: '/routestar/items',
     icon: PackageIcon

@@ -6,3 +6,4 @@ export { default as inventoryService } from './inventoryService';
 export { default as userService } from './userService';
 export { default as invoiceService } from './invoiceService';
 export { default as reportService } from './reportService';
+export { default as routeStarItemAliasService } from './routeStarItemAliasService';

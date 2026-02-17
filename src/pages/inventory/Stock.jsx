@@ -229,9 +229,6 @@ const Stock = () => {
               <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    #
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Category Name
                   </th>
                   {activeTab === 'use' ? (
@@ -275,9 +272,6 @@ const Stock = () => {
                       className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                       onClick={() => handleCategoryClick(item.categoryName)}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        {index + 1}
-                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           {expandedCategories.has(item.categoryName) ? (
@@ -345,7 +339,7 @@ const Stock = () => {
                       <>
                         {loadingCategories.has(item.categoryName) ? (
                           <tr>
-                            <td colSpan="5" className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            <td colSpan={activeTab === 'use' ? '4' : '6'} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                               <div className="flex items-center justify-center">
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500 mr-2"></div>
                                 Loading SKUs...
@@ -359,7 +353,6 @@ const Stock = () => {
                                 className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                                 onClick={() => handleSKUClick(sku.sku)}
                               >
-                                <td className="px-6 py-4 whitespace-nowrap"></td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                   <div className="flex items-center pl-8">
                                     {expandedSKUs.has(sku.sku) ? (
@@ -378,33 +371,62 @@ const Stock = () => {
                                     </div>
                                   </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-center">
-                                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                                    {activeTab === 'use' ? sku.totalQuantity : sku.totalPurchased}
-                                  </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-center">
-                                  <span className="text-xs text-gray-600 dark:text-gray-400">
-                                    {activeTab === 'use'
-                                      ? `${(sku.purchaseHistory || []).length} orders`
-                                      : `${(sku.purchaseHistory || []).length} orders | ${(sku.salesHistory || []).length} invoices`
-                                    }
-                                  </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right">
-                                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                                    ${activeTab === 'use' ? sku.totalValue.toFixed(2) : sku.totalPurchaseValue.toFixed(2)}
-                                  </span>
-                                </td>
+                                {activeTab === 'use' ? (
+                                  <>
+                                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                                        {sku.totalQuantity}
+                                      </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                                        {(sku.purchaseHistory || []).length} orders
+                                      </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                                        ${sku.totalValue.toFixed(2)}
+                                      </span>
+                                    </td>
+                                  </>
+                                ) : (
+                                  <>
+                                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                                      <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                                        {sku.totalPurchased || 0}
+                                      </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                                      <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                                        {sku.totalSold || 0}
+                                      </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                                      <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                                        {(sku.totalPurchased || 0) - (sku.totalSold || 0)}
+                                      </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                                        {(sku.purchaseHistory || []).length} orders | {(sku.salesHistory || []).length} invoices
+                                      </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                                        ${sku.totalPurchaseValue.toFixed(2)}
+                                      </span>
+                                    </td>
+                                  </>
+                                )}
                               </tr>
 
                               {}
                               {expandedSKUs.has(sku.sku) && (
                                 <>
                                   {activeTab === 'sell' && (
-                                    
+
                                     <tr className="bg-indigo-50 dark:bg-indigo-900/20">
-                                      <td colSpan="5" className="px-16 py-3">
+                                      <td colSpan="6" className="px-6 py-3">
                                         <div className="grid grid-cols-4 gap-4 text-sm">
                                           <div>
                                             <div className="text-xs text-gray-600 dark:text-gray-400">Total Purchased</div>
@@ -428,10 +450,10 @@ const Stock = () => {
                                   )}
 
                                   {(activeTab === 'use' && sku.purchaseHistory && sku.purchaseHistory.length > 0) && (
-                                    
+
                                     <tr>
-                                      <td colSpan="5" className="px-0 py-0">
-                                        <div className="bg-white dark:bg-gray-900 border-l-4 border-blue-300 dark:border-blue-700 ml-16">
+                                      <td colSpan="4" className="px-0 py-0">
+                                        <div className="bg-white dark:bg-gray-900 border-l-4 border-blue-300 dark:border-blue-700 ml-6">
                                           <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 font-semibold text-sm">
                                             Purchase History
                                           </div>
@@ -509,8 +531,8 @@ const Stock = () => {
                                       {}
                                       {sku.purchaseHistory && sku.purchaseHistory.length > 0 && (
                                         <tr>
-                                          <td colSpan="5" className="px-0 py-0">
-                                            <div className="bg-white dark:bg-gray-900 border-l-4 border-blue-300 dark:border-blue-700 ml-16">
+                                          <td colSpan="6" className="px-0 py-0">
+                                            <div className="bg-white dark:bg-gray-900 border-l-4 border-blue-300 dark:border-blue-700 ml-6">
                                               <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 font-semibold text-sm flex items-center gap-2">
                                                 <ShoppingCartIcon className="w-4 h-4" />
                                                 Purchase History ({sku.purchaseHistory.length} orders)
@@ -587,8 +609,8 @@ const Stock = () => {
                                       {}
                                       {sku.salesHistory && sku.salesHistory.length > 0 && (
                                         <tr>
-                                          <td colSpan="5" className="px-0 py-0">
-                                            <div className="bg-white dark:bg-gray-900 border-l-4 border-green-300 dark:border-green-700 ml-16 mt-2">
+                                          <td colSpan="6" className="px-0 py-0">
+                                            <div className="bg-white dark:bg-gray-900 border-l-4 border-green-300 dark:border-green-700 ml-6 mt-2">
                                               <div className="px-4 py-2 bg-green-100 dark:bg-green-900/30 font-semibold text-sm flex items-center gap-2">
                                                 <ShoppingBagIcon className="w-4 h-4" />
                                                 Sales History ({sku.salesHistory.length} invoices)
@@ -669,7 +691,7 @@ const Stock = () => {
                           ))
                         ) : (
                           <tr>
-                            <td colSpan={activeTab === 'use' ? '5' : '7'} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                            <td colSpan={activeTab === 'use' ? '4' : '6'} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
                               No SKUs mapped to this category
                             </td>
                           </tr>
@@ -681,7 +703,7 @@ const Stock = () => {
               </tbody>
               <tfoot className="bg-gray-50 dark:bg-gray-800">
                 <tr className="font-bold">
-                  <td colSpan="2" className="px-6 py-4 text-right text-sm text-gray-900 dark:text-white uppercase">
+                  <td className="px-6 py-4 text-right text-sm text-gray-900 dark:text-white uppercase">
                     Total:
                   </td>
                   {activeTab === 'use' ? (

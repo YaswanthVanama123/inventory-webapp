@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
-import { getInvoices, syncPendingInvoices, syncPendingInvoicesWithDetails, syncAllInvoiceDetails, getInvoiceRange, deleteAllPendingInvoices } from '../../services/routestarService';
+import { getInvoices, syncPendingInvoices, syncPendingInvoicesWithDetails, syncPendingInvoiceDetails, syncAllInvoiceDetails, getInvoiceRange, deleteAllPendingInvoices, checkPendingInvoicesInRouteStar } from '../../services/routestarService';
 import SearchBar from '../../components/common/SearchBar';
 import Select from '../../components/common/Select';
 import Button from '../../components/common/Button';
@@ -33,10 +33,12 @@ const PendingInvoices = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-  const [syncLimit, setSyncLimit] = useState(0); 
+  const [syncLimit, setSyncLimit] = useState(0);
   const [showSyncOptions, setShowSyncOptions] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [checkingRouteStar, setCheckingRouteStar] = useState(false);
+  const [routeStarPendingCount, setRouteStarPendingCount] = useState(null);
 
   useEffect(() => {
     fetchInvoices();
@@ -202,17 +204,38 @@ const PendingInvoices = () => {
     setSyncingDetails(true);
     setSyncing(true);
     try {
-      const response = await syncAllInvoiceDetails(0); 
+      const response = await syncPendingInvoiceDetails(0);
       if (response.success) {
-        showSuccess(`Synced details for ${response.data.synced || 0} invoices (${response.data.skipped || 0} skipped)`);
+        showSuccess(`Synced details for ${response.data.synced || 0} pending invoices (${response.data.skipped || 0} skipped)`);
         fetchInvoices();
       }
     } catch (err) {
-      console.error('Error syncing invoice details:', err);
-      showError(err.message || 'Failed to sync invoice details');
+      console.error('Error syncing pending invoice details:', err);
+      showError(err.message || 'Failed to sync pending invoice details');
     } finally {
       setSyncingDetails(false);
       setSyncing(false);
+    }
+  };
+
+  const handleDeleteClick = async () => {
+    if (!isAdmin) {
+      showError('Only administrators can delete invoices');
+      return;
+    }
+
+    setCheckingRouteStar(true);
+    try {
+      const response = await checkPendingInvoicesInRouteStar();
+      if (response.success) {
+        setRouteStarPendingCount(response.data.count);
+        setShowDeleteConfirm(true);
+      }
+    } catch (err) {
+      console.error('Error checking RouteStar pending invoices:', err);
+      showError('Failed to check RouteStar status. Please try again.');
+    } finally {
+      setCheckingRouteStar(false);
     }
   };
 
@@ -228,6 +251,7 @@ const PendingInvoices = () => {
       if (response.success) {
         showSuccess(`Deleted ${response.data.deletedCount} pending invoices`);
         setShowDeleteConfirm(false);
+        setRouteStarPendingCount(null);
         fetchInvoices();
         fetchInvoiceRange();
       }
@@ -441,7 +465,7 @@ const PendingInvoices = () => {
                   disabled={syncing}
                   variant="info"
                   className="whitespace-nowrap"
-                  title="Fetch detailed line items for invoices"
+                  title="Fetch detailed line items for PENDING invoices"
                 >
                   {syncingDetails ? (
                     <>
@@ -458,21 +482,30 @@ const PendingInvoices = () => {
                   )}
                 </Button>
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                  Fetch line items for invoices without details
+                  Fetch line items for PENDING invoices without details
                 </div>
               </div>
               <Button
-                onClick={() => setShowDeleteConfirm(true)}
+                onClick={handleDeleteClick}
                 variant="danger"
                 size="sm"
                 className="whitespace-nowrap"
-                disabled={totalItems === 0}
+                disabled={totalItems === 0 || checkingRouteStar}
                 title={`Delete all ${totalItems} pending invoices`}
               >
-                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                Clear All ({totalItems})
+                {checkingRouteStar ? (
+                  <>
+                    <LoadingSpinner size="sm" className="mr-2" />
+                    Checking...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Clear All ({totalItems})
+                  </>
+                )}
               </Button>
             </div>
           )}
@@ -523,15 +556,24 @@ const PendingInvoices = () => {
                   </p>
                 </div>
                 <Button
-                  onClick={() => setShowDeleteConfirm(true)}
+                  onClick={handleDeleteClick}
                   variant="danger"
                   size="sm"
-                  disabled={totalItems === 0}
+                  disabled={totalItems === 0 || checkingRouteStar}
                 >
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  Clear All Pending Invoices
+                  {checkingRouteStar ? (
+                    <>
+                      <LoadingSpinner size="sm" className="mr-2" />
+                      Checking...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Clear All Pending Invoices
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -560,18 +602,35 @@ const PendingInvoices = () => {
 
               <div className="mb-6">
                 <p className="text-slate-700 dark:text-gray-300 mb-2">
-                  Are you sure you want to delete all <strong>{totalItems} pending invoices</strong>?
+                  Are you sure you want to delete all <strong>{totalItems} pending invoices</strong> from the database?
                 </p>
+
+                {routeStarPendingCount !== null && (
+                  <div className={`${routeStarPendingCount > 0 ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'} border rounded-lg p-3 mt-3`}>
+                    <p className={`text-sm ${routeStarPendingCount > 0 ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}`}>
+                      <strong>RouteStar Status:</strong> {routeStarPendingCount} pending invoice{routeStarPendingCount !== 1 ? 's' : ''} currently in RouteStar
+                    </p>
+                    {routeStarPendingCount > 0 && (
+                      <p className="text-sm text-red-800 dark:text-red-200 mt-2">
+                        ⚠️ <strong>Warning:</strong> RouteStar still has {routeStarPendingCount} pending invoices. These have NOT moved to closed status yet. Deleting now may cause data inconsistency. Please sync first or wait until all invoices are closed in RouteStar.
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mt-3">
                   <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                    <strong>Warning:</strong> This will permanently delete all pending invoices from the database. You will need to sync again to restore them.
+                    <strong>Note:</strong> This will permanently delete all pending invoices from the database. You will need to sync again to restore them.
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-3 justify-end">
                 <Button
-                  onClick={() => setShowDeleteConfirm(false)}
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setRouteStarPendingCount(null);
+                  }}
                   variant="secondary"
                   disabled={deleting}
                 >
@@ -580,7 +639,8 @@ const PendingInvoices = () => {
                 <Button
                   onClick={handleClearInvoices}
                   variant="danger"
-                  disabled={deleting}
+                  disabled={deleting || routeStarPendingCount > 0}
+                  title={routeStarPendingCount > 0 ? 'Cannot delete while RouteStar has pending invoices' : ''}
                 >
                   {deleting ? (
                     <>

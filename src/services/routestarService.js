@@ -161,13 +161,58 @@ export const syncAllInvoiceDetails = async (limit = 0) => {
     const response = await api.post('/routestar/sync/all-details',
       { limit },
       {
-        timeout: 0, 
-        retry: false 
+        timeout: 0,
+        retry: false
       }
     );
     return response;
   } catch (error) {
     console.error('Error syncing all invoice details:', error);
+    throw error;
+  }
+};
+
+
+export const syncPendingInvoiceDetails = async (limit = 0) => {
+  try {
+    const response = await api.post('/routestar/sync/pending-details',
+      { limit },
+      {
+        timeout: 0,
+        retry: false
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error('Error syncing pending invoice details:', error);
+    throw error;
+  }
+};
+
+
+export const syncClosedInvoiceDetails = async (limit = 0) => {
+  try {
+    const response = await api.post('/routestar/sync/closed-details',
+      { limit },
+      {
+        timeout: 0,
+        retry: false
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error('Error syncing closed invoice details:', error);
+    throw error;
+  }
+};
+
+
+export const checkPendingInvoicesInRouteStar = async () => {
+  try {
+    const response = await api.get('/routestar/check-pending');
+    return response;
+  } catch (error) {
+    console.error('Error checking pending invoices in RouteStar:', error);
     throw error;
   }
 };
@@ -259,6 +304,12 @@ export default {
   syncPendingInvoices,
   syncClosedInvoices,
   syncInvoiceDetails,
+  syncPendingInvoicesWithDetails,
+  syncClosedInvoicesWithDetails,
+  syncAllInvoiceDetails,
+  syncPendingInvoiceDetails,
+  syncClosedInvoiceDetails,
+  checkPendingInvoicesInRouteStar,
   processStockMovements,
   fullSync,
   deleteAllPendingInvoices,

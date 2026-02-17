@@ -22,6 +22,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   
   useEffect(() => {
@@ -128,14 +129,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
     });
   };
 
-  const handleSelectAll = () => {
-    if (selectedItems.length === groupedItems.length) {
-      setSelectedItems([]);
-    } else {
-      setSelectedItems(groupedItems.map(item => item.sku));
-    }
-  };
-
   const handleDeleteSelected = () => {
     if (selectedItems.length === 0) {
       showError('Please select items to delete');
@@ -168,6 +161,26 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
     }
   };
 
+  // Filter items based on search term
+  const filteredItems = groupedItems.filter(item => {
+    if (!searchTerm) return true;
+
+    const search = searchTerm.toLowerCase();
+    return (
+      item.name?.toLowerCase().includes(search) ||
+      item.sku?.toLowerCase().includes(search)
+    );
+  });
+
+  // Update handleSelectAll to use filteredItems
+  const handleSelectAll = () => {
+    if (selectedItems.length === filteredItems.length && filteredItems.length > 0) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(filteredItems.map(item => item.sku));
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -190,6 +203,47 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
 
   return (
     <div className="space-y-3">
+      {/* Search Bar */}
+      <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
+        <div className="relative">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by name or SKU..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <svg
+            className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+        {searchTerm && (
+          <p className="text-sm text-slate-500 mt-2">
+            Found {filteredItems.length} of {groupedItems.length} items
+          </p>
+        )}
+      </div>
+
       {}
       {groupedItems.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-4 border border-blue-200">
@@ -200,12 +254,12 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={selectedItems.length === groupedItems.length && groupedItems.length > 0}
+                    checked={selectedItems.length === filteredItems.length && filteredItems.length > 0}
                     onChange={handleSelectAll}
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
                   <span className="text-sm font-medium text-slate-700">
-                    Select All ({selectedItems.length}/{groupedItems.length})
+                    Select All ({selectedItems.length}/{filteredItems.length})
                   </span>
                 </label>
 
@@ -237,7 +291,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
         </div>
       )}
 
-      {groupedItems.map((group) => {
+      {filteredItems.map((group) => {
         const isExpanded = expandedItems[group.sku];
         const isSelected = selectedItems.includes(group.sku);
 
@@ -455,6 +509,23 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
           </div>
         );
       })}
+
+      {/* No results message */}
+      {filteredItems.length === 0 && groupedItems.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-slate-200">
+          <Package className="w-16 h-16 mx-auto text-slate-300 mb-4" />
+          <p className="text-slate-900 font-semibold text-lg mb-2">No items found</p>
+          <p className="text-sm text-slate-500">
+            No items match your search "{searchTerm}". Try a different search term.
+          </p>
+          <button
+            onClick={() => setSearchTerm('')}
+            className="mt-4 text-blue-600 hover:text-blue-700 font-medium text-sm"
+          >
+            Clear search
+          </button>
+        </div>
+      )}
 
       {}
       <Modal

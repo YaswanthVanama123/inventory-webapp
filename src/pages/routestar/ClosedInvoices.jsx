@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
-import { getInvoices, syncClosedInvoices, syncClosedInvoicesWithDetails, syncAllInvoiceDetails, getInvoiceRange, deleteAllClosedInvoices, deleteBulkClosedInvoicesByNumbers } from '../../services/routestarService';
+import { getInvoices, syncClosedInvoices, syncClosedInvoicesWithDetails, syncClosedInvoiceDetails, syncAllInvoiceDetails, getInvoiceRange, deleteAllClosedInvoices, deleteBulkClosedInvoicesByNumbers } from '../../services/routestarService';
 import SearchBar from '../../components/common/SearchBar';
 import Select from '../../components/common/Select';
 import Button from '../../components/common/Button';
@@ -205,14 +205,14 @@ const ClosedInvoices = () => {
     setSyncingDetails(true);
     setSyncing(true);
     try {
-      const response = await syncAllInvoiceDetails(0); 
+      const response = await syncClosedInvoiceDetails(0);
       if (response.success) {
-        showSuccess(`Synced details for ${response.data.synced || 0} invoices (${response.data.skipped || 0} skipped)`);
+        showSuccess(`Synced details for ${response.data.synced || 0} closed invoices (${response.data.skipped || 0} skipped)`);
         fetchInvoices();
       }
     } catch (err) {
-      console.error('Error syncing invoice details:', err);
-      showError(err.message || 'Failed to sync invoice details');
+      console.error('Error syncing closed invoice details:', err);
+      showError(err.message || 'Failed to sync closed invoice details');
     } finally {
       setSyncingDetails(false);
       setSyncing(false);
@@ -494,7 +494,7 @@ const ClosedInvoices = () => {
                   disabled={syncing}
                   variant="info"
                   className="whitespace-nowrap"
-                  title="Fetch detailed line items for invoices"
+                  title="Fetch detailed line items for CLOSED invoices"
                 >
                   {syncingDetails ? (
                     <>
@@ -511,7 +511,7 @@ const ClosedInvoices = () => {
                   )}
                 </Button>
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                  Fetch line items for invoices without details
+                  Fetch line items for CLOSED invoices without details
                 </div>
               </div>
               <Button

@@ -14,8 +14,7 @@ import Modal from '../../components/common/Modal';
 import AddPurchaseModal from '../../components/inventory/AddPurchaseModal';
 import FolderView from '../../components/inventory/FolderView';
 import SalesFolderView from '../../components/inventory/SalesFolderView';
-import StockReconciliationView from '../../components/inventory/StockReconciliationView';
-import { Trash2, ShoppingBag, ShoppingCart, ChevronRight, Package } from 'lucide-react';
+import { Trash2, ShoppingBag, ShoppingCart, ChevronRight } from 'lucide-react';
 
 const InventoryList = () => {
   const navigate = useNavigate();
@@ -69,8 +68,8 @@ const InventoryList = () => {
   const [purchaseToDelete, setPurchaseToDelete] = useState(null);
   const [deletingPurchase, setDeletingPurchase] = useState(false);
 
-  
-  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'stock');
+  // Tab state
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'purchases');
   const [expandedSales, setExpandedSales] = useState({});
   const [sales, setSales] = useState({});
   const [loadingSales, setLoadingSales] = useState({});
@@ -96,7 +95,7 @@ const InventoryList = () => {
     if (sortBy !== 'name') params.sortBy = sortBy;
     if (sortOrder !== 'asc') params.sortOrder = sortOrder;
     if (currentPage > 1) params.page = currentPage.toString();
-    if (activeTab !== 'stock') params.tab = activeTab;
+    if (activeTab !== 'purchases') params.tab = activeTab;
 
     setSearchParams(params, { replace: true });
   }, [debouncedSearchTerm, selectedCategory, statusFilter, sortBy, sortOrder, currentPage, activeTab, setSearchParams]);
@@ -714,18 +713,6 @@ const InventoryList = () => {
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1 max-w-2xl">
           <button
-            onClick={() => setActiveTab('stock')}
-            className={`flex-1 px-4 py-2 rounded font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-              activeTab === 'stock'
-                ? 'bg-slate-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-            aria-label="Stock tab"
-          >
-            <Package className="w-5 h-5" />
-            <span>Stock</span>
-          </button>
-          <button
             onClick={() => setActiveTab('purchases')}
             className={`flex-1 px-4 py-2 rounded font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
               activeTab === 'purchases'
@@ -764,11 +751,8 @@ const InventoryList = () => {
         </div>
       )}
 
-      {}
-      {activeTab === 'stock' ? (
-        
-        <StockReconciliationView />
-      ) : activeTab === 'purchases' ? (
+      {/* Tab content */}
+      {activeTab === 'purchases' ? (
         
         <>
           {}

@@ -23,6 +23,7 @@ const SalesFolderView = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   
   useEffect(() => {
@@ -132,10 +133,10 @@ const SalesFolderView = () => {
   };
 
   const handleSelectAll = () => {
-    if (selectedItems.length === groupedItems.length) {
+    if (selectedItems.length === filteredItems.length && filteredItems.length > 0) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(groupedItems.map(item => item.sku));
+      setSelectedItems(filteredItems.map(item => item.sku));
     }
   };
 
@@ -152,7 +153,7 @@ const SalesFolderView = () => {
 
     setDeleting(true);
     try {
-      
+
       await api.post('/routestar/invoices/bulk-delete', {
         skus: selectedItems
       });
@@ -161,7 +162,7 @@ const SalesFolderView = () => {
       setDeleteModalOpen(false);
       setSelectedItems([]);
 
-      
+
       fetchGroupedItems();
     } catch (err) {
       console.error('Error deleting items:', err);
@@ -170,6 +171,18 @@ const SalesFolderView = () => {
       setDeleting(false);
     }
   };
+
+  // Filter items based on search term
+  const filteredItems = groupedItems.filter(item => {
+    if (!searchTerm) return true;
+
+    const search = searchTerm.toLowerCase();
+    return (
+      item.name?.toLowerCase().includes(search) ||
+      item.sku?.toLowerCase().includes(search) ||
+      item.originalNames?.some(name => name.toLowerCase().includes(search))
+    );
+  });
 
   if (loading) {
     return (
@@ -193,6 +206,78 @@ const SalesFolderView = () => {
 
   return (
     <div className="space-y-3">
+      {/* Search Bar */}
+      <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
+        <div className="relative">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by name, SKU, or variation..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+          />
+          <svg
+            className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+        {searchTerm && (
+          <p className="text-sm text-slate-500 mt-2">
+            Found {filteredItems.length} of {groupedItems.length} items
+          </p>
+        )}
+      </div>
+
+      {/* Summary Statistics */}
+      <div className="bg-gradient-to-r from-emerald-500 to-green-600 rounded-lg shadow-sm p-6 text-white">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <p className="text-emerald-100 text-sm font-medium mb-1">Total Items</p>
+            <p className="text-3xl font-bold">{filteredItems.length}</p>
+          </div>
+          <div>
+            <p className="text-emerald-100 text-sm font-medium mb-1">Total Invoices</p>
+            <p className="text-3xl font-bold">
+              {filteredItems.reduce((sum, item) => sum + item.invoiceCount, 0)}
+            </p>
+          </div>
+          <div>
+            <p className="text-emerald-100 text-sm font-medium mb-1">Units Sold</p>
+            <p className="text-3xl font-bold">
+              {filteredItems.reduce((sum, item) => sum + item.totalQuantity, 0).toLocaleString()}
+            </p>
+          </div>
+          <div>
+            <p className="text-emerald-100 text-sm font-medium mb-1">Total Revenue</p>
+            <p className="text-3xl font-bold">
+              {formatCurrency(filteredItems.reduce((sum, item) => sum + item.totalValue, 0))}
+            </p>
+          </div>
+        </div>
+        <p className="text-emerald-100 text-xs mt-4">
+          ℹ️ Items with multiple name variations are automatically merged and displayed with their canonical names
+        </p>
+      </div>
+
       {}
       {groupedItems.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-4 border border-emerald-200">
@@ -203,12 +288,12 @@ const SalesFolderView = () => {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={selectedItems.length === groupedItems.length && groupedItems.length > 0}
+                    checked={selectedItems.length === filteredItems.length && filteredItems.length > 0}
                     onChange={handleSelectAll}
                     className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
                   />
                   <span className="text-sm font-medium text-slate-700">
-                    Select All ({selectedItems.length}/{groupedItems.length})
+                    Select All ({selectedItems.length}/{filteredItems.length})
                   </span>
                 </label>
 
@@ -240,7 +325,7 @@ const SalesFolderView = () => {
         </div>
       )}
 
-      {groupedItems.map((group) => {
+      {filteredItems.map((group) => {
         const isExpanded = expandedItems[group.sku];
         const isSelected = selectedItems.includes(group.sku);
 
@@ -298,17 +383,49 @@ const SalesFolderView = () => {
                 className="flex-1 min-w-0 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
               >
-                <h3 className="font-semibold text-slate-900 truncate text-base">
-                  {group.name}
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-slate-900 truncate text-base">
+                    {group.name}
+                  </h3>
+                  {group.originalNames && group.originalNames.length > 1 && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                      {group.originalNames.length} merged
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-slate-500 mt-0.5">
                   SKU: <span className="font-mono text-slate-700">{group.sku}</span>
                   <span className="mx-2">•</span>
                   <span className="text-slate-600">{group.invoiceCount} {group.invoiceCount === 1 ? 'invoice' : 'invoices'}</span>
+                  {group.originalNames && group.originalNames.length > 1 && (
+                    <>
+                      <span className="mx-2">•</span>
+                      <span className="text-slate-400 text-xs" title={group.originalNames.join(', ')}>
+                        Variations: {group.originalNames.slice(0, 2).join(', ')}
+                        {group.originalNames.length > 2 && ` +${group.originalNames.length - 2} more`}
+                      </span>
+                    </>
+                  )}
                 </p>
               </div>
 
-              {}
+              {/* Mobile stats - visible on small screens */}
+              <div className="lg:hidden w-full mt-3 grid grid-cols-3 gap-2">
+                <div className="bg-slate-50 rounded p-2 text-center">
+                  <p className="text-xs text-slate-500 font-medium">Sold</p>
+                  <p className="text-sm font-bold text-slate-900">{group.totalQuantity}</p>
+                </div>
+                <div className="bg-emerald-50 rounded p-2 text-center">
+                  <p className="text-xs text-emerald-600 font-medium">Avg Price</p>
+                  <p className="text-sm font-semibold text-emerald-700">{formatCurrency(group.avgUnitPrice)}</p>
+                </div>
+                <div className="bg-green-50 rounded p-2 text-center">
+                  <p className="text-xs text-green-600 font-medium">Revenue</p>
+                  <p className="text-sm font-bold text-green-700">{formatCurrency(group.totalValue)}</p>
+                </div>
+              </div>
+
+              {/* Desktop stats - hidden on mobile */}
               <div
                 className="hidden lg:flex items-center gap-6 mr-2 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -457,6 +574,23 @@ const SalesFolderView = () => {
           </div>
         );
       })}
+
+      {/* No results message */}
+      {filteredItems.length === 0 && groupedItems.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-slate-200">
+          <ShoppingCart className="w-16 h-16 mx-auto text-slate-300 mb-4" />
+          <p className="text-slate-900 font-semibold text-lg mb-2">No items found</p>
+          <p className="text-sm text-slate-500">
+            No items match your search "{searchTerm}". Try a different search term.
+          </p>
+          <button
+            onClick={() => setSearchTerm('')}
+            className="mt-4 text-emerald-600 hover:text-emerald-700 font-medium text-sm"
+          >
+            Clear search
+          </button>
+        </div>
+      )}
 
       {}
       <Modal

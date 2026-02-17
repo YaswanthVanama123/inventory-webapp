@@ -211,7 +211,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by name or SKU..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           />
           <svg
             className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
@@ -246,7 +246,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
 
       {}
       {groupedItems.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-4 border border-blue-200">
+        <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             {}
             {isAdmin && (
@@ -256,7 +256,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                     type="checkbox"
                     checked={selectedItems.length === filteredItems.length && filteredItems.length > 0}
                     onChange={handleSelectAll}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                   />
                   <span className="text-sm font-medium text-slate-700">
                     Select All ({selectedItems.length}/{filteredItems.length})
@@ -299,7 +299,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
           <div
             key={group.sku}
             className={`bg-white rounded-lg shadow-sm overflow-hidden border-2 transition-all ${
-              isSelected ? 'border-blue-500 shadow-md' : 'border-blue-200 hover:shadow-md'
+              isSelected ? 'border-indigo-400 shadow-lg' : 'border-slate-200 hover:border-slate-300 hover:shadow-md'
             }`}
           >
             {}
@@ -314,23 +314,23 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                       e.stopPropagation();
                       handleCheckboxChange(group.sku);
                     }}
-                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                    className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer"
                   />
                 </div>
               )}
 
               {}
               <button
-                className="flex-shrink-0 p-1.5 hover:bg-blue-200 rounded transition-colors"
+                className="flex-shrink-0 p-1.5 hover:bg-slate-100 rounded transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleItemFolder(group.sku);
                 }}
               >
                 {isExpanded ? (
-                  <ChevronDown className="w-5 h-5 text-blue-600" />
+                  <ChevronDown className="w-5 h-5 text-slate-600" />
                 ) : (
-                  <ChevronRight className="w-5 h-5 text-blue-600" />
+                  <ChevronRight className="w-5 h-5 text-slate-600" />
                 )}
               </button>
 
@@ -339,8 +339,8 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                 className="flex-shrink-0 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
               >
-                <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                  <Package className="w-7 h-7 text-blue-600" />
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg flex items-center justify-center border border-indigo-100">
+                  <Package className="w-7 h-7 text-indigo-600" />
                 </div>
               </div>
 
@@ -372,7 +372,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-slate-500 uppercase font-medium mb-1">Avg Price</p>
-                  <p className="text-lg font-semibold text-blue-600">
+                  <p className="text-lg font-semibold text-slate-700">
                     {formatCurrency(group.avgUnitPrice)}
                   </p>
                 </div>
@@ -387,7 +387,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
 
             {}
             {isExpanded && (
-              <div className="border-t border-blue-200 bg-blue-50">
+              <div className="border-t border-slate-200 bg-slate-50">
                 {group.orders.length === 0 ? (
                   <div className="p-8 text-center text-slate-500">
                     <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -396,47 +396,47 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
-                      <thead className="bg-blue-100 border-b border-blue-200">
+                      <thead className="bg-slate-100 border-b border-slate-200">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                             Order #
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                             PO Number
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                             Order Date
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                             Vendor
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                             Quantity
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                             Unit Price
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                             Line Total
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                             Status
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                             Stock
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-blue-200 bg-white">
+                      <tbody className="divide-y divide-slate-200 bg-white">
                         {group.orders.map((order, index) => {
                           const stockStatus = getStockStatus(order.stockProcessed);
                           return (
                             <tr
                               key={`${order.orderNumber}-${index}`}
-                              className="hover:bg-blue-50 transition-colors"
+                              className="hover:bg-slate-50 transition-colors"
                             >
                               <td className="px-6 py-4">
-                                <span className="font-mono text-sm font-medium text-blue-600">
+                                <span className="font-mono text-sm font-medium text-indigo-600">
                                   {order.orderNumber}
                                 </span>
                               </td>

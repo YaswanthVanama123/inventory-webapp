@@ -24,6 +24,7 @@ const OrdersList = () => {
   const [syncingOld, setSyncingOld] = useState(false);
   const [orderRange, setOrderRange] = useState({ highest: null, lowest: null, totalOrders: 0 });
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [stockProcessedFilter, setStockProcessedFilter] = useState('');
   const [dateFrom, setDateFrom] = useState('');
@@ -32,7 +33,7 @@ const OrdersList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-  const [syncLimit, setSyncLimit] = useState(0); 
+  const [syncLimit, setSyncLimit] = useState(0);
   const [showSyncOptions, setShowSyncOptions] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -40,10 +41,19 @@ const OrdersList = () => {
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [deletingBulk, setDeletingBulk] = useState(false);
 
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   useEffect(() => {
     fetchOrders();
     fetchOrderRange();
-  }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, dateFrom, dateTo]);
+  }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, dateFrom, dateTo, debouncedSearchTerm]);
 
   const fetchOrderRange = async () => {
     try {
@@ -81,8 +91,8 @@ const OrdersList = () => {
         params.endDate = dateTo;
       }
 
-      if (searchTerm) {
-        params.vendor = searchTerm;
+      if (debouncedSearchTerm) {
+        params.vendor = debouncedSearchTerm;
       }
 
       const response = await getOrders(params);
@@ -189,9 +199,18 @@ const OrdersList = () => {
     }
   };
 
-  const handleSearch = (value) => {
-    setSearchTerm(value);
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    if (e.target.value === '') {
+      // Don't reset page when clearing to avoid focus loss
+      return;
+    }
     setCurrentPage(1);
+  };
+
+  const handleSearchClear = () => {
+    setSearchTerm('');
+    // Don't reset page here to avoid focus loss
   };
 
   const handleStatusFilterChange = (e) => {
@@ -512,8 +531,10 @@ const OrdersList = () => {
           <SearchBar
             value={searchTerm}
             onChange={handleSearch}
+            onClear={handleSearchClear}
             placeholder="Search by vendor..."
             className="w-full"
+            loading={loading && searchTerm !== debouncedSearchTerm}
           />
 
           <Select

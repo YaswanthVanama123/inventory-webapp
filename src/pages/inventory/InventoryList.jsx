@@ -14,7 +14,7 @@ import Modal from '../../components/common/Modal';
 import AddPurchaseModal from '../../components/inventory/AddPurchaseModal';
 import FolderView from '../../components/inventory/FolderView';
 import SalesFolderView from '../../components/inventory/SalesFolderView';
-import { Trash2, ShoppingBag, ShoppingCart, ChevronRight } from 'lucide-react';
+import { Trash2, Package, TrendingUp, ChevronRight } from 'lucide-react';
 
 const InventoryList = () => {
   const navigate = useNavigate();
@@ -644,7 +644,7 @@ const InventoryList = () => {
                     onClick={() => setViewMode('table')}
                     className={`flex-1 px-3 py-1.5 rounded font-medium transition-all duration-200 ${
                       viewMode === 'table'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-indigo-600 text-white shadow-sm'
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                     aria-label="Table view"
@@ -658,7 +658,7 @@ const InventoryList = () => {
                     onClick={() => setViewMode('card')}
                     className={`flex-1 px-3 py-1.5 rounded font-medium transition-all duration-200 ${
                       viewMode === 'card'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-indigo-600 text-white shadow-sm'
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                     aria-label="Card view"
@@ -672,7 +672,7 @@ const InventoryList = () => {
                     onClick={() => setViewMode('folder')}
                     className={`flex-1 px-3 py-1.5 rounded font-medium transition-all duration-200 ${
                       viewMode === 'folder'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-indigo-600 text-white shadow-sm'
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                     aria-label="Folder view"
@@ -711,29 +711,29 @@ const InventoryList = () => {
 
       {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
-        <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1 max-w-2xl">
+        <div className="flex items-center gap-3 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-1.5 max-w-2xl border border-slate-200 dark:border-gray-700">
           <button
             onClick={() => setActiveTab('purchases')}
-            className={`flex-1 px-4 py-2 rounded font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+            className={`flex-1 px-5 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2.5 ${
               activeTab === 'purchases'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
+                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/50 transform scale-105'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-white/70 dark:hover:bg-gray-700/70 hover:text-indigo-600 dark:hover:text-indigo-400'
             }`}
             aria-label="Purchases tab"
           >
-            <ShoppingBag className="w-5 h-5" />
+            <Package className="w-5 h-5" strokeWidth={2.5} />
             <span>Purchases</span>
           </button>
           <button
             onClick={() => setActiveTab('sells')}
-            className={`flex-1 px-4 py-2 rounded font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+            className={`flex-1 px-5 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2.5 ${
               activeTab === 'sells'
-                ? 'bg-green-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/50 transform scale-105'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-white/70 dark:hover:bg-gray-700/70 hover:text-emerald-600 dark:hover:text-emerald-400'
             }`}
             aria-label="Sells tab"
           >
-            <ShoppingCart className="w-5 h-5" />
+            <TrendingUp className="w-5 h-5" strokeWidth={2.5} />
             <span>Sells</span>
           </button>
         </div>
@@ -883,7 +883,7 @@ const InventoryList = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleView(item._id)}
-                              className="text-blue-600 hover:text-blue-800"
+                              className="text-indigo-600 hover:text-indigo-800"
                             >
                               View
                             </Button>
@@ -1153,8 +1153,8 @@ const InventoryList = () => {
                       onClick={() => toggleExpand(item._id)}
                       className={`w-full mb-3 px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 ${
                         activeTab === 'purchases'
-                          ? 'text-blue-600 bg-blue-50 hover:bg-blue-100'
-                          : 'text-green-500 bg-green-50 hover:bg-green-100'
+                          ? 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200'
+                          : 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200'
                       }`}
                     >
                       <span>{expandedItems[item._id] ? 'Hide' : 'View'} {activeTab === 'purchases' ? 'Purchase' : 'Sales'} History</span>

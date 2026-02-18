@@ -51,6 +51,7 @@ const UserProfile = lazy(() => import('./pages/profile/UserProfile'));
 const Settings = lazy(() => import('./pages/settings/Settings'));
 const Trash = lazy(() => import('./pages/trash/Trash'));
 const EmployeeActivities = lazy(() => import('./pages/activities/EmployeeActivities'));
+const FetchHistory = lazy(() => import('./pages/system/FetchHistory'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 
@@ -508,6 +509,18 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute requireAdmin>
                         <EmployeeActivities />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+
+                {}
+                <Route
+                  path="/system/fetch-history"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <FetchHistory />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

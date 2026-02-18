@@ -183,26 +183,6 @@ const adminMenuItems = [
     ]
   },
   {
-    label: 'Point of Sale',
-    path: '/pos',
-    icon: ShoppingCartIcon
-  },
-  {
-    label: 'Categories',
-    path: '/categories',
-    icon: TagIcon
-  },
-  {
-    label: 'Units',
-    path: '/units',
-    icon: CubeIcon
-  },
-  {
-    label: 'Coupons & Payments',
-    path: '/coupons',
-    icon: TagIcon
-  },
-  {
     label: 'Stock',
     path: '/stock',
     icon: PackageIcon
@@ -244,11 +224,6 @@ const adminMenuItems = [
     icon: ChartIcon
   },
   {
-    label: 'Approvals',
-    path: '/approvals',
-    icon: CheckCircleIcon
-  },
-  {
     label: 'Users',
     path: '/users',
     icon: UsersIcon,
@@ -273,11 +248,6 @@ const adminMenuItems = [
     icon: ActivityIcon
   },
   {
-    label: 'Trash',
-    path: '/trash',
-    icon: TrashIcon
-  },
-  {
     label: 'Profile',
     path: '/profile',
     icon: ProfileIcon
@@ -297,11 +267,6 @@ const employeeMenuItems = [
     submenu: [
       { label: 'View All', path: '/inventory', icon: ListIcon },
     ]
-  },
-  {
-    label: 'Point of Sale',
-    path: '/pos',
-    icon: ShoppingCartIcon
   },
   {
     label: 'Profile',

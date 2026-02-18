@@ -248,39 +248,105 @@ const SalesFolderView = () => {
       </div>
 
       {/* Summary Statistics */}
-      <div className="bg-gradient-to-r from-emerald-500 to-green-600 rounded-lg shadow-sm p-6 text-white">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <p className="text-emerald-100 text-sm font-medium mb-1">Total Items</p>
-            <p className="text-3xl font-bold">{filteredItems.length}</p>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Total Items */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Items</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{filteredItems.length}</p>
+            </div>
+            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+              <ShoppingCart className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+            </div>
           </div>
-          <div>
-            <p className="text-emerald-100 text-sm font-medium mb-1">Total Invoices</p>
-            <p className="text-3xl font-bold">
-              {filteredItems.reduce((sum, item) => sum + item.invoiceCount, 0)}
-            </p>
-          </div>
-          <div>
-            <p className="text-emerald-100 text-sm font-medium mb-1">Units Sold</p>
-            <p className="text-3xl font-bold">
-              {filteredItems.reduce((sum, item) => sum + item.totalQuantity, 0).toLocaleString()}
-            </p>
-          </div>
-          <div>
-            <p className="text-emerald-100 text-sm font-medium mb-1">Total Revenue</p>
-            <p className="text-3xl font-bold">
-              {formatCurrency(filteredItems.reduce((sum, item) => sum + item.totalValue, 0))}
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Distinct products
             </p>
           </div>
         </div>
-        <p className="text-emerald-100 text-xs mt-4">
-          ℹ️ Items with multiple name variations are automatically merged and displayed with their canonical names
+
+        {/* Total Invoices */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Invoices</p>
+              <p className="text-3xl font-bold text-blue-600 dark:text-blue-500">
+                {filteredItems.reduce((sum, item) => sum + item.invoiceCount, 0)}
+              </p>
+            </div>
+            <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600 dark:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Sales transactions
+            </p>
+          </div>
+        </div>
+
+        {/* Units Sold */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Units Sold</p>
+              <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-500">
+                {filteredItems.reduce((sum, item) => sum + item.totalQuantity, 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center">
+              <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+              </svg>
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Total quantity sold
+            </p>
+          </div>
+        </div>
+
+        {/* Total Revenue */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Revenue</p>
+              <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-500">
+                {formatCurrency(filteredItems.reduce((sum, item) => sum + item.totalValue, 0))}
+              </p>
+            </div>
+            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg flex items-center justify-center">
+              <svg className="w-6 h-6 text-emerald-600 dark:text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Sales value
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Info Note */}
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <p className="text-sm text-blue-800 dark:text-blue-300 flex items-start gap-2">
+          <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+          </svg>
+          <span>Items with multiple name variations are automatically merged and displayed with their canonical names</span>
         </p>
       </div>
 
       {}
       {groupedItems.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-4 border border-emerald-200">
+        <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             {}
             {isAdmin && (

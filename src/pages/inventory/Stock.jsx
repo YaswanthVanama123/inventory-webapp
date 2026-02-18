@@ -164,47 +164,119 @@ const Stock = () => {
         </div>
       </Card>
 
-      {}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {activeTab === 'use' ? (
           <>
-            <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-              <div className="text-3xl font-bold">{currentData.totals.categoryCount || 0}</div>
-              <div className="text-sm opacity-90">Total Categories</div>
-            </Card>
-            <Card className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white">
-              <div className="flex items-center gap-2">
-                <ArrowTrendingUpIcon className="w-6 h-6" />
+            {/* Total Categories */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-3xl font-bold">{currentData.totals.totalQuantity || 0}</div>
-                  <div className="text-sm opacity-90">Total Quantity</div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Categories</p>
+                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-500">{currentData.totals.categoryCount || 0}</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+                  <FolderIcon className="w-6 h-6 text-blue-600 dark:text-blue-500" />
                 </div>
               </div>
-            </Card>
-            <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-              <div className="flex items-center gap-2">
-                <CurrencyDollarIcon className="w-6 h-6" />
+              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Distinct categories
+                </p>
+              </div>
+            </div>
+
+            {/* Total Quantity */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-3xl font-bold">${(currentData.totals.totalValue || 0).toFixed(2)}</div>
-                  <div className="text-sm opacity-90">Total Value</div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Quantity</p>
+                  <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-500">{currentData.totals.totalQuantity || 0}</p>
+                </div>
+                <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center">
+                  <ArrowTrendingUpIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-500" />
                 </div>
               </div>
-            </Card>
+              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Units purchased
+                </p>
+              </div>
+            </div>
+
+            {/* Total Value */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Value</p>
+                  <p className="text-3xl font-bold text-purple-600 dark:text-purple-500">${(currentData.totals.totalValue || 0).toFixed(2)}</p>
+                </div>
+                <div className="w-12 h-12 bg-purple-50 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
+                  <CurrencyDollarIcon className="w-6 h-6 text-purple-600 dark:text-purple-500" />
+                </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Purchase value
+                </p>
+              </div>
+            </div>
           </>
         ) : (
           <>
-            <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-              <div className="text-3xl font-bold">{currentData.totals.totalPurchased || 0}</div>
-              <div className="text-sm opacity-90">Total Purchased</div>
-            </Card>
-            <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
-              <div className="text-3xl font-bold">{currentData.totals.totalSold || 0}</div>
-              <div className="text-sm opacity-90">Total Sold</div>
-            </Card>
-            <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-              <div className="text-3xl font-bold">{currentData.totals.stockRemaining || 0}</div>
-              <div className="text-sm opacity-90">Stock Remaining</div>
-            </Card>
+            {/* Total Purchased */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Purchased</p>
+                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-500">{currentData.totals.totalPurchased || 0}</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+                  <ShoppingCartIcon className="w-6 h-6 text-blue-600 dark:text-blue-500" />
+                </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Units ordered
+                </p>
+              </div>
+            </div>
+
+            {/* Total Sold */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Sold</p>
+                  <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-500">{currentData.totals.totalSold || 0}</p>
+                </div>
+                <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg flex items-center justify-center">
+                  <ShoppingBagIcon className="w-6 h-6 text-emerald-600 dark:text-emerald-500" />
+                </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Units sold
+                </p>
+              </div>
+            </div>
+
+            {/* Stock Remaining */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Stock Remaining</p>
+                  <p className="text-3xl font-bold text-purple-600 dark:text-purple-500">{currentData.totals.stockRemaining || 0}</p>
+                </div>
+                <div className="w-12 h-12 bg-purple-50 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
+                  <ArchiveBoxIcon className="w-6 h-6 text-purple-600 dark:text-purple-500" />
+                </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Available stock
+                </p>
+              </div>
+            </div>
           </>
         )}
       </div>

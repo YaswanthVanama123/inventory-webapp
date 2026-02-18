@@ -90,44 +90,79 @@ const SalesReport = () => {
         </Button>
       </div>
 
-      {}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-          <div className="flex items-center gap-2">
-            <ChartBarIcon className="w-6 h-6" />
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Total Items */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
             <div>
-              <div className="text-3xl font-bold">{totals.totalItems || 0}</div>
-              <div className="text-sm opacity-90">Total Items</div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Items</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{totals.totalItems || 0}</p>
+            </div>
+            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+              <ChartBarIcon className="w-6 h-6 text-gray-600 dark:text-gray-400" />
             </div>
           </div>
-        </Card>
-        <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
-          <div className="flex items-center gap-2">
-            <ShoppingBagIcon className="w-6 h-6" />
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Items with sales data
+            </p>
+          </div>
+        </div>
+
+        {/* Total Sold Quantity */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
             <div>
-              <div className="text-3xl font-bold">{totals.totalSoldQuantity || 0}</div>
-              <div className="text-sm opacity-90">Total Sold Quantity</div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Sold Quantity</p>
+              <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-500">{totals.totalSoldQuantity || 0}</p>
+            </div>
+            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg flex items-center justify-center">
+              <ShoppingBagIcon className="w-6 h-6 text-emerald-600 dark:text-emerald-500" />
             </div>
           </div>
-        </Card>
-        <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-          <div className="flex items-center gap-2">
-            <CurrencyDollarIcon className="w-6 h-6" />
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Units sold
+            </p>
+          </div>
+        </div>
+
+        {/* Total Sales Amount */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
             <div>
-              <div className="text-3xl font-bold">${(totals.totalSoldAmount || 0).toFixed(2)}</div>
-              <div className="text-sm opacity-90">Total Sales Amount</div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Sales Amount</p>
+              <p className="text-3xl font-bold text-blue-600 dark:text-blue-500">${(totals.totalSoldAmount || 0).toFixed(2)}</p>
+            </div>
+            <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+              <CurrencyDollarIcon className="w-6 h-6 text-blue-600 dark:text-blue-500" />
             </div>
           </div>
-        </Card>
-        <Card className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white">
-          <div className="flex items-center gap-2">
-            <DocumentTextIcon className="w-6 h-6" />
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Total revenue
+            </p>
+          </div>
+        </div>
+
+        {/* Total Invoices */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
             <div>
-              <div className="text-3xl font-bold">{totals.totalInvoices || 0}</div>
-              <div className="text-sm opacity-90">Total Invoices</div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Invoices</p>
+              <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-500">{totals.totalInvoices || 0}</p>
+            </div>
+            <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center">
+              <DocumentTextIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-500" />
             </div>
           </div>
-        </Card>
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Invoices processed
+            </p>
+          </div>
+        </div>
       </div>
 
       {}

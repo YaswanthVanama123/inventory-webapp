@@ -11,6 +11,7 @@ const Button = ({
   type = 'button',
   onClick,
   className = '',
+  icon,
   ...props
 }) => {
   const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
@@ -61,13 +62,14 @@ const Button = ({
           />
         </svg>
       )}
+      {icon && <span className={children ? 'mr-2' : ''}>{icon}</span>}
       {children}
     </button>
   );
 };
 
 Button.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
   variant: PropTypes.oneOf(['primary', 'secondary', 'danger', 'outline', 'ghost']),
   size: PropTypes.oneOf(['sm', 'md', 'lg']),
   loading: PropTypes.bool,
@@ -76,6 +78,7 @@ Button.propTypes = {
   type: PropTypes.oneOf(['button', 'submit', 'reset']),
   onClick: PropTypes.func,
   className: PropTypes.string,
+  icon: PropTypes.node,
 };
 
 export default Button;

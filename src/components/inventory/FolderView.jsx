@@ -161,7 +161,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
     }
   };
 
-  // Filter items based on search term
   const filteredItems = groupedItems.filter(item => {
     if (!searchTerm) return true;
 
@@ -172,7 +171,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
     );
   });
 
-  // Update handleSelectAll to use filteredItems
   const handleSelectAll = () => {
     if (selectedItems.length === filteredItems.length && filteredItems.length > 0) {
       setSelectedItems([]);
@@ -480,9 +478,9 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                           );
                         })}
                       </tbody>
-                      <tfoot className="bg-blue-100 border-t-2 border-blue-300">
+                      <tfoot className="bg-slate-100 border-t-2 border-slate-300">
                         <tr>
-                          <td colSpan="4" className="px-6 py-3 text-right text-sm font-semibold text-blue-700">
+                          <td colSpan="4" className="px-6 py-3 text-right text-sm font-semibold text-slate-700">
                             Totals:
                           </td>
                           <td className="px-6 py-3">
@@ -490,7 +488,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                               {group.orders.reduce((sum, order) => sum + order.qty, 0)}
                             </span>
                           </td>
-                          <td className="px-6 py-3 text-sm font-medium text-blue-700">
+                          <td className="px-6 py-3 text-sm font-medium text-slate-700">
                             Avg: {formatCurrency(group.avgUnitPrice)}
                           </td>
                           <td className="px-6 py-3">

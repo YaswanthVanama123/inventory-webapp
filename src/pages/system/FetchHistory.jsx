@@ -416,6 +416,11 @@ const FetchHistory = () => {
                           <div className="text-blue-600 dark:text-blue-400">
                             Updated: <span className="font-semibold">{fetch.results.updated || 0}</span>
                           </div>
+                          {fetch.results.deleted > 0 && (
+                            <div className="text-orange-600 dark:text-orange-400">
+                              Deleted: <span className="font-semibold">{fetch.results.deleted}</span>
+                            </div>
+                          )}
                           {fetch.results.failed > 0 && (
                             <div className="text-red-600 dark:text-red-400">
                               Failed: <span className="font-semibold">{fetch.results.failed}</span>

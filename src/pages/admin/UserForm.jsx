@@ -23,6 +23,7 @@ const UserForm = () => {
     password: '',
     confirmPassword: '',
     role: '',
+    truckNumber: '',
     isActive: true,
   });
 
@@ -64,14 +65,16 @@ const UserForm = () => {
       }
 
       const data = await response.json();
+      const user = data.data.user;  // Extract user from nested response
       setFormData({
-        username: data.username || '',
-        email: data.email || '',
-        fullName: data.fullName || '',
+        username: user.username || '',
+        email: user.email || '',
+        fullName: user.fullName || '',
         password: '',
         confirmPassword: '',
-        role: data.role || '',
-        isActive: data.isActive !== undefined ? data.isActive : true,
+        role: user.role || '',
+        truckNumber: user.truckNumber || '',
+        isActive: user.isActive !== undefined ? user.isActive : true,
       });
     } catch (err) {
       console.error('Error fetching user:', err);
@@ -252,6 +255,7 @@ const UserForm = () => {
         fullName: formData.fullName,
         role: formData.role,
         isActive: formData.isActive,
+        truckNumber: formData.truckNumber || null,
       };
 
       if (!isEditMode || formData.password) {
@@ -288,9 +292,9 @@ const UserForm = () => {
         message: successMessage,
       });
 
-      
+
       setTimeout(() => {
-        navigate('/admin/users');
+        navigate('/users');
       }, 1500);
     } catch (err) {
       console.error('Error saving user:', err);
@@ -307,7 +311,7 @@ const UserForm = () => {
 
   
   const handleCancel = () => {
-    navigate('/admin/users');
+    navigate('/users');
   };
 
   if (fetchLoading) {
@@ -535,6 +539,21 @@ const UserForm = () => {
             fullWidth
             disabled={loading}
             helperText="Admin has full access, Employee has limited access"
+          />
+
+          {/* Truck Number */}
+          <Input
+            label="Truck Number"
+            name="truckNumber"
+            type="text"
+            value={formData.truckNumber}
+            onChange={handleChange}
+            placeholder="e.g., NRV01, TRUCK01"
+            error={errors.truckNumber}
+            fullWidth
+            disabled={loading}
+            helperText="Unique truck/vehicle identifier for this employee (appears in Class column of invoices)"
+            style={{ textTransform: 'uppercase' }}
           />
 
           {}

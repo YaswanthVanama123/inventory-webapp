@@ -52,6 +52,7 @@ const Settings = lazy(() => import('./pages/settings/Settings'));
 const Trash = lazy(() => import('./pages/trash/Trash'));
 const EmployeeActivities = lazy(() => import('./pages/activities/EmployeeActivities'));
 const FetchHistory = lazy(() => import('./pages/system/FetchHistory'));
+const EmployeeWorkDashboard = lazy(() => import('./pages/employee/EmployeeWorkDashboard'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 
@@ -533,6 +534,18 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute>
                         <UserProfile />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+
+                {}
+                <Route
+                  path="/my-work"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute>
+                        <EmployeeWorkDashboard />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

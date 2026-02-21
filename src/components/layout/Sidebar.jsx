@@ -291,6 +291,11 @@ const employeeMenuItems = [
     ]
   },
   {
+    label: 'Stock',
+    path: '/stock',
+    icon: PackageIcon
+  },
+  {
     label: 'Profile',
     path: '/profile',
     icon: ProfileIcon

@@ -296,6 +296,36 @@ const employeeMenuItems = [
     icon: PackageIcon
   },
   {
+    label: 'Orders',
+    path: '/orders',
+    icon: ClipboardListIcon
+  },
+  {
+    label: 'Invoices',
+    path: '/invoices',
+    icon: InvoicesIcon,
+    submenu: [
+      { label: 'View All', path: '/invoices', icon: ListIcon },
+      { label: 'Pending (RouteStar)', path: '/invoices/routestar/pending', icon: ListIcon },
+      { label: 'Closed (RouteStar)', path: '/invoices/routestar/closed', icon: ListIcon },
+    ]
+  },
+  {
+    label: 'RouteStar Items',
+    path: '/routestar/items',
+    icon: PackageIcon
+  },
+  {
+    label: 'Sales Report',
+    path: '/routestar/sales-report',
+    icon: ChartIcon
+  },
+  {
+    label: 'Fetch History',
+    path: '/system/fetch-history',
+    icon: ClockHistoryIcon
+  },
+  {
     label: 'Profile',
     path: '/profile',
     icon: ProfileIcon

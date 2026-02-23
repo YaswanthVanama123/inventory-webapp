@@ -1,20 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ToastContext } from '../../contexts/ToastContext';
 import api from '../../services/api';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Alert from '../../components/common/Alert';
+import Modal from '../../components/common/Modal';
 
 const InvoiceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showSuccess, showError } = useContext(ToastContext);
+
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
   const [showPrintView, setShowPrintView] = useState(false);
+
+  // Modal states
+  const [showMarkAsPaidModal, setShowMarkAsPaidModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   useEffect(() => {
     fetchInvoice();
@@ -77,7 +85,7 @@ const InvoiceDetail = () => {
   const handleDownloadPDF = async () => {
     setActionLoading('download');
     try {
-      
+
       const response = await api.get(`/invoices/${id}/pdf`, {
         responseType: 'blob',
       });
@@ -90,7 +98,7 @@ const InvoiceDetail = () => {
       link.remove();
     } catch (err) {
       console.error('Error downloading PDF:', err);
-      alert('Failed to download PDF');
+      showError('Failed to download PDF');
     } finally {
       setActionLoading(null);
     }
@@ -100,45 +108,53 @@ const InvoiceDetail = () => {
     setActionLoading('email');
     try {
       await api.post(`/invoices/${id}/send`);
-      alert('Invoice sent successfully');
+      showSuccess('Invoice sent successfully');
       fetchInvoice();
     } catch (err) {
       console.error('Error sending email:', err);
-      alert('Failed to send invoice');
+      showError('Failed to send invoice');
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleMarkAsPaid = async () => {
-    if (!confirm('Mark this invoice as paid?')) return;
+  const handleMarkAsPaid = () => {
+    setShowMarkAsPaidModal(true);
+  };
+
+  const confirmMarkAsPaid = async () => {
     setActionLoading('paid');
     try {
       await api.patch(`/invoices/${id}/status`, {
         paymentStatus: 'paid',
       });
-      alert('Invoice marked as paid');
+      showSuccess('Invoice marked as paid');
+      setShowMarkAsPaidModal(false);
       fetchInvoice();
     } catch (err) {
       console.error('Error marking as paid:', err);
-      alert('Failed to update invoice');
+      showError('Failed to update invoice');
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleCancel = async () => {
-    if (!confirm('Are you sure you want to cancel this invoice?')) return;
+  const handleCancel = () => {
+    setShowCancelModal(true);
+  };
+
+  const confirmCancel = async () => {
     setActionLoading('cancel');
     try {
       await api.patch(`/invoices/${id}/status`, {
         status: 'cancelled',
       });
-      alert('Invoice cancelled');
+      showSuccess('Invoice cancelled');
+      setShowCancelModal(false);
       fetchInvoice();
     } catch (err) {
       console.error('Error cancelling invoice:', err);
-      alert('Failed to cancel invoice');
+      showError('Failed to cancel invoice');
     } finally {
       setActionLoading(null);
     }
@@ -581,7 +597,111 @@ const InvoiceDetail = () => {
         </div>
       </div>
 
-      {}
+      {/* Mark as Paid Modal */}
+      <Modal
+        isOpen={showMarkAsPaidModal}
+        onClose={() => !actionLoading && setShowMarkAsPaidModal(false)}
+        title="Mark Invoice as Paid"
+        size="md"
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => setShowMarkAsPaidModal(false)}
+              disabled={actionLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="success"
+              onClick={confirmMarkAsPaid}
+              loading={actionLoading === 'paid'}
+              disabled={actionLoading === 'paid'}
+            >
+              Confirm
+            </Button>
+          </>
+        }
+      >
+        <p className="text-gray-700">
+          Are you sure you want to mark this invoice as paid?
+        </p>
+        {invoice && (
+          <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+            <p className="text-sm">
+              Invoice: <strong>#{invoice.invoiceNumber}</strong>
+            </p>
+            <p className="text-sm">
+              Amount: <strong>${invoice.totalAmount?.toFixed(2)}</strong>
+            </p>
+          </div>
+        )}
+      </Modal>
+
+      {/* Cancel Invoice Modal */}
+      <Modal
+        isOpen={showCancelModal}
+        onClose={() => !actionLoading && setShowCancelModal(false)}
+        title="Cancel Invoice"
+        size="md"
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => setShowCancelModal(false)}
+              disabled={actionLoading}
+            >
+              Keep Invoice
+            </Button>
+            <Button
+              variant="danger"
+              onClick={confirmCancel}
+              loading={actionLoading === 'cancel'}
+              disabled={actionLoading === 'cancel'}
+            >
+              Yes, Cancel Invoice
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3">
+            <svg
+              className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <div>
+              <p className="text-sm font-medium text-gray-900">
+                Are you sure you want to cancel this invoice?
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                This action cannot be undone.
+              </p>
+            </div>
+          </div>
+          {invoice && (
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <p className="text-sm">
+                Invoice: <strong>#{invoice.invoiceNumber}</strong>
+              </p>
+              <p className="text-sm">
+                Customer: <strong>{invoice.customerName}</strong>
+              </p>
+            </div>
+          )}
+        </div>
+      </Modal>
+
+      {/* Print Styles */}
       <style jsx>{`
         @media print {
           body {

@@ -6,6 +6,7 @@ import Card from '../../components/common/Card';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Badge from '../../components/common/Badge';
 import Select from '../../components/common/Select';
+import Modal from '../../components/common/Modal';
 import {
   ClockIcon,
   CheckCircleIcon,
@@ -23,6 +24,10 @@ const FetchHistory = () => {
   const [activeFetches, setActiveFetches] = useState([]);
   const [statistics, setStatistics] = useState(null);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 50, pages: 0 });
+
+  // Cancel modal state
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [fetchToCancel, setFetchToCancel] = useState(null);
 
   // Filters
   const [sourceFilter, setSourceFilter] = useState('all');
@@ -85,16 +90,22 @@ const FetchHistory = () => {
   };
 
   const handleCancelFetch = async (id, source) => {
-    if (!window.confirm('Are you sure you want to cancel this fetch operation?')) {
-      return;
-    }
+    setFetchToCancel({ id, source });
+    setCancelModalOpen(true);
+  };
+
+  const confirmCancelFetch = async () => {
+    if (!fetchToCancel) return;
 
     try {
-      await fetchHistoryService.cancelFetch(id);
+      await fetchHistoryService.cancelFetch(fetchToCancel.id);
       showSuccess('Fetch operation cancelled');
       loadData();
     } catch (error) {
       showError('Failed to cancel fetch: ' + error.message);
+    } finally {
+      setCancelModalOpen(false);
+      setFetchToCancel(null);
     }
   };
 
@@ -120,6 +131,18 @@ const FetchHistory = () => {
       'routestar_items': 'RouteStar Items'
     };
     return labels[source] || source;
+  };
+
+  const getFetchTypeLabel = (fetchType) => {
+    const labels = {
+      'pending': 'Pending',
+      'closed': 'Closed',
+      'all': 'All',
+      'items': 'Items',
+      'pending_with_details': 'Pending + Details',
+      'closed_with_details': 'Closed + Details'
+    };
+    return labels[fetchType] || fetchType;
   };
 
   const getStatusVariant = (status) => {
@@ -264,7 +287,7 @@ const FetchHistory = () => {
                         {getSourceLabel(fetch.source)}
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {fetch.fetchType} • Running for {formatDuration(fetch.currentDuration)}
+                        {getFetchTypeLabel(fetch.fetchType)} • Running for {formatDuration(fetch.currentDuration)}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                         Started: {new Date(fetch.startedAt).toLocaleString()}
@@ -390,7 +413,7 @@ const FetchHistory = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                      {fetch.fetchType}
+                      {getFetchTypeLabel(fetch.fetchType)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Badge variant={getStatusVariant(fetch.status)}>
@@ -416,6 +439,11 @@ const FetchHistory = () => {
                           <div className="text-blue-600 dark:text-blue-400">
                             Updated: <span className="font-semibold">{fetch.results.updated || 0}</span>
                           </div>
+                          {fetch.results.detailsSynced > 0 && (
+                            <div className="text-purple-600 dark:text-purple-400">
+                              Details: <span className="font-semibold">{fetch.results.detailsSynced}</span>
+                            </div>
+                          )}
                           {fetch.results.deleted > 0 && (
                             <div className="text-orange-600 dark:text-orange-400">
                               Deleted: <span className="font-semibold">{fetch.results.deleted}</span>
@@ -499,6 +527,41 @@ const FetchHistory = () => {
           </div>
         )}
       </Card>
+
+      {/* Cancel Confirmation Modal */}
+      <Modal
+        isOpen={cancelModalOpen}
+        onClose={() => {
+          setCancelModalOpen(false);
+          setFetchToCancel(null);
+        }}
+        title="Cancel Fetch Operation"
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setCancelModalOpen(false);
+                setFetchToCancel(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={confirmCancelFetch}>
+              Confirm Cancel
+            </Button>
+          </>
+        }
+      >
+        <p className="text-gray-700 dark:text-gray-300">
+          Are you sure you want to cancel this fetch operation?
+        </p>
+        {fetchToCancel && (
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Source: <span className="font-semibold">{fetchToCancel.source}</span>
+          </p>
+        )}
+      </Modal>
     </div>
   );
 };

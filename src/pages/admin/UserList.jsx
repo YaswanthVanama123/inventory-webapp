@@ -27,9 +27,10 @@ const UserList = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [viewMode, setViewMode] = useState('table'); 
 
-  
+
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showToggleStatusModal, setShowToggleStatusModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState(null);
@@ -140,28 +141,35 @@ const UserList = () => {
     setShowDeleteModal(true);
   };
 
-  const handleToggleStatus = async (userId, currentStatus) => {
-    if (currentUser?._id === userId) {
+  const handleToggleStatus = (user) => {
+    if (currentUser?._id === user._id) {
       showError('You cannot deactivate your own account');
       return;
     }
 
-    const confirmMessage = currentStatus
-      ? 'Are you sure you want to deactivate this user?'
-      : 'Are you sure you want to activate this user?';
+    setSelectedUser(user);
+    setShowToggleStatusModal(true);
+  };
 
-    if (!window.confirm(confirmMessage)) {
-      return;
-    }
+  const confirmToggleStatus = async () => {
+    if (!selectedUser) return;
+
+    setModalLoading(true);
+    setModalError(null);
 
     try {
-      await api.patch(`/users/${userId}/status`, { isActive: !currentStatus });
-      showSuccess(`User ${currentStatus ? 'deactivated' : 'activated'} successfully`);
-      fetchUsers(); 
+      await api.patch(`/users/${selectedUser._id}/status`, { isActive: !selectedUser.isActive });
+      showSuccess(`User ${selectedUser.isActive ? 'deactivated' : 'activated'} successfully`);
+      setShowToggleStatusModal(false);
+      setSelectedUser(null);
+      fetchUsers();
     } catch (err) {
       console.error('Error toggling user status:', err);
       const errorMessage = err.message || 'Failed to update user status';
+      setModalError(errorMessage);
       showError(errorMessage);
+    } finally {
+      setModalLoading(false);
     }
   };
 
@@ -506,7 +514,7 @@ const UserList = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleToggleStatus(user._id, user.isActive)}
+                              onClick={() => handleToggleStatus(user)}
                               className={
                                 user.isActive
                                   ? 'text-amber-600 hover:text-amber-800'
@@ -605,7 +613,7 @@ const UserList = () => {
                         <Button
                           variant={user.isActive ? 'danger' : 'outline'}
                           size="sm"
-                          onClick={() => handleToggleStatus(user._id, user.isActive)}
+                          onClick={() => handleToggleStatus(user)}
                           fullWidth
                         >
                           {user.isActive ? 'Deactivate' : 'Activate'}
@@ -742,6 +750,73 @@ const UserList = () => {
                       {selectedUser.email || 'N/A'}
                     </span>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {modalError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-sm text-red-800">{modalError}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
+
+      {/* Toggle Status Modal */}
+      <Modal
+        isOpen={showToggleStatusModal}
+        onClose={() => {
+          if (!modalLoading) {
+            setShowToggleStatusModal(false);
+            setSelectedUser(null);
+            setModalError(null);
+          }
+        }}
+        title={selectedUser?.isActive ? "Deactivate User" : "Activate User"}
+        size="md"
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setShowToggleStatusModal(false);
+                setSelectedUser(null);
+                setModalError(null);
+              }}
+              disabled={modalLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant={selectedUser?.isActive ? "danger" : "success"}
+              onClick={confirmToggleStatus}
+              loading={modalLoading}
+              disabled={modalLoading}
+            >
+              {selectedUser?.isActive ? "Deactivate" : "Activate"}
+            </Button>
+          </>
+        }
+      >
+        {selectedUser && (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-700">
+              Are you sure you want to {selectedUser.isActive ? 'deactivate' : 'activate'} this user?
+            </p>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-gray-500">Name:</span>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {selectedUser.fullName || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-gray-500">Username:</span>
+                  <span className="text-sm font-semibold text-gray-900">
+                    @{selectedUser.username}
+                  </span>
                 </div>
               </div>
             </div>

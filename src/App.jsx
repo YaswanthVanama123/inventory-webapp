@@ -520,7 +520,7 @@ function App() {
                   path="/system/fetch-history"
                   element={
                     <ErrorBoundary>
-                      <ProtectedRoute requireAdmin>
+                      <ProtectedRoute>
                         <FetchHistory />
                       </ProtectedRoute>
                     </ErrorBoundary>

@@ -53,6 +53,10 @@ const Trash = lazy(() => import('./pages/trash/Trash'));
 const EmployeeActivities = lazy(() => import('./pages/activities/EmployeeActivities'));
 const FetchHistory = lazy(() => import('./pages/system/FetchHistory'));
 const EmployeeWorkDashboard = lazy(() => import('./pages/employee/EmployeeWorkDashboard'));
+const TruckCheckoutList = lazy(() => import('./pages/truck-checkout/TruckCheckoutList'));
+const TruckCheckoutShop = lazy(() => import('./pages/truck-checkout/TruckCheckoutShop'));
+const TruckCheckoutDetail = lazy(() => import('./pages/truck-checkout/TruckCheckoutDetail'));
+const EmployeeCheckouts = lazy(() => import('./pages/truck-checkout/EmployeeCheckouts'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 
@@ -546,6 +550,48 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute>
                         <EmployeeWorkDashboard />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+
+                {/* Truck Checkouts */}
+                <Route
+                  path="/truck-checkouts"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute>
+                        <TruckCheckoutList />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/truck-checkouts/new"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute>
+                        <TruckCheckoutShop />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/truck-checkouts/employee/:employeeName"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute>
+                        <EmployeeCheckouts />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/truck-checkouts/:id"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute>
+                        <TruckCheckoutDetail />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

@@ -7,13 +7,26 @@ const inventoryService = {
 
   getAll: async (params = {}) => {
     try {
-      
+
       const endpoint = params.usePOSPricing ? '/inventory/pos' : '/inventory';
 
-      
+
       const { usePOSPricing, ...backendParams } = params;
 
       const response = await api.get(endpoint, { params: backendParams });
+      return response;
+    } catch (error) {
+      throw handleApiError(error, {
+        network: 'Unable to load inventory items. Please check your connection.',
+        server: 'Failed to load inventory. Please try again later.',
+      });
+    }
+  },
+
+  // Get inventory items with RouteStar alias mappings for truck checkout
+  getAllForTruckCheckout: async () => {
+    try {
+      const response = await api.get('/inventory/truck-checkout');
       return response;
     } catch (error) {
       throw handleApiError(error, {

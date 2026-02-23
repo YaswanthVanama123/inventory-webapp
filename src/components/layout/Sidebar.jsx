@@ -200,6 +200,11 @@ const adminMenuItems = [
     icon: PackageIcon
   },
   {
+    label: 'Truck Checkouts',
+    path: '/truck-checkouts',
+    icon: TruckIcon
+  },
+  {
     label: 'Orders',
     path: '/orders',
     icon: ClipboardListIcon
@@ -294,6 +299,11 @@ const employeeMenuItems = [
     label: 'Stock',
     path: '/stock',
     icon: PackageIcon
+  },
+  {
+    label: 'Truck Checkouts',
+    path: '/truck-checkouts',
+    icon: TruckIcon
   },
   {
     label: 'Orders',

@@ -260,7 +260,7 @@ const TruckCheckoutShop = () => {
                       {/* Item Info */}
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2">
-                          {item.itemName}
+                          {item.canonicalName || item.itemName}
                         </h3>
                         {item.skuCode && (
                           <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
@@ -268,14 +268,19 @@ const TruckCheckoutShop = () => {
                           </p>
                         )}
                         {item.hasAliases && item.routeStarAliases && item.routeStarAliases.length > 0 && (
-                          <div className="mb-2">
-                            <p className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">
-                              Also known as:
+                          <div className="mb-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
+                            <p className="text-xs font-medium text-blue-700 dark:text-blue-400 mb-1">
+                              RouteStar Aliases ({item.routeStarAliases.length}):
                             </p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                            <p className="text-xs text-blue-600 dark:text-blue-300 line-clamp-2">
                               {item.routeStarAliases.join(', ')}
                             </p>
                           </div>
+                        )}
+                        {item.itemCount > 1 && (
+                          <p className="text-xs text-green-600 dark:text-green-400 mb-1">
+                            {item.itemCount} variations combined
+                          </p>
                         )}
                         <div className="flex items-center gap-2 mb-3">
                           <Badge variant={item.quantity > 0 ? 'success' : 'danger'} size="sm">

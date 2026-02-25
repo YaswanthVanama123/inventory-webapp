@@ -50,6 +50,15 @@ const truckCheckoutService = {
     return response;
   },
 
+  // Check work: Fetch invoices and compare (before completing)
+  checkWork: async (id, invoiceNumbers, invoiceType = 'closed') => {
+    const response = await api.post(`/truck-checkouts/${id}/check-work`, {
+      invoiceNumbers,
+      invoiceType
+    });
+    return response;
+  },
+
   // Fetch invoices and tally results
   tallyCheckout: async (id) => {
     const response = await api.post(`/truck-checkouts/${id}/tally`);

@@ -8,18 +8,21 @@ import Badge from '../../components/common/Badge';
 import Select from '../../components/common/Select';
 import Input from '../../components/common/Input';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import Modal from '../../components/common/Modal';
+import Alert from '../../components/common/Alert';
 import {
   TruckIcon,
   PlusIcon,
   FunnelIcon,
   ClockIcon,
   CheckCircleIcon,
-  XCircleIcon
+  XCircleIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline';
 
 const TruckCheckoutList = () => {
   const navigate = useNavigate();
-  const { showError } = useContext(ToastContext);
+  const { showError, showSuccess } = useContext(ToastContext);
 
   const [loading, setLoading] = useState(true);
   const [checkouts, setCheckouts] = useState([]);
@@ -28,6 +31,11 @@ const TruckCheckoutList = () => {
   // Filters
   const [statusFilter, setStatusFilter] = useState('all');
   const [employeeFilter, setEmployeeFilter] = useState('');
+
+  // Delete modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [checkoutToDelete, setCheckoutToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     loadCheckouts();
@@ -92,6 +100,29 @@ const TruckCheckoutList = () => {
   const handleEmployeeClick = (employeeName, e) => {
     e.stopPropagation();
     navigate(`/truck-checkouts/employee/${employeeName}`);
+  };
+
+  const handleDelete = async (checkoutId, e) => {
+    e.stopPropagation();
+    setCheckoutToDelete(checkoutId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!checkoutToDelete) return;
+
+    try {
+      setDeleting(true);
+      await truckCheckoutService.deleteCheckout(checkoutToDelete);
+      showSuccess('Checkout deleted successfully');
+      setShowDeleteModal(false);
+      setCheckoutToDelete(null);
+      loadCheckouts(); // Reload the list
+    } catch (error) {
+      showError(error.response?.data?.message || 'Failed to delete checkout');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   if (loading && checkouts.length === 0) {
@@ -207,12 +238,15 @@ const TruckCheckoutList = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Invoices
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
               {checkouts.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                  <td colSpan="7" className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                     No checkouts found
                   </td>
                 </tr>
@@ -268,6 +302,17 @@ const TruckCheckoutList = () => {
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
+                    </td>
+
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => handleDelete(checkout._id, e)}
+                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </Button>
                     </td>
                   </tr>
                 ))
@@ -330,6 +375,35 @@ const TruckCheckoutList = () => {
           </div>
         )}
       </Card>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => !deleting && setShowDeleteModal(false)}
+        title="Delete Checkout"
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => setShowDeleteModal(false)}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={confirmDelete}
+              loading={deleting}
+            >
+              Delete Checkout
+            </Button>
+          </>
+        }
+      >
+        <Alert variant="danger" title="Warning">
+          This will permanently delete this checkout. This action cannot be undone!
+        </Alert>
+      </Modal>
     </div>
   );
 };

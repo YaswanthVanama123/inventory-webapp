@@ -32,6 +32,7 @@ const ModelCategoryMapping = lazy(() => import('./pages/routestar/ModelCategoryM
 const ItemNameAliasMapping = lazy(() => import('./pages/routestar/ItemNameAliasMapping'));
 const RouteStarItemsList = lazy(() => import('./pages/routestar/RouteStarItemsList'));
 const RouteStarSalesReport = lazy(() => import('./pages/routestar/SalesReport'));
+const ItemsInvoiceUsage = lazy(() => import('./pages/routestar/ItemsInvoiceUsage'));
 const PointOfSale = lazy(() => import('./pages/pos/PointOfSale'));
 const Categories = lazy(() => import('./pages/categories/Categories'));
 const Units = lazy(() => import('./pages/units/Units'));
@@ -378,6 +379,18 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute requireAdmin>
                         <RouteStarSalesReport />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+
+                {}
+                <Route
+                  path="/routestar/items-invoice-usage"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute>
+                        <ItemsInvoiceUsage />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

@@ -296,6 +296,17 @@ export const deleteBulkClosedInvoicesByNumbers = async (invoiceNumbers) => {
   }
 };
 
+// Get items with invoice usage (folder structure)
+export const getItemsInvoiceUsage = async () => {
+  try {
+    const response = await api.get('/routestar/items/invoice-usage');
+    return response;
+  } catch (error) {
+    console.error('Error fetching items invoice usage:', error);
+    throw error;
+  }
+};
+
 export default {
   getInvoices,
   getInvoiceByNumber,
@@ -315,4 +326,5 @@ export default {
   deleteAllPendingInvoices,
   deleteAllClosedInvoices,
   deleteBulkClosedInvoicesByNumbers,
+  getItemsInvoiceUsage,
 };

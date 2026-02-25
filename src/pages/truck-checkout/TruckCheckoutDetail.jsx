@@ -19,7 +19,9 @@ import {
   DocumentTextIcon,
   CalculatorIcon,
   CubeIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  XMarkIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline';
 
 const TruckCheckoutDetail = () => {
@@ -33,12 +35,18 @@ const TruckCheckoutDetail = () => {
 
   // Complete modal
   const [showCompleteModal, setShowCompleteModal] = useState(false);
-  const [invoiceInput, setInvoiceInput] = useState('');
+  const [invoiceNumbers, setInvoiceNumbers] = useState([]);
+  const [currentInput, setCurrentInput] = useState('');
   const [invoiceType, setInvoiceType] = useState('closed');
+  const [comparisonData, setComparisonData] = useState(null);
+  const [checkWorkDone, setCheckWorkDone] = useState(false);
 
   // Cancel modal
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
+
+  // Delete modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     loadCheckout();
@@ -57,24 +65,19 @@ const TruckCheckoutDetail = () => {
     }
   };
 
-  const handleComplete = async () => {
-    const invoiceNumbers = invoiceInput
-      .split(/[\s,]+/)
-      .map(num => num.trim())
-      .filter(num => num);
-
+  const handleCheckWork = async () => {
     if (invoiceNumbers.length === 0) {
       showError('Please enter at least one invoice number');
       return;
     }
 
     try {
-      setActionLoading('complete');
-      await truckCheckoutService.completeCheckout(id, invoiceNumbers, invoiceType);
-      showSuccess('Checkout completed successfully');
-      setShowCompleteModal(false);
-      setInvoiceInput('');
-      loadCheckout();
+      setActionLoading('check-work');
+      const response = await truckCheckoutService.checkWork(id, invoiceNumbers, invoiceType);
+      showSuccess('Invoices fetched successfully. Review the comparison below.');
+      setComparisonData(response.data);
+      setCheckWorkDone(true);
+      loadCheckout(); // Reload to get updated data
     } catch (error) {
       const errorData = error.response?.data;
 
@@ -87,13 +90,77 @@ const TruckCheckoutDetail = () => {
 
         showError(
           `${errorData.message}\n\nDuplicate invoices found in:\n${duplicateDetails}`,
-          10000 // Show for 10 seconds
+          10000
         );
       } else {
-        showError(errorData?.message || 'Failed to complete checkout');
+        showError(errorData?.message || 'Failed to check work');
       }
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleComplete = async () => {
+    if (!checkWorkDone) {
+      showError('Please click "Check Work" first to review the comparison');
+      return;
+    }
+
+    try {
+      setActionLoading('complete');
+      await truckCheckoutService.completeCheckout(id, invoiceNumbers, invoiceType);
+      showSuccess('Checkout completed successfully');
+      setShowCompleteModal(false);
+      setInvoiceNumbers([]);
+      setCurrentInput('');
+      setComparisonData(null);
+      setCheckWorkDone(false);
+      loadCheckout();
+    } catch (error) {
+      showError(error.response?.data?.message || 'Failed to complete checkout');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleAddInvoice = (value) => {
+    const trimmedValue = value.trim();
+    if (trimmedValue && !invoiceNumbers.includes(trimmedValue)) {
+      setInvoiceNumbers([...invoiceNumbers, trimmedValue]);
+    }
+  };
+
+  const handleRemoveInvoice = (invoiceToRemove) => {
+    setInvoiceNumbers(invoiceNumbers.filter(inv => inv !== invoiceToRemove));
+  };
+
+  const handleInvoiceInputKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      handleAddInvoice(currentInput);
+      setCurrentInput('');
+    } else if (e.key === 'Backspace' && currentInput === '' && invoiceNumbers.length > 0) {
+      // Remove last invoice if backspace is pressed on empty input
+      setInvoiceNumbers(invoiceNumbers.slice(0, -1));
+    }
+  };
+
+  const handleInvoiceInputChange = (e) => {
+    const value = e.target.value;
+    // If user pastes comma-separated values, split them
+    if (value.includes(',')) {
+      const parts = value.split(',').map(p => p.trim()).filter(p => p);
+      parts.forEach(part => handleAddInvoice(part));
+      setCurrentInput('');
+    } else {
+      setCurrentInput(value);
+    }
+  };
+
+  const handleInvoiceInputBlur = () => {
+    if (currentInput.trim()) {
+      handleAddInvoice(currentInput);
+      setCurrentInput('');
     }
   };
 
@@ -147,6 +214,24 @@ const TruckCheckoutDetail = () => {
       showError(error.response?.data?.message || 'Failed to cancel checkout');
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleDelete = () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      setActionLoading('delete');
+      await truckCheckoutService.deleteCheckout(id);
+      showSuccess('Checkout deleted successfully');
+      navigate('/truck-checkouts');
+    } catch (error) {
+      showError(error.response?.data?.message || 'Failed to delete checkout');
+    } finally {
+      setActionLoading(null);
+      setShowDeleteModal(false);
     }
   };
 
@@ -250,6 +335,15 @@ const TruckCheckoutDetail = () => {
               <XCircleIcon className="w-5 h-5 mr-2" />
               Cancel Checkout
             </Button>
+            <Button
+              variant="ghost"
+              onClick={handleDelete}
+              loading={actionLoading === 'delete'}
+              className="ml-auto"
+            >
+              <TrashIcon className="w-5 h-5 mr-2" />
+              Delete Checkout
+            </Button>
           </div>
         </Card>
       )}
@@ -283,12 +377,36 @@ const TruckCheckoutDetail = () => {
                 Stock Processed
               </Badge>
             )}
+            <Button
+              variant="ghost"
+              onClick={handleDelete}
+              loading={actionLoading === 'delete'}
+              className="ml-auto"
+            >
+              <TrashIcon className="w-5 h-5 mr-2" />
+              Delete Checkout
+            </Button>
           </div>
           {canProcessStock && (
             <Alert variant="info" title="Stock Processing" className="mt-4">
               This will adjust stock levels by adding back sold items (to compensate for double-decrease during checkout and invoice sync) and tracking used items separately.
             </Alert>
           )}
+        </Card>
+      )}
+
+      {checkout.status === 'cancelled' && (
+        <Card>
+          <div className="flex items-center gap-3 flex-wrap">
+            <Button
+              variant="ghost"
+              onClick={handleDelete}
+              loading={actionLoading === 'delete'}
+            >
+              <TrashIcon className="w-5 h-5 mr-2" />
+              Delete Checkout
+            </Button>
+          </div>
         </Card>
       )}
 
@@ -425,21 +543,21 @@ const TruckCheckoutDetail = () => {
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
               <p className="text-sm text-blue-600 dark:text-blue-400">Total Items Taken</p>
               <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
-                {checkout.tallyResults.itemsTaken?.reduce((sum, item) => sum + item.quantityTaken, 0) || 0}
+                {checkout.tallyResults.discrepancies?.reduce((sum, item) => sum + item.quantityTaken, 0) || 0}
               </p>
             </div>
             <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
               <p className="text-sm text-green-600 dark:text-green-400">Items Sold</p>
               <p className="text-2xl font-bold text-green-700 dark:text-green-300">
-                {checkout.tallyResults.itemsSold?.reduce((sum, item) => sum + item.quantitySold, 0) || 0}
+                {checkout.tallyResults.discrepancies?.reduce((sum, item) => sum + item.quantitySold, 0) || 0}
               </p>
               <p className="text-xs text-green-600 dark:text-green-400 mt-1">From invoices</p>
             </div>
             <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
               <p className="text-sm text-orange-600 dark:text-orange-400">Items Used</p>
               <p className="text-2xl font-bold text-orange-700 dark:text-orange-300">
-                {(checkout.tallyResults.itemsTaken?.reduce((sum, item) => sum + item.quantityTaken, 0) || 0) -
-                 (checkout.tallyResults.itemsSold?.reduce((sum, item) => sum + item.quantitySold, 0) || 0)}
+                {(checkout.tallyResults.discrepancies?.reduce((sum, item) => sum + item.quantityTaken, 0) || 0) -
+                 (checkout.tallyResults.discrepancies?.reduce((sum, item) => sum + item.quantitySold, 0) || 0)}
               </p>
               <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">For service/installation</p>
             </div>
@@ -526,60 +644,177 @@ const TruckCheckoutDetail = () => {
       {/* Complete Modal */}
       <Modal
         isOpen={showCompleteModal}
-        onClose={() => !actionLoading && setShowCompleteModal(false)}
-        title="Complete Checkout"
-        size="lg"
+        onClose={() => {
+          if (!actionLoading) {
+            setShowCompleteModal(false);
+            setInvoiceNumbers([]);
+            setCurrentInput('');
+            setComparisonData(null);
+            setCheckWorkDone(false);
+          }
+        }}
+        title={checkWorkDone ? "Review & Complete Checkout" : "Complete Checkout"}
+        size={checkWorkDone ? "xl" : "lg"}
         footer={
           <>
             <Button
               variant="ghost"
-              onClick={() => setShowCompleteModal(false)}
+              onClick={() => {
+                setShowCompleteModal(false);
+                setInvoiceNumbers([]);
+                setCurrentInput('');
+                setComparisonData(null);
+                setCheckWorkDone(false);
+              }}
               disabled={actionLoading}
             >
               Cancel
             </Button>
-            <Button
-              variant="primary"
-              onClick={handleComplete}
-              loading={actionLoading === 'complete'}
-            >
-              Complete Checkout
-            </Button>
+            {!checkWorkDone ? (
+              <Button
+                variant="secondary"
+                onClick={handleCheckWork}
+                loading={actionLoading === 'check-work'}
+                disabled={invoiceNumbers.length === 0}
+              >
+                Check Work
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                onClick={handleComplete}
+                loading={actionLoading === 'complete'}
+              >
+                Complete Checkout
+              </Button>
+            )}
           </>
         }
       >
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Invoice Numbers
-            </label>
-            <Textarea
-              value={invoiceInput}
-              onChange={(e) => setInvoiceInput(e.target.value)}
-              placeholder="Enter invoice numbers (one per line or comma-separated)&#10;Example: INV-001, INV-002, INV-003"
-              rows={5}
-            />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Enter multiple invoice numbers separated by commas or new lines
-            </p>
-          </div>
+          {/* Step 1: Invoice Input */}
+          {!checkWorkDone && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Invoice Numbers
+                </label>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Invoice Type
-            </label>
-            <Select
-              value={invoiceType}
-              onChange={(e) => setInvoiceType(e.target.value)}
-            >
-              <option value="closed">Closed Invoices</option>
-              <option value="pending">Pending Invoices</option>
-            </Select>
-          </div>
+                {/* Tags Container */}
+                <div className="min-h-[120px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {invoiceNumbers.map((invoice, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium"
+                      >
+                        {invoice}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveInvoice(invoice)}
+                          className="hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5 transition-colors"
+                        >
+                          <XMarkIcon className="w-3.5 h-3.5" />
+                        </button>
+                      </span>
+                    ))}
+                    <input
+                      type="text"
+                      value={currentInput}
+                      onChange={handleInvoiceInputChange}
+                      onKeyDown={handleInvoiceInputKeyDown}
+                      onBlur={handleInvoiceInputBlur}
+                      placeholder={invoiceNumbers.length === 0 ? "Type invoice number and press Enter or comma..." : "Add another..."}
+                      className="flex-1 min-w-[200px] outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                    />
+                  </div>
+                </div>
 
-          <Alert variant="info" title="Next Steps">
-            After completing, you can fetch the invoices from RouteStar and tally them against the items taken.
-          </Alert>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Press Enter or comma to add invoice numbers. Click × to remove.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Invoice Type
+                </label>
+                <Select
+                  value={invoiceType}
+                  onChange={(e) => setInvoiceType(e.target.value)}
+                >
+                  <option value="closed">Closed Invoices</option>
+                  <option value="pending">Pending Invoices</option>
+                </Select>
+              </div>
+
+              <Alert variant="info" title="Next Steps">
+                Click "Check Work" to fetch invoices and compare quantities with checked out items.
+              </Alert>
+            </>
+          )}
+
+          {/* Step 2: Comparison Display */}
+          {checkWorkDone && comparisonData && (
+            <>
+              <Alert variant="success" title="Invoices Fetched">
+                {comparisonData.summary.fetchedInvoices} of {comparisonData.summary.totalInvoices} invoices fetched successfully. Review the comparison below.
+              </Alert>
+
+              {/* Comparison Table */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Item Comparison</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Matched: {comparisonData.summary.matched} | Discrepancies: {comparisonData.summary.discrepancies}
+                  </p>
+                </div>
+
+                <div className="overflow-x-auto max-h-96">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Item</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Taken</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Sold</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Difference</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                      {comparisonData.comparison.discrepancies.map((item, index) => (
+                        <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{item.name}</td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-700 dark:text-gray-300">{item.quantityTaken}</td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-700 dark:text-gray-300">{item.quantitySold}</td>
+                          <td className={`px-4 py-3 text-sm text-center font-semibold ${
+                            item.difference === 0 ? 'text-green-600 dark:text-green-400' :
+                            item.difference > 0 ? 'text-blue-600 dark:text-blue-400' :
+                            'text-red-600 dark:text-red-400'
+                          }`}>
+                            {item.difference > 0 ? `+${item.difference}` : item.difference}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <Badge variant={
+                              item.status === 'matched' ? 'success' :
+                              item.status === 'excess' ? 'info' : 'warning'
+                            }>
+                              {item.status === 'matched' ? 'Matched' :
+                               item.status === 'excess' ? 'Excess (Returns)' : 'Shortage'}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <Alert variant="warning" title="Important">
+                Review the comparison carefully. Click "Complete Checkout" to finalize. Stock movements will be recorded without double-decreasing inventory.
+              </Alert>
+            </>
+          )}
         </div>
       </Modal>
 
@@ -623,6 +858,35 @@ const TruckCheckoutDetail = () => {
             />
           </div>
         </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => !actionLoading && setShowDeleteModal(false)}
+        title="Delete Checkout"
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => setShowDeleteModal(false)}
+              disabled={actionLoading === 'delete'}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={confirmDelete}
+              loading={actionLoading === 'delete'}
+            >
+              Delete Checkout
+            </Button>
+          </>
+        }
+      >
+        <Alert variant="danger" title="Warning">
+          This will permanently delete this checkout. This action cannot be undone!
+        </Alert>
       </Modal>
     </div>
   );

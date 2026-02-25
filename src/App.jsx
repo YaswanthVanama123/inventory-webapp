@@ -178,7 +178,7 @@ function App() {
                   path="/orders"
                   element={
                     <ErrorBoundary>
-                      <ProtectedRoute requireAdmin>
+                      <ProtectedRoute>
                         <OrdersList />
                       </ProtectedRoute>
                     </ErrorBoundary>
@@ -188,7 +188,7 @@ function App() {
                   path="/orders/:orderNumber"
                   element={
                     <ErrorBoundary>
-                      <ProtectedRoute requireAdmin>
+                      <ProtectedRoute>
                         <OrderDetail />
                       </ProtectedRoute>
                     </ErrorBoundary>

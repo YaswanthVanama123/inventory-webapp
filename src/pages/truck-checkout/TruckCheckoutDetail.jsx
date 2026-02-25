@@ -76,7 +76,22 @@ const TruckCheckoutDetail = () => {
       setInvoiceInput('');
       loadCheckout();
     } catch (error) {
-      showError(error.response?.data?.message || 'Failed to complete checkout');
+      const errorData = error.response?.data;
+
+      // Special handling for duplicate invoice error
+      if (errorData?.duplicateCheckouts && errorData.duplicateCheckouts.length > 0) {
+        const duplicates = errorData.duplicateCheckouts;
+        const duplicateDetails = duplicates.map(dup =>
+          `${dup.employeeName} (Checkout #${dup.checkoutId}): ${dup.invoices.join(', ')}`
+        ).join('\n');
+
+        showError(
+          `${errorData.message}\n\nDuplicate invoices found in:\n${duplicateDetails}`,
+          10000 // Show for 10 seconds
+        );
+      } else {
+        showError(errorData?.message || 'Failed to complete checkout');
+      }
     } finally {
       setActionLoading(null);
     }
@@ -104,7 +119,14 @@ const TruckCheckoutDetail = () => {
     try {
       setActionLoading('stock');
       const response = await truckCheckoutService.processStock(id);
-      showSuccess(`Stock movements processed: ${response.data.processed} items`);
+
+      const { soldAdjustments, usedMovements, errors } = response.data;
+
+      showSuccess(
+        `Stock movements processed successfully! ` +
+        `Added back ${soldAdjustments} sold items, tracked ${usedMovements} used items.` +
+        (errors && errors.length > 0 ? ` ${errors.length} errors occurred.` : '')
+      );
       loadCheckout();
     } catch (error) {
       showError(error.response?.data?.message || 'Failed to process stock');
@@ -173,7 +195,7 @@ const TruckCheckoutDetail = () => {
     );
   }
 
-  const hasTally = checkout.tallyResults && checkout.tallyResults.discrepancies;
+  const hasTally = checkout.tallyResults && checkout.tallyResults.discrepancies && checkout.tallyResults.discrepancies.length > 0;
   const canTally = checkout.status === 'completed' && checkout.invoiceNumbers && checkout.invoiceNumbers.length > 0;
   const canProcessStock = hasTally && !checkout.stockProcessed;
 
@@ -262,6 +284,11 @@ const TruckCheckoutDetail = () => {
               </Badge>
             )}
           </div>
+          {canProcessStock && (
+            <Alert variant="info" title="Stock Processing" className="mt-4">
+              This will adjust stock levels by adding back sold items (to compensate for double-decrease during checkout and invoice sync) and tracking used items separately.
+            </Alert>
+          )}
         </Card>
       )}
 
@@ -394,7 +421,7 @@ const TruckCheckoutDetail = () => {
           </h2>
 
           {/* Summary */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
               <p className="text-sm text-blue-600 dark:text-blue-400">Total Items Taken</p>
               <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
@@ -402,10 +429,19 @@ const TruckCheckoutDetail = () => {
               </p>
             </div>
             <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-              <p className="text-sm text-green-600 dark:text-green-400">Total Items Sold</p>
+              <p className="text-sm text-green-600 dark:text-green-400">Items Sold</p>
               <p className="text-2xl font-bold text-green-700 dark:text-green-300">
                 {checkout.tallyResults.itemsSold?.reduce((sum, item) => sum + item.quantitySold, 0) || 0}
               </p>
+              <p className="text-xs text-green-600 dark:text-green-400 mt-1">From invoices</p>
+            </div>
+            <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
+              <p className="text-sm text-orange-600 dark:text-orange-400">Items Used</p>
+              <p className="text-2xl font-bold text-orange-700 dark:text-orange-300">
+                {(checkout.tallyResults.itemsTaken?.reduce((sum, item) => sum + item.quantityTaken, 0) || 0) -
+                 (checkout.tallyResults.itemsSold?.reduce((sum, item) => sum + item.quantitySold, 0) || 0)}
+              </p>
+              <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">For service/installation</p>
             </div>
             <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
               <p className="text-sm text-purple-600 dark:text-purple-400">Discrepancies</p>
@@ -435,7 +471,7 @@ const TruckCheckoutDetail = () => {
                         Sold
                       </th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                        Difference
+                        Used
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                         Status
@@ -452,22 +488,22 @@ const TruckCheckoutDetail = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600 dark:text-gray-400">
                           {item.quantityTaken}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600 dark:text-gray-400">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-green-600 dark:text-green-400 font-semibold">
                           {item.quantitySold}
                         </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm text-right font-semibold ${
-                          item.difference === 0 ? 'text-green-600 dark:text-green-400' :
+                          item.difference === 0 ? 'text-gray-600 dark:text-gray-400' :
                           item.difference > 0 ? 'text-orange-600 dark:text-orange-400' :
                           'text-red-600 dark:text-red-400'
                         }`}>
-                          {item.difference > 0 ? '+' : ''}{item.difference}
+                          {item.difference > 0 ? item.difference : 0}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {item.status === 'matched' && <Badge variant="success">Matched</Badge>}
                           {item.status === 'excess' && (
                             <Badge variant="warning">
                               <ExclamationTriangleIcon className="w-4 h-4 mr-1" />
-                              Excess (Returned)
+                              Has Returns
                             </Badge>
                           )}
                           {item.status === 'shortage' && (

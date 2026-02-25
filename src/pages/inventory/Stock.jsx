@@ -4,7 +4,7 @@ import stockService from '../../services/stockService';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { ArchiveBoxIcon, ShoppingCartIcon, ShoppingBagIcon, ArrowPathIcon, ArrowTrendingUpIcon, CurrencyDollarIcon, ChevronRightIcon, ChevronDownIcon, FolderIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import { ArchiveBoxIcon, ShoppingCartIcon, ShoppingBagIcon, ArrowPathIcon, ArrowTrendingUpIcon, CurrencyDollarIcon, ChevronRightIcon, ChevronDownIcon, FolderIcon, DocumentTextIcon, TruckIcon } from '@heroicons/react/24/outline';
 
 const Stock = () => {
   const { showSuccess, showError } = useContext(ToastContext);
@@ -165,7 +165,7 @@ const Stock = () => {
       </Card>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className={`grid grid-cols-1 ${activeTab === 'sell' ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-6`}>
         {activeTab === 'use' ? (
           <>
             {/* Total Categories */}
@@ -260,6 +260,24 @@ const Stock = () => {
               </div>
             </div>
 
+            {/* Total Checked Out */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Checked Out</p>
+                  <p className="text-3xl font-bold text-orange-600 dark:text-orange-500">{currentData.totals.totalCheckedOut || 0}</p>
+                </div>
+                <div className="w-12 h-12 bg-orange-50 dark:bg-orange-900/20 rounded-lg flex items-center justify-center">
+                  <TruckIcon className="w-6 h-6 text-orange-600 dark:text-orange-500" />
+                </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Units on trucks
+                </p>
+              </div>
+            </div>
+
             {/* Stock Remaining */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-between">
@@ -322,6 +340,9 @@ const Stock = () => {
                       </th>
                       <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Sold
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Checked Out
                       </th>
                       <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Stock Remaining
@@ -388,6 +409,11 @@ const Stock = () => {
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
+                            <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                              {item.totalCheckedOut || 0}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center">
                             <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
                               {item.stockRemaining || 0}
                             </span>
@@ -411,7 +437,7 @@ const Stock = () => {
                       <>
                         {loadingCategories.has(item.categoryName) ? (
                           <tr>
-                            <td colSpan={activeTab === 'use' ? '4' : '6'} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            <td colSpan={activeTab === 'use' ? '4' : '7'} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                               <div className="flex items-center justify-center">
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500 mr-2"></div>
                                 Loading SKUs...
@@ -474,8 +500,13 @@ const Stock = () => {
                                       </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-center">
+                                      <span className="text-sm font-semibold text-orange-600 dark:text-orange-400">
+                                        {sku.totalCheckedOut || 0}
+                                      </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-center">
                                       <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                                        {(sku.totalPurchased || 0) - (sku.totalSold || 0)}
+                                        {(sku.totalPurchased || 0) - (sku.totalSold || 0) - (sku.totalCheckedOut || 0)}
                                       </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -496,10 +527,9 @@ const Stock = () => {
                               {expandedSKUs.has(sku.sku) && (
                                 <>
                                   {activeTab === 'sell' && (
-
                                     <tr className="bg-indigo-50 dark:bg-indigo-900/20">
-                                      <td colSpan="6" className="px-6 py-3">
-                                        <div className="grid grid-cols-4 gap-4 text-sm">
+                                      <td colSpan="7" className="px-6 py-3">
+                                        <div className="grid grid-cols-5 gap-4 text-sm">
                                           <div>
                                             <div className="text-xs text-gray-600 dark:text-gray-400">Total Purchased</div>
                                             <div className="font-bold text-blue-600 dark:text-blue-400">{sku.totalPurchased || 0} units</div>
@@ -509,8 +539,12 @@ const Stock = () => {
                                             <div className="font-bold text-green-600 dark:text-green-400">{sku.totalSold || 0} units</div>
                                           </div>
                                           <div>
+                                            <div className="text-xs text-gray-600 dark:text-gray-400">Checked Out</div>
+                                            <div className="font-bold text-orange-600 dark:text-orange-400">{sku.totalCheckedOut || 0} units</div>
+                                          </div>
+                                          <div>
                                             <div className="text-xs text-gray-600 dark:text-gray-400">Remaining Stock</div>
-                                            <div className="font-bold text-purple-600 dark:text-purple-400">{(sku.totalPurchased || 0) - (sku.totalSold || 0)} units</div>
+                                            <div className="font-bold text-purple-600 dark:text-purple-400">{(sku.totalPurchased || 0) - (sku.totalSold || 0) - (sku.totalCheckedOut || 0)} units</div>
                                           </div>
                                           <div>
                                             <div className="text-xs text-gray-600 dark:text-gray-400">Net Value</div>
@@ -603,7 +637,7 @@ const Stock = () => {
                                       {}
                                       {sku.purchaseHistory && sku.purchaseHistory.length > 0 && (
                                         <tr>
-                                          <td colSpan="6" className="px-0 py-0">
+                                          <td colSpan="7" className="px-0 py-0">
                                             <div className="bg-white dark:bg-gray-900 border-l-4 border-blue-300 dark:border-blue-700 ml-6">
                                               <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 font-semibold text-sm flex items-center gap-2">
                                                 <ShoppingCartIcon className="w-4 h-4" />
@@ -681,7 +715,7 @@ const Stock = () => {
                                       {}
                                       {sku.salesHistory && sku.salesHistory.length > 0 && (
                                         <tr>
-                                          <td colSpan="6" className="px-0 py-0">
+                                          <td colSpan="7" className="px-0 py-0">
                                             <div className="bg-white dark:bg-gray-900 border-l-4 border-green-300 dark:border-green-700 ml-6 mt-2">
                                               <div className="px-4 py-2 bg-green-100 dark:bg-green-900/30 font-semibold text-sm flex items-center gap-2">
                                                 <ShoppingBagIcon className="w-4 h-4" />
@@ -755,6 +789,64 @@ const Stock = () => {
                                           </td>
                                         </tr>
                                       )}
+
+                                      {/* Checkout History */}
+                                      {sku.checkoutHistory && sku.checkoutHistory.length > 0 && (
+                                        <tr>
+                                          <td colSpan="7" className="px-0 py-0">
+                                            <div className="bg-white dark:bg-gray-900 border-l-4 border-orange-300 dark:border-orange-700 ml-6 mt-2">
+                                              <div className="px-4 py-2 bg-orange-100 dark:bg-orange-900/30 font-semibold text-sm flex items-center gap-2">
+                                                <TruckIcon className="w-4 h-4" />
+                                                Checkout History ({sku.checkoutHistory.length} checkouts)
+                                              </div>
+                                              <div className="overflow-x-auto">
+                                                <table className="min-w-full">
+                                                  <thead className="bg-orange-50 dark:bg-orange-900/20">
+                                                    <tr>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Employee
+                                                      </th>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Truck Number
+                                                      </th>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Checkout Date
+                                                      </th>
+                                                      <th className="px-4 py-2 text-center text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Quantity
+                                                      </th>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Notes
+                                                      </th>
+                                                    </tr>
+                                                  </thead>
+                                                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                                                    {sku.checkoutHistory.map((record, recordIndex) => (
+                                                      <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                                        <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
+                                                          {record.employeeName || '-'}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                          {record.truckNumber || '-'}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                          {record.checkoutDate ? new Date(record.checkoutDate).toLocaleDateString() : '-'}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-center text-xs font-medium text-gray-900 dark:text-white">
+                                                          {record.quantity}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                          {record.notes || '-'}
+                                                        </td>
+                                                      </tr>
+                                                    ))}
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      )}
                                     </>
                                   )}
                                 </>
@@ -763,7 +855,7 @@ const Stock = () => {
                           ))
                         ) : (
                           <tr>
-                            <td colSpan={activeTab === 'use' ? '4' : '6'} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                            <td colSpan={activeTab === 'use' ? '4' : '7'} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
                               No SKUs mapped to this category
                             </td>
                           </tr>
@@ -797,6 +889,9 @@ const Stock = () => {
                       </td>
                       <td className="px-6 py-4 text-center text-lg text-green-600 dark:text-green-400">
                         {currentData.totals.totalSold || 0}
+                      </td>
+                      <td className="px-6 py-4 text-center text-lg text-orange-600 dark:text-orange-400">
+                        {currentData.totals.totalCheckedOut || 0}
                       </td>
                       <td className="px-6 py-4 text-center text-lg text-purple-600 dark:text-purple-400">
                         {currentData.totals.stockRemaining || 0}

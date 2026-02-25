@@ -422,7 +422,7 @@ const InvoiceDetail = () => {
                     >
                       <td className="py-3 sm:py-4 px-2">
                         <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                          {item.name || item.itemName}
+                          {item.itemName}
                         </p>
                         {item.description && (
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -430,23 +430,23 @@ const InvoiceDetail = () => {
                           </p>
                         )}
                         <p className="text-xs text-gray-500 dark:text-gray-400 sm:hidden mt-1">
-                          SKU: {item.skuCode || item.sku || 'N/A'}
+                          SKU: {item.skuCode}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 sm:hidden">
-                          {formatCurrency(item.priceAtSale || item.unitPrice || item.price)} each
+                          {formatCurrency(item.priceAtSale)} each
                         </p>
                       </td>
                       <td className="py-3 sm:py-4 px-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 hidden sm:table-cell">
-                        {item.skuCode || item.sku || 'N/A'}
+                        {item.skuCode}
                       </td>
                       <td className="py-3 sm:py-4 px-2 text-xs sm:text-sm text-right text-gray-900 dark:text-white">
                         {item.quantity} {item.unit || ''}
                       </td>
                       <td className="py-3 sm:py-4 px-2 text-xs sm:text-sm text-right text-gray-900 dark:text-white hidden sm:table-cell">
-                        {formatCurrency(item.priceAtSale || item.unitPrice || item.price)}
+                        {formatCurrency(item.priceAtSale)}
                       </td>
                       <td className="py-3 sm:py-4 px-2 text-xs sm:text-sm text-right font-medium text-gray-900 dark:text-white">
-                        {formatCurrency(item.subtotal || (item.priceAtSale || item.unitPrice || item.price) * item.quantity)}
+                        {formatCurrency(item.subtotal)}
                       </td>
                     </tr>
                   ))}
@@ -461,7 +461,7 @@ const InvoiceDetail = () => {
               <div className="w-full space-y-2">
                 <div className="flex justify-between text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                   <span>Subtotal:</span>
-                  <span className="font-medium">{formatCurrency(invoice.subtotalAmount || invoice.subtotal)}</span>
+                  <span className="font-medium">{formatCurrency(invoice.subtotalAmount)}</span>
                 </div>
 
                 {(invoice.discount?.amount || invoice.discount) > 0 && (

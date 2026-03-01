@@ -58,6 +58,7 @@ const TruckCheckoutList = lazy(() => import('./pages/truck-checkout/TruckCheckou
 const TruckCheckoutShop = lazy(() => import('./pages/truck-checkout/TruckCheckoutShop'));
 const TruckCheckoutDetail = lazy(() => import('./pages/truck-checkout/TruckCheckoutDetail'));
 const EmployeeCheckouts = lazy(() => import('./pages/truck-checkout/EmployeeCheckouts'));
+const DiscrepancyManagement = lazy(() => import('./pages/admin/DiscrepancyManagement'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 
@@ -171,6 +172,16 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute>
                         <Stock />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/discrepancies"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute>
+                        <DiscrepancyManagement />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

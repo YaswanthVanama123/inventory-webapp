@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ToastContext } from '../../contexts/ToastContext';
 import stockService from '../../services/stockService';
+import discrepancyService from '../../services/discrepancyService';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { ArchiveBoxIcon, ShoppingCartIcon, ShoppingBagIcon, ArrowPathIcon, ArrowTrendingUpIcon, CurrencyDollarIcon, ChevronRightIcon, ChevronDownIcon, FolderIcon, DocumentTextIcon, TruckIcon } from '@heroicons/react/24/outline';
+import { ArchiveBoxIcon, ShoppingCartIcon, ShoppingBagIcon, ArrowPathIcon, ArrowTrendingUpIcon, CurrencyDollarIcon, ChevronRightIcon, ChevronDownIcon, FolderIcon, DocumentTextIcon, TruckIcon, ExclamationTriangleIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Package, CheckCircle2 } from 'lucide-react';
 
 const Stock = () => {
   const { showSuccess, showError } = useContext(ToastContext);
@@ -20,11 +22,29 @@ const Stock = () => {
   const [categorySkuData, setCategorySkuData] = useState({});
   const [loadingCategories, setLoadingCategories] = useState(new Set());
 
+  // Discrepancy modal state
+  const [showDiscrepancyModal, setShowDiscrepancyModal] = useState(false);
+  const [prefilledItem, setPrefilledItem] = useState(null);
+
   useEffect(() => {
     loadData();
   }, []);
 
-  const loadData = async () => {
+  // Auto-refresh when page becomes visible (e.g., returning from Discrepancy Management)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadData();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  const loadData = async (showToast = false) => {
     try {
       setLoading(true);
       const response = await stockService.getStockSummary();
@@ -32,7 +52,9 @@ const Stock = () => {
       setUseStockData(response.useStock || { items: [], totals: {} });
       setSellStockData(response.sellStock || { items: [], totals: {} });
 
-      showSuccess('Stock data loaded successfully');
+      if (showToast) {
+        showSuccess('Stock data refreshed successfully');
+      }
     } catch (error) {
       console.error('Error loading stock data:', error);
       showError('Failed to load stock data: ' + error.message);
@@ -116,7 +138,7 @@ const Stock = () => {
         </div>
         <Button
           variant="secondary"
-          onClick={loadData}
+          onClick={() => loadData(true)}
           size="sm"
         >
           <ArrowPathIcon className="w-4 h-4 mr-2" />
@@ -348,6 +370,9 @@ const Stock = () => {
                         Stock Remaining
                       </th>
                       <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Discrepancies
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Orders / Invoices
                       </th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -419,6 +444,11 @@ const Stock = () => {
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
+                            <span className="text-lg font-bold text-red-600 dark:text-red-400">
+                              {item.totalDiscrepancyDifference !== undefined ? item.totalDiscrepancyDifference : item.totalDiscrepancies || 0}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center">
                             <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                               {item.itemCount || 0} / {item.invoiceCount || 0}
                             </span>
@@ -437,7 +467,7 @@ const Stock = () => {
                       <>
                         {loadingCategories.has(item.categoryName) ? (
                           <tr>
-                            <td colSpan={activeTab === 'use' ? '4' : '7'} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            <td colSpan={activeTab === 'use' ? '4' : '8'} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                               <div className="flex items-center justify-center">
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500 mr-2"></div>
                                 Loading SKUs...
@@ -506,8 +536,49 @@ const Stock = () => {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-center">
                                       <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                                        {(sku.totalPurchased || 0) - (sku.totalSold || 0) - (sku.totalCheckedOut || 0)}
+                                        {sku.stockRemaining !== undefined ? sku.stockRemaining : ((sku.totalPurchased || 0) - (sku.totalSold || 0) - (sku.totalCheckedOut || 0))}
                                       </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                                      <div className="flex items-center justify-center gap-2">
+                                        <span className="text-sm font-semibold text-red-600 dark:text-red-400">
+                                          {(sku.discrepancyHistory || []).reduce((sum, d) => sum + (d.difference || 0), 0)}
+                                        </span>
+                                        {activeTab === 'sell' && (
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              const stockRemaining = (sku.totalPurchased || 0) - (sku.totalSold || 0) - (sku.totalCheckedOut || 0);
+
+                                              // Extract actual RouteStarItem category from itemName
+                                              // e.g., "20001 SANIPOD... 'WHITE'" -> "WHITE"
+                                              let actualCategory = item.categoryName;
+                                              const itemNameUpper = sku.itemName.toUpperCase();
+
+                                              // Check if itemName contains common color/category names
+                                              const categoryKeywords = ['WHITE', 'BLACK', 'BLUE', 'RED', 'GREEN', 'YELLOW', 'BROWN', 'GRAY', 'GREY', 'ORANGE', 'PINK', 'PURPLE'];
+                                              for (const keyword of categoryKeywords) {
+                                                if (itemNameUpper.includes(keyword)) {
+                                                  actualCategory = keyword;
+                                                  break;
+                                                }
+                                              }
+
+                                              setPrefilledItem({
+                                                itemName: sku.itemName,
+                                                itemSku: sku.sku,
+                                                categoryName: actualCategory,
+                                                systemQuantity: stockRemaining
+                                              });
+                                              setShowDiscrepancyModal(true);
+                                            }}
+                                            className="p-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                                            title="Add Discrepancy"
+                                          >
+                                            <PlusIcon className="w-4 h-4" />
+                                          </button>
+                                        )}
+                                      </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-center">
                                       <span className="text-xs text-gray-600 dark:text-gray-400">
@@ -528,7 +599,7 @@ const Stock = () => {
                                 <>
                                   {activeTab === 'sell' && (
                                     <tr className="bg-indigo-50 dark:bg-indigo-900/20">
-                                      <td colSpan="7" className="px-6 py-3">
+                                      <td colSpan="8" className="px-6 py-3">
                                         <div className="grid grid-cols-5 gap-4 text-sm">
                                           <div>
                                             <div className="text-xs text-gray-600 dark:text-gray-400">Total Purchased</div>
@@ -544,7 +615,9 @@ const Stock = () => {
                                           </div>
                                           <div>
                                             <div className="text-xs text-gray-600 dark:text-gray-400">Remaining Stock</div>
-                                            <div className="font-bold text-purple-600 dark:text-purple-400">{(sku.totalPurchased || 0) - (sku.totalSold || 0) - (sku.totalCheckedOut || 0)} units</div>
+                                            <div className="font-bold text-purple-600 dark:text-purple-400">
+                                              {sku.stockRemaining !== undefined ? sku.stockRemaining : ((sku.totalPurchased || 0) - (sku.totalSold || 0) - (sku.totalCheckedOut || 0))} units
+                                            </div>
                                           </div>
                                           <div>
                                             <div className="text-xs text-gray-600 dark:text-gray-400">Net Value</div>
@@ -637,7 +710,7 @@ const Stock = () => {
                                       {}
                                       {sku.purchaseHistory && sku.purchaseHistory.length > 0 && (
                                         <tr>
-                                          <td colSpan="7" className="px-0 py-0">
+                                          <td colSpan="8" className="px-0 py-0">
                                             <div className="bg-white dark:bg-gray-900 border-l-4 border-blue-300 dark:border-blue-700 ml-6">
                                               <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 font-semibold text-sm flex items-center gap-2">
                                                 <ShoppingCartIcon className="w-4 h-4" />
@@ -715,7 +788,7 @@ const Stock = () => {
                                       {}
                                       {sku.salesHistory && sku.salesHistory.length > 0 && (
                                         <tr>
-                                          <td colSpan="7" className="px-0 py-0">
+                                          <td colSpan="8" className="px-0 py-0">
                                             <div className="bg-white dark:bg-gray-900 border-l-4 border-green-300 dark:border-green-700 ml-6 mt-2">
                                               <div className="px-4 py-2 bg-green-100 dark:bg-green-900/30 font-semibold text-sm flex items-center gap-2">
                                                 <ShoppingBagIcon className="w-4 h-4" />
@@ -793,7 +866,7 @@ const Stock = () => {
                                       {/* Checkout History */}
                                       {sku.checkoutHistory && sku.checkoutHistory.length > 0 && (
                                         <tr>
-                                          <td colSpan="7" className="px-0 py-0">
+                                          <td colSpan="8" className="px-0 py-0">
                                             <div className="bg-white dark:bg-gray-900 border-l-4 border-orange-300 dark:border-orange-700 ml-6 mt-2">
                                               <div className="px-4 py-2 bg-orange-100 dark:bg-orange-900/30 font-semibold text-sm flex items-center gap-2">
                                                 <TruckIcon className="w-4 h-4" />
@@ -847,6 +920,104 @@ const Stock = () => {
                                           </td>
                                         </tr>
                                       )}
+
+                                      {/* Discrepancy History */}
+                                      {sku.discrepancyHistory && sku.discrepancyHistory.length > 0 && (
+                                        <tr>
+                                          <td colSpan="8" className="px-0 py-0">
+                                            <div className="bg-white dark:bg-gray-900 border-l-4 border-red-300 dark:border-red-700 ml-6 mt-2">
+                                              <div className="px-4 py-2 bg-red-100 dark:bg-red-900/30 font-semibold text-sm flex items-center gap-2">
+                                                <ExclamationTriangleIcon className="w-4 h-4" />
+                                                Discrepancy History ({sku.discrepancyHistory.length} discrepancies)
+                                              </div>
+                                              <div className="overflow-x-auto">
+                                                <table className="min-w-full">
+                                                  <thead className="bg-red-50 dark:bg-red-900/20">
+                                                    <tr>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Invoice Number
+                                                      </th>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Reported Date
+                                                      </th>
+                                                      <th className="px-4 py-2 text-center text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        System Qty
+                                                      </th>
+                                                      <th className="px-4 py-2 text-center text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Actual Qty
+                                                      </th>
+                                                      <th className="px-4 py-2 text-center text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Difference
+                                                      </th>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Type
+                                                      </th>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Status
+                                                      </th>
+                                                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
+                                                        Reported By
+                                                      </th>
+                                                    </tr>
+                                                  </thead>
+                                                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                                                    {sku.discrepancyHistory.map((record, recordIndex) => (
+                                                      <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                                        <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
+                                                          {record.invoiceNumber}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                          {record.reportedAt ? new Date(record.reportedAt).toLocaleDateString() : '-'}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-center text-xs text-gray-900 dark:text-white">
+                                                          {record.systemQuantity}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-center text-xs text-gray-900 dark:text-white">
+                                                          {record.actualQuantity}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-center text-xs font-bold">
+                                                          <span className={record.difference > 0 ? 'text-green-600' : 'text-red-600'}>
+                                                            {record.difference > 0 ? '+' : ''}{record.difference}
+                                                          </span>
+                                                        </td>
+                                                        <td className="px-4 py-2 text-xs">
+                                                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                                            record.discrepancyType === 'Overage'
+                                                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                                                              : record.discrepancyType === 'Shortage'
+                                                              ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                                              : record.discrepancyType === 'Damage'
+                                                              ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+                                                              : 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+                                                          }`}>
+                                                            {record.discrepancyType}
+                                                          </span>
+                                                        </td>
+                                                        <td className="px-4 py-2 text-xs">
+                                                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                                            record.status === 'Approved'
+                                                              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                                              : record.status === 'Rejected'
+                                                              ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                                              : record.status === 'Pending'
+                                                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400'
+                                                          }`}>
+                                                            {record.status}
+                                                          </span>
+                                                        </td>
+                                                        <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                          {record.reportedBy?.fullName || record.reportedBy?.username || '-'}
+                                                        </td>
+                                                      </tr>
+                                                    ))}
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      )}
                                     </>
                                   )}
                                 </>
@@ -855,7 +1026,7 @@ const Stock = () => {
                           ))
                         ) : (
                           <tr>
-                            <td colSpan={activeTab === 'use' ? '4' : '7'} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                            <td colSpan={activeTab === 'use' ? '4' : '8'} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
                               No SKUs mapped to this category
                             </td>
                           </tr>
@@ -896,6 +1067,9 @@ const Stock = () => {
                       <td className="px-6 py-4 text-center text-lg text-purple-600 dark:text-purple-400">
                         {currentData.totals.stockRemaining || 0}
                       </td>
+                      <td className="px-6 py-4 text-center text-lg text-red-600 dark:text-red-400">
+                        {currentData.totals.totalDiscrepancyDifference !== undefined ? currentData.totals.totalDiscrepancyDifference : currentData.totals.totalDiscrepancies || 0}
+                      </td>
                       <td className="px-6 py-4 text-center text-sm text-gray-900 dark:text-white">
                         {currentData.items.reduce((sum, item) => sum + (item.itemCount || 0), 0)} / {currentData.items.reduce((sum, item) => sum + (item.invoiceCount || 0), 0)}
                       </td>
@@ -926,6 +1100,374 @@ const Stock = () => {
           </div>
         </div>
       </Card>
+
+      {/* Discrepancy Modal */}
+      {showDiscrepancyModal && (
+        <DiscrepancyModal
+          onClose={() => {
+            setShowDiscrepancyModal(false);
+            setPrefilledItem(null);
+          }}
+          onSuccess={() => {
+            setShowDiscrepancyModal(false);
+            setPrefilledItem(null);
+            loadData(); // Refresh stock data
+            showSuccess?.('Discrepancy recorded successfully');
+          }}
+          prefilledItem={prefilledItem}
+        />
+      )}
+    </div>
+  );
+};
+
+// Discrepancy Modal Component
+const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
+  const { showSuccess, showError } = useContext(ToastContext);
+  const [loading, setLoading] = useState(false);
+  const [searchingInvoice, setSearchingInvoice] = useState(false);
+  const [invoices, setInvoices] = useState([]);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [formData, setFormData] = useState({
+    invoiceNumber: '',
+    invoiceId: '',
+    invoiceType: 'RouteStarInvoice',
+    itemName: prefilledItem?.itemName || '',
+    itemSku: prefilledItem?.itemSku || '',
+    categoryName: prefilledItem?.categoryName || '',
+    systemQuantity: prefilledItem?.systemQuantity || 0,
+    actualQuantity: 0,
+    discrepancyType: '',
+    reason: '',
+    notes: prefilledItem ? `Reported from Stock Management for ${prefilledItem.categoryName}` : ''
+  });
+
+  // Search invoices
+  const searchInvoices = async (searchTerm) => {
+    if (!searchTerm || searchTerm.length < 2) {
+      setInvoices([]);
+      return;
+    }
+
+    try {
+      setSearchingInvoice(true);
+      const response = await discrepancyService.searchInvoices(searchTerm, 10);
+      if (response.success) {
+        setInvoices(response.data.invoices || []);
+      }
+    } catch (error) {
+      console.error('Search invoices error:', error);
+    } finally {
+      setSearchingInvoice(false);
+    }
+  };
+
+  // Handle invoice selection
+  const handleInvoiceSelect = (invoice) => {
+    setSelectedInvoice(invoice);
+    setFormData({
+      ...formData,
+      invoiceNumber: invoice.invoiceNumber,
+      invoiceId: invoice._id,
+      invoiceType: 'RouteStarInvoice',
+      itemName: '',
+      itemSku: '',
+      systemQuantity: 0
+    });
+    setInvoices([]);
+  };
+
+  // Handle line item selection
+  const handleLineItemSelect = (item) => {
+    setFormData({
+      ...formData,
+      itemName: item.itemName,
+      itemSku: item.itemCode || '',
+      systemQuantity: item.quantity || 0
+    });
+  };
+
+  // Auto-determine discrepancy type
+  useEffect(() => {
+    if (formData.systemQuantity && formData.actualQuantity) {
+      const diff = formData.actualQuantity - formData.systemQuantity;
+      if (diff > 0 && !formData.discrepancyType) {
+        setFormData(prev => ({ ...prev, discrepancyType: 'Overage' }));
+      } else if (diff < 0 && !formData.discrepancyType) {
+        setFormData(prev => ({ ...prev, discrepancyType: 'Shortage' }));
+      }
+    }
+  }, [formData.systemQuantity, formData.actualQuantity, formData.discrepancyType]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!prefilledItem && !formData.invoiceNumber) {
+      showError?.('Please select an invoice');
+      return;
+    }
+
+    if (!formData.itemName) {
+      showError?.('Please select an item');
+      return;
+    }
+
+    if (formData.actualQuantity === formData.systemQuantity) {
+      showError?.('Actual quantity matches system quantity - no discrepancy to record');
+      return;
+    }
+
+    if (!formData.discrepancyType) {
+      showError?.('Please select a discrepancy type');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await discrepancyService.createDiscrepancy(formData);
+
+      if (response.success) {
+        onSuccess();
+      } else {
+        showError?.(response.message || 'Failed to record discrepancy');
+      }
+    } catch (error) {
+      showError?.('Error recording discrepancy');
+      console.error('Record discrepancy error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const difference = formData.actualQuantity - formData.systemQuantity;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Record Stock Discrepancy</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Enter the details of the stock count difference</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Show invoice/item selection only if NOT prefilled */}
+          {!prefilledItem && (
+            <>
+              {/* Invoice Search */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Invoice Number *
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={formData.invoiceNumber}
+                    onChange={(e) => {
+                      setFormData({ ...formData, invoiceNumber: e.target.value });
+                      searchInvoices(e.target.value);
+                    }}
+                    placeholder="Search invoice by number..."
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    required
+                  />
+                  {searchingInvoice && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <Package className="w-5 h-5 text-blue-600 animate-spin" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Invoice Search Results */}
+                {invoices.length > 0 && (
+                  <div className="mt-2 border border-gray-200 dark:border-gray-700 rounded-lg max-h-48 overflow-y-auto">
+                    {invoices.map((invoice) => (
+                      <button
+                        key={invoice._id}
+                        type="button"
+                        onClick={() => handleInvoiceSelect(invoice)}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                      >
+                        <div className="font-medium text-gray-900 dark:text-white">{invoice.invoiceNumber}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {invoice.customerName} • {new Date(invoice.invoiceDate).toLocaleDateString()}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Line Items Selection */}
+              {selectedInvoice && selectedInvoice.lineItems && selectedInvoice.lineItems.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Select Item *
+                  </label>
+                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg max-h-48 overflow-y-auto">
+                    {selectedInvoice.lineItems.map((item, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleLineItemSelect(item)}
+                        className={`w-full px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0 ${
+                          formData.itemName === item.itemName ? 'bg-blue-50 dark:bg-blue-900/30' : ''
+                        }`}
+                      >
+                        <div className="font-medium text-gray-900 dark:text-white">{item.itemName}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          SKU: {item.itemCode || 'N/A'} • Qty: {item.quantity}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Show item details if prefilled */}
+          {prefilledItem && (
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
+              <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">Item Details</h3>
+              <div className="space-y-1">
+                <div className="text-sm text-blue-800 dark:text-blue-200">
+                  <span className="font-medium">Item:</span> {prefilledItem.itemName}
+                </div>
+                <div className="text-sm text-blue-800 dark:text-blue-200">
+                  <span className="font-medium">SKU:</span> {prefilledItem.itemSku}
+                </div>
+                <div className="text-sm text-blue-800 dark:text-blue-200">
+                  <span className="font-medium">Category:</span> {prefilledItem.categoryName}
+                </div>
+                <div className="text-sm text-blue-800 dark:text-blue-200">
+                  <span className="font-medium">Current Stock:</span> {prefilledItem.systemQuantity} units
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* System Quantity (Read-only) */}
+          {formData.itemName && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  System Quantity
+                </label>
+                <input
+                  type="number"
+                  value={formData.systemQuantity}
+                  readOnly
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                />
+              </div>
+
+              {/* Actual Quantity */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Actual Quantity (Physical Count) *
+                </label>
+                <input
+                  type="number"
+                  value={formData.actualQuantity}
+                  onChange={(e) => setFormData({ ...formData, actualQuantity: parseFloat(e.target.value) || 0 })}
+                  placeholder="Enter actual counted quantity"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  required
+                  min="0"
+                  step="1"
+                />
+              </div>
+
+              {/* Difference Display */}
+              {formData.actualQuantity !== 0 && (
+                <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Difference:</span>
+                    <span className={`text-lg font-bold ${difference > 0 ? 'text-green-600' : difference < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                      {difference > 0 ? '+' : ''}{difference}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Discrepancy Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Discrepancy Type *
+                </label>
+                <select
+                  value={formData.discrepancyType}
+                  onChange={(e) => setFormData({ ...formData, discrepancyType: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  required
+                >
+                  <option value="">Select type...</option>
+                  <option value="Overage">Overage (More than expected)</option>
+                  <option value="Shortage">Shortage (Less than expected)</option>
+                  <option value="Damage">Damage</option>
+                  <option value="Missing">Missing</option>
+                </select>
+              </div>
+
+              {/* Reason */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Reason
+                </label>
+                <textarea
+                  value={formData.reason}
+                  onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                  placeholder="Explain the reason for this discrepancy..."
+                  rows="2"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Additional Notes
+                </label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  placeholder="Any additional information..."
+                  rows="2"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+            </>
+          )}
+        </form>
+
+        <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={loading || !formData.itemName || !formData.discrepancyType}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <>
+                <Package className="w-5 h-5 animate-spin" />
+                Recording...
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-5 h-5" />
+                Record Discrepancy
+              </>
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

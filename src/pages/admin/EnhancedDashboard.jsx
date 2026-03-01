@@ -156,46 +156,23 @@ const EnhancedDashboard = () => {
       console.log('EnhancedDashboard: API response:', response);
 
       if (response.success && response.data) {
-        const { summary, categoryStats, recentActivity, topSellingItems, salesTrend } = response.data;
+        const { summary, recentActivity, topSellingItems, topSellingItemsDetailed, salesTrend, invoiceStatusStats } = response.data;
 
-        // Calculate sales channels from automation data
-        const totalSales = summary.totalRevenue || 0;
-        const totalPurchases = summary.totalPurchaseAmount || 0;
-        const routeStarPercentage = totalSales > 0 ? (totalSales / (totalSales + totalPurchases)) * 100 : 0;
-        const customerConnectPercentage = 100 - routeStarPercentage;
+        // Transform invoice status stats
+        const statusColors = {
+          'Pending': '#F59E0B',
+          'Completed': '#10B981',
+          'Closed': '#3B82F6',
+          'Cancelled': '#EF4444',
+        };
 
-        // Calculate category performance with real sales data
-        const categorySalesMap = {};
-        if (topSellingItems && Array.isArray(topSellingItems)) {
-          topSellingItems.forEach(item => {
-            // Extract category from item name or use default
-            const category = item.category || 'General';
-            if (!categorySalesMap[category]) {
-              categorySalesMap[category] = {
-                sales: 0,
-                revenue: 0,
-                count: 0
-              };
-            }
-            categorySalesMap[category].sales += item.quantity || 0;
-            categorySalesMap[category].revenue += item.value || 0;
-            categorySalesMap[category].count += 1;
-          });
-        }
-
-        // Calculate stock turnover by category (simplified calculation)
-        const categoryTurnover = categoryStats?.map(cat => {
-          const categoryName = cat._id || cat.category || 'Unknown';
-          const salesData = categorySalesMap[categoryName] || { sales: 0, count: 0 };
-          const turnoverRate = cat.count > 0 ? (salesData.sales / cat.count) : 0;
-
-          return {
-            category: categoryName,
-            turnover: Math.round(turnoverRate * 10) / 10, // Round to 1 decimal
-            sales: salesData.sales,
-            inventory: cat.count
-          };
-        }) || [];
+        const statusDistribution = invoiceStatusStats ? Object.keys(invoiceStatusStats)
+          .filter(status => invoiceStatusStats[status] > 0)
+          .map(status => ({
+            name: status,
+            value: invoiceStatusStats[status],
+            color: statusColors[status] || '#64748B'
+          })) : [];
 
 
         const transformedData = {
@@ -221,46 +198,15 @@ const EnhancedDashboard = () => {
             profit: item.profit || 0,
           })) || [],
 
-          categoryPerformance: categoryStats?.map(cat => {
-            const categoryName = cat._id || cat.category || 'Unknown';
-            const salesData = categorySalesMap[categoryName] || { sales: 0, revenue: 0 };
-            const avgRevenue = cat.count > 0 ? salesData.revenue / cat.count : 0;
-
-            return {
-              category: categoryName,
-              sales: salesData.sales || 0,
-              profit: Math.round(avgRevenue), // Use average revenue per item as proxy for profit
-              inventory: cat.count || 0,
-              satisfaction: Math.min(95, 70 + (salesData.sales > 0 ? 20 : 0)), // Dynamic satisfaction based on sales
-            };
-          }) || [],
-
-          topProducts: (topSellingItems || []).slice(0, 5).map(item => ({
+          topProducts: (topSellingItemsDetailed || []).slice(0, 5).map(item => ({
             name: item.itemName,
             sales: item.value || 0,
             units: item.quantity || 0,
             margin: 0,
           })) || [],
 
-          // Real sales channel data from automation
-          salesByChannel: [
-            {
-              name: 'RouteStar Sales',
-              value: Math.round(routeStarPercentage),
-              color: '#3B82F6'
-            },
-            {
-              name: 'CustomerConnect',
-              value: Math.round(customerConnectPercentage),
-              color: '#10B981'
-            },
-          ].filter(channel => channel.value > 0), // Only show channels with data
-
-          // Real stock turnover from calculated data
-          stockTurnover: categoryTurnover.slice(0, 6), // Top 6 categories
-
-          // Placeholder for inventory trend - would need historical data
-          inventoryTrend: [],
+          // Invoice status distribution from real data
+          statusDistribution: statusDistribution,
         };
 
         console.log('EnhancedDashboard: Transformed data:', transformedData);
@@ -316,11 +262,8 @@ const EnhancedDashboard = () => {
       marginChange: '+0%',
     },
     revenueTrend: [],
-    inventoryTrend: [],
     topProducts: [],
-    categoryPerformance: [],
-    salesByChannel: [],
-    stockTurnover: [],
+    statusDistribution: [],
   };
 
   
@@ -498,14 +441,14 @@ const EnhancedDashboard = () => {
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-300">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-900">Sales by Channel</h2>
-            <p className="text-sm text-slate-500">Distribution across platforms</p>
+            <h2 className="text-xl font-bold text-slate-900">Invoice Status</h2>
+            <p className="text-sm text-slate-500">Order status distribution</p>
           </div>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
               <Pie
-                data={data.salesByChannel}
+                data={data.statusDistribution}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -515,7 +458,7 @@ const EnhancedDashboard = () => {
                 paddingAngle={0}
                 dataKey="value"
               >
-                {data.salesByChannel.map((entry, index) => (
+                {data.statusDistribution.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -525,75 +468,16 @@ const EnhancedDashboard = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-3 mt-4">
-            {data.salesByChannel.map((channel, index) => (
+            {data.statusDistribution.map((status, index) => (
               <div key={index} className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg">
                 <div
                   className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: channel.color }}
+                  style={{ backgroundColor: status.color }}
                 ></div>
-                <span className="text-sm font-medium text-slate-700">{channel.name}</span>
-                <span className="text-xs text-slate-500 ml-auto">{channel.value}%</span>
+                <span className="text-sm font-medium text-slate-700">{status.name}</span>
+                <span className="text-xs text-slate-500 ml-auto">{status.value} orders</span>
               </div>
             ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-300">
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-900">Category Performance</h2>
-            <p className="text-sm text-slate-500">Multi-dimensional analysis</p>
-          </div>
-          <div className="h-96">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={data.categoryPerformance}>
-              <PolarGrid stroke="#E2E8F0" />
-              <PolarAngleAxis dataKey="category" stroke="#64748B" fontSize={12} />
-              <PolarRadiusAxis stroke="#64748B" fontSize={11} />
-              <Tooltip content={<CustomTooltip />} />
-              <Radar
-                name="Sales"
-                dataKey="sales"
-                stroke="#3B82F6"
-                fill="#3B82F6"
-                fillOpacity={0.3}
-                strokeWidth={2}
-              />
-              <Radar
-                name="Profit"
-                dataKey="profit"
-                stroke="#10B981"
-                fill="#10B981"
-                fillOpacity={0.3}
-                strokeWidth={2}
-              />
-              <Legend wrapperStyle={{ fontSize: '14px' }} />
-            </RadarChart>
-          </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-300">
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-900">Stock Turnover Rate</h2>
-            <p className="text-sm text-slate-500">Inventory efficiency by category</p>
-          </div>
-          <div className="h-96">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.stockTurnover}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
-              <XAxis dataKey="category" stroke="#64748B" fontSize={12} />
-              <YAxis stroke="#64748B" fontSize={12} tickFormatter={(value) => `${value}x`} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar
-                dataKey="turnover"
-                fill="#6366F1"
-                radius={[8, 8, 0, 0]}
-                name="Turnover Rate"
-              />
-            </BarChart>
-          </ResponsiveContainer>
           </div>
         </div>
       </div>

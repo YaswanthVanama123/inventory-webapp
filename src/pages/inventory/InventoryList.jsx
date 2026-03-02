@@ -74,9 +74,6 @@ const InventoryList = () => {
   const [expandedSales, setExpandedSales] = useState({});
   const [sales, setSales] = useState({});
   const [loadingSales, setLoadingSales] = useState({});
-  const [invoices, setInvoices] = useState([]);
-  const [loadingInvoices, setLoadingInvoices] = useState(false);
-  const [expandedInvoices, setExpandedInvoices] = useState({});
 
 
   useEffect(() => {
@@ -118,14 +115,7 @@ const InventoryList = () => {
     }
   }, [debouncedSearchTerm, selectedCategory, statusFilter, sortBy, sortOrder, currentPage, itemsPerPage, activeTab, viewMode]);
 
-  
-  useEffect(() => {
-    if (activeTab === 'sells') {
-      fetchInvoices();
-    }
-  }, [debouncedSearchTerm, currentPage, itemsPerPage, activeTab]);
 
-  
   useEffect(() => {
     setError(null);
   }, [activeTab]);
@@ -133,21 +123,6 @@ const InventoryList = () => {
   const fetchCategories = async () => {
     // Categories endpoint removed - setting empty array
     setCategories([]);
-  };
-
-  const fetchInvoices = async () => {
-    setLoadingInvoices(true);
-    try {
-      const response = await api.get('/invoices');
-      const invoicesData = response.data?.data?.invoices || response.data?.invoices || [];
-      setInvoices(invoicesData);
-    } catch (err) {
-      console.error('Error fetching invoices:', err);
-      showError('Failed to load invoices');
-      setInvoices([]);
-    } finally {
-      setLoadingInvoices(false);
-    }
   };
 
   const fetchInventoryItems = async () => {

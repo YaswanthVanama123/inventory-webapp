@@ -20,6 +20,7 @@ const SalesFolderView = () => {
   const [expandedItems, setExpandedItems] = useState({});
   const [groupedItems, setGroupedItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingInvoices, setLoadingInvoices] = useState({});
   const [selectedItems, setSelectedItems] = useState([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -34,10 +35,13 @@ const SalesFolderView = () => {
     setLoading(true);
     try {
       const response = await api.get('/routestar/items/grouped');
-      console.log('[SalesFolderView] API response:', response);
-      
-      const items = response.data?.items || [];
-      console.log('[SalesFolderView] Parsed items:', items.length, 'items');
+      console.log('[SalesFolderView] Full API response:', response);
+      console.log('[SalesFolderView] response.data:', response.data);
+      console.log('[SalesFolderView] response.data.data:', response.data?.data);
+
+      // Try multiple paths to handle different response structures
+      const items = response.data?.data?.items || response.data?.items || [];
+      console.log('[SalesFolderView] Parsed items:', items.length, 'items', items);
       setGroupedItems(items);
     } catch (err) {
       console.error('Error fetching grouped RouteStar invoice items:', err);
@@ -48,10 +52,59 @@ const SalesFolderView = () => {
   };
 
   const toggleItemFolder = async (sku) => {
+    const isCurrentlyExpanded = expandedItems[sku];
+
+    // Toggle the expansion state
     setExpandedItems(prev => ({
       ...prev,
       [sku]: !prev[sku]
     }));
+
+    // If we're expanding (not collapsing) and haven't loaded invoices yet
+    if (!isCurrentlyExpanded) {
+      const item = groupedItems.find(i => i.sku === sku);
+
+      // Only fetch if invoices haven't been loaded yet
+      if (!item.invoices) {
+        setLoadingInvoices(prev => ({ ...prev, [sku]: true }));
+
+        try {
+          const response = await api.get(`/routestar/items/${encodeURIComponent(item.name)}/invoices`);
+          console.log('[SalesFolderView] Invoices response for item', item.name, ':', response);
+          console.log('[SalesFolderView] response.data:', response.data);
+          console.log('[SalesFolderView] response.data.data:', response.data?.data);
+
+          // Try multiple paths to handle different response structures
+          const invoices = response.data?.data?.entries || response.data?.entries || [];
+          console.log('[SalesFolderView] Extracted invoices:', invoices.length, 'entries', invoices);
+
+          // Update the item with its invoices
+          setGroupedItems(prev => {
+            const updated = prev.map(item => {
+              if (item.sku === sku) {
+                console.log('[SalesFolderView] Updating item', sku, 'with', invoices.length, 'invoices');
+                return { ...item, invoices };
+              }
+              return item;
+            });
+            console.log('[SalesFolderView] Updated groupedItems:', updated);
+            return updated;
+          });
+        } catch (error) {
+          console.error(`Error fetching invoices for item ${item.name}:`, error);
+          showError('Failed to load invoice details');
+
+          // Set empty invoices array so we don't keep trying
+          setGroupedItems(prev => prev.map(item =>
+            item.sku === sku
+              ? { ...item, invoices: [] }
+              : item
+          ));
+        } finally {
+          setLoadingInvoices(prev => ({ ...prev, [sku]: false }));
+        }
+      }
+    }
   };
 
   const handleDownloadItemNames = () => {
@@ -520,7 +573,12 @@ const SalesFolderView = () => {
             {}
             {isExpanded && (
               <div className="border-t border-emerald-200 bg-emerald-50">
-                {group.invoices.length === 0 ? (
+                {loadingInvoices[group.sku] ? (
+                  <div className="p-8 text-center">
+                    <LoadingSpinner size="md" />
+                    <p className="text-sm text-slate-600 mt-3">Loading invoice details...</p>
+                  </div>
+                ) : !group.invoices || group.invoices.length === 0 ? (
                   <div className="p-8 text-center text-slate-500">
                     <ShoppingCart className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p className="font-medium">No invoice entries found</p>

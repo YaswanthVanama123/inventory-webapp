@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { AuthContext } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
 import dashboardService from '../../services/dashboardService';
@@ -54,21 +54,21 @@ const StatCard = ({ title, value, change, changeType, icon: Icon, loading }) => 
 
   if (loading) {
     return (
-      <Card className="p-6 animate-pulse">
+      <Card className="p-6 animate-pulse" style={{ minHeight: '140px' }}>
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="h-4 bg-gray-200 rounded w-24 mb-3"></div>
             <div className="h-8 bg-gray-200 rounded w-32 mb-2"></div>
             <div className="h-3 bg-gray-200 rounded w-20"></div>
           </div>
-          <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
+          <div className="w-12 h-12 bg-gray-200 rounded-lg flex-shrink-0"></div>
         </div>
       </Card>
     );
   }
 
   return (
-    <Card className="p-6 hover:shadow-md transition-shadow duration-200">
+    <Card className="p-6 hover:shadow-md transition-shadow duration-200" style={{ minHeight: '140px' }}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
@@ -83,7 +83,7 @@ const StatCard = ({ title, value, change, changeType, icon: Icon, loading }) => 
             </div>
           )}
         </div>
-        <div className={`p-3 rounded-lg ${changeBgColor}`}>
+        <div className={`p-3 rounded-lg ${changeBgColor} flex-shrink-0`}>
           <Icon className={`w-6 h-6 ${changeColor}`} />
         </div>
       </div>
@@ -93,9 +93,9 @@ const StatCard = ({ title, value, change, changeType, icon: Icon, loading }) => 
 
 
 const ChartSkeleton = () => (
-  <div className="animate-pulse">
+  <div className="animate-pulse" style={{ minHeight: '428px' }}>
     <div className="h-4 bg-gray-200 rounded w-32 mb-4"></div>
-    <div className="h-64 bg-gray-100 rounded"></div>
+    <div className="h-80 bg-gray-100 rounded"></div>
   </div>
 );
 
@@ -103,10 +103,10 @@ const ChartSkeleton = () => (
 const RecentActivityTable = ({ activities, loading }) => {
   if (loading) {
     return (
-      <div className="animate-pulse space-y-3">
+      <div className="animate-pulse space-y-3" style={{ minHeight: '300px' }}>
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+          <div key={i} className="flex items-center gap-4 py-3">
+            <div className="w-10 h-10 bg-gray-200 rounded-full flex-shrink-0"></div>
             <div className="flex-1">
               <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
               <div className="h-3 bg-gray-200 rounded w-1/2"></div>
@@ -119,7 +119,7 @@ const RecentActivityTable = ({ activities, loading }) => {
 
   if (!activities || activities.length === 0) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12" style={{ minHeight: '300px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         <Activity className="w-12 h-12 text-gray-400 mx-auto mb-3" />
         <p className="text-gray-500">No recent activity</p>
       </div>
@@ -220,8 +220,9 @@ const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const hasFetchedRef = useRef(false);
 
-  
+
   const fetchDashboardData = async () => {
     console.log('fetchDashboardData called - starting API request...');
     setLoading(true);
@@ -241,7 +242,7 @@ const Dashboard = () => {
         console.log('Sales trend:', salesTrend);
         console.log('Top selling items:', topSellingItems);
 
-        
+
         const transformedData = {
           stats: {
             totalRevenue: summary.totalRevenue || 0,
@@ -252,7 +253,7 @@ const Dashboard = () => {
             ordersChange: summary.ordersChange || 0,
             lowStockChange: summary.lowStockChange || 0,
             profitMarginChange: summary.profitMarginChange || 0,
-            
+
             totalPurchaseAmount: summary.totalPurchaseAmount || 0,
             totalPurchaseOrders: summary.totalPurchaseOrders || 0,
             avgPurchaseValue: summary.avgPurchaseValue || 0,
@@ -292,13 +293,13 @@ const Dashboard = () => {
     }
   };
 
-  
+
   const getColorForIndex = (index) => {
     const colors = ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EF4444', '#EC4899', '#14B8A6', '#6B7280'];
     return colors[index % colors.length];
   };
 
-  
+
   const formatActivityDescription = (activity) => {
     const action = activity.action || '';
     const resource = activity.resource || '';
@@ -316,7 +317,7 @@ const Dashboard = () => {
     }
   };
 
-  
+
   const formatTimeAgo = (timestamp) => {
     if (!timestamp) return 'Unknown';
 
@@ -334,7 +335,14 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    // Prevent double call in React 18 StrictMode during development
+    if (hasFetchedRef.current) {
+      console.log('Dashboard data already fetched, skipping duplicate call');
+      return;
+    }
+
     console.log('Dashboard component mounted, calling fetchDashboardData...');
+    hasFetchedRef.current = true;
     fetchDashboardData();
   }, []);
 
@@ -355,22 +363,26 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 md:p-8 text-white">
+    <div className="space-y-6" style={{ contain: 'layout' }}>
+      {/* Header Banner - Fixed height to prevent CLS */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 md:p-8 text-white" style={{ minHeight: '140px', contain: 'layout style' }}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold mb-2">
+          <div className="flex-1">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ minHeight: '40px', lineHeight: '1.2' }}>
               Welcome back, {user?.name || user?.username || 'Admin'}!
             </h1>
-            <p className="text-blue-100 text-sm md:text-base">
+            <p className="text-blue-100 text-sm md:text-base" style={{ minHeight: '24px', lineHeight: '1.5' }}>
               Here's what's happening with your business today.
             </p>
           </div>
           <button
-            onClick={fetchDashboardData}
+            onClick={() => {
+              hasFetchedRef.current = false; // Reset ref to allow manual refresh
+              fetchDashboardData();
+            }}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+            style={{ minHeight: '40px', minWidth: '120px' }}
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             <span className="text-sm font-medium">Refresh</span>
@@ -381,7 +393,13 @@ const Dashboard = () => {
       {}
       {error && !dashboardData && (
         <Card className="p-6">
-          <ErrorState message={error} onRetry={fetchDashboardData} />
+          <ErrorState
+            message={error}
+            onRetry={() => {
+              hasFetchedRef.current = false; // Reset ref to allow retry
+              fetchDashboardData();
+            }}
+          />
         </Card>
       )}
 
@@ -463,19 +481,19 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {}
+      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        {}
-        <Card className="p-6">
+        {/* Revenue Chart */}
+        <Card className="p-6" style={{ minHeight: '500px' }}>
           {loading ? (
             <ChartSkeleton />
           ) : salesTrend.length > 0 ? (
             <>
-              <div className="mb-6">
+              <div className="mb-6" style={{ minHeight: '60px' }}>
                 <h2 className="text-lg font-semibold text-gray-900">Revenue & Profit Trend</h2>
                 <p className="text-sm text-gray-500">Last {salesTrend.length} months performance</p>
               </div>
-              <div className="h-80">
+              <div className="h-80" style={{ height: '320px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={salesTrend}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
@@ -521,17 +539,17 @@ const Dashboard = () => {
           )}
         </Card>
 
-        {}
-        <Card className="p-6">
+        {/* Category Chart */}
+        <Card className="p-6" style={{ minHeight: '500px' }}>
           {loading ? (
             <ChartSkeleton />
           ) : categoryDistribution.length > 0 ? (
             <>
-              <div className="mb-6">
+              <div className="mb-6" style={{ minHeight: '60px' }}>
                 <h2 className="text-lg font-semibold text-gray-900">Category Distribution</h2>
                 <p className="text-sm text-gray-500">Inventory by category</p>
               </div>
-              <div className="h-80">
+              <div className="h-80" style={{ height: '320px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -584,10 +602,10 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {}
+      {/* Bottom Grid - Top Items and Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        <Card className="p-6">
-          <div className="mb-6">
+        <Card className="p-6" style={{ minHeight: '480px' }}>
+          <div className="mb-6" style={{ minHeight: '60px' }}>
             <h2 className="text-lg font-semibold text-gray-900">
               Top Selling Items
               {stats.dataSource === 'automation' && (
@@ -599,9 +617,18 @@ const Dashboard = () => {
             <p className="text-sm text-gray-500">Based on actual sales revenue (last 180 days)</p>
           </div>
           {loading ? (
-            <div className="animate-pulse space-y-3">
+            <div className="animate-pulse space-y-3" style={{ minHeight: '340px' }}>
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-12 bg-gray-200 rounded"></div>
+                <div key={i} className="h-16 bg-gray-200 rounded-lg p-3 flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="h-3 bg-gray-300 rounded w-2/3 mb-2"></div>
+                    <div className="h-2 bg-gray-300 rounded w-1/3"></div>
+                  </div>
+                  <div className="ml-2">
+                    <div className="h-3 bg-gray-300 rounded w-16 mb-2"></div>
+                    <div className="h-2 bg-gray-300 rounded w-20"></div>
+                  </div>
+                </div>
               ))}
             </div>
           ) : data.topSellingItems && data.topSellingItems.length > 0 ? (
@@ -629,9 +656,9 @@ const Dashboard = () => {
           )}
         </Card>
 
-        {}
-        <Card className="p-6">
-          <div className="mb-6">
+        {/* Quick Actions */}
+        <Card className="p-6" style={{ minHeight: '280px' }}>
+          <div className="mb-6" style={{ minHeight: '60px' }}>
             <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
             <p className="text-sm text-gray-500">Common tasks</p>
           </div>
@@ -639,9 +666,9 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-6">
+      {/* Recent Activity */}
+      <Card className="p-6" style={{ minHeight: '400px' }}>
+        <div className="flex items-center justify-between mb-6" style={{ minHeight: '48px' }}>
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
             <p className="text-sm text-gray-500">Latest actions and updates</p>

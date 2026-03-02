@@ -131,19 +131,7 @@ const inventoryService = {
     }
   },
 
-  
-  getCategories: async () => {
-    try {
-      const response = await api.get('/inventory/categories');
-      return response;
-    } catch (error) {
-      throw handleApiError(error, {
-        network: 'Unable to load categories. Please check your connection.',
-      });
-    }
-  },
 
-  
   uploadImages: async (id, images, primaryIndex = 0) => {
     try {
       const formData = new FormData();

@@ -128,12 +128,8 @@ const InventoryForm = () => {
   const fetchCategories = async () => {
     setLoadingSettings(true);
     try {
-      const categoriesRes = await settingsService.getCategories();
-
-
-      const categoriesData = categoriesRes?.data?.categories || [];
-
-      setCategories(categoriesData);
+      // Categories endpoint removed - setting empty array
+      setCategories([]);
     } catch (error) {
       console.error('Error fetching settings:', error);
 

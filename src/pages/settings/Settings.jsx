@@ -49,20 +49,16 @@ const Settings = () => {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const [categoriesRes, unitsRes] = await Promise.all([
-        settingsService.getCategories(true), 
-        settingsService.getUnits(true), 
-      ]);
+      const unitsRes = await settingsService.getUnits(true);
 
-      
-      const categoriesData = categoriesRes?.categories || [];
-      const unitsData = unitsRes?.units || [];
 
-      setCategories(categoriesData);
+      const unitsData = unitsRes?.data?.units || [];
+
+      setCategories([]); // Categories endpoint removed
       setUnits(unitsData);
     } catch (error) {
       console.error('Error fetching settings:', error);
-      
+
       setCategories([]);
       setUnits([]);
       showError(error.message || 'Failed to load settings. Please ensure the server is running.');

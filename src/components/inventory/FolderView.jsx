@@ -33,10 +33,13 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
     setLoading(true);
     try {
       const response = await api.get('/customerconnect/items/grouped');
-      console.log('[FolderView] API response:', response);
-      
-      const items = response.data?.items || [];
-      console.log('[FolderView] Parsed items:', items.length, 'items');
+      console.log('[FolderView] Full API response:', response);
+      console.log('[FolderView] response.data:', response.data);
+      console.log('[FolderView] response.data.data:', response.data?.data);
+
+      // Try multiple paths to handle different response structures
+      const items = response.data?.data?.items || response.data?.items || [];
+      console.log('[FolderView] Parsed items:', items.length, 'items', items);
       setGroupedItems(items);
     } catch (err) {
       console.error('Error fetching grouped items:', err);
@@ -47,10 +50,59 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
   };
 
   const toggleItemFolder = async (sku) => {
+    const isCurrentlyExpanded = expandedItems[sku];
+
+    // Toggle the expansion state
     setExpandedItems(prev => ({
       ...prev,
       [sku]: !prev[sku]
     }));
+
+    // If we're expanding (not collapsing) and haven't loaded orders yet
+    if (!isCurrentlyExpanded) {
+      const item = groupedItems.find(i => i.sku === sku);
+
+      // Only fetch if orders haven't been loaded yet
+      if (!item.orders) {
+        setLoadingOrders(prev => ({ ...prev, [sku]: true }));
+
+        try {
+          const response = await api.get(`/customerconnect/items/${encodeURIComponent(sku)}/orders`);
+          console.log('[FolderView] Orders response for SKU', sku, ':', response);
+          console.log('[FolderView] response.data:', response.data);
+          console.log('[FolderView] response.data.data:', response.data?.data);
+
+          // Try multiple paths to handle different response structures
+          const orders = response.data?.data?.entries || response.data?.entries || [];
+          console.log('[FolderView] Extracted orders:', orders.length, 'orders', orders);
+
+          // Update the item with its orders
+          setGroupedItems(prev => {
+            const updated = prev.map(item => {
+              if (item.sku === sku) {
+                console.log('[FolderView] Updating item', sku, 'with', orders.length, 'orders');
+                return { ...item, orders };
+              }
+              return item;
+            });
+            console.log('[FolderView] Updated groupedItems:', updated);
+            return updated;
+          });
+        } catch (error) {
+          console.error(`Error fetching orders for SKU ${sku}:`, error);
+          showError('Failed to load order details');
+
+          // Set empty orders array so we don't keep trying
+          setGroupedItems(prev => prev.map(item =>
+            item.sku === sku
+              ? { ...item, orders: [] }
+              : item
+          ));
+        } finally {
+          setLoadingOrders(prev => ({ ...prev, [sku]: false }));
+        }
+      }
+    }
   };
 
   const handleDownloadItemNames = () => {
@@ -386,7 +438,12 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
             {}
             {isExpanded && (
               <div className="border-t border-slate-200 bg-slate-50">
-                {group.orders.length === 0 ? (
+                {loadingOrders[group.sku] ? (
+                  <div className="p-8 text-center">
+                    <LoadingSpinner size="md" />
+                    <p className="text-sm text-slate-600 mt-3">Loading order details...</p>
+                  </div>
+                ) : !group.orders || group.orders.length === 0 ? (
                   <div className="p-8 text-center text-slate-500">
                     <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p className="font-medium">No order entries found</p>

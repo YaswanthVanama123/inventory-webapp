@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
 import api from '../../services/api';
+import settingsService from '../../services/settingsService';
 import SearchBar from '../../components/common/SearchBar';
 import Select from '../../components/common/Select';
 import Button from '../../components/common/Button';
@@ -130,16 +131,8 @@ const InventoryList = () => {
   }, [activeTab]);
 
   const fetchCategories = async () => {
-    try {
-      const response = await api.get('/inventory/categories');
-
-      const categoriesData = response.data?.data?.categories || response.data?.categories || [];
-      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
-    } catch (err) {
-      console.error('Error fetching categories:', err);
-
-      setCategories([]);
-    }
+    // Categories endpoint removed - setting empty array
+    setCategories([]);
   };
 
   const fetchInvoices = async () => {

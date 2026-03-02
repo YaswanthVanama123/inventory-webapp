@@ -96,18 +96,14 @@ const PointOfSale = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [productsRes, categoriesRes] = await Promise.all([
-        inventoryService.getAll({ limit: 1000, usePOSPricing: true }),
-        settingsService.getCategories(),
-      ]);
+      const productsRes = await inventoryService.getAll({ limit: 1000, usePOSPricing: true });
 
       const productsData = productsRes?.data?.items || [];
-      const categoriesData = categoriesRes?.data?.categories || [];
 
-      
+
       setProducts(productsData);
       setFilteredProducts(productsData);
-      setCategories(categoriesData);
+      setCategories([]); // Categories endpoint removed
     } catch (error) {
       console.error('Error fetching data:', error);
       showError('Failed to load products');

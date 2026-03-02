@@ -1,37 +1,6 @@
 import api from './api';
 
 
-
-
-export const getSettings = async () => {
-  const response = await api.get('/settings');
-  return response;
-};
-
-
-export const getCategories = async (includeInactive = false) => {
-  const response = await api.get('/settings/categories', {
-    params: { includeInactive },
-  });
-  return response;
-};
-
-export const addCategory = async (categoryData) => {
-  const response = await api.post('/settings/categories', categoryData);
-  return response;
-};
-
-export const updateCategory = async (id, categoryData) => {
-  const response = await api.put(`/settings/categories/${id}`, categoryData);
-  return response;
-};
-
-export const deleteCategory = async (id) => {
-  const response = await api.delete(`/settings/categories/${id}`);
-  return response;
-};
-
-
 export const getUnits = async (includeInactive = false) => {
   const response = await api.get('/settings/units', {
     params: { includeInactive },
@@ -66,11 +35,6 @@ export const updateSKUConfig = async (config) => {
 };
 
 const settingsService = {
-  getSettings,
-  getCategories,
-  addCategory,
-  updateCategory,
-  deleteCategory,
   getUnits,
   addUnit,
   updateUnit,

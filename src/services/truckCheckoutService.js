@@ -1,7 +1,27 @@
 import api from './api';
 
 const truckCheckoutService = {
-  // Create new checkout
+  // Search items for checkout (RouteStarItems with stock)
+  searchItems: async (query = '', forSell = true, limit = 100) => {
+    const response = await api.get('/truck-checkouts/items/search', {
+      params: { q: query, forSell, limit }
+    });
+    return response;
+  },
+
+  // Get current stock for an item
+  getItemStock: async (itemName) => {
+    const response = await api.get(`/truck-checkouts/stock/${encodeURIComponent(itemName)}`);
+    return response;
+  },
+
+  // Create new checkout (NEW API - single item with validation)
+  createCheckoutNew: async (checkoutData) => {
+    const response = await api.post('/truck-checkouts/create-new', checkoutData);
+    return response;
+  },
+
+  // Create new checkout (OLD API - multiple items, backwards compatibility)
   createCheckout: async (checkoutData) => {
     const response = await api.post('/truck-checkouts', checkoutData);
     return response;

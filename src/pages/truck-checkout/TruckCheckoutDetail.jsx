@@ -578,7 +578,7 @@ const TruckCheckoutDetail = () => {
       {/* Items Taken */}
       <Card>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Items Taken ({checkout.itemsTaken?.length || 0})
+          Items Taken ({checkout.itemName ? '1' : checkout.itemsTaken?.length || 0})
         </h2>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -599,22 +599,41 @@ const TruckCheckoutDetail = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-              {checkout.itemsTaken?.map((item, index) => (
-                <tr key={index}>
+              {/* New single-item checkout format */}
+              {checkout.itemName ? (
+                <tr>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                    {item.name}
+                    {checkout.itemName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                    {item.sku || '-'}
+                    -
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900 dark:text-white">
-                    {item.quantity}
+                    {checkout.quantityTaking}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                    {item.notes || '-'}
+                    {checkout.notes || '-'}
                   </td>
                 </tr>
-              ))}
+              ) : (
+                /* Old multi-item checkout format */
+                checkout.itemsTaken?.map((item, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                      {item.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                      {item.sku || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900 dark:text-white">
+                      {item.quantity}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                      {item.notes || '-'}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
             <tfoot className="bg-gray-50 dark:bg-gray-800">
               <tr>
@@ -622,7 +641,7 @@ const TruckCheckoutDetail = () => {
                   Total
                 </td>
                 <td className="px-6 py-3 text-sm font-bold text-right text-gray-900 dark:text-white">
-                  {checkout.itemsTaken?.reduce((sum, item) => sum + item.quantity, 0) || 0}
+                  {checkout.itemName ? checkout.quantityTaking : checkout.itemsTaken?.reduce((sum, item) => sum + item.quantity, 0) || 0}
                 </td>
                 <td></td>
               </tr>

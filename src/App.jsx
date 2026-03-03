@@ -55,6 +55,7 @@ const EmployeeActivities = lazy(() => import('./pages/activities/EmployeeActivit
 const FetchHistory = lazy(() => import('./pages/system/FetchHistory'));
 const EmployeeWorkDashboard = lazy(() => import('./pages/employee/EmployeeWorkDashboard'));
 const TruckCheckoutList = lazy(() => import('./pages/truck-checkout/TruckCheckoutList'));
+const TruckCheckoutForm = lazy(() => import('./pages/truck-checkout/TruckCheckoutForm'));
 const TruckCheckoutShop = lazy(() => import('./pages/truck-checkout/TruckCheckoutShop'));
 const TruckCheckoutDetail = lazy(() => import('./pages/truck-checkout/TruckCheckoutDetail'));
 const EmployeeCheckouts = lazy(() => import('./pages/truck-checkout/EmployeeCheckouts'));
@@ -595,7 +596,7 @@ function App() {
                   element={
                     <ErrorBoundary>
                       <ProtectedRoute>
-                        <TruckCheckoutShop />
+                        <TruckCheckoutForm />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

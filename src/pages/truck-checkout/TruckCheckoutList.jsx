@@ -279,12 +279,27 @@ const TruckCheckoutList = () => {
 
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm">
-                        <p className="font-medium text-gray-900 dark:text-white">
-                          {checkout.itemsTaken?.length || 0} items
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          Total qty: {checkout.itemsTaken?.reduce((sum, item) => sum + item.quantity, 0) || 0}
-                        </p>
+                        {/* New single-item checkout format */}
+                        {checkout.itemName ? (
+                          <>
+                            <p className="font-medium text-gray-900 dark:text-white">
+                              {checkout.itemName}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              Qty: {checkout.quantityTaking || 0}
+                            </p>
+                          </>
+                        ) : (
+                          /* Old multi-item checkout format */
+                          <>
+                            <p className="font-medium text-gray-900 dark:text-white">
+                              {checkout.itemsTaken?.length || 0} items
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              Total qty: {checkout.itemsTaken?.reduce((sum, item) => sum + item.quantity, 0) || 0}
+                            </p>
+                          </>
+                        )}
                       </div>
                     </td>
 

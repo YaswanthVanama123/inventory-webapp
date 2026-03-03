@@ -1,29 +1,73 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ToastContext } from '../../contexts/ToastContext';
+import { AuthContext } from '../../contexts/AuthContext';
 import truckCheckoutService from '../../services/truckCheckoutService';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Textarea from '../../components/common/Textarea';
-import { PlusIcon, TrashIcon, TruckIcon } from '@heroicons/react/24/outline';
+import Modal from '../../components/common/Modal';
+import { TruckIcon, MagnifyingGlassIcon, ExclamationTriangleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 const TruckCheckoutForm = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useContext(ToastContext);
+  const { user } = useContext(AuthContext);
+  const searchInputRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    employeeName: '',
-    employeeId: '',
-    truckNumber: '',
     notes: '',
     checkoutDate: new Date().toISOString().split('T')[0]
   });
 
-  const [items, setItems] = useState([
-    { name: '', sku: '', quantity: 1, notes: '' }
-  ]);
+  // Item selection state
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [showItemPicker, setShowItemPicker] = useState(false);
+
+  // Quantity state
+  const [quantityTaking, setQuantityTaking] = useState('');
+  const [remainingQuantity, setRemainingQuantity] = useState('');
+  const [validationError, setValidationError] = useState('');
+
+  // Discrepancy modal state
+  const [showDiscrepancyModal, setShowDiscrepancyModal] = useState(false);
+  const [discrepancyInfo, setDiscrepancyInfo] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Load all items when modal opens and search when query changes
+  useEffect(() => {
+    if (!showItemPicker) {
+      setSearchQuery(''); // Clear search when closing
+      setSearchResults([]);
+      return;
+    }
+
+    // Load items with current search query (debounced)
+    const delayDebounce = setTimeout(() => {
+      searchItems();
+    }, searchQuery ? 300 : 0); // No delay for initial load
+
+    return () => clearTimeout(delayDebounce);
+  }, [showItemPicker, searchQuery]);
+
+  const searchItems = async () => {
+    try {
+      setSearching(true);
+      const response = await truckCheckoutService.searchItems(searchQuery, true, 100);
+      setSearchResults(response.data || []);
+    } catch (error) {
+      console.error('Search items error:', error);
+      showError('Failed to search items');
+      setSearchResults([]);
+    } finally {
+      setSearching(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -33,62 +77,150 @@ const TruckCheckoutForm = () => {
     }));
   };
 
-  const handleItemChange = (index, field, value) => {
-    const newItems = [...items];
-    newItems[index][field] = value;
-    setItems(newItems);
+  const handleItemSelect = (item) => {
+    setSelectedItem(item);
+    setShowItemPicker(false);
+    setValidationError('');
+    setQuantityTaking('');
+    setRemainingQuantity('');
   };
 
-  const addItem = () => {
-    setItems([...items, { name: '', sku: '', quantity: 1, notes: '' }]);
+  const handleQuantityTakingChange = (e) => {
+    setQuantityTaking(e.target.value);
+    setValidationError('');
   };
 
-  const removeItem = (index) => {
-    if (items.length === 1) {
-      showError('At least one item is required');
-      return;
+  const handleRemainingQuantityChange = (e) => {
+    setRemainingQuantity(e.target.value);
+    setValidationError('');
+  };
+
+  const validateStockMath = () => {
+    if (!selectedItem || !quantityTaking || !remainingQuantity) {
+      return true; // Don't validate incomplete data
     }
-    setItems(items.filter((_, i) => i !== index));
+
+    const taking = parseFloat(quantityTaking);
+    const remaining = parseFloat(remainingQuantity);
+    const currentStock = selectedItem.currentStock || 0;
+
+    const expectedRemaining = currentStock - taking;
+
+    if (Math.abs(remaining - expectedRemaining) > 0.001) {
+      const error = `Math Error: Current stock (${currentStock}) - Taking (${taking}) should equal ${expectedRemaining.toFixed(2)}, but you entered ${remaining}`;
+      setValidationError(error);
+      return false;
+    }
+
+    setValidationError('');
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validation
-    if (!formData.employeeName.trim()) {
-      showError('Employee name is required');
+    if (!user || !user.fullName?.trim()) {
+      showError('Employee name is required. Please update your profile.');
       return;
     }
 
-    const validItems = items.filter(item => item.name.trim() && item.quantity > 0);
-    if (validItems.length === 0) {
-      showError('At least one valid item is required');
+    if (!user.truckNumber?.trim()) {
+      showError('Truck number is required. Please update your profile.');
       return;
     }
 
+    if (!selectedItem) {
+      showError('Please select an item');
+      return;
+    }
+
+    const taking = parseFloat(quantityTaking);
+    const remaining = parseFloat(remainingQuantity);
+
+    if (!taking || taking <= 0) {
+      showError('Please enter a valid quantity to take');
+      return;
+    }
+
+    if (isNaN(remaining)) {
+      showError('Please enter remaining quantity');
+      return;
+    }
+
+    // Validate math
+    if (!validateStockMath()) {
+      // Show discrepancy modal
+      const currentStock = selectedItem.currentStock || 0;
+      const expectedRemaining = currentStock - taking;
+      const difference = remaining - expectedRemaining;
+
+      setDiscrepancyInfo({
+        itemName: selectedItem.itemName,
+        currentStock,
+        taking,
+        expectedRemaining: expectedRemaining.toFixed(2),
+        userEnteredRemaining: remaining,
+        difference: difference.toFixed(2),
+        discrepancyType: difference > 0 ? 'Overage' : 'Shortage',
+      });
+      setShowDiscrepancyModal(true);
+      return;
+    }
+
+    // Proceed with checkout (no discrepancy)
+    await submitCheckout(false);
+  };
+
+  const submitCheckout = async (acceptDiscrepancy) => {
     try {
-      setLoading(true);
+      setSubmitting(true);
 
       const checkoutData = {
-        ...formData,
-        itemsTaken: validItems.map(item => ({
-          name: item.name.trim(),
-          sku: item.sku.trim() || undefined,
-          quantity: parseInt(item.quantity),
-          notes: item.notes.trim() || undefined
-        })),
-        checkoutDate: formData.checkoutDate ? new Date(formData.checkoutDate) : new Date()
+        employeeName: user.fullName.trim(),
+        truckNumber: user.truckNumber.trim(),
+        itemName: selectedItem.itemName,
+        quantityTaking: parseFloat(quantityTaking),
+        remainingQuantity: parseFloat(remainingQuantity),
+        notes: formData.notes.trim(),
+        checkoutDate: formData.checkoutDate ? new Date(formData.checkoutDate).toISOString() : new Date().toISOString(),
+        acceptDiscrepancy,
       };
 
-      await truckCheckoutService.createCheckout(checkoutData);
+      console.log('[TruckCheckout] Submitting:', checkoutData);
 
-      showSuccess('Checkout created successfully');
-      navigate('/truck-checkouts');
+      const response = await truckCheckoutService.createCheckoutNew(checkoutData);
+
+      if (!response.success && response.requiresConfirmation) {
+        // Backend detected discrepancy - show modal
+        const validation = response.validation;
+        setDiscrepancyInfo({
+          itemName: selectedItem.itemName,
+          currentStock: validation.currentStock,
+          taking: validation.quantityTaking,
+          expectedRemaining: validation.systemCalculatedRemaining,
+          userEnteredRemaining: validation.userRemainingQuantity,
+          difference: validation.discrepancyDifference,
+          discrepancyType: validation.discrepancyType,
+        });
+        setShowDiscrepancyModal(true);
+        return;
+      }
+
+      if (response.success) {
+        setShowDiscrepancyModal(false);
+        showSuccess(
+          response.discrepancy
+            ? 'Checkout created with discrepancy adjustment'
+            : 'Checkout created successfully'
+        );
+        navigate('/truck-checkouts');
+      }
     } catch (error) {
       console.error('Create checkout error:', error);
       showError(error.response?.data?.message || 'Failed to create checkout');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -102,7 +234,7 @@ const TruckCheckoutForm = () => {
           </h1>
         </div>
         <p className="text-gray-600 dark:text-gray-400">
-          Record items being taken in truck for delivery
+          Select single item to check out with stock validation
         </p>
       </div>
 
@@ -119,34 +251,21 @@ const TruckCheckoutForm = () => {
               </label>
               <Input
                 name="employeeName"
-                value={formData.employeeName}
-                onChange={handleInputChange}
-                placeholder="Enter employee name"
-                required
+                value={user?.fullName || 'Not set'}
+                disabled
+                className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Employee ID
-              </label>
-              <Input
-                name="employeeId"
-                value={formData.employeeId}
-                onChange={handleInputChange}
-                placeholder="Enter employee ID"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Truck Number
+                Truck Number <span className="text-red-500">*</span>
               </label>
               <Input
                 name="truckNumber"
-                value={formData.truckNumber}
-                onChange={handleInputChange}
-                placeholder="Enter truck number"
+                value={user?.truckNumber || 'Not set'}
+                disabled
+                className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
               />
             </div>
 
@@ -164,95 +283,84 @@ const TruckCheckoutForm = () => {
           </div>
         </Card>
 
-        {/* Items */}
+        {/* Item Selection */}
         <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Items Taken
-            </h2>
-            <Button
-              type="button"
-              variant="primary"
-              size="sm"
-              onClick={addItem}
-            >
-              <PlusIcon className="w-4 h-4 mr-2" />
-              Add Item
-            </Button>
-          </div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Select Item
+          </h2>
 
-          <div className="space-y-4">
-            {items.map((item, index) => (
-              <div
-                key={index}
-                className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Select Item <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowItemPicker(true)}
+                className="w-full px-4 py-2 text-left border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-between"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Item #{index + 1}
-                  </span>
-                  {items.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem(index)}
-                      className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                    >
-                      <TrashIcon className="w-5 h-5" />
-                    </button>
+                <span>
+                  {selectedItem ? (
+                    <div>
+                      <div className="font-medium">{selectedItem.itemName}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        Current Stock: {selectedItem.currentStock || 0}
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="text-gray-400">Click to select item</span>
                   )}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                  <div className="lg:col-span-2">
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                      Item Name <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      value={item.name}
-                      onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-                      placeholder="Enter item name"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                      SKU / Code
-                    </label>
-                    <Input
-                      value={item.sku}
-                      onChange={(e) => handleItemChange(index, 'sku', e.target.value)}
-                      placeholder="Item SKU"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                      Quantity <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      type="number"
-                      min="1"
-                      value={item.quantity}
-                      onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="lg:col-span-4">
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                      Item Notes
-                    </label>
-                    <Input
-                      value={item.notes}
-                      onChange={(e) => handleItemChange(index, 'notes', e.target.value)}
-                      placeholder="Optional notes for this item"
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
+                </span>
+                <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
           </div>
+
+          {selectedItem && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Quantity Taking <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={quantityTaking}
+                  onChange={handleQuantityTakingChange}
+                  placeholder="Enter quantity to take"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Remaining Quantity After Taking <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={remainingQuantity}
+                  onChange={handleRemainingQuantityChange}
+                  onBlur={validateStockMath}
+                  placeholder="Enter remaining quantity"
+                  required
+                />
+                {selectedItem && quantityTaking && (
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Expected: {selectedItem.currentStock || 0} - {parseFloat(quantityTaking) || 0} ={' '}
+                    {((selectedItem.currentStock || 0) - (parseFloat(quantityTaking) || 0)).toFixed(2)}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {validationError && (
+            <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
+              <ExclamationTriangleIcon className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700 dark:text-red-300">{validationError}</p>
+            </div>
+          )}
         </Card>
 
         {/* Notes */}
@@ -275,20 +383,181 @@ const TruckCheckoutForm = () => {
             type="button"
             variant="ghost"
             onClick={() => navigate('/truck-checkouts')}
-            disabled={loading}
+            disabled={loading || submitting}
           >
             Cancel
           </Button>
           <Button
             type="submit"
             variant="primary"
-            loading={loading}
-            disabled={loading}
+            loading={loading || submitting}
+            disabled={loading || submitting}
           >
             Create Checkout
           </Button>
         </div>
       </form>
+
+      {/* Item Picker Modal */}
+      <Modal
+        isOpen={showItemPicker}
+        onClose={() => setShowItemPicker(false)}
+        title="Select Item"
+        size="lg"
+      >
+        <div className="space-y-4">
+          <div className="relative">
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search items..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoFocus
+            />
+          </div>
+
+          <div className="max-h-96 overflow-y-auto space-y-2">
+            {searching && (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                Loading items...
+              </div>
+            )}
+
+            {!searching && searchResults.length === 0 && (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                {searchQuery ? `No items found matching "${searchQuery}"` : 'No RouteStarItems available'}
+              </div>
+            )}
+
+            {!searching && searchResults.map((item, index) => (
+              <button
+                key={`${item.itemName}-${index}`}
+                type="button"
+                onClick={() => handleItemSelect(item)}
+                className="w-full p-4 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-medium text-gray-900 dark:text-white">
+                    {item.itemName}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    Stock: {item.currentStock || 0} • Purchased: {item.totalPurchased || 0} • Sold:{' '}
+                    {item.totalSold || 0}
+                  </div>
+                </div>
+                {selectedItem?.itemName === item.itemName && (
+                  <CheckCircleIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </Modal>
+
+      {/* Discrepancy Confirmation Modal */}
+      <Modal
+        isOpen={showDiscrepancyModal}
+        onClose={() => !submitting && setShowDiscrepancyModal(false)}
+        title="Stock Discrepancy Detected"
+        size="md"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+            <ExclamationTriangleIcon className="w-8 h-8 text-red-600 dark:text-red-400 flex-shrink-0" />
+            <div>
+              <h3 className="font-semibold text-red-900 dark:text-red-100">
+                Math Validation Failed
+              </h3>
+              <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                The remaining quantity you entered doesn't match the system calculation.
+              </p>
+            </div>
+          </div>
+
+          {discrepancyInfo && (
+            <div className="space-y-3">
+              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Item:</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  {discrepancyInfo.itemName}
+                </span>
+              </div>
+
+              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Current Stock:</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  {discrepancyInfo.currentStock}
+                </span>
+              </div>
+
+              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Taking:</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  {discrepancyInfo.taking}
+                </span>
+              </div>
+
+              <div className="flex justify-between py-2 border-b-2 border-gray-300 dark:border-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Expected Remaining:</span>
+                <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                  {discrepancyInfo.expectedRemaining}
+                </span>
+              </div>
+
+              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-sm text-gray-600 dark:text-gray-400">You Entered:</span>
+                <span className="text-sm font-bold text-red-600 dark:text-red-400">
+                  {discrepancyInfo.userEnteredRemaining}
+                </span>
+              </div>
+
+              <div className="flex justify-between py-2">
+                <span className="text-sm font-medium text-gray-900 dark:text-white">Difference:</span>
+                <span
+                  className={`text-sm font-bold ${
+                    parseFloat(discrepancyInfo.difference) > 0
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-red-600 dark:text-red-400'
+                  }`}
+                >
+                  {parseFloat(discrepancyInfo.difference) > 0 ? '+' : ''}
+                  {discrepancyInfo.difference} ({discrepancyInfo.discrepancyType})
+                </span>
+              </div>
+
+              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  ⚠️ Accepting this will automatically create an <strong>Approved</strong> discrepancy
+                  and adjust stock accordingly.
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setShowDiscrepancyModal(false)}
+              disabled={submitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              loading={submitting}
+              disabled={submitting}
+              onClick={() => submitCheckout(true)}
+            >
+              Accept & Create Checkout
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

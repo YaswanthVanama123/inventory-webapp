@@ -219,7 +219,11 @@ const adminMenuItems = [
   {
     label: 'Truck Checkouts',
     path: '/truck-checkouts',
-    icon: TruckIcon
+    icon: TruckIcon,
+    submenu: [
+      { label: 'View All', path: '/truck-checkouts', icon: ListIcon },
+      { label: 'New Checkout', path: '/truck-checkouts/new', icon: AddIcon },
+    ]
   },
   {
     label: 'Orders',
@@ -292,6 +296,11 @@ const adminMenuItems = [
     icon: ClockHistoryIcon
   },
   {
+    label: 'Settings',
+    path: '/settings',
+    icon: SettingsIcon
+  },
+  {
     label: 'Profile',
     path: '/profile',
     icon: ProfileIcon
@@ -330,7 +339,11 @@ const employeeMenuItems = [
   {
     label: 'Truck Checkouts',
     path: '/truck-checkouts',
-    icon: TruckIcon
+    icon: TruckIcon,
+    submenu: [
+      { label: 'View All', path: '/truck-checkouts', icon: ListIcon },
+      { label: 'New Checkout', path: '/truck-checkouts/new', icon: AddIcon },
+    ]
   },
   {
     label: 'Orders',

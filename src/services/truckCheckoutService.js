@@ -107,6 +107,12 @@ const truckCheckoutService = {
   deleteCheckout: async (id) => {
     const response = await api.delete(`/truck-checkouts/${id}`);
     return response;
+  },
+
+  // Get checkout sales tracking
+  getSalesTracking: async (params = {}) => {
+    const response = await api.get('/truck-checkouts/sales-tracking', { params });
+    return response;
   }
 };
 

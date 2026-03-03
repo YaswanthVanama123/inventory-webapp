@@ -34,6 +34,16 @@ export const updateSKUConfig = async (config) => {
   return response;
 };
 
+export const getStockCutoffDate = async () => {
+  const response = await api.get('/settings/stock-cutoff-date');
+  return response;
+};
+
+export const updateStockCutoffDate = async (cutoffDate) => {
+  const response = await api.put('/settings/stock-cutoff-date', { cutoffDate });
+  return response;
+};
+
 const settingsService = {
   getUnits,
   addUnit,
@@ -41,6 +51,8 @@ const settingsService = {
   deleteUnit,
   generateSKU,
   updateSKUConfig,
+  getStockCutoffDate,
+  updateStockCutoffDate,
 };
 
 export default settingsService;

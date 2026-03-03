@@ -24,8 +24,13 @@ const TruckCheckoutList = () => {
   const navigate = useNavigate();
   const { showError, showSuccess } = useContext(ToastContext);
 
+  // Tab state
+  const [activeTab, setActiveTab] = useState('checkouts');
+
   const [loading, setLoading] = useState(true);
   const [checkouts, setCheckouts] = useState([]);
+  const [salesTracking, setSalesTracking] = useState([]);
+  const [salesSummary, setSalesSummary] = useState({});
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 50, pages: 0 });
 
   // Filters
@@ -38,8 +43,12 @@ const TruckCheckoutList = () => {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    loadCheckouts();
-  }, [statusFilter, employeeFilter, pagination.page]);
+    if (activeTab === 'checkouts') {
+      loadCheckouts();
+    } else if (activeTab === 'sales') {
+      loadSalesTracking();
+    }
+  }, [statusFilter, employeeFilter, pagination.page, activeTab]);
 
   const loadCheckouts = async () => {
     try {
@@ -60,6 +69,25 @@ const TruckCheckoutList = () => {
     } catch (error) {
       console.error('Load checkouts error:', error);
       showError('Failed to load checkouts');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadSalesTracking = async () => {
+    try {
+      setLoading(true);
+
+      const params = {};
+      if (employeeFilter.trim()) params.employeeName = employeeFilter.trim();
+
+      const response = await truckCheckoutService.getSalesTracking(params);
+
+      setSalesTracking(response.data.checkouts || []);
+      setSalesSummary(response.data.summary || {});
+    } catch (error) {
+      console.error('Load sales tracking error:', error);
+      showError('Failed to load sales tracking');
     } finally {
       setLoading(false);
     }
@@ -153,6 +181,32 @@ const TruckCheckoutList = () => {
         </Button>
       </div>
 
+      {/* Tabs */}
+      <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="flex gap-1">
+          <button
+            onClick={() => setActiveTab('checkouts')}
+            className={`px-6 py-3 font-medium transition-colors ${
+              activeTab === 'checkouts'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+            }`}
+          >
+            Checkouts
+          </button>
+          <button
+            onClick={() => setActiveTab('sales')}
+            className={`px-6 py-3 font-medium transition-colors ${
+              activeTab === 'sales'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+            }`}
+          >
+            Sales & Remaining
+          </button>
+        </div>
+      </div>
+
       {/* Filters */}
       <Card>
         <div className="flex items-center gap-2 mb-4">
@@ -211,7 +265,8 @@ const TruckCheckoutList = () => {
       </Card>
 
       {/* Checkouts Table */}
-      <Card>
+      {activeTab === 'checkouts' && (
+        <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Checkouts ({pagination.total} records)
         </h2>
@@ -390,6 +445,147 @@ const TruckCheckoutList = () => {
           </div>
         )}
       </Card>
+      )}
+
+      {/* Sales Tracking Table */}
+      {activeTab === 'sales' && (
+        <Card>
+          <div className="mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Sales & Remaining Tracking
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Track what was sold vs what was checked out
+            </p>
+          </div>
+
+          {/* Summary Cards */}
+          {salesSummary && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-green-600 dark:text-green-400 font-medium">Good (Matched)</p>
+                    <p className="text-2xl font-bold text-green-700 dark:text-green-300">{salesSummary.good || 0}</p>
+                  </div>
+                  <CheckCircleIcon className="w-8 h-8 text-green-600 dark:text-green-400" />
+                </div>
+              </div>
+
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">Shortage</p>
+                    <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">{salesSummary.shortage || 0}</p>
+                  </div>
+                  <ClockIcon className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
+                </div>
+              </div>
+
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-red-600 dark:text-red-400 font-medium">Overage</p>
+                    <p className="text-2xl font-bold text-red-700 dark:text-red-300">{salesSummary.overage || 0}</p>
+                  </div>
+                  <XCircleIcon className="w-8 h-8 text-red-600 dark:text-red-400" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                    Employee
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                    Truck
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                    Item
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                    Checked Out
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                    Sold
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                    Remaining
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                    Invoices
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                {salesTracking.length === 0 ? (
+                  <tr>
+                    <td colSpan="8" className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                      No sales tracking data found
+                    </td>
+                  </tr>
+                ) : (
+                  salesTracking.map((item) => (
+                    <tr
+                      key={item.checkoutId}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                        {item.employeeName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                        {item.truckNumber || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                        {item.itemName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900 dark:text-white">
+                        {item.quantityCheckedOut}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-blue-600 dark:text-blue-400">
+                        {item.totalSold}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900 dark:text-white">
+                        {item.remaining}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {item.status === 'Good' && (
+                          <Badge variant="success">
+                            <CheckCircleIcon className="w-4 h-4 mr-1" />
+                            Good
+                          </Badge>
+                        )}
+                        {item.status === 'Shortage' && (
+                          <Badge variant="warning">
+                            <ClockIcon className="w-4 h-4 mr-1" />
+                            Shortage
+                          </Badge>
+                        )}
+                        {item.status === 'Overage' && (
+                          <Badge variant="danger">
+                            <XCircleIcon className="w-4 h-4 mr-1" />
+                            Overage
+                          </Badge>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                        {item.matchedInvoices} matched
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
 
       {/* Delete Confirmation Modal */}
       <Modal

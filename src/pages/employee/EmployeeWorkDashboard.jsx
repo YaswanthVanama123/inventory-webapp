@@ -88,7 +88,7 @@ const EmployeeWorkDashboard = () => {
         throw new Error(data.error?.message || data.message || 'Failed to update truck number');
       }
 
-      // Update user in context and localStorage
+      
       const updatedUser = { ...user, truckNumber: truckNumberInput.toUpperCase() };
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));

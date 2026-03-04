@@ -591,7 +591,7 @@ function App() {
                   }
                 />
 
-                {/* Truck Checkouts */}
+                {}
                 <Route
                   path="/truck-checkouts"
                   element={

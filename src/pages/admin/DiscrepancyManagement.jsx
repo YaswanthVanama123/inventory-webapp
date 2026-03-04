@@ -27,7 +27,7 @@ const DiscrepancyManagement = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDiscrepancies, setSelectedDiscrepancies] = useState([]);
   const [filters, setFilters] = useState({
-    status: '',  // Show all statuses by default for tracking
+    status: '',  
     type: '',
     search: ''
   });
@@ -38,7 +38,7 @@ const DiscrepancyManagement = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [discrepancyToDelete, setDiscrepancyToDelete] = useState(null);
 
-  // Pagination
+  
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 50,
@@ -51,12 +51,12 @@ const DiscrepancyManagement = () => {
     fetchSummary();
   }, [filters, pagination.page]);
 
-  // Handle prefilled data from navigation
+  
   useEffect(() => {
     if (location.state?.prefilledItem) {
       setPrefilledItem(location.state.prefilledItem);
       setShowRecordModal(true);
-      // Clear the state to prevent re-opening on page refresh
+      
       window.history.replaceState({}, document.title);
     }
   }, [location]);
@@ -238,7 +238,7 @@ const DiscrepancyManagement = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
@@ -257,7 +257,7 @@ const DiscrepancyManagement = () => {
         </div>
       </div>
 
-      {/* Summary Cards */}
+      {}
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
@@ -288,10 +288,10 @@ const DiscrepancyManagement = () => {
         </div>
       )}
 
-      {/* Filters and Actions */}
+      {}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <div className="flex flex-col lg:flex-row gap-4">
-          {/* Search */}
+          {}
           <div className="flex-1">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
@@ -305,7 +305,7 @@ const DiscrepancyManagement = () => {
             </div>
           </div>
 
-          {/* Status Filter */}
+          {}
           <select
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
@@ -318,7 +318,7 @@ const DiscrepancyManagement = () => {
             <option value="Resolved">Resolved</option>
           </select>
 
-          {/* Type Filter */}
+          {}
           <select
             value={filters.type}
             onChange={(e) => setFilters({ ...filters, type: e.target.value })}
@@ -331,7 +331,7 @@ const DiscrepancyManagement = () => {
             <option value="Missing">Missing</option>
           </select>
 
-          {/* Bulk Approve */}
+          {}
           {selectedDiscrepancies.length > 0 && (
             <button
               onClick={handleBulkApprove}
@@ -344,7 +344,7 @@ const DiscrepancyManagement = () => {
         </div>
       </div>
 
-      {/* Discrepancies Table */}
+      {}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -473,7 +473,7 @@ const DiscrepancyManagement = () => {
                             </button>
                           </>
                         )}
-                        {/* Delete button - visible for all statuses (testing) */}
+                        {}
                         <button
                           onClick={() => handleDelete(discrepancy._id)}
                           className="p-1 text-slate-600 hover:text-slate-700 hover:bg-slate-50 rounded transition-colors"
@@ -544,7 +544,7 @@ const DiscrepancyManagement = () => {
           </table>
         </div>
 
-        {/* Pagination */}
+        {}
         {pagination.totalPages > 1 && (
           <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
             <div className="text-sm text-slate-600">
@@ -570,7 +570,7 @@ const DiscrepancyManagement = () => {
         )}
       </div>
 
-      {/* Empty State */}
+      {}
       {!loading && filteredDiscrepancies.length === 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
           <AlertTriangle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
@@ -590,7 +590,7 @@ const DiscrepancyManagement = () => {
         </div>
       )}
 
-      {/* Record Discrepancy Modal - To be implemented */}
+      {}
       {showRecordModal && (
         <RecordDiscrepancyModal
           onClose={() => {
@@ -607,7 +607,7 @@ const DiscrepancyManagement = () => {
         />
       )}
 
-      {/* Delete Confirmation Modal */}
+      {}
       {showDeleteModal && (
         <DeleteConfirmationModal
           onClose={() => {
@@ -621,7 +621,7 @@ const DiscrepancyManagement = () => {
   );
 };
 
-// Record Discrepancy Modal
+
 const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
   const { showSuccess, showError } = useContext(ToastContext);
   const [loading, setLoading] = useState(false);
@@ -642,7 +642,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     notes: prefilledItem ? `Reported from Stock Management for ${prefilledItem.categoryName}` : ''
   });
 
-  // Search invoices as user types
+  
   const searchInvoices = async (searchTerm) => {
     if (!searchTerm || searchTerm.length < 2) {
       setInvoices([]);
@@ -662,7 +662,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     }
   };
 
-  // Select invoice and populate line items
+  
   const handleInvoiceSelect = (invoice) => {
     setSelectedInvoice(invoice);
     setFormData({
@@ -677,7 +677,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     setInvoices([]);
   };
 
-  // Select line item
+  
   const handleLineItemSelect = (item) => {
     setFormData({
       ...formData,
@@ -687,7 +687,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     });
   };
 
-  // Auto-determine discrepancy type based on quantities
+  
   useEffect(() => {
     if (formData.systemQuantity && formData.actualQuantity) {
       const diff = formData.actualQuantity - formData.systemQuantity;
@@ -702,7 +702,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
+    
     if (!prefilledItem && !formData.invoiceNumber) {
       showError?.('Please select an invoice');
       return;
@@ -752,10 +752,10 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Show invoice/item selection only if NOT prefilled */}
+          {}
           {!prefilledItem && (
             <>
-              {/* Invoice Search */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Invoice Number *
@@ -779,7 +779,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   )}
                 </div>
 
-                {/* Invoice Search Results */}
+                {}
                 {invoices.length > 0 && (
                   <div className="mt-2 border border-slate-200 rounded-lg max-h-48 overflow-y-auto">
                     {invoices.map((invoice) => (
@@ -799,7 +799,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 )}
               </div>
 
-              {/* Line Items Selection */}
+              {}
               {selectedInvoice && selectedInvoice.lineItems && selectedInvoice.lineItems.length > 0 && (
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -827,7 +827,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
             </>
           )}
 
-          {/* Show item details if prefilled */}
+          {}
           {prefilledItem && (
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <h3 className="text-sm font-semibold text-blue-900 mb-2">Item Details</h3>
@@ -845,7 +845,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
             </div>
           )}
 
-          {/* System Quantity (Read-only) */}
+          {}
           {formData.itemName && (
             <>
               <div>
@@ -860,7 +860,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 />
               </div>
 
-              {/* Actual Quantity */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Actual Quantity (Physical Count) *
@@ -877,7 +877,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 />
               </div>
 
-              {/* Difference Display */}
+              {}
               {formData.actualQuantity !== 0 && (
                 <div className="p-4 bg-slate-50 rounded-lg">
                   <div className="flex items-center justify-between">
@@ -889,7 +889,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 </div>
               )}
 
-              {/* Discrepancy Type */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Discrepancy Type *
@@ -908,7 +908,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 </select>
               </div>
 
-              {/* Reason */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Reason
@@ -922,7 +922,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 />
               </div>
 
-              {/* Notes */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Additional Notes
@@ -971,7 +971,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
   );
 };
 
-// Delete Confirmation Modal
+
 const DeleteConfirmationModal = ({ onClose, onConfirm }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

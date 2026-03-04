@@ -1,7 +1,7 @@
 import api from './api';
 
 const employeeDataService = {
-  // Get my work data (filtered by my truck number)
+  
   async getMyWorkData(params = {}) {
     const queryParams = new URLSearchParams();
     if (params.page) queryParams.append('page', params.page);
@@ -17,7 +17,7 @@ const employeeDataService = {
     return response;
   },
 
-  // Get my statistics
+  
   async getMyStatistics(startDate, endDate) {
     const queryParams = new URLSearchParams();
     if (startDate) queryParams.append('startDate', startDate);
@@ -27,13 +27,13 @@ const employeeDataService = {
     return response;
   },
 
-  // Get my recent activity
+  
   async getMyRecentActivity(limit = 10) {
     const response = await api.get(`/employee-data/my-activity?limit=${limit}`);
     return response;
   },
 
-  // Get my performance metrics
+  
   async getMyPerformance(startDate, endDate) {
     const queryParams = new URLSearchParams();
     if (startDate) queryParams.append('startDate', startDate);
@@ -43,7 +43,7 @@ const employeeDataService = {
     return response;
   },
 
-  // Admin: Get employee data by truck number
+  
   async getEmployeeDataByTruckNumber(truckNumber, params = {}) {
     const queryParams = new URLSearchParams();
     if (params.page) queryParams.append('page', params.page);
@@ -57,7 +57,7 @@ const employeeDataService = {
     return response;
   },
 
-  // Admin: Get all truck assignments
+  
   async getAllTruckAssignments() {
     const response = await api.get('/employee-data/truck-assignments');
     return response;

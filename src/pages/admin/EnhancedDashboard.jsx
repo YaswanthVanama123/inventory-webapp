@@ -158,7 +158,7 @@ const EnhancedDashboard = () => {
       if (response.success && response.data) {
         const { summary, recentActivity, topSellingItems, topSellingItemsDetailed, salesTrend, invoiceStatusStats } = response.data;
 
-        // Transform invoice status stats
+        
         const statusColors = {
           'Pending': '#F59E0B',
           'Completed': '#10B981',
@@ -205,7 +205,7 @@ const EnhancedDashboard = () => {
             margin: 0,
           })) || [],
 
-          // Invoice status distribution from real data
+          
           statusDistribution: statusDistribution,
         };
 

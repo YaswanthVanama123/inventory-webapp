@@ -34,7 +34,7 @@ const OrderVerification = () => {
   }, [orderId]);
 
   useEffect(() => {
-    // Check if there are any discrepancies
+    
     const discrepancies = items.some(item =>
       parseFloat(item.receivedQuantity || 0) !== item.qty
     );
@@ -48,10 +48,10 @@ const OrderVerification = () => {
 
       if (response.success) {
         setOrder(response.data);
-        // Initialize items with expected quantities
+        
         setItems(response.data.items.map(item => ({
           ...item,
-          receivedQuantity: item.qty, // Default to expected quantity
+          receivedQuantity: item.qty, 
           itemName: item.name
         })));
       }
@@ -94,7 +94,7 @@ const OrderVerification = () => {
     try {
       setSubmitting(true);
 
-      // Prepare items data
+      
       const itemsData = items.map(item => ({
         sku: item.sku,
         itemName: item.itemName || item.name,
@@ -151,7 +151,7 @@ const OrderVerification = () => {
 
   return (
     <div className="p-6 space-y-5">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between pb-2">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -166,7 +166,7 @@ const OrderVerification = () => {
         </Button>
       </div>
 
-      {/* Order Info */}
+      {}
       <Card variant="elevated" padding="lg">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
@@ -186,7 +186,7 @@ const OrderVerification = () => {
         </div>
       </Card>
 
-      {/* Instruction */}
+      {}
       <Alert variant="info" title="Instructions">
         <ul className="list-disc list-inside space-y-1 mt-2 text-sm">
           <li>Enter the actual quantity received for each item</li>
@@ -195,7 +195,7 @@ const OrderVerification = () => {
         </ul>
       </Alert>
 
-      {/* Items Table */}
+      {}
       <Card variant="elevated" padding="none">
         <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -290,7 +290,7 @@ const OrderVerification = () => {
         </div>
       </Card>
 
-      {/* Notes */}
+      {}
       <Card variant="elevated" padding="lg">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Notes (Optional)
@@ -304,7 +304,7 @@ const OrderVerification = () => {
         />
       </Card>
 
-      {/* Discrepancy Warning */}
+      {}
       {hasDiscrepancies && (
         <Alert variant="warning" title="Discrepancies Detected">
           <p className="mt-2">
@@ -313,7 +313,7 @@ const OrderVerification = () => {
         </Alert>
       )}
 
-      {/* Action Buttons */}
+      {}
       <div className="flex justify-end gap-4">
         <Button
           variant="ghost"

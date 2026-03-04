@@ -23,7 +23,7 @@ const inventoryService = {
     }
   },
 
-  // Get inventory items with RouteStar alias mappings for truck checkout
+  
   getAllForTruckCheckout: async () => {
     try {
       const response = await api.get('/inventory/truck-checkout');

@@ -28,11 +28,11 @@ const RouteStarItemsList = () => {
   const [filterForUse, setFilterForUse] = useState(false);
   const [filterForSell, setFilterForSell] = useState(false);
 
-  // Consolidated effect with debouncing for search
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       loadData();
-    }, searchText ? 500 : 0); // Debounce only when searching
+    }, searchText ? 500 : 0); 
 
     return () => clearTimeout(timer);
   }, [pagination.page, selectedParent, selectedType, selectedCategory, filterForUse, filterForSell, searchText]);
@@ -52,7 +52,7 @@ const RouteStarItemsList = () => {
         forSell: filterForSell ? 'true' : undefined
       };
 
-      // OPTIMIZED: Use single API call instead of two separate calls
+      
       const data = await routeStarItemsService.getItemsWithStats(params);
 
       console.log('Combined page data:', data);
@@ -75,14 +75,14 @@ const RouteStarItemsList = () => {
         [flagType]: !currentValue
       });
 
-      // Update local state optimistically
+      
       setItems(prevItems =>
         prevItems.map(item =>
           item._id === itemId ? { ...item, [flagType]: updatedItem[flagType] } : item
         )
       );
 
-      // Reload data to get updated stats
+      
       await loadData();
 
       showSuccess('Item updated successfully');
@@ -180,9 +180,9 @@ const RouteStarItemsList = () => {
         </p>
       </div>
 
-      {/* Stats Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        {/* Total Items */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -197,7 +197,7 @@ const RouteStarItemsList = () => {
           </div>
         </div>
 
-        {/* For Use */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -212,7 +212,7 @@ const RouteStarItemsList = () => {
           </div>
         </div>
 
-        {/* For Sell */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -227,7 +227,7 @@ const RouteStarItemsList = () => {
           </div>
         </div>
 
-        {/* Both */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -242,7 +242,7 @@ const RouteStarItemsList = () => {
           </div>
         </div>
 
-        {/* Unmarked */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>

@@ -39,7 +39,7 @@ const SalesFolderView = () => {
       console.log('[SalesFolderView] response.data:', response.data);
       console.log('[SalesFolderView] response.data.data:', response.data?.data);
 
-      // Try multiple paths to handle different response structures
+      
       const items = response.data?.data?.items || response.data?.items || [];
       console.log('[SalesFolderView] Parsed items:', items.length, 'items', items);
       setGroupedItems(items);
@@ -54,17 +54,17 @@ const SalesFolderView = () => {
   const toggleItemFolder = async (sku) => {
     const isCurrentlyExpanded = expandedItems[sku];
 
-    // Toggle the expansion state
+    
     setExpandedItems(prev => ({
       ...prev,
       [sku]: !prev[sku]
     }));
 
-    // If we're expanding (not collapsing) and haven't loaded invoices yet
+    
     if (!isCurrentlyExpanded) {
       const item = groupedItems.find(i => i.sku === sku);
 
-      // Only fetch if invoices haven't been loaded yet
+      
       if (!item.invoices) {
         setLoadingInvoices(prev => ({ ...prev, [sku]: true }));
 
@@ -74,11 +74,11 @@ const SalesFolderView = () => {
           console.log('[SalesFolderView] response.data:', response.data);
           console.log('[SalesFolderView] response.data.data:', response.data?.data);
 
-          // Try multiple paths to handle different response structures
+          
           const invoices = response.data?.data?.entries || response.data?.entries || [];
           console.log('[SalesFolderView] Extracted invoices:', invoices.length, 'entries', invoices);
 
-          // Update the item with its invoices
+          
           setGroupedItems(prev => {
             const updated = prev.map(item => {
               if (item.sku === sku) {
@@ -94,7 +94,7 @@ const SalesFolderView = () => {
           console.error(`Error fetching invoices for item ${item.name}:`, error);
           showError('Failed to load invoice details');
 
-          // Set empty invoices array so we don't keep trying
+          
           setGroupedItems(prev => prev.map(item =>
             item.sku === sku
               ? { ...item, invoices: [] }
@@ -225,7 +225,7 @@ const SalesFolderView = () => {
     }
   };
 
-  // Filter items based on search term
+  
   const filteredItems = groupedItems.filter(item => {
     if (!searchTerm) return true;
 
@@ -259,7 +259,7 @@ const SalesFolderView = () => {
 
   return (
     <div className="space-y-3">
-      {/* Search Bar */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
         <div className="relative">
           <input
@@ -300,9 +300,9 @@ const SalesFolderView = () => {
         )}
       </div>
 
-      {/* Summary Statistics */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Total Items */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -320,7 +320,7 @@ const SalesFolderView = () => {
           </div>
         </div>
 
-        {/* Total Invoices */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -342,7 +342,7 @@ const SalesFolderView = () => {
           </div>
         </div>
 
-        {/* Units Sold */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -364,7 +364,7 @@ const SalesFolderView = () => {
           </div>
         </div>
 
-        {/* Total Revenue */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -387,7 +387,7 @@ const SalesFolderView = () => {
         </div>
       </div>
 
-      {/* Info Note */}
+      {}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
         <p className="text-sm text-blue-800 dark:text-blue-300 flex items-start gap-2">
           <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -528,7 +528,7 @@ const SalesFolderView = () => {
                 </p>
               </div>
 
-              {/* Mobile stats - visible on small screens */}
+              {}
               <div className="lg:hidden w-full mt-3 grid grid-cols-3 gap-2">
                 <div className="bg-slate-50 rounded p-2 text-center">
                   <p className="text-xs text-slate-500 font-medium">Sold</p>
@@ -544,7 +544,7 @@ const SalesFolderView = () => {
                 </div>
               </div>
 
-              {/* Desktop stats - hidden on mobile */}
+              {}
               <div
                 className="hidden lg:flex items-center gap-6 mr-2 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -699,7 +699,7 @@ const SalesFolderView = () => {
         );
       })}
 
-      {/* No results message */}
+      {}
       {filteredItems.length === 0 && groupedItems.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-slate-200">
           <ShoppingCart className="w-16 h-16 mx-auto text-slate-300 mb-4" />

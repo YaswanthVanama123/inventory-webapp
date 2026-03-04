@@ -29,7 +29,7 @@ const Categories = () => {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      // Categories endpoint removed - setting empty array
+      
       setCategories([]);
     } catch (error) {
       console.error('Error fetching categories:', error);

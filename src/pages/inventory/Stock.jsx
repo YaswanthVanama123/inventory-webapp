@@ -22,7 +22,7 @@ const Stock = () => {
   const [categorySkuData, setCategorySkuData] = useState({});
   const [loadingCategories, setLoadingCategories] = useState(new Set());
 
-  // Discrepancy modal state
+  
   const [showDiscrepancyModal, setShowDiscrepancyModal] = useState(false);
   const [prefilledItem, setPrefilledItem] = useState(null);
 
@@ -30,7 +30,7 @@ const Stock = () => {
     loadData();
   }, []);
 
-  // Auto-refresh when page becomes visible (e.g., returning from Discrepancy Management)
+  
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
@@ -186,11 +186,11 @@ const Stock = () => {
         </div>
       </Card>
 
-      {/* Stats Cards */}
+      {}
       <div className={`grid grid-cols-1 ${activeTab === 'sell' ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-6`}>
         {activeTab === 'use' ? (
           <>
-            {/* Total Categories */}
+            {}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -208,7 +208,7 @@ const Stock = () => {
               </div>
             </div>
 
-            {/* Total Quantity */}
+            {}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -226,7 +226,7 @@ const Stock = () => {
               </div>
             </div>
 
-            {/* Total Value */}
+            {}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -246,7 +246,7 @@ const Stock = () => {
           </>
         ) : (
           <>
-            {/* Total Purchased */}
+            {}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -264,7 +264,7 @@ const Stock = () => {
               </div>
             </div>
 
-            {/* Total Sold */}
+            {}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -282,7 +282,7 @@ const Stock = () => {
               </div>
             </div>
 
-            {/* Total Checked Out */}
+            {}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -300,7 +300,7 @@ const Stock = () => {
               </div>
             </div>
 
-            {/* Stock Remaining */}
+            {}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -550,12 +550,12 @@ const Stock = () => {
                                               e.stopPropagation();
                                               const stockRemaining = (sku.totalPurchased || 0) - (sku.totalSold || 0) - (sku.totalCheckedOut || 0);
 
-                                              // Extract actual RouteStarItem category from itemName
-                                              // e.g., "20001 SANIPOD... 'WHITE'" -> "WHITE"
+                                              
+                                              
                                               let actualCategory = item.categoryName;
                                               const itemNameUpper = sku.itemName.toUpperCase();
 
-                                              // Check if itemName contains common color/category names
+                                              
                                               const categoryKeywords = ['WHITE', 'BLACK', 'BLUE', 'RED', 'GREEN', 'YELLOW', 'BROWN', 'GRAY', 'GREY', 'ORANGE', 'PINK', 'PURPLE'];
                                               for (const keyword of categoryKeywords) {
                                                 if (itemNameUpper.includes(keyword)) {
@@ -863,7 +863,7 @@ const Stock = () => {
                                         </tr>
                                       )}
 
-                                      {/* Checkout History */}
+                                      {}
                                       {sku.checkoutHistory && sku.checkoutHistory.length > 0 && (
                                         <tr>
                                           <td colSpan="8" className="px-0 py-0">
@@ -921,7 +921,7 @@ const Stock = () => {
                                         </tr>
                                       )}
 
-                                      {/* Discrepancy History */}
+                                      {}
                                       {sku.discrepancyHistory && sku.discrepancyHistory.length > 0 && (
                                         <tr>
                                           <td colSpan="8" className="px-0 py-0">
@@ -1101,7 +1101,7 @@ const Stock = () => {
         </div>
       </Card>
 
-      {/* Discrepancy Modal */}
+      {}
       {showDiscrepancyModal && (
         <DiscrepancyModal
           onClose={() => {
@@ -1111,7 +1111,7 @@ const Stock = () => {
           onSuccess={() => {
             setShowDiscrepancyModal(false);
             setPrefilledItem(null);
-            loadData(); // Refresh stock data
+            loadData(); 
             showSuccess?.('Discrepancy recorded successfully');
           }}
           prefilledItem={prefilledItem}
@@ -1121,7 +1121,7 @@ const Stock = () => {
   );
 };
 
-// Discrepancy Modal Component
+
 const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
   const { showSuccess, showError } = useContext(ToastContext);
   const [loading, setLoading] = useState(false);
@@ -1142,7 +1142,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     notes: prefilledItem ? `Reported from Stock Management for ${prefilledItem.categoryName}` : ''
   });
 
-  // Search invoices
+  
   const searchInvoices = async (searchTerm) => {
     if (!searchTerm || searchTerm.length < 2) {
       setInvoices([]);
@@ -1162,7 +1162,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     }
   };
 
-  // Handle invoice selection
+  
   const handleInvoiceSelect = (invoice) => {
     setSelectedInvoice(invoice);
     setFormData({
@@ -1177,7 +1177,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     setInvoices([]);
   };
 
-  // Handle line item selection
+  
   const handleLineItemSelect = (item) => {
     setFormData({
       ...formData,
@@ -1187,7 +1187,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     });
   };
 
-  // Auto-determine discrepancy type
+  
   useEffect(() => {
     if (formData.systemQuantity && formData.actualQuantity) {
       const diff = formData.actualQuantity - formData.systemQuantity;
@@ -1250,10 +1250,10 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Show invoice/item selection only if NOT prefilled */}
+          {}
           {!prefilledItem && (
             <>
-              {/* Invoice Search */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Invoice Number *
@@ -1277,7 +1277,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   )}
                 </div>
 
-                {/* Invoice Search Results */}
+                {}
                 {invoices.length > 0 && (
                   <div className="mt-2 border border-gray-200 dark:border-gray-700 rounded-lg max-h-48 overflow-y-auto">
                     {invoices.map((invoice) => (
@@ -1297,7 +1297,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 )}
               </div>
 
-              {/* Line Items Selection */}
+              {}
               {selectedInvoice && selectedInvoice.lineItems && selectedInvoice.lineItems.length > 0 && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1325,7 +1325,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
             </>
           )}
 
-          {/* Show item details if prefilled */}
+          {}
           {prefilledItem && (
             <div className="p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
               <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">Item Details</h3>
@@ -1346,7 +1346,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
             </div>
           )}
 
-          {/* System Quantity (Read-only) */}
+          {}
           {formData.itemName && (
             <>
               <div>
@@ -1361,7 +1361,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 />
               </div>
 
-              {/* Actual Quantity */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Actual Quantity (Physical Count) *
@@ -1378,7 +1378,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 />
               </div>
 
-              {/* Difference Display */}
+              {}
               {formData.actualQuantity !== 0 && (
                 <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <div className="flex items-center justify-between">
@@ -1390,7 +1390,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 </div>
               )}
 
-              {/* Discrepancy Type */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Discrepancy Type *
@@ -1409,7 +1409,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 </select>
               </div>
 
-              {/* Reason */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Reason
@@ -1423,7 +1423,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 />
               </div>
 
-              {/* Notes */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Additional Notes

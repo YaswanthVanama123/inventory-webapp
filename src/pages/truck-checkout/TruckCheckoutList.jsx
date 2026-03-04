@@ -24,7 +24,7 @@ const TruckCheckoutList = () => {
   const navigate = useNavigate();
   const { showError, showSuccess } = useContext(ToastContext);
 
-  // Tab state
+  
   const [activeTab, setActiveTab] = useState('checkouts');
 
   const [loading, setLoading] = useState(true);
@@ -33,11 +33,11 @@ const TruckCheckoutList = () => {
   const [salesSummary, setSalesSummary] = useState({});
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 50, pages: 0 });
 
-  // Filters
+  
   const [statusFilter, setStatusFilter] = useState('all');
   const [employeeFilter, setEmployeeFilter] = useState('');
 
-  // Delete modal
+  
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [checkoutToDelete, setCheckoutToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
@@ -145,7 +145,7 @@ const TruckCheckoutList = () => {
       showSuccess('Checkout deleted successfully');
       setShowDeleteModal(false);
       setCheckoutToDelete(null);
-      loadCheckouts(); // Reload the list
+      loadCheckouts(); 
     } catch (error) {
       showError(error.response?.data?.message || 'Failed to delete checkout');
     } finally {
@@ -159,7 +159,7 @@ const TruckCheckoutList = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <TruckIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
@@ -181,7 +181,7 @@ const TruckCheckoutList = () => {
         </Button>
       </div>
 
-      {/* Tabs */}
+      {}
       <div className="border-b border-gray-200 dark:border-gray-700">
         <div className="flex gap-1">
           <button
@@ -207,7 +207,7 @@ const TruckCheckoutList = () => {
         </div>
       </div>
 
-      {/* Filters */}
+      {}
       <Card>
         <div className="flex items-center gap-2 mb-4">
           <FunnelIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -264,7 +264,7 @@ const TruckCheckoutList = () => {
         </div>
       </Card>
 
-      {/* Checkouts Table */}
+      {}
       {activeTab === 'checkouts' && (
         <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
@@ -334,7 +334,7 @@ const TruckCheckoutList = () => {
 
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm">
-                        {/* New single-item checkout format */}
+                        {}
                         {checkout.itemName ? (
                           <>
                             <p className="font-medium text-gray-900 dark:text-white">
@@ -345,7 +345,7 @@ const TruckCheckoutList = () => {
                             </p>
                           </>
                         ) : (
-                          /* Old multi-item checkout format */
+                          
                           <>
                             <p className="font-medium text-gray-900 dark:text-white">
                               {checkout.itemsTaken?.length || 0} items
@@ -391,7 +391,7 @@ const TruckCheckoutList = () => {
           </table>
         </div>
 
-        {/* Pagination */}
+        {}
         {pagination.pages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
@@ -447,7 +447,7 @@ const TruckCheckoutList = () => {
       </Card>
       )}
 
-      {/* Sales Tracking Table */}
+      {}
       {activeTab === 'sales' && (
         <Card>
           <div className="mb-4">
@@ -459,7 +459,7 @@ const TruckCheckoutList = () => {
             </p>
           </div>
 
-          {/* Summary Cards */}
+          {}
           {salesSummary && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
@@ -587,7 +587,7 @@ const TruckCheckoutList = () => {
         </Card>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {}
       <Modal
         isOpen={showDeleteModal}
         onClose={() => !deleting && setShowDeleteModal(false)}

@@ -45,14 +45,14 @@ const OrdersList = () => {
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [deletingBulk, setDeletingBulk] = useState(false);
 
-  // Order verification state
+  
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [verifyingOrder, setVerifyingOrder] = useState(null);
   const [verificationItems, setVerificationItems] = useState([]);
   const [verificationNotes, setVerificationNotes] = useState('');
   const [submittingVerification, setSubmittingVerification] = useState(false);
 
-  // Debounce search term
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -106,7 +106,7 @@ const OrdersList = () => {
         setTotalItems(response.data.pagination.total || 0);
         setCurrentPage(response.data.pagination.page || 1);
 
-        // Extract range from combined response
+        
         if (response.data.range) {
           setOrderRange({
             highest: response.data.range.highest,
@@ -211,7 +211,7 @@ const OrdersList = () => {
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
     if (e.target.value === '') {
-      // Don't reset page when clearing to avoid focus loss
+      
       return;
     }
     setCurrentPage(1);
@@ -219,7 +219,7 @@ const OrdersList = () => {
 
   const handleSearchClear = () => {
     setSearchTerm('');
-    // Don't reset page here to avoid focus loss
+    
   };
 
   const handleStatusFilterChange = (e) => {
@@ -351,7 +351,7 @@ const OrdersList = () => {
     }
   };
 
-  // Order verification handlers
+  
   const handleOpenVerifyModal = async (order) => {
     try {
       const response = await purchaseOrderService.getOrderById(order.orderNumber);
@@ -629,9 +629,9 @@ const OrdersList = () => {
         )}
       </div>
 
-      {/* Filters */}
+      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
-        {/* First row - Search and main filters */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="lg:col-span-2">
             <SearchBar
@@ -678,7 +678,7 @@ const OrdersList = () => {
           </Select>
         </div>
 
-        {/* Second row - Date filters and clear button */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
@@ -1095,7 +1095,7 @@ const OrdersList = () => {
         </div>
       </Modal>
 
-      {/* Order Verification Modal */}
+      {}
       <Modal
         isOpen={showVerifyModal}
         onClose={() => !submittingVerification && setShowVerifyModal(false)}
@@ -1104,7 +1104,7 @@ const OrdersList = () => {
       >
         {verifyingOrder && (
           <div className="space-y-4">
-            {/* Order Info */}
+            {}
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
               <div className="grid grid-cols-3 gap-4">
                 <div>
@@ -1134,14 +1134,14 @@ const OrdersList = () => {
               </div>
             </div>
 
-            {/* Instructions */}
+            {}
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
               <p className="text-xs text-gray-700 dark:text-gray-300">
                 <strong>Instructions:</strong> Enter the actual quantity received for each item. If all items match exactly, click "All Good". Otherwise, the differences will be recorded as discrepancies for admin approval.
               </p>
             </div>
 
-            {/* Items Table */}
+            {}
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
               <div className="max-h-96 overflow-y-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -1233,7 +1233,7 @@ const OrdersList = () => {
               </div>
             </div>
 
-            {/* Notes */}
+            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Notes (Optional)
@@ -1247,7 +1247,7 @@ const OrdersList = () => {
               />
             </div>
 
-            {/* Discrepancy Warning */}
+            {}
             {hasDiscrepancies && (
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
                 <p className="text-xs text-yellow-800 dark:text-yellow-200">
@@ -1256,7 +1256,7 @@ const OrdersList = () => {
               </div>
             )}
 
-            {/* Action Buttons */}
+            {}
             <div className="flex justify-end gap-3 pt-2">
               <Button
                 variant="ghost"

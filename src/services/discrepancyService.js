@@ -2,7 +2,7 @@ import api from './api';
 import { handleApiError } from './errorHandler';
 
 const discrepancyService = {
-  // Get all discrepancies with filters and pagination
+  
   getDiscrepancies: async (params = {}) => {
     try {
       const queryParams = new URLSearchParams();
@@ -23,7 +23,7 @@ const discrepancyService = {
     }
   },
 
-  // Get discrepancy summary statistics
+  
   getSummary: async (startDate, endDate) => {
     try {
       const queryParams = new URLSearchParams();
@@ -40,7 +40,7 @@ const discrepancyService = {
     }
   },
 
-  // Create new discrepancy
+  
   createDiscrepancy: async (data) => {
     try {
       const response = await api.post('/discrepancies', data);
@@ -53,7 +53,7 @@ const discrepancyService = {
     }
   },
 
-  // Update discrepancy
+  
   updateDiscrepancy: async (id, data) => {
     try {
       const response = await api.put(`/discrepancies/${id}`, data);
@@ -66,7 +66,7 @@ const discrepancyService = {
     }
   },
 
-  // Approve discrepancy
+  
   approveDiscrepancy: async (id, notes = '') => {
     try {
       const response = await api.post(`/discrepancies/${id}/approve`, { notes });
@@ -79,7 +79,7 @@ const discrepancyService = {
     }
   },
 
-  // Reject discrepancy
+  
   rejectDiscrepancy: async (id, notes = '') => {
     try {
       const response = await api.post(`/discrepancies/${id}/reject`, { notes });
@@ -92,7 +92,7 @@ const discrepancyService = {
     }
   },
 
-  // Bulk approve discrepancies
+  
   bulkApproveDiscrepancies: async (discrepancyIds, notes = '') => {
     try {
       const response = await api.post('/discrepancies/bulk-approve', {
@@ -108,7 +108,7 @@ const discrepancyService = {
     }
   },
 
-  // Delete discrepancy
+  
   deleteDiscrepancy: async (id) => {
     try {
       const response = await api.delete(`/discrepancies/${id}`);
@@ -121,7 +121,7 @@ const discrepancyService = {
     }
   },
 
-  // Search invoices for discrepancy recording
+  
   searchInvoices: async (searchTerm, limit = 10) => {
     try {
       const response = await api.get(`/routestar/invoices?search=${searchTerm}&limit=${limit}`);

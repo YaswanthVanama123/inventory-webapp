@@ -80,7 +80,7 @@ const InventoryForm = () => {
   const [categories, setCategories] = useState([]);
   const [loadingSettings, setLoadingSettings] = useState(true);
 
-  // Cancel confirmation modal
+  
   const [showCancelModal, setShowCancelModal] = useState(false);
 
   
@@ -128,7 +128,7 @@ const InventoryForm = () => {
   const fetchCategories = async () => {
     setLoadingSettings(true);
     try {
-      // Categories endpoint removed - setting empty array
+      
       setCategories([]);
     } catch (error) {
       console.error('Error fetching settings:', error);
@@ -993,7 +993,7 @@ const InventoryForm = () => {
         </form>
       </div>
 
-      {/* Cancel Confirmation Modal */}
+      {}
       <Modal
         isOpen={showCancelModal}
         onClose={() => setShowCancelModal(false)}

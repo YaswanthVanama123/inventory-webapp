@@ -25,11 +25,11 @@ const FetchHistory = () => {
   const [statistics, setStatistics] = useState(null);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 50, pages: 0 });
 
-  // Cancel modal state
+  
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [fetchToCancel, setFetchToCancel] = useState(null);
 
-  // Filters
+  
   const [sourceFilter, setSourceFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [daysFilter, setDaysFilter] = useState('all');
@@ -38,7 +38,7 @@ const FetchHistory = () => {
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 30000); // Refresh every 30 seconds
+    const interval = setInterval(loadData, 30000); 
     return () => clearInterval(interval);
   }, [sourceFilter, statusFilter, daysFilter, customStartDate, customEndDate, pagination.page]);
 
@@ -53,16 +53,16 @@ const FetchHistory = () => {
         page: pagination.page
       };
 
-      // Add date filter based on selection
+      
       if (daysFilter === 'custom') {
         if (customStartDate) params.startDate = customStartDate;
         if (customEndDate) params.endDate = customEndDate;
       } else if (daysFilter !== 'all') {
         params.days = daysFilter;
       }
-      // If daysFilter is 'all', don't add any date params
+      
 
-      // OPTIMIZED: Use single API call instead of three separate calls
+      
       const data = await fetchHistoryService.getPageData(params);
 
       console.log('Page data received:', data);
@@ -160,7 +160,7 @@ const FetchHistory = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -185,10 +185,10 @@ const FetchHistory = () => {
         </Button>
       </div>
 
-      {/* Statistics Cards */}
+      {}
       {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Active Fetches */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between">
               <div>
@@ -206,7 +206,7 @@ const FetchHistory = () => {
             </div>
           </div>
 
-          {/* Today's Fetches */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between">
               <div>

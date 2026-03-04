@@ -191,9 +191,9 @@ const ModelCategoryMapping = () => {
         </p>
       </div>
 
-      {/* Stats Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Total Models */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -208,7 +208,7 @@ const ModelCategoryMapping = () => {
           </div>
         </div>
 
-        {/* Mapped */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -228,7 +228,7 @@ const ModelCategoryMapping = () => {
           </div>
         </div>
 
-        {/* Unmapped */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -248,7 +248,7 @@ const ModelCategoryMapping = () => {
           </div>
         </div>
 
-        {/* RouteStar Items Available */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>

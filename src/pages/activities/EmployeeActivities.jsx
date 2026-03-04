@@ -40,12 +40,12 @@ const EmployeeActivities = () => {
   const [activeTab, setActiveTab] = useState('all');
 
 
-  // OPTIMIZED: Load all data (activities, stats, users) in one API call
+  
   useEffect(() => {
     if (activeTab === 'all') {
       fetchPageData();
     } else {
-      // For tab-specific views (sales, stock, deletions), use existing endpoints
+      
       fetchActivities();
     }
   }, [filters, activeTab]);

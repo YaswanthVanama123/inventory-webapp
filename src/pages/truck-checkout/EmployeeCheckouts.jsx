@@ -82,7 +82,7 @@ const EmployeeCheckouts = () => {
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      {/* Header */}
+      {}
       <div>
         <Button
           variant="ghost"
@@ -108,10 +108,10 @@ const EmployeeCheckouts = () => {
         </div>
       </div>
 
-      {/* Statistics */}
+      {}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Total Checkouts */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between">
               <div>
@@ -124,7 +124,7 @@ const EmployeeCheckouts = () => {
             </div>
           </div>
 
-          {/* Completed */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between">
               <div>
@@ -137,7 +137,7 @@ const EmployeeCheckouts = () => {
             </div>
           </div>
 
-          {/* Active */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between">
               <div>
@@ -150,7 +150,7 @@ const EmployeeCheckouts = () => {
             </div>
           </div>
 
-          {/* Total Invoices */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between">
               <div>
@@ -165,7 +165,7 @@ const EmployeeCheckouts = () => {
         </div>
       )}
 
-      {/* Checkouts List */}
+      {}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Checkout History ({checkouts.length} records)

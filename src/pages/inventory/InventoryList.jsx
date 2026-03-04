@@ -69,7 +69,7 @@ const InventoryList = () => {
   const [purchaseToDelete, setPurchaseToDelete] = useState(null);
   const [deletingPurchase, setDeletingPurchase] = useState(false);
 
-  // Tab state
+  
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'purchases');
   const [expandedSales, setExpandedSales] = useState({});
   const [sales, setSales] = useState({});
@@ -121,7 +121,7 @@ const InventoryList = () => {
   }, [activeTab]);
 
   const fetchCategories = async () => {
-    // Categories endpoint removed - setting empty array
+    
     setCategories([]);
   };
 
@@ -719,7 +719,7 @@ const InventoryList = () => {
         </div>
       )}
 
-      {/* Tab content */}
+      {}
       {activeTab === 'purchases' ? (
         
         <>

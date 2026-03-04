@@ -28,18 +28,18 @@ const TruckCheckoutShop = () => {
   const { showSuccess, showError } = useContext(ToastContext);
   const { user } = useContext(AuthContext);
 
-  // Inventory items
+  
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredItems, setFilteredItems] = useState([]);
 
-  // Cart
+  
   const [cart, setCart] = useState([]);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Employee info for checkout
+  
   const [employeeInfo, setEmployeeInfo] = useState({
     employeeName: user?.fullName || '',
     employeeId: user?._id || '',
@@ -47,7 +47,7 @@ const TruckCheckoutShop = () => {
     notes: ''
   });
 
-  // Update employee info when user data changes
+  
   useEffect(() => {
     if (user) {
       setEmployeeInfo(prev => ({
@@ -67,14 +67,14 @@ const TruckCheckoutShop = () => {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       const filtered = items.filter(item => {
-        // Search in item name, SKU, category
+        
         const matchesBasic =
           item.itemName?.toLowerCase().includes(query) ||
           item.skuCode?.toLowerCase().includes(query) ||
           item.categoryName?.toLowerCase().includes(query) ||
           item.canonicalName?.toLowerCase().includes(query);
 
-        // Search in RouteStar aliases
+        
         const matchesAlias = item.routeStarAliases?.some(alias =>
           alias.toLowerCase().includes(query)
         );
@@ -214,10 +214,10 @@ const TruckCheckoutShop = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-900">
-      {/* Main Content - Inventory Items */}
+      {}
       <div className="flex-1 overflow-y-auto p-6">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
+          {}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -237,7 +237,7 @@ const TruckCheckoutShop = () => {
               </Button>
             </div>
 
-            {/* Stats Cards */}
+            {}
             {filteredItems.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 p-4 rounded-xl border border-blue-200 dark:border-blue-700">
@@ -285,7 +285,7 @@ const TruckCheckoutShop = () => {
               </div>
             )}
 
-            {/* Search */}
+            {}
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <Input
@@ -298,7 +298,7 @@ const TruckCheckoutShop = () => {
             </div>
           </div>
 
-          {/* Items Grid */}
+          {}
           {filteredItems.length === 0 ? (
             <Card>
               <div className="text-center py-12">
@@ -315,7 +315,7 @@ const TruckCheckoutShop = () => {
 
                 return (
                   <div key={item._id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    {/* Image Area */}
+                    {}
                     <div className="relative bg-gray-50 dark:bg-gray-900 p-6 flex items-center justify-center" style={{ height: '180px' }}>
                       {item.images && item.images.length > 0 ? (
                         <img
@@ -327,7 +327,7 @@ const TruckCheckoutShop = () => {
                         <CubeIcon className="w-20 h-20 text-gray-300 dark:text-gray-600" />
                       )}
 
-                      {/* Stock Badge - Top Right */}
+                      {}
                       <div className="absolute top-2 right-2">
                         <div className="flex flex-col gap-1">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
@@ -346,19 +346,19 @@ const TruckCheckoutShop = () => {
                       </div>
                     </div>
 
-                    {/* Content Area */}
+                    {}
                     <div className="p-4 space-y-3">
-                      {/* Item Name */}
+                      {}
                       <h3 className="font-semibold text-gray-900 dark:text-white text-base line-clamp-2 min-h-[48px]">
                         {item.canonicalName}
                       </h3>
 
-                      {/* SKU */}
+                      {}
                       <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                         {item.skuCode}
                       </p>
 
-                      {/* Tags Row */}
+                      {}
                       <div className="flex flex-wrap gap-1.5">
                         {item.categoryName && (
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
@@ -378,7 +378,7 @@ const TruckCheckoutShop = () => {
                         )}
                       </div>
 
-                      {/* Aliases Section */}
+                      {}
                       {item.hasAliases && item.routeStarAliases && item.routeStarAliases.length > 0 && (
                         <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
                           <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
@@ -391,7 +391,7 @@ const TruckCheckoutShop = () => {
                         </div>
                       )}
 
-                      {/* Stock Breakdown */}
+                      {}
                       {(item.totalPurchased > 0 || item.totalSold > 0) && (
                         <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
                           <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
@@ -414,7 +414,7 @@ const TruckCheckoutShop = () => {
                         </div>
                       )}
 
-                      {/* Add to Cart Button */}
+                      {}
                       <Button
                         variant={inCart ? 'success' : 'primary'}
                         size="sm"
@@ -443,7 +443,7 @@ const TruckCheckoutShop = () => {
         </div>
       </div>
 
-      {/* Cart Sidebar */}
+      {}
       <div className="w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 overflow-y-auto">
         <div className="p-6 sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 z-10">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -465,7 +465,7 @@ const TruckCheckoutShop = () => {
             </div>
           ) : (
             <>
-              {/* Cart Items */}
+              {}
               <div className="space-y-4 mb-6">
                 {cart.map((item) => (
                   <div
@@ -491,7 +491,7 @@ const TruckCheckoutShop = () => {
                       </button>
                     </div>
 
-                    {/* Quantity Controls */}
+                    {}
                     <div className="flex items-center gap-3 mb-3">
                       <button
                         onClick={() => updateCartQuantity(item._id, item.quantity - 1)}
@@ -517,7 +517,7 @@ const TruckCheckoutShop = () => {
                       </span>
                     </div>
 
-                    {/* Item Notes */}
+                    {}
                     <Input
                       placeholder="Optional notes for this item"
                       value={item.notes}
@@ -528,7 +528,7 @@ const TruckCheckoutShop = () => {
                 ))}
               </div>
 
-              {/* Checkout Button */}
+              {}
               <Button
                 variant="primary"
                 onClick={handleCheckoutToTruck}
@@ -543,7 +543,7 @@ const TruckCheckoutShop = () => {
         </div>
       </div>
 
-      {/* Checkout Modal */}
+      {}
       <Modal
         isOpen={showCheckoutModal}
         onClose={() => !submitting && setShowCheckoutModal(false)}
@@ -569,7 +569,7 @@ const TruckCheckoutShop = () => {
         }
       >
         <div className="space-y-4">
-          {/* Employee Information */}
+          {}
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-gray-900 dark:text-white">
@@ -613,7 +613,7 @@ const TruckCheckoutShop = () => {
             </div>
           </div>
 
-          {/* Cart Summary */}
+          {}
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
               Items Summary ({getTotalItems()} items)

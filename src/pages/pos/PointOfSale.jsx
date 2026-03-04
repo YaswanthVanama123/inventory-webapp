@@ -103,7 +103,7 @@ const PointOfSale = () => {
 
       setProducts(productsData);
       setFilteredProducts(productsData);
-      setCategories([]); // Categories endpoint removed
+      setCategories([]); 
     } catch (error) {
       console.error('Error fetching data:', error);
       showError('Failed to load products');

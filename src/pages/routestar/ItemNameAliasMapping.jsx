@@ -65,7 +65,7 @@ const ItemNameAliasMapping = () => {
     try {
       setLoading(true);
 
-      // Use combined endpoint - single API call instead of three
+      
       const pageData = await routeStarItemAliasService.getPageData();
 
       console.log('Combined API response:', pageData);
@@ -392,9 +392,9 @@ const ItemNameAliasMapping = () => {
         </p>
       </div>
 
-      {/* Stats Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Total Unique Item Names */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -409,7 +409,7 @@ const ItemNameAliasMapping = () => {
           </div>
         </div>
 
-        {/* Mapped Items */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -429,7 +429,7 @@ const ItemNameAliasMapping = () => {
           </div>
         </div>
 
-        {/* Unmapped Items */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -449,7 +449,7 @@ const ItemNameAliasMapping = () => {
           </div>
         </div>
 
-        {/* Total Mappings */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>

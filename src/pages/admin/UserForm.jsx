@@ -65,7 +65,7 @@ const UserForm = () => {
       }
 
       const data = await response.json();
-      const user = data.data.user;  // Extract user from nested response
+      const user = data.data.user;  
       setFormData({
         username: user.username || '',
         email: user.email || '',
@@ -541,7 +541,7 @@ const UserForm = () => {
             helperText="Admin has full access, Employee has limited access"
           />
 
-          {/* Truck Number */}
+          {}
           <Input
             label="Truck Number"
             name="truckNumber"

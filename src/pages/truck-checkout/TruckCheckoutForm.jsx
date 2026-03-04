@@ -22,35 +22,35 @@ const TruckCheckoutForm = () => {
     checkoutDate: new Date().toISOString().split('T')[0]
   });
 
-  // Item selection state
+  
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [showItemPicker, setShowItemPicker] = useState(false);
 
-  // Quantity state
+  
   const [quantityTaking, setQuantityTaking] = useState('');
   const [remainingQuantity, setRemainingQuantity] = useState('');
   const [validationError, setValidationError] = useState('');
 
-  // Discrepancy modal state
+  
   const [showDiscrepancyModal, setShowDiscrepancyModal] = useState(false);
   const [discrepancyInfo, setDiscrepancyInfo] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Load all items when modal opens and search when query changes
+  
   useEffect(() => {
     if (!showItemPicker) {
-      setSearchQuery(''); // Clear search when closing
+      setSearchQuery(''); 
       setSearchResults([]);
       return;
     }
 
-    // Load items with current search query (debounced)
+    
     const delayDebounce = setTimeout(() => {
       searchItems();
-    }, searchQuery ? 300 : 0); // No delay for initial load
+    }, searchQuery ? 300 : 0); 
 
     return () => clearTimeout(delayDebounce);
   }, [showItemPicker, searchQuery]);
@@ -97,7 +97,7 @@ const TruckCheckoutForm = () => {
 
   const validateStockMath = () => {
     if (!selectedItem || !quantityTaking || !remainingQuantity) {
-      return true; // Don't validate incomplete data
+      return true; 
     }
 
     const taking = parseFloat(quantityTaking);
@@ -119,7 +119,7 @@ const TruckCheckoutForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
+    
     if (!user || !user.fullName?.trim()) {
       showError('Employee name is required. Please update your profile.');
       return;
@@ -148,9 +148,9 @@ const TruckCheckoutForm = () => {
       return;
     }
 
-    // Validate math
+    
     if (!validateStockMath()) {
-      // Show discrepancy modal
+      
       const currentStock = selectedItem.currentStock || 0;
       const expectedRemaining = currentStock - taking;
       const difference = remaining - expectedRemaining;
@@ -168,7 +168,7 @@ const TruckCheckoutForm = () => {
       return;
     }
 
-    // Proceed with checkout (no discrepancy)
+    
     await submitCheckout(false);
   };
 
@@ -192,7 +192,7 @@ const TruckCheckoutForm = () => {
       const response = await truckCheckoutService.createCheckoutNew(checkoutData);
 
       if (!response.success && response.requiresConfirmation) {
-        // Backend detected discrepancy - show modal
+        
         const validation = response.validation;
         setDiscrepancyInfo({
           itemName: selectedItem.itemName,
@@ -239,7 +239,7 @@ const TruckCheckoutForm = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Employee Information */}
+        {}
         <Card>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Employee Information
@@ -283,7 +283,7 @@ const TruckCheckoutForm = () => {
           </div>
         </Card>
 
-        {/* Item Selection */}
+        {}
         <Card>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Select Item
@@ -363,7 +363,7 @@ const TruckCheckoutForm = () => {
           )}
         </Card>
 
-        {/* Notes */}
+        {}
         <Card>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Additional Notes
@@ -377,7 +377,7 @@ const TruckCheckoutForm = () => {
           />
         </Card>
 
-        {/* Actions */}
+        {}
         <div className="flex items-center justify-end gap-3">
           <Button
             type="button"
@@ -398,7 +398,7 @@ const TruckCheckoutForm = () => {
         </div>
       </form>
 
-      {/* Item Picker Modal */}
+      {}
       <Modal
         isOpen={showItemPicker}
         onClose={() => setShowItemPicker(false)}
@@ -457,7 +457,7 @@ const TruckCheckoutForm = () => {
         </div>
       </Modal>
 
-      {/* Discrepancy Confirmation Modal */}
+      {}
       <Modal
         isOpen={showDiscrepancyModal}
         onClose={() => !submitting && setShowDiscrepancyModal(false)}

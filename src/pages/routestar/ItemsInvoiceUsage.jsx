@@ -91,7 +91,7 @@ const ItemsInvoiceUsage = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -107,7 +107,7 @@ const ItemsInvoiceUsage = () => {
         </Button>
       </div>
 
-      {/* Stats Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between">
@@ -158,7 +158,7 @@ const ItemsInvoiceUsage = () => {
         </div>
       </div>
 
-      {/* Search */}
+      {}
       <Card>
         <div className="relative">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -172,7 +172,7 @@ const ItemsInvoiceUsage = () => {
         </div>
       </Card>
 
-      {/* Items Table */}
+      {}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Items ({filteredItems.length} items)
@@ -210,7 +210,7 @@ const ItemsInvoiceUsage = () => {
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                 {filteredItems.map((item, index) => (
                   <React.Fragment key={item.itemName}>
-                    {/* Main Item Row */}
+                    {}
                     <tr
                       className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                       onClick={() => handleItemClick(item.itemName)}
@@ -254,7 +254,7 @@ const ItemsInvoiceUsage = () => {
                       </td>
                     </tr>
 
-                    {/* Expanded Section - Aliases */}
+                    {}
                     {expandedItems.has(item.itemName) && item.aliases.length > 0 && (
                       <tr className="bg-purple-50 dark:bg-purple-900/10">
                         <td colSpan="5" className="px-6 py-3">
@@ -275,7 +275,7 @@ const ItemsInvoiceUsage = () => {
                       </tr>
                     )}
 
-                    {/* Expanded Section - Invoices */}
+                    {}
                     {expandedItems.has(item.itemName) && item.invoices.length > 0 && (
                       <tr className="bg-gray-50 dark:bg-gray-800">
                         <td colSpan="5" className="px-6 py-4">

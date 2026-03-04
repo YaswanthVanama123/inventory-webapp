@@ -20,7 +20,7 @@ const InvoiceDetail = () => {
   const [actionLoading, setActionLoading] = useState(null);
   const [showPrintView, setShowPrintView] = useState(false);
 
-  // Modal states
+  
   const [showMarkAsPaidModal, setShowMarkAsPaidModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
 
@@ -597,7 +597,7 @@ const InvoiceDetail = () => {
         </div>
       </div>
 
-      {/* Mark as Paid Modal */}
+      {}
       <Modal
         isOpen={showMarkAsPaidModal}
         onClose={() => !actionLoading && setShowMarkAsPaidModal(false)}
@@ -638,7 +638,7 @@ const InvoiceDetail = () => {
         )}
       </Modal>
 
-      {/* Cancel Invoice Modal */}
+      {}
       <Modal
         isOpen={showCancelModal}
         onClose={() => !actionLoading && setShowCancelModal(false)}
@@ -701,7 +701,7 @@ const InvoiceDetail = () => {
         </div>
       </Modal>
 
-      {/* Print Styles */}
+      {}
       <style jsx>{`
         @media print {
           body {

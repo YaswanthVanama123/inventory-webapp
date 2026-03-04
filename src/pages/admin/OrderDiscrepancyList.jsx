@@ -30,12 +30,12 @@ const OrderDiscrepancyList = () => {
   const [stats, setStats] = useState(null);
   const [expandedRow, setExpandedRow] = useState(null);
 
-  // Filters
+  
   const [statusFilter, setStatusFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [orderNumberFilter, setOrderNumberFilter] = useState('');
 
-  // Pagination
+  
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 50,
@@ -43,7 +43,7 @@ const OrderDiscrepancyList = () => {
     pages: 0
   });
 
-  // Action modals
+  
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedDiscrepancy, setSelectedDiscrepancy] = useState(null);
@@ -202,7 +202,7 @@ const OrderDiscrepancyList = () => {
 
   return (
     <div className="space-y-5">
-      {/* Stats Cards */}
+      {}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card variant="elevated" padding="lg">
@@ -232,7 +232,7 @@ const OrderDiscrepancyList = () => {
         </div>
       )}
 
-      {/* Filters */}
+      {}
       <Card variant="elevated" padding="lg">
         <div className="flex items-center gap-2 mb-6">
           <FunnelIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -307,7 +307,7 @@ const OrderDiscrepancyList = () => {
         </div>
       </Card>
 
-      {/* Discrepancies Table */}
+      {}
       <Card variant="elevated" padding="none">
         <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -451,7 +451,7 @@ const OrderDiscrepancyList = () => {
                       )}
                     </tr>
 
-                    {/* Expanded Row Details */}
+                    {}
                     {expandedRow === discrepancy._id && (
                       <tr>
                         <td colSpan={isAdmin ? 9 : 8} className="px-6 py-4 bg-gray-50 dark:bg-gray-800">
@@ -491,7 +491,7 @@ const OrderDiscrepancyList = () => {
           </table>
         </div>
 
-        {/* Pagination */}
+        {}
         {pagination.pages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
@@ -522,7 +522,7 @@ const OrderDiscrepancyList = () => {
         )}
       </Card>
 
-      {/* Approve Modal */}
+      {}
       <Modal
         isOpen={showApproveModal}
         onClose={() => !actionLoading && setShowApproveModal(false)}
@@ -570,7 +570,7 @@ const OrderDiscrepancyList = () => {
         )}
       </Modal>
 
-      {/* Reject Modal */}
+      {}
       <Modal
         isOpen={showRejectModal}
         onClose={() => !actionLoading && setShowRejectModal(false)}

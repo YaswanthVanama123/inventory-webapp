@@ -296,7 +296,7 @@ export const deleteBulkClosedInvoicesByNumbers = async (invoiceNumbers) => {
   }
 };
 
-// Get items with invoice usage (folder structure)
+
 export const getItemsInvoiceUsage = async () => {
   try {
     const response = await api.get('/routestar/items/invoice-usage');

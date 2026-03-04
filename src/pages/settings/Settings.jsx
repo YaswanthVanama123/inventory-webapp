@@ -73,7 +73,7 @@ const Settings = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-slate-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
@@ -83,7 +83,7 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* Stock Calculation Cutoff Date */}
+      {}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-slate-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Stock Calculation Cutoff Date</h3>
         <p className="text-sm text-slate-600 dark:text-gray-400 mb-4">

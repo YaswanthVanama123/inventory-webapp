@@ -90,9 +90,9 @@ const SalesReport = () => {
         </Button>
       </div>
 
-      {/* Stats Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Total Items */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -110,7 +110,7 @@ const SalesReport = () => {
           </div>
         </div>
 
-        {/* Total Sold Quantity */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -128,7 +128,7 @@ const SalesReport = () => {
           </div>
         </div>
 
-        {/* Total Sales Amount */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -146,7 +146,7 @@ const SalesReport = () => {
           </div>
         </div>
 
-        {/* Total Invoices */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>

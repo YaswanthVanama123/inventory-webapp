@@ -763,7 +763,7 @@ const UserList = () => {
         )}
       </Modal>
 
-      {/* Toggle Status Modal */}
+      {}
       <Modal
         isOpen={showToggleStatusModal}
         onClose={() => {

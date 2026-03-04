@@ -335,7 +335,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    // Prevent double call in React 18 StrictMode during development
+    
     if (hasFetchedRef.current) {
       console.log('Dashboard data already fetched, skipping duplicate call');
       return;
@@ -364,7 +364,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6" style={{ contain: 'layout' }}>
-      {/* Header Banner - Fixed height to prevent CLS */}
+      {}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 md:p-8 text-white" style={{ minHeight: '140px', contain: 'layout style' }}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex-1">
@@ -377,7 +377,7 @@ const Dashboard = () => {
           </div>
           <button
             onClick={() => {
-              hasFetchedRef.current = false; // Reset ref to allow manual refresh
+              hasFetchedRef.current = false; 
               fetchDashboardData();
             }}
             disabled={loading}
@@ -396,7 +396,7 @@ const Dashboard = () => {
           <ErrorState
             message={error}
             onRetry={() => {
-              hasFetchedRef.current = false; // Reset ref to allow retry
+              hasFetchedRef.current = false; 
               fetchDashboardData();
             }}
           />
@@ -481,9 +481,9 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Charts Section */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        {/* Revenue Chart */}
+        {}
         <Card className="p-6" style={{ minHeight: '500px' }}>
           {loading ? (
             <ChartSkeleton />
@@ -539,7 +539,7 @@ const Dashboard = () => {
           )}
         </Card>
 
-        {/* Category Chart */}
+        {}
         <Card className="p-6" style={{ minHeight: '500px' }}>
           {loading ? (
             <ChartSkeleton />
@@ -602,7 +602,7 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Bottom Grid - Top Items and Quick Actions */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <Card className="p-6" style={{ minHeight: '480px' }}>
           <div className="mb-6" style={{ minHeight: '60px' }}>
@@ -656,7 +656,7 @@ const Dashboard = () => {
           )}
         </Card>
 
-        {/* Quick Actions */}
+        {}
         <Card className="p-6" style={{ minHeight: '280px' }}>
           <div className="mb-6" style={{ minHeight: '60px' }}>
             <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
@@ -666,7 +666,7 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Recent Activity */}
+      {}
       <Card className="p-6" style={{ minHeight: '400px' }}>
         <div className="flex items-center justify-between mb-6" style={{ minHeight: '48px' }}>
           <div>

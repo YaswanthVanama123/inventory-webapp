@@ -37,7 +37,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
       console.log('[FolderView] response.data:', response.data);
       console.log('[FolderView] response.data.data:', response.data?.data);
 
-      // Try multiple paths to handle different response structures
+      
       const items = response.data?.data?.items || response.data?.items || [];
       console.log('[FolderView] Parsed items:', items.length, 'items', items);
       setGroupedItems(items);
@@ -52,17 +52,17 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
   const toggleItemFolder = async (sku) => {
     const isCurrentlyExpanded = expandedItems[sku];
 
-    // Toggle the expansion state
+    
     setExpandedItems(prev => ({
       ...prev,
       [sku]: !prev[sku]
     }));
 
-    // If we're expanding (not collapsing) and haven't loaded orders yet
+    
     if (!isCurrentlyExpanded) {
       const item = groupedItems.find(i => i.sku === sku);
 
-      // Only fetch if orders haven't been loaded yet
+      
       if (!item.orders) {
         setLoadingOrders(prev => ({ ...prev, [sku]: true }));
 
@@ -72,11 +72,11 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
           console.log('[FolderView] response.data:', response.data);
           console.log('[FolderView] response.data.data:', response.data?.data);
 
-          // Try multiple paths to handle different response structures
+          
           const orders = response.data?.data?.entries || response.data?.entries || [];
           console.log('[FolderView] Extracted orders:', orders.length, 'orders', orders);
 
-          // Update the item with its orders
+          
           setGroupedItems(prev => {
             const updated = prev.map(item => {
               if (item.sku === sku) {
@@ -92,7 +92,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
           console.error(`Error fetching orders for SKU ${sku}:`, error);
           showError('Failed to load order details');
 
-          // Set empty orders array so we don't keep trying
+          
           setGroupedItems(prev => prev.map(item =>
             item.sku === sku
               ? { ...item, orders: [] }
@@ -253,7 +253,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
 
   return (
     <div className="space-y-3">
-      {/* Search Bar */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
         <div className="relative">
           <input
@@ -565,7 +565,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
         );
       })}
 
-      {/* No results message */}
+      {}
       {filteredItems.length === 0 && groupedItems.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-slate-200">
           <Package className="w-16 h-16 mx-auto text-slate-300 mb-4" />

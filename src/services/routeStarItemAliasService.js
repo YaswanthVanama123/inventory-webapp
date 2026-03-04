@@ -5,10 +5,7 @@ import api from './api';
 
 
 const routeStarItemAliasService = {
-  /**
-   * Get all page data (mappings + unique items + stats) in one call
-   * OPTIMIZED: Single API call instead of three
-   */
+  
   getPageData: async () => {
     try {
       const response = await api.get('/routestar-item-alias/page-data');

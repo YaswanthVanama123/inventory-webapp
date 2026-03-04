@@ -113,6 +113,11 @@ const truckCheckoutService = {
   getSalesTracking: async (params = {}) => {
     const response = await api.get('/truck-checkouts/sales-tracking', { params });
     return response;
+  },
+
+  getAllEmployeesWithStats: async (params = {}) => {
+    const response = await api.get('/truck-checkouts/employees/stats', { params });
+    return response;
   }
 };
 

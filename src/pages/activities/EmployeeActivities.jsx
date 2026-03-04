@@ -14,7 +14,7 @@ const EmployeeActivities = () => {
   const { showSuccess, showError } = useContext(ToastContext);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  
+
   const [loading, setLoading] = useState(true);
   const [activities, setActivities] = useState([]);
   const [stats, setStats] = useState(null);
@@ -26,7 +26,7 @@ const EmployeeActivities = () => {
     limit: 20,
   });
 
-  
+
   const [filters, setFilters] = useState({
     employeeId: '',
     action: '',
@@ -37,34 +37,45 @@ const EmployeeActivities = () => {
     page: 1,
   });
 
-  const [activeTab, setActiveTab] = useState('all'); 
+  const [activeTab, setActiveTab] = useState('all');
 
-  
-  useEffect(() => {
-    fetchEmployees();
-    fetchStats();
-  }, []);
 
-  
+  // OPTIMIZED: Load all data (activities, stats, users) in one API call
   useEffect(() => {
-    fetchActivities();
+    if (activeTab === 'all') {
+      fetchPageData();
+    } else {
+      // For tab-specific views (sales, stock, deletions), use existing endpoints
+      fetchActivities();
+    }
   }, [filters, activeTab]);
 
-  const fetchEmployees = async () => {
+  const fetchPageData = async () => {
     try {
-      const response = await api.get('/users');
-      setEmployees(response.data.users);
-    } catch (error) {
-      console.error('Error fetching employees:', error);
-    }
-  };
+      setLoading(true);
 
-  const fetchStats = async () => {
-    try {
-      const response = await api.get('/activities/stats');
-      setStats(response.data);
+      const params = new URLSearchParams();
+      if (filters.employeeId) params.append('employeeId', filters.employeeId);
+      if (filters.action) params.append('action', filters.action);
+      if (filters.resource) params.append('resource', filters.resource);
+      if (filters.startDate) params.append('startDate', filters.startDate);
+      if (filters.endDate) params.append('endDate', filters.endDate);
+      if (filters.search) params.append('search', filters.search);
+      params.append('page', filters.page);
+      params.append('limit', pagination.limit);
+
+      const response = await api.get(`/activities/page-data?${params.toString()}`);
+      const data = response.data;
+
+      setActivities(data.activities || []);
+      setPagination(data.pagination);
+      setStats(data.stats);
+      setEmployees(data.users || []);
+      setLoading(false);
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error('Error fetching page data:', error);
+      showError('Failed to fetch activities');
+      setLoading(false);
     }
   };
 
@@ -74,7 +85,7 @@ const EmployeeActivities = () => {
 
       let endpoint = '/activities';
 
-      
+
       if (activeTab === 'sales') {
         endpoint = '/activities/sales';
       } else if (activeTab === 'stock') {

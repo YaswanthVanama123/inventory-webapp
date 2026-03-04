@@ -1,6 +1,29 @@
 import api from './api';
 
 const fetchHistoryService = {
+  // OPTIMIZED: Get page data (history + active + stats) in one call
+  async getPageData(params = {}) {
+    const { source, status, fetchType, limit = 50, page = 1, days, startDate, endDate } = params;
+
+    const queryParams = new URLSearchParams();
+    if (source) queryParams.append('source', source);
+    if (status) queryParams.append('status', status);
+    if (fetchType) queryParams.append('fetchType', fetchType);
+    queryParams.append('limit', limit);
+    queryParams.append('page', page);
+
+    // Handle date filtering
+    if (startDate && endDate) {
+      queryParams.append('startDate', startDate);
+      queryParams.append('endDate', endDate);
+    } else if (days) {
+      queryParams.append('days', days);
+    }
+
+    const response = await api.get(`/fetch-history/page-data?${queryParams.toString()}`);
+    return response.data || response; // Handle both response.data and direct response
+  },
+
   // Get all fetch history with filters
   async getHistory(params = {}) {
     const { source, status, fetchType, limit = 50, page = 1, days = 10 } = params;

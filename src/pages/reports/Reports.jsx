@@ -61,7 +61,7 @@ const Reports = () => {
       color: 'from-blue-500 to-blue-600',
       path: '/reports/sales',
       stats: dashboardData?.summary?.totalSales
-        ? `$${dashboardData.summary.totalSales.toLocaleString()}`
+        ? `$${Number(dashboardData.summary.totalSales).toLocaleString()}`
         : 'Loading...',
     },
     {
@@ -159,10 +159,10 @@ const Reports = () => {
             <DollarSign className="w-6 h-6 text-white" />
           </div>
           <p className="text-3xl font-bold text-white">
-            ${summary.totalSales?.toLocaleString() || 0}
+            ${Number(summary.totalSales || 0).toLocaleString()}
           </p>
           <p className="text-sm text-white mt-2">
-            {summary.salesChange >= 0 ? '+' : ''}{summary.salesChange?.toFixed(1) || 0}% from last period
+            {Number(summary.salesChange || 0) >= 0 ? '+' : ''}{Number(summary.salesChange || 0).toFixed(1)}% from last period
           </p>
         </div>
 
@@ -172,10 +172,10 @@ const Reports = () => {
             <TrendingUp className="w-6 h-6 text-white" />
           </div>
           <p className="text-3xl font-bold text-white">
-            ${summary.totalProfit?.toLocaleString() || 0}
+            ${Number(summary.totalProfit || 0).toLocaleString()}
           </p>
           <p className="text-sm text-white mt-2">
-            {summary.profitMargin?.toFixed(1) || 0}% profit margin
+            {Number(summary.profitMargin || 0).toFixed(1)}% profit margin
           </p>
         </div>
 
@@ -185,10 +185,10 @@ const Reports = () => {
             <ShoppingCart className="w-6 h-6 text-white" />
           </div>
           <p className="text-3xl font-bold text-white">
-            {summary.totalOrders?.toLocaleString() || 0}
+            {Number(summary.totalOrders || 0).toLocaleString()}
           </p>
           <p className="text-sm text-white mt-2">
-            Avg: ${summary.averageOrderValue?.toFixed(2) || 0}
+            Avg: ${Number(summary.averageOrderValue || 0).toFixed(2)}
           </p>
         </div>
 

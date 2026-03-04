@@ -32,55 +32,45 @@ const FetchHistory = () => {
   // Filters
   const [sourceFilter, setSourceFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [daysFilter, setDaysFilter] = useState(10);
+  const [daysFilter, setDaysFilter] = useState('all');
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
 
   useEffect(() => {
     loadData();
     const interval = setInterval(loadData, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
-  }, [sourceFilter, statusFilter, daysFilter, pagination.page]);
+  }, [sourceFilter, statusFilter, daysFilter, customStartDate, customEndDate, pagination.page]);
 
   const loadData = async () => {
     try {
       setLoading(true);
 
-      // Load each API call separately with better error handling
-      const historyPromise = fetchHistoryService.getHistory({
+      const params = {
         source: sourceFilter !== 'all' ? sourceFilter : null,
         status: statusFilter !== 'all' ? statusFilter : null,
         limit: pagination.limit,
-        page: pagination.page,
-        days: daysFilter
-      }).catch(err => {
-        console.error('History API error:', err);
-        return { history: [], pagination: { total: 0, page: 1, limit: 50, pages: 0 } };
-      });
+        page: pagination.page
+      };
 
-      const activePromise = fetchHistoryService.getActiveFetches(
-        sourceFilter !== 'all' ? sourceFilter : null
-      ).catch(err => {
-        console.error('Active fetches API error:', err);
-        return { activeFetches: [] };
-      });
+      // Add date filter based on selection
+      if (daysFilter === 'custom') {
+        if (customStartDate) params.startDate = customStartDate;
+        if (customEndDate) params.endDate = customEndDate;
+      } else if (daysFilter !== 'all') {
+        params.days = daysFilter;
+      }
+      // If daysFilter is 'all', don't add any date params
 
-      const statsPromise = fetchHistoryService.getStatistics(
-        sourceFilter !== 'all' ? sourceFilter : null,
-        daysFilter
-      ).catch(err => {
-        console.error('Statistics API error:', err);
-        return { summary: { activeCount: 0, todayCount: 0, successRate: 0, totalCompleted: 0, totalFailed: 0 } };
-      });
+      // OPTIMIZED: Use single API call instead of three separate calls
+      const data = await fetchHistoryService.getPageData(params);
 
-      const [historyData, activeData, statsData] = await Promise.all([
-        historyPromise,
-        activePromise,
-        statsPromise
-      ]);
+      console.log('Page data received:', data);
 
-      setHistory(historyData?.history || []);
-      setPagination(historyData?.pagination || { total: 0, page: 1, limit: 50, pages: 0 });
-      setActiveFetches(activeData?.activeFetches || []);
-      setStatistics(statsData?.summary || null);
+      setHistory(data?.history || []);
+      setPagination(data?.pagination || { total: 0, page: 1, limit: 50, pages: 0 });
+      setActiveFetches(data?.activeFetches || []);
+      setStatistics(data?.summary || null);
     } catch (error) {
       console.error('Error loading fetch history:', error);
       showError('Failed to load fetch history: ' + error.message);
@@ -177,7 +167,12 @@ const FetchHistory = () => {
             Fetch History
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Track all sync and fetch operations (last {daysFilter} days)
+            {daysFilter === 'all'
+              ? 'Track all sync and fetch operations (all time)'
+              : daysFilter === 'custom'
+              ? 'Track sync and fetch operations (custom range)'
+              : `Track all sync and fetch operations (last ${daysFilter} days)`
+            }
           </p>
         </div>
         <Button
@@ -260,7 +255,12 @@ const FetchHistory = () => {
             </div>
             <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Last {daysFilter} days
+                {daysFilter === 'all'
+                  ? 'All time'
+                  : daysFilter === 'custom'
+                  ? 'Custom range'
+                  : `Last ${daysFilter} days`
+                }
               </p>
             </div>
           </div>
@@ -354,15 +354,52 @@ const FetchHistory = () => {
             </label>
             <Select
               value={daysFilter}
-              onChange={(e) => setDaysFilter(parseInt(e.target.value))}
+              onChange={(e) => {
+                setDaysFilter(e.target.value);
+                if (e.target.value !== 'custom') {
+                  setCustomStartDate('');
+                  setCustomEndDate('');
+                }
+              }}
             >
               <option value="1">Last 24 hours</option>
               <option value="3">Last 3 days</option>
               <option value="7">Last 7 days</option>
               <option value="10">Last 10 days</option>
+              <option value="30">Last 30 days</option>
+              <option value="all">All Time</option>
+              <option value="custom">Custom Range</option>
             </Select>
           </div>
         </div>
+
+        {/* Custom Date Range */}
+        {daysFilter === 'custom' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Start Date
+              </label>
+              <input
+                type="date"
+                value={customStartDate}
+                onChange={(e) => setCustomStartDate(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                End Date
+              </label>
+              <input
+                type="date"
+                value={customEndDate}
+                onChange={(e) => setCustomEndDate(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              />
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* History Table */}

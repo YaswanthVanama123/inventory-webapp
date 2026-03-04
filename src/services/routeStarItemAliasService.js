@@ -5,8 +5,27 @@ import api from './api';
 
 
 const routeStarItemAliasService = {
-  
-
+  /**
+   * Get all page data (mappings + unique items + stats) in one call
+   * OPTIMIZED: Single API call instead of three
+   */
+  getPageData: async () => {
+    try {
+      const response = await api.get('/routestar-item-alias/page-data');
+      return response.data || {
+        mappings: { mappings: [], total: 0 },
+        uniqueItems: { items: [], stats: { totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 } },
+        stats: { totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 }
+      };
+    } catch (error) {
+      console.error('getPageData error:', error);
+      return {
+        mappings: { mappings: [], total: 0 },
+        uniqueItems: { items: [], stats: { totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 } },
+        stats: { totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 }
+      };
+    }
+  },
 
   getAllMappings: async () => {
     try {

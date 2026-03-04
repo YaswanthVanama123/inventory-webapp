@@ -28,22 +28,14 @@ const RouteStarItemsList = () => {
   const [filterForUse, setFilterForUse] = useState(false);
   const [filterForSell, setFilterForSell] = useState(false);
 
-  
-  useEffect(() => {
-    loadData();
-  }, [pagination.page, selectedParent, selectedType, selectedCategory, filterForUse, filterForSell]);
-
-  
+  // Consolidated effect with debouncing for search
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (pagination.page === 1) {
-        loadData();
-      } else {
-        setPagination(prev => ({ ...prev, page: 1 }));
-      }
-    }, 500);
+      loadData();
+    }, searchText ? 500 : 0); // Debounce only when searching
+
     return () => clearTimeout(timer);
-  }, [searchText]);
+  }, [pagination.page, selectedParent, selectedType, selectedCategory, filterForUse, filterForSell, searchText]);
 
   const loadData = async () => {
     try {
@@ -60,18 +52,15 @@ const RouteStarItemsList = () => {
         forSell: filterForSell ? 'true' : undefined
       };
 
-      const [itemsData, statsData] = await Promise.all([
-        routeStarItemsService.getItems(params),
-        routeStarItemsService.getStats()
-      ]);
+      // OPTIMIZED: Use single API call instead of two separate calls
+      const data = await routeStarItemsService.getItemsWithStats(params);
 
-      console.log('Items data:', itemsData);
-      console.log('Stats data:', statsData);
+      console.log('Combined page data:', data);
 
-      setItems(itemsData.items || []);
-      setPagination(itemsData.pagination || { total: 0, page: 1, limit: 50, pages: 0 });
-      setFilters(itemsData.filters || { itemParents: [], types: [] });
-      setStats(statsData || { total: 0, forUse: 0, forSell: 0, both: 0, unmarked: 0 });
+      setItems(data.items || []);
+      setPagination(data.pagination || { total: 0, page: 1, limit: 50, pages: 0 });
+      setFilters(data.filters || { itemParents: [], types: [] });
+      setStats(data.stats || { total: 0, forUse: 0, forSell: 0, both: 0, unmarked: 0 });
     } catch (error) {
       console.error('Error loading data:', error);
       showError('Failed to load items: ' + error.message);
@@ -86,16 +75,15 @@ const RouteStarItemsList = () => {
         [flagType]: !currentValue
       });
 
-      
+      // Update local state optimistically
       setItems(prevItems =>
         prevItems.map(item =>
           item._id === itemId ? { ...item, [flagType]: updatedItem[flagType] } : item
         )
       );
 
-      
-      const statsData = await routeStarItemsService.getStats();
-      setStats(statsData);
+      // Reload data to get updated stats
+      await loadData();
 
       showSuccess('Item updated successfully');
     } catch (error) {

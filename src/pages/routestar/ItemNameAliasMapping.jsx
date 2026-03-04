@@ -64,31 +64,24 @@ const ItemNameAliasMapping = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [mappingsData, itemsData, statsData] = await Promise.all([
-        routeStarItemAliasService.getAllMappings(),
-        routeStarItemAliasService.getUniqueItems(),
-        routeStarItemAliasService.getStats()
-      ]);
 
-      console.log('Raw API responses:');
-      console.log('- mappingsData:', mappingsData);
-      console.log('- itemsData:', itemsData);
-      console.log('- statsData:', statsData);
+      // Use combined endpoint - single API call instead of three
+      const pageData = await routeStarItemAliasService.getPageData();
 
-      console.log('Loaded data:', {
-        mappingsCount: mappingsData.mappings?.length,
-        itemsCount: itemsData.items?.length,
-        stats: itemsData.stats
+      console.log('Combined API response:', pageData);
+
+      setMappings(pageData.mappings?.mappings || []);
+      setUniqueItems(pageData.uniqueItems?.items || []);
+      setStats(pageData.uniqueItems?.stats || pageData.stats || {
+        totalUniqueItems: 0,
+        mappedItems: 0,
+        unmappedItems: 0
       });
 
-      setMappings(mappingsData.mappings || []);
-      setUniqueItems(itemsData.items || []);
-      setStats(itemsData.stats || statsData);
-
       console.log('State after setting:', {
-        mappings: mappingsData.mappings?.length,
-        uniqueItems: itemsData.items?.length,
-        stats: itemsData.stats
+        mappings: pageData.mappings?.mappings?.length,
+        uniqueItems: pageData.uniqueItems?.items?.length,
+        stats: pageData.uniqueItems?.stats || pageData.stats
       });
     } catch (error) {
       console.error('loadData error:', error);

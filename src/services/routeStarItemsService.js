@@ -46,11 +46,18 @@ const routeStarItemsService = {
     return response.data;
   },
 
-  
-
 
   getSalesReport: async () => {
     const response = await api.get('/routestar-items/sales-report');
+    return response.data;
+  },
+
+  /**
+   * OPTIMIZED: Get items with stats in one call
+   * Combines items list and stats into single request
+   */
+  getItemsWithStats: async (params = {}) => {
+    const response = await api.get('/routestar-items/page-data', { params });
     return response.data;
   }
 };

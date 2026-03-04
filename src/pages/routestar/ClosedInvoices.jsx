@@ -89,11 +89,13 @@ const ClosedInvoices = () => {
 
       const response = await getInvoices(params);
 
-      if (response.success) {
+      if (response?.success && response?.data) {
         setInvoices(response.data.invoices || []);
-        setTotalPages(response.data.pagination.pages || 1);
-        setTotalItems(response.data.pagination.total || 0);
-        setCurrentPage(response.data.pagination.page || 1);
+        setTotalPages(response.data.pagination?.pages || 1);
+        setTotalItems(response.data.pagination?.total || 0);
+        setCurrentPage(response.data.pagination?.page || 1);
+      } else {
+        setInvoices([]);
       }
     } catch (err) {
       console.error('Error fetching invoices:', err);

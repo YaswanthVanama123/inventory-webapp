@@ -90,9 +90,9 @@ const PendingInvoices = () => {
 
       if (response.success) {
         setInvoices(response.data.invoices || []);
-        setTotalPages(response.data.pagination.pages || 1);
-        setTotalItems(response.data.pagination.total || 0);
-        setCurrentPage(response.data.pagination.page || 1);
+        setTotalPages(response.data.pagination?.pages || 1);
+        setTotalItems(response.data.pagination?.total || 0);
+        setCurrentPage(response.data.pagination?.page || 1);
       }
     } catch (err) {
       console.error('Error fetching invoices:', err);

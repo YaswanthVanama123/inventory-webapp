@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
-import { getOrders, syncOrders, getOrderRange, deleteAllOrders, deleteBulkOrdersByNumbers } from '../../services/ordersService';
+import { getOrders, syncOrders, deleteAllOrders, deleteBulkOrdersByNumbers } from '../../services/ordersService';
 import purchaseOrderService from '../../services/purchaseOrderService';
 import orderDiscrepancyService from '../../services/orderDiscrepancyService';
 import SearchBar from '../../components/common/SearchBar';
@@ -63,19 +63,7 @@ const OrdersList = () => {
 
   useEffect(() => {
     fetchOrders();
-    fetchOrderRange();
   }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, verifiedFilter, dateFrom, dateTo, debouncedSearchTerm]);
-
-  const fetchOrderRange = async () => {
-    try {
-      const response = await getOrderRange();
-      if (response.success) {
-        setOrderRange(response.data);
-      }
-    } catch (err) {
-      console.error('Error fetching order range:', err);
-    }
-  };
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -117,6 +105,15 @@ const OrdersList = () => {
         setTotalPages(response.data.pagination.pages || 1);
         setTotalItems(response.data.pagination.total || 0);
         setCurrentPage(response.data.pagination.page || 1);
+
+        // Extract range from combined response
+        if (response.data.range) {
+          setOrderRange({
+            highest: response.data.range.highest,
+            lowest: response.data.range.lowest,
+            totalOrders: response.data.range.totalOrders
+          });
+        }
       }
     } catch (err) {
       console.error('Error fetching orders:', err);
@@ -148,7 +145,6 @@ const OrdersList = () => {
           `Synced: ${created} new, ${updated} updated, ${skipped} skipped | Limit: ${limitText} | Range: #${orderRange.highest || 'N/A'}+`
         );
         fetchOrders();
-        fetchOrderRange();
       }
     } catch (err) {
       console.error('Error syncing new orders:', err);
@@ -180,7 +176,6 @@ const OrdersList = () => {
           `Synced: ${created} new, ${updated} updated, ${skipped} skipped | Limit: ${limitText} | Range: <#${orderRange.lowest || 'N/A'}`
         );
         fetchOrders();
-        fetchOrderRange();
       }
     } catch (err) {
       console.error('Error syncing old orders:', err);
@@ -204,7 +199,6 @@ const OrdersList = () => {
         showSuccess(`Successfully deleted ${response.data.deletedCount || 0} orders`);
         setShowDeleteModal(false);
         fetchOrders();
-        fetchOrderRange();
       }
     } catch (err) {
       console.error('Error deleting orders:', err);
@@ -346,7 +340,6 @@ const OrdersList = () => {
         setShowBulkDeleteModal(false);
         setSelectedOrders([]);
         fetchOrders();
-        fetchOrderRange();
       } else {
         throw new Error(response.message || 'Failed to delete orders');
       }
@@ -899,7 +892,7 @@ const OrdersList = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-slate-900 dark:text-white">
-                          {order.items?.length || 0} items
+                          {order.itemCount || 0} items
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

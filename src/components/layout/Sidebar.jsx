@@ -228,7 +228,10 @@ const adminMenuItems = [
   {
     label: 'Orders',
     path: '/orders',
-    icon: ClipboardListIcon
+    icon: ClipboardListIcon,
+    submenu: [
+      { label: 'View All', path: '/orders', icon: ListIcon },
+    ]
   },
   {
     label: 'Invoices',
@@ -348,7 +351,10 @@ const employeeMenuItems = [
   {
     label: 'Orders',
     path: '/orders',
-    icon: ClipboardListIcon
+    icon: ClipboardListIcon,
+    submenu: [
+      { label: 'View All', path: '/orders', icon: ListIcon },
+    ]
   },
   {
     label: 'Invoices',

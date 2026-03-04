@@ -25,6 +25,7 @@ const InventoryDetail = lazy(() => import('./pages/inventory/InventoryDetail'));
 const Stock = lazy(() => import('./pages/inventory/Stock'));
 const OrdersList = lazy(() => import('./pages/orders/OrdersList'));
 const OrderDetail = lazy(() => import('./pages/orders/OrderDetail'));
+const OrderVerification = lazy(() => import('./pages/orders/OrderVerification'));
 const PendingInvoices = lazy(() => import('./pages/routestar/PendingInvoices'));
 const ClosedInvoices = lazy(() => import('./pages/routestar/ClosedInvoices'));
 const RouteStarInvoiceDetail = lazy(() => import('./pages/routestar/RouteStarInvoiceDetail'));
@@ -59,7 +60,7 @@ const TruckCheckoutForm = lazy(() => import('./pages/truck-checkout/TruckCheckou
 const TruckCheckoutShop = lazy(() => import('./pages/truck-checkout/TruckCheckoutShop'));
 const TruckCheckoutDetail = lazy(() => import('./pages/truck-checkout/TruckCheckoutDetail'));
 const EmployeeCheckouts = lazy(() => import('./pages/truck-checkout/EmployeeCheckouts'));
-const DiscrepancyManagement = lazy(() => import('./pages/admin/DiscrepancyManagement'));
+const DiscrepancyPage = lazy(() => import('./pages/admin/DiscrepancyPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 
@@ -182,7 +183,7 @@ function App() {
                   element={
                     <ErrorBoundary>
                       <ProtectedRoute>
-                        <DiscrepancyManagement />
+                        <DiscrepancyPage />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }
@@ -203,6 +204,16 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute>
                         <OrderDetail />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/orders/verify/:orderId"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute>
+                        <OrderVerification />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

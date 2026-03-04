@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
 import { getOrders, syncOrders, getOrderRange, deleteAllOrders, deleteBulkOrdersByNumbers } from '../../services/ordersService';
+import purchaseOrderService from '../../services/purchaseOrderService';
+import orderDiscrepancyService from '../../services/orderDiscrepancyService';
 import SearchBar from '../../components/common/SearchBar';
 import Select from '../../components/common/Select';
 import Button from '../../components/common/Button';
@@ -11,6 +13,7 @@ import Pagination from '../../components/common/Pagination';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import Modal from '../../components/common/Modal';
+import Input from '../../components/common/Input';
 
 const OrdersList = () => {
   const navigate = useNavigate();
@@ -27,6 +30,7 @@ const OrdersList = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [stockProcessedFilter, setStockProcessedFilter] = useState('');
+  const [verifiedFilter, setVerifiedFilter] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,6 +45,13 @@ const OrdersList = () => {
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [deletingBulk, setDeletingBulk] = useState(false);
 
+  // Order verification state
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [verifyingOrder, setVerifyingOrder] = useState(null);
+  const [verificationItems, setVerificationItems] = useState([]);
+  const [verificationNotes, setVerificationNotes] = useState('');
+  const [submittingVerification, setSubmittingVerification] = useState(false);
+
   // Debounce search term
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -53,7 +64,7 @@ const OrdersList = () => {
   useEffect(() => {
     fetchOrders();
     fetchOrderRange();
-  }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, dateFrom, dateTo, debouncedSearchTerm]);
+  }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, verifiedFilter, dateFrom, dateTo, debouncedSearchTerm]);
 
   const fetchOrderRange = async () => {
     try {
@@ -81,6 +92,10 @@ const OrdersList = () => {
 
       if (stockProcessedFilter !== '') {
         params.stockProcessed = stockProcessedFilter;
+      }
+
+      if (verifiedFilter !== '') {
+        params.verified = verifiedFilter;
       }
 
       if (dateFrom) {
@@ -223,6 +238,11 @@ const OrdersList = () => {
     setCurrentPage(1);
   };
 
+  const handleVerifiedFilterChange = (e) => {
+    setVerifiedFilter(e.target.value);
+    setCurrentPage(1);
+  };
+
   const handleDateFromChange = (e) => {
     setDateFrom(e.target.value);
     setCurrentPage(1);
@@ -237,6 +257,7 @@ const OrdersList = () => {
     setSearchTerm('');
     setStatusFilter('');
     setStockProcessedFilter('');
+    setVerifiedFilter('');
     setDateFrom('');
     setDateTo('');
     setCurrentPage(1);
@@ -334,6 +355,96 @@ const OrdersList = () => {
       showError(err.message || 'Failed to delete orders');
     } finally {
       setDeletingBulk(false);
+    }
+  };
+
+  // Order verification handlers
+  const handleOpenVerifyModal = async (order) => {
+    try {
+      const response = await purchaseOrderService.getOrderById(order.orderNumber);
+      if (response.success) {
+        const orderData = response.data;
+        setVerifyingOrder(orderData);
+        setVerificationItems(orderData.items.map(item => ({
+          ...item,
+          receivedQuantity: item.qty,
+          itemName: item.name
+        })));
+        setVerificationNotes('');
+        setShowVerifyModal(true);
+      }
+    } catch (error) {
+      console.error('Error loading order:', error);
+      showError('Failed to load order details');
+    }
+  };
+
+  const handleQuantityChange = (index, value) => {
+    const newItems = [...verificationItems];
+    newItems[index].receivedQuantity = value;
+    setVerificationItems(newItems);
+  };
+
+  const hasDiscrepancies = verificationItems.some(
+    item => parseFloat(item.receivedQuantity || 0) !== item.qty
+  );
+
+  const handleVerifyAllGood = async () => {
+    try {
+      setSubmittingVerification(true);
+      const response = await orderDiscrepancyService.verifyOrder(verifyingOrder._id, {
+        allGood: true,
+        notes: verificationNotes.trim() || 'All items received as expected'
+      });
+
+      if (response.success) {
+        showSuccess('Order verified successfully - all items correct');
+        setShowVerifyModal(false);
+        setVerifyingOrder(null);
+        setVerificationItems([]);
+        setVerificationNotes('');
+        fetchOrders();
+      }
+    } catch (error) {
+      console.error('Verify order error:', error);
+      showError(error.response?.data?.message || 'Failed to verify order');
+    } finally {
+      setSubmittingVerification(false);
+    }
+  };
+
+  const handleSubmitWithDiscrepancies = async () => {
+    try {
+      setSubmittingVerification(true);
+
+      const itemsData = verificationItems.map(item => ({
+        sku: item.sku,
+        itemName: item.itemName || item.name,
+        expectedQuantity: item.qty,
+        receivedQuantity: parseFloat(item.receivedQuantity) || 0,
+        notes: item.notes || ''
+      }));
+
+      const response = await orderDiscrepancyService.verifyOrder(verifyingOrder._id, {
+        allGood: false,
+        items: itemsData,
+        notes: verificationNotes.trim()
+      });
+
+      if (response.success) {
+        const discrepancyCount = response.data.discrepancies?.length || 0;
+        showSuccess(`Order verified with ${discrepancyCount} discrepancy(ies) recorded`);
+        setShowVerifyModal(false);
+        setVerifyingOrder(null);
+        setVerificationItems([]);
+        setVerificationNotes('');
+        fetchOrders();
+      }
+    } catch (error) {
+      console.error('Submit discrepancies error:', error);
+      showError(error.response?.data?.message || 'Failed to submit discrepancies');
+    } finally {
+      setSubmittingVerification(false);
     }
   };
 
@@ -525,17 +636,20 @@ const OrdersList = () => {
         )}
       </div>
 
-      {}
+      {/* Filters */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <SearchBar
-            value={searchTerm}
-            onChange={handleSearch}
-            onClear={handleSearchClear}
-            placeholder="Search by vendor..."
-            className="w-full"
-            loading={loading && searchTerm !== debouncedSearchTerm}
-          />
+        {/* First row - Search and main filters */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="lg:col-span-2">
+            <SearchBar
+              value={searchTerm}
+              onChange={handleSearch}
+              onClear={handleSearchClear}
+              placeholder="Search by vendor..."
+              className="w-full"
+              loading={loading && searchTerm !== debouncedSearchTerm}
+            />
+          </div>
 
           <Select
             value={statusFilter}
@@ -555,21 +669,24 @@ const OrdersList = () => {
             onChange={handleStockProcessedFilterChange}
             className="w-full"
           >
-            <option value="">All Orders</option>
+            <option value="">All Stock Status</option>
             <option value="true">Stock Processed</option>
             <option value="false">Not Processed</option>
           </Select>
 
-          <Button
-            onClick={handleClearFilters}
-            variant="secondary"
+          <Select
+            value={verifiedFilter}
+            onChange={handleVerifiedFilterChange}
             className="w-full"
           >
-            Clear Filters
-          </Button>
+            <option value="">All Verification</option>
+            <option value="true">Verified</option>
+            <option value="false">Not Verified</option>
+          </Select>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Second row - Date filters and clear button */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
               From Date
@@ -591,6 +708,15 @@ const OrdersList = () => {
               onChange={handleDateToChange}
               className="w-full px-3 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
             />
+          </div>
+          <div className="flex items-end">
+            <Button
+              onClick={handleClearFilters}
+              variant="secondary"
+              className="w-full"
+            >
+              Clear All Filters
+            </Button>
           </div>
         </div>
       </div>
@@ -777,15 +903,28 @@ const OrdersList = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewOrder(order.orderNumber);
-                          }}
-                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                        >
-                          View Details
-                        </button>
+                        <div className="flex gap-2 justify-end">
+                          {!order.verified && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenVerifyModal(order);
+                              }}
+                              className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 font-medium"
+                            >
+                              Verify Order
+                            </button>
+                          )}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewOrder(order.orderNumber);
+                            }}
+                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                          >
+                            View Details
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -961,6 +1100,207 @@ const OrdersList = () => {
             </Button>
           </div>
         </div>
+      </Modal>
+
+      {/* Order Verification Modal */}
+      <Modal
+        isOpen={showVerifyModal}
+        onClose={() => !submittingVerification && setShowVerifyModal(false)}
+        title="Verify Order Receipt"
+        size="xl"
+      >
+        {verifyingOrder && (
+          <div className="space-y-4">
+            {/* Order Info */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                    Order Number
+                  </p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {verifyingOrder.orderNumber}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                    Vendor
+                  </p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {verifyingOrder.vendor?.name}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                    Order Date
+                  </p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {new Date(verifyingOrder.orderDate).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Instructions */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+              <p className="text-xs text-gray-700 dark:text-gray-300">
+                <strong>Instructions:</strong> Enter the actual quantity received for each item. If all items match exactly, click "All Good". Otherwise, the differences will be recorded as discrepancies for admin approval.
+              </p>
+            </div>
+
+            {/* Items Table */}
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+              <div className="max-h-96 overflow-y-auto">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                        Item
+                      </th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                        Expected
+                      </th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                        Received
+                      </th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                        Difference
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                    {verificationItems.map((item, index) => {
+                      const received = parseFloat(item.receivedQuantity) || 0;
+                      const expected = item.qty;
+                      const difference = received - expected;
+                      const hasDiscrepancy = difference !== 0;
+
+                      return (
+                        <tr
+                          key={index}
+                          className={hasDiscrepancy ? 'bg-yellow-50 dark:bg-yellow-900/10' : ''}
+                        >
+                          <td className="px-4 py-3">
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              {item.name}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              {item.sku}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-right text-sm text-gray-700 dark:text-gray-300">
+                            {expected}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-right">
+                            <Input
+                              type="number"
+                              value={item.receivedQuantity}
+                              onChange={(e) => handleQuantityChange(index, e.target.value)}
+                              min="0"
+                              step="1"
+                              className="w-20 text-right"
+                              required
+                            />
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-right">
+                            {hasDiscrepancy ? (
+                              <span
+                                className={`text-sm font-bold ${
+                                  difference > 0
+                                    ? 'text-blue-600 dark:text-blue-400'
+                                    : 'text-orange-600 dark:text-orange-400'
+                                }`}
+                              >
+                                {difference > 0 ? '+' : ''}
+                                {difference}
+                              </span>
+                            ) : (
+                              <span className="text-sm text-green-600 dark:text-green-400">
+                                -
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            {hasDiscrepancy ? (
+                              <Badge variant={difference > 0 ? 'info' : 'warning'}>
+                                {difference > 0 ? 'Overage' : 'Shortage'}
+                              </Badge>
+                            ) : (
+                              <Badge variant="success">Matched</Badge>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Notes (Optional)
+              </label>
+              <textarea
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
+                rows="3"
+                value={verificationNotes}
+                onChange={(e) => setVerificationNotes(e.target.value)}
+                placeholder="Add any notes about this order verification..."
+              />
+            </div>
+
+            {/* Discrepancy Warning */}
+            {hasDiscrepancies && (
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                  <strong>Discrepancies Detected:</strong> Some items have quantity differences. These will be recorded as discrepancies and sent to admin for approval.
+                </p>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-3 pt-2">
+              <Button
+                variant="ghost"
+                onClick={() => setShowVerifyModal(false)}
+                disabled={submittingVerification}
+              >
+                Cancel
+              </Button>
+
+              {!hasDiscrepancies ? (
+                <Button
+                  variant="success"
+                  onClick={handleVerifyAllGood}
+                  loading={submittingVerification}
+                  disabled={submittingVerification}
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  All Good - Everything Matches
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  onClick={handleSubmitWithDiscrepancies}
+                  loading={submittingVerification}
+                  disabled={submittingVerification}
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  Submit with Discrepancies
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
+import dashboardService from '../../services/dashboardService';
 import inventoryService from '../../services/inventoryService';
-import reportService from '../../services/reportService';
 import Card from '../../components/common/Card';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Alert from '../../components/common/Alert';
@@ -42,51 +42,48 @@ const EmployeeDashboard = () => {
     setError(null);
 
     try {
-      
-      const inventoryResponse = await inventoryService.getAll({ limit: 1000 });
-      const items = inventoryResponse.data.items || [];
+      // Fetch all dashboard data in a single API call
+      const dashboardResponse = await dashboardService.getDashboardData();
 
-      
-      const totalItems = items.length;
+      if (dashboardResponse.success && dashboardResponse.data) {
+        const { inventoryItems, recentActivity: activities } = dashboardResponse.data;
+        const items = inventoryItems || [];
 
-      
-      const lowStockItemsData = items.filter(
-        (item) => item.currentStock <= item.minimumStock
-      );
-      const lowStockCount = lowStockItemsData.length;
+        // Calculate total items
+        const totalItems = items.length;
 
-      
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const itemsUpdatedToday = items.filter((item) => {
-        const updatedDate = new Date(item.updatedAt);
-        updatedDate.setHours(0, 0, 0, 0);
-        return updatedDate.getTime() === today.getTime();
-      }).length;
+        // Filter low stock items
+        const lowStockItemsData = items.filter(
+          (item) => item.quantity?.current <= item.quantity?.minimum
+        );
+        const lowStockCount = lowStockItemsData.length;
 
-      setStats({
-        totalItems,
-        lowStockItems: lowStockCount,
-        itemsUpdatedToday,
-      });
+        // Calculate items updated today
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const itemsUpdatedToday = items.filter((item) => {
+          const updatedDate = new Date(item.updatedAt);
+          updatedDate.setHours(0, 0, 0, 0);
+          return updatedDate.getTime() === today.getTime();
+        }).length;
 
-      
-      const sortedItems = [...items].sort(
-        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
-      );
-      setRecentUpdates(sortedItems.slice(0, 5));
+        setStats({
+          totalItems,
+          lowStockItems: lowStockCount,
+          itemsUpdatedToday,
+        });
 
-      
-      setLowStockItems(lowStockItemsData.slice(0, 5));
+        // Sort items by most recently updated
+        const sortedItems = [...items].sort(
+          (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+        );
+        setRecentUpdates(sortedItems.slice(0, 5));
 
-      
-      try {
-        const activityResponse = await reportService.recentActivity(10);
-        setRecentActivity(activityResponse.data.activities || []);
-      } catch (activityErr) {
-        console.warn('Could not fetch recent activity:', activityErr);
-        
-        setRecentActivity([]);
+        // Set low stock items
+        setLowStockItems(lowStockItemsData.slice(0, 5));
+
+        // Set recent activity
+        setRecentActivity(activities || []);
       }
     } catch (err) {
       console.error('Error fetching dashboard data:', err);

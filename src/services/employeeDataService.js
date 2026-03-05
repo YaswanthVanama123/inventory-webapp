@@ -57,9 +57,20 @@ const employeeDataService = {
     return response;
   },
 
-  
+
   async getAllTruckAssignments() {
     const response = await api.get('/employee-data/truck-assignments');
+    return response;
+  },
+
+  // Combined dashboard endpoint - gets statistics, activity, and performance in one call
+  async getMyCombinedDashboard(startDate, endDate, limit = 10) {
+    const queryParams = new URLSearchParams();
+    if (startDate) queryParams.append('startDate', startDate);
+    if (endDate) queryParams.append('endDate', endDate);
+    if (limit) queryParams.append('limit', limit);
+
+    const response = await api.get(`/employee-data/my-dashboard?${queryParams.toString()}`);
     return response;
   }
 };

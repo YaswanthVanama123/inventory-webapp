@@ -45,15 +45,18 @@ const EmployeeWorkDashboard = () => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const [statsData, activityData, performanceData] = await Promise.all([
-        employeeDataService.getMyStatistics(dateRange.start, dateRange.end),
-        employeeDataService.getMyRecentActivity(10),
-        employeeDataService.getMyPerformance(dateRange.start, dateRange.end)
-      ]);
+      // Use combined dashboard API - single call instead of three separate ones
+      const response = await employeeDataService.getMyCombinedDashboard(
+        dateRange.start,
+        dateRange.end,
+        10
+      );
 
-      setStatistics(statsData.data);
-      setRecentActivity(activityData.data);
-      setPerformance(performanceData.data);
+      if (response.data) {
+        setStatistics(response.data.statistics);
+        setRecentActivity(response.data.recentActivity);
+        setPerformance(response.data.performance);
+      }
     } catch (error) {
       console.error('Error loading dashboard:', error);
       showError('Failed to load dashboard data');

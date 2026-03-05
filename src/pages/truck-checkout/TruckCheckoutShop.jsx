@@ -28,26 +28,19 @@ const TruckCheckoutShop = () => {
   const { showSuccess, showError } = useContext(ToastContext);
   const { user } = useContext(AuthContext);
 
-  
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredItems, setFilteredItems] = useState([]);
-
-  
   const [cart, setCart] = useState([]);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
-  
   const [employeeInfo, setEmployeeInfo] = useState({
     employeeName: user?.fullName || '',
     employeeId: user?._id || '',
     truckNumber: user?.truckNumber || '',
     notes: ''
   });
-
-  
   useEffect(() => {
     if (user) {
       setEmployeeInfo(prev => ({
@@ -58,27 +51,21 @@ const TruckCheckoutShop = () => {
       }));
     }
   }, [user]);
-
   useEffect(() => {
     loadInventory();
   }, []);
-
   useEffect(() => {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       const filtered = items.filter(item => {
-        
         const matchesBasic =
           item.itemName?.toLowerCase().includes(query) ||
           item.skuCode?.toLowerCase().includes(query) ||
           item.categoryName?.toLowerCase().includes(query) ||
           item.canonicalName?.toLowerCase().includes(query);
-
-        
         const matchesAlias = item.routeStarAliases?.some(alias =>
           alias.toLowerCase().includes(query)
         );
-
         return matchesBasic || matchesAlias;
       });
       setFilteredItems(filtered);
@@ -86,7 +73,6 @@ const TruckCheckoutShop = () => {
       setFilteredItems(items);
     }
   }, [searchQuery, items]);
-
   const loadInventory = async () => {
     try {
       setLoading(true);
@@ -101,16 +87,13 @@ const TruckCheckoutShop = () => {
       setLoading(false);
     }
   };
-
   const getMappedStats = () => {
     const mapped = filteredItems.filter(item => item.hasAliases).length;
     const unique = filteredItems.filter(item => !item.hasAliases).length;
     return { mapped, unique, total: filteredItems.length };
   };
-
   const addToCart = (item) => {
     const existingItem = cart.find(c => c._id === item._id);
-
     if (existingItem) {
       setCart(cart.map(c =>
         c._id === item._id
@@ -130,20 +113,17 @@ const TruckCheckoutShop = () => {
       showSuccess(`Added ${item.itemName} to cart`);
     }
   };
-
   const updateCartQuantity = (itemId, newQuantity) => {
     if (newQuantity <= 0) {
       removeFromCart(itemId);
       return;
     }
-
     setCart(cart.map(c =>
       c._id === itemId
         ? { ...c, quantity: newQuantity }
         : c
     ));
   };
-
   const removeFromCart = (itemId) => {
     const item = cart.find(c => c._id === itemId);
     setCart(cart.filter(c => c._id !== itemId));
@@ -151,7 +131,6 @@ const TruckCheckoutShop = () => {
       showSuccess(`Removed ${item.name} from cart`);
     }
   };
-
   const updateCartItemNotes = (itemId, notes) => {
     setCart(cart.map(c =>
       c._id === itemId
@@ -159,11 +138,9 @@ const TruckCheckoutShop = () => {
         : c
     ));
   };
-
   const getTotalItems = () => {
     return cart.reduce((sum, item) => sum + item.quantity, 0);
   };
-
   const handleCheckoutToTruck = () => {
     if (cart.length === 0) {
       showError('Please add items to cart first');
@@ -171,13 +148,11 @@ const TruckCheckoutShop = () => {
     }
     setShowCheckoutModal(true);
   };
-
   const handleSubmitCheckout = async () => {
     if (!employeeInfo.employeeName.trim()) {
       showError('Please enter employee name');
       return;
     }
-
     try {
       setSubmitting(true);
       const checkoutData = {
@@ -192,7 +167,6 @@ const TruckCheckoutShop = () => {
           notes: item.notes
         }))
       };
-
       await truckCheckoutService.createCheckout(checkoutData);
       showSuccess('Truck checkout created successfully');
       navigate('/truck-checkouts');
@@ -203,15 +177,12 @@ const TruckCheckoutShop = () => {
       setSubmitting(false);
     }
   };
-
   const getItemInCart = (itemId) => {
     return cart.find(c => c._id === itemId);
   };
-
   if (loading) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-900">
       {}
@@ -236,7 +207,6 @@ const TruckCheckoutShop = () => {
                 Back to Checkouts
               </Button>
             </div>
-
             {}
             {filteredItems.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -253,7 +223,6 @@ const TruckCheckoutShop = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 p-4 rounded-xl border border-purple-200 dark:border-purple-700">
                   <div className="flex items-center justify-between">
                     <div>
@@ -268,7 +237,6 @@ const TruckCheckoutShop = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 p-4 rounded-xl border border-green-200 dark:border-green-700">
                   <div className="flex items-center justify-between">
                     <div>
@@ -284,7 +252,6 @@ const TruckCheckoutShop = () => {
                 </div>
               </div>
             )}
-
             {}
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -297,7 +264,6 @@ const TruckCheckoutShop = () => {
               />
             </div>
           </div>
-
           {}
           {filteredItems.length === 0 ? (
             <Card>
@@ -312,7 +278,6 @@ const TruckCheckoutShop = () => {
               {filteredItems.map((item) => {
                 const cartItem = getItemInCart(item._id);
                 const inCart = !!cartItem;
-
                 return (
                   <div key={item._id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700 overflow-hidden">
                     {}
@@ -326,7 +291,6 @@ const TruckCheckoutShop = () => {
                       ) : (
                         <CubeIcon className="w-20 h-20 text-gray-300 dark:text-gray-600" />
                       )}
-
                       {}
                       <div className="absolute top-2 right-2">
                         <div className="flex flex-col gap-1">
@@ -345,19 +309,16 @@ const TruckCheckoutShop = () => {
                         </div>
                       </div>
                     </div>
-
                     {}
                     <div className="p-4 space-y-3">
                       {}
                       <h3 className="font-semibold text-gray-900 dark:text-white text-base line-clamp-2 min-h-[48px]">
                         {item.canonicalName}
                       </h3>
-
                       {}
                       <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                         {item.skuCode}
                       </p>
-
                       {}
                       <div className="flex flex-wrap gap-1.5">
                         {item.categoryName && (
@@ -377,7 +338,6 @@ const TruckCheckoutShop = () => {
                           </span>
                         )}
                       </div>
-
                       {}
                       {item.hasAliases && item.routeStarAliases && item.routeStarAliases.length > 0 && (
                         <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
@@ -390,7 +350,6 @@ const TruckCheckoutShop = () => {
                           </p>
                         </div>
                       )}
-
                       {}
                       {(item.totalPurchased > 0 || item.totalSold > 0) && (
                         <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
@@ -413,7 +372,6 @@ const TruckCheckoutShop = () => {
                           </div>
                         </div>
                       )}
-
                       {}
                       <Button
                         variant={inCart ? 'success' : 'primary'}
@@ -442,7 +400,6 @@ const TruckCheckoutShop = () => {
           )}
         </div>
       </div>
-
       {}
       <div className="w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 overflow-y-auto">
         <div className="p-6 sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 z-10">
@@ -451,7 +408,6 @@ const TruckCheckoutShop = () => {
             Cart ({getTotalItems()} items)
           </h2>
         </div>
-
         <div className="p-6">
           {cart.length === 0 ? (
             <div className="text-center py-12">
@@ -490,7 +446,6 @@ const TruckCheckoutShop = () => {
                         <TrashIcon className="w-5 h-5" />
                       </button>
                     </div>
-
                     {}
                     <div className="flex items-center gap-3 mb-3">
                       <button
@@ -516,7 +471,6 @@ const TruckCheckoutShop = () => {
                         Stock: {item.currentStock}
                       </span>
                     </div>
-
                     {}
                     <Input
                       placeholder="Optional notes for this item"
@@ -527,7 +481,6 @@ const TruckCheckoutShop = () => {
                   </div>
                 ))}
               </div>
-
               {}
               <Button
                 variant="primary"
@@ -542,7 +495,6 @@ const TruckCheckoutShop = () => {
           )}
         </div>
       </div>
-
       {}
       <Modal
         isOpen={showCheckoutModal}
@@ -612,7 +564,6 @@ const TruckCheckoutShop = () => {
               />
             </div>
           </div>
-
           {}
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
@@ -643,5 +594,4 @@ const TruckCheckoutShop = () => {
     </div>
   );
 };
-
 export default TruckCheckoutShop;

@@ -19,28 +19,21 @@ const RouteStarItemsList = () => {
   const [stats, setStats] = useState({ total: 0, forUse: 0, forSell: 0, both: 0, unmarked: 0 });
   const [filters, setFilters] = useState({ itemParents: [], types: [] });
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 50, pages: 0 });
-
-  
   const [searchText, setSearchText] = useState('');
   const [selectedParent, setSelectedParent] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [filterForUse, setFilterForUse] = useState(false);
   const [filterForSell, setFilterForSell] = useState(false);
-
-  
   useEffect(() => {
     const timer = setTimeout(() => {
       loadData();
     }, searchText ? 500 : 0); 
-
     return () => clearTimeout(timer);
   }, [pagination.page, selectedParent, selectedType, selectedCategory, filterForUse, filterForSell, searchText]);
-
   const loadData = async () => {
     try {
       setLoading(true);
-
       const params = {
         page: pagination.page,
         limit: pagination.limit,
@@ -51,12 +44,8 @@ const RouteStarItemsList = () => {
         forUse: filterForUse ? 'true' : undefined,
         forSell: filterForSell ? 'true' : undefined
       };
-
-      
       const data = await routeStarItemsService.getItemsWithStats(params);
-
       console.log('Combined page data:', data);
-
       setItems(data.items || []);
       setPagination(data.pagination || { total: 0, page: 1, limit: 50, pages: 0 });
       setFilters(data.filters || { itemParents: [], types: [] });
@@ -68,63 +57,48 @@ const RouteStarItemsList = () => {
       setLoading(false);
     }
   };
-
   const handleFlagChange = async (itemId, flagType, currentValue) => {
     try {
       const updatedItem = await routeStarItemsService.updateItemFlags(itemId, {
         [flagType]: !currentValue
       });
-
-      
       setItems(prevItems =>
         prevItems.map(item =>
           item._id === itemId ? { ...item, [flagType]: updatedItem[flagType] } : item
         )
       );
-
-      
       await loadData();
-
       showSuccess('Item updated successfully');
     } catch (error) {
       showError('Failed to update item: ' + error.message);
     }
   };
-
   const handleCategoryChange = async (itemId, newCategory) => {
     try {
       const updatedItem = await routeStarItemsService.updateItemFlags(itemId, {
         itemCategory: newCategory
       });
-
-      
       setItems(prevItems =>
         prevItems.map(item =>
           item._id === itemId ? { ...item, itemCategory: updatedItem.itemCategory } : item
         )
       );
-
       showSuccess('Item category updated successfully');
     } catch (error) {
       showError('Failed to update item category: ' + error.message);
     }
   };
-
   const handlePageChange = (newPage) => {
     setPagination(prev => ({ ...prev, page: newPage }));
   };
-
   const handleDeleteAll = async () => {
     if (!window.confirm('Are you sure you want to delete ALL items? This action cannot be undone!')) {
       return;
     }
-
     try {
       setDeleting(true);
       const result = await routeStarItemsService.deleteAllItems();
       showSuccess(result.message);
-
-      
       await loadData();
     } catch (error) {
       showError('Failed to delete items: ' + error.message);
@@ -132,28 +106,21 @@ const RouteStarItemsList = () => {
       setDeleting(false);
     }
   };
-
   const handleSync = async () => {
     if (syncing) {
       showError('Sync already in progress. Please wait.');
       return;
     }
-
     if (!window.confirm('This will sync all items from RouteStar. This may take several minutes. Continue?')) {
       return;
     }
-
     try {
       setSyncing(true);
       showSuccess('Sync started... This may take a few minutes.');
-
       const result = await routeStarItemsService.syncItems();
       showSuccess(`Sync completed! Fetched: ${result.total}, Created: ${result.created}, Updated: ${result.updated}`);
-
-      
       await loadData();
     } catch (error) {
-      
       if (error.response && error.response.status === 409) {
         showError('Another sync is already in progress. Please wait for it to complete.');
       } else {
@@ -163,11 +130,9 @@ const RouteStarItemsList = () => {
       setSyncing(false);
     }
   };
-
   if (loading && items.length === 0) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="p-6 space-y-6">
       {}
@@ -179,7 +144,6 @@ const RouteStarItemsList = () => {
           Manage items usage flags (For Use / For Sell)
         </p>
       </div>
-
       {}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {}
@@ -196,7 +160,6 @@ const RouteStarItemsList = () => {
             </div>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -211,7 +174,6 @@ const RouteStarItemsList = () => {
             </div>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -226,7 +188,6 @@ const RouteStarItemsList = () => {
             </div>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -241,7 +202,6 @@ const RouteStarItemsList = () => {
             </div>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -257,7 +217,6 @@ const RouteStarItemsList = () => {
           </div>
         </div>
       </div>
-
       {}
       <Card>
         <div className="space-y-4">
@@ -273,7 +232,6 @@ const RouteStarItemsList = () => {
                 className="pl-10"
               />
             </div>
-
             {}
             <Select
               value={selectedParent}
@@ -284,7 +242,6 @@ const RouteStarItemsList = () => {
                 <option key={parent} value={parent}>{parent}</option>
               ))}
             </Select>
-
             {}
             <Select
               value={selectedType}
@@ -295,7 +252,6 @@ const RouteStarItemsList = () => {
                 <option key={type} value={type}>{type}</option>
               ))}
             </Select>
-
             {}
             <Select
               value={selectedCategory}
@@ -306,7 +262,6 @@ const RouteStarItemsList = () => {
               <option value="Service">Service</option>
             </Select>
           </div>
-
           {}
           <div className="flex flex-wrap gap-2">
             <Button
@@ -336,7 +291,6 @@ const RouteStarItemsList = () => {
               {deleting ? 'Deleting...' : 'Delete All'}
             </Button>
           </div>
-
           {}
           <div className="flex gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -360,7 +314,6 @@ const RouteStarItemsList = () => {
           </div>
         </div>
       </Card>
-
       {}
       <Card>
         <div className="overflow-x-auto">
@@ -483,7 +436,6 @@ const RouteStarItemsList = () => {
             </tbody>
           </table>
         </div>
-
         {}
         {pagination.pages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
@@ -504,7 +456,6 @@ const RouteStarItemsList = () => {
                 <div className="flex gap-1">
                   {[...Array(pagination.pages)].map((_, i) => {
                     const page = i + 1;
-                    
                     if (
                       page === 1 ||
                       page === pagination.pages ||
@@ -542,5 +493,4 @@ const RouteStarItemsList = () => {
     </div>
   );
 };
-
 export default RouteStarItemsList;

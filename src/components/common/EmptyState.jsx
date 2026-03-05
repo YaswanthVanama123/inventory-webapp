@@ -29,19 +29,16 @@ const EmptyState = ({
       <div className="mb-4">
         {icon || defaultIcon}
       </div>
-
       {title && (
         <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">
           {title}
         </h3>
       )}
-
       {description && (
         <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-6 max-w-md">
           {description}
         </p>
       )}
-
       {action && (
         <div>
           {action}
@@ -50,7 +47,6 @@ const EmptyState = ({
     </div>
   );
 };
-
 EmptyState.propTypes = {
   icon: PropTypes.node,
   title: PropTypes.string,
@@ -58,5 +54,4 @@ EmptyState.propTypes = {
   action: PropTypes.node,
   className: PropTypes.string,
 };
-
 export default EmptyState;

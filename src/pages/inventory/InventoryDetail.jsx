@@ -17,38 +17,30 @@ const InventoryDetail = () => {
   const { user, isAdmin, isEmployee } = useAuth();
   const { showSuccess, showError } = useToast();
 
-
   const [item, setItem] = useState(null);
   const [activityLogs, setActivityLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('info'); 
-
-
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
-
   const [uploadImagesModal, setUploadImagesModal] = useState(false);
   const [deleteConfirmModal, setDeleteConfirmModal] = useState(false);
   const [deleteImageModal, setDeleteImageModal] = useState(false);
   const [imageToDelete, setImageToDelete] = useState(null);
-
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [actionLoading, setActionLoading] = useState(false);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
-
         const [itemResponse, activityResponse] = await Promise.all([
           inventoryService.getById(id),
           api.get(`/activities?resource=INVENTORY&search=${id}&limit=100`),
         ]);
-
         setItem(itemResponse.data.item);
         setActivityLogs(activityResponse.data?.activities || []);
       } catch (err) {
@@ -58,48 +50,35 @@ const InventoryDetail = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [id]);
-
   const handleTouchStart = (e) => {
     setTouchStart(e.targetTouches[0].clientX);
   };
-
   const handleTouchMove = (e) => {
     setTouchEnd(e.targetTouches[0].clientX);
   };
-
   const handleTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > 50;
     const isRightSwipe = distance < -50;
-
     if (isLeftSwipe && selectedImage < (item?.images?.length || 1) - 1) {
       setSelectedImage(selectedImage + 1);
     }
     if (isRightSwipe && selectedImage > 0) {
       setSelectedImage(selectedImage - 1);
     }
-
     setTouchStart(0);
     setTouchEnd(0);
   };
-
   const handleUploadImages = async () => {
     try {
       setActionLoading(true);
       await inventoryService.uploadImages(id, selectedFiles);
-
       showSuccess('Images uploaded successfully');
-
-      
       const itemResponse = await inventoryService.getById(id);
       setItem(itemResponse.data.item);
-
-      
       setSelectedFiles([]);
       setUploadImagesModal(false);
       setError(null);
@@ -111,8 +90,6 @@ const InventoryDetail = () => {
       setActionLoading(false);
     }
   };
-
-  
   const handleDeleteItem = async () => {
     try {
       setActionLoading(true);
@@ -127,35 +104,26 @@ const InventoryDetail = () => {
       setActionLoading(false);
     }
   };
-
   const getImagePath = (image) => {
     let path = '';
-
     if (typeof image === 'string') {
       path = image;
     } else {
       path = image?.path || '/placeholder-product.png';
     }
-
-    
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
-
-    
     if (path.startsWith('/uploads')) {
       const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5001';
       return `${backendUrl}${path}`;
     }
-
     return path;
   };
-
   const getImageId = (image) => {
     if (typeof image === 'object' && image?._id) return image._id;
     return null;
   };
-
   const handleDeleteImage = (image) => {
     const imageId = getImageId(image);
     if (!imageId) {
@@ -165,25 +133,17 @@ const InventoryDetail = () => {
     setImageToDelete({ id: imageId, path: getImagePath(image) });
     setDeleteImageModal(true);
   };
-
   const confirmDeleteImage = async () => {
     if (!imageToDelete) return;
-
     try {
       setActionLoading(true);
       await inventoryService.deleteImage(id, imageToDelete.id);
-
       showSuccess('Image removed successfully');
-
-      
       const itemResponse = await inventoryService.getById(id);
       setItem(itemResponse.data.item);
-
-      
       if (selectedImage >= (itemResponse.data.item.images?.length || 0)) {
         setSelectedImage(Math.max(0, (itemResponse.data.item.images?.length || 1) - 1));
       }
-
       setDeleteImageModal(false);
       setImageToDelete(null);
     } catch (err) {
@@ -193,11 +153,9 @@ const InventoryDetail = () => {
       setActionLoading(false);
     }
   };
-
   if (loading) {
     return <LoadingSpinner fullScreen text="Loading item details..." />;
   }
-
   if (error && !item) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -210,7 +168,6 @@ const InventoryDetail = () => {
       </div>
     );
   }
-
   if (!item) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -223,11 +180,9 @@ const InventoryDetail = () => {
       </div>
     );
   }
-
   const images = item.images && item.images.length > 0
     ? item.images
     : ['/placeholder-product.png'];
-
   return (
     <div className="container mx-auto px-4 py-6 sm:py-8">
       {}
@@ -238,7 +193,6 @@ const InventoryDetail = () => {
           </svg>
           Back to Inventory
         </Button>
-
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
@@ -248,7 +202,6 @@ const InventoryDetail = () => {
               SKU: {item.skuCode}
             </p>
           </div>
-
           <div className="flex flex-wrap gap-2">
             {isAdmin && (
               <>
@@ -278,14 +231,12 @@ const InventoryDetail = () => {
           </div>
         </div>
       </div>
-
       {}
       {error && (
         <Alert variant="danger" dismissible onDismiss={() => setError(null)} className="mb-6">
           {error}
         </Alert>
       )}
-
       {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {}
@@ -304,7 +255,6 @@ const InventoryDetail = () => {
                 alt={item.itemName}
                 className="w-full h-full object-contain"
               />
-
               {}
               {images.length > 1 && (
                 <>
@@ -334,7 +284,6 @@ const InventoryDetail = () => {
                   </button>
                 </>
               )}
-
               {}
               {images.length > 1 && (
                 <div className="absolute bottom-2 right-2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
@@ -342,7 +291,6 @@ const InventoryDetail = () => {
                 </div>
               )}
             </div>
-
             {}
             {images.length > 1 && (
               <div className="p-4 bg-white dark:bg-gray-800">
@@ -384,7 +332,6 @@ const InventoryDetail = () => {
             )}
           </Card>
         </div>
-
         {}
         <div className="space-y-6">
           {}
@@ -412,7 +359,6 @@ const InventoryDetail = () => {
               </button>
             </nav>
           </div>
-
           {}
           <div className="min-h-[400px]">
             {}
@@ -444,7 +390,6 @@ const InventoryDetail = () => {
                       </div>
                     )}
                   </div>
-
                   {}
                   <div>
                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -457,7 +402,6 @@ const InventoryDetail = () => {
                 </div>
               </Card>
             )}
-
             {}
             {activeTab === 'history' && (
               <div className="space-y-6">
@@ -507,7 +451,6 @@ const InventoryDetail = () => {
                           </div>
                         </div>
                       )}
-
                       {}
                       {activityLogs.length > 0 && (
                         <div>
@@ -521,7 +464,6 @@ const InventoryDetail = () => {
                                 {index < activityLogs.length - 1 && (
                                   <div className="absolute left-4 top-8 -bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
                                 )}
-
                                 <div className="relative flex items-start space-x-3">
                                   {}
                                   <div
@@ -573,7 +515,6 @@ const InventoryDetail = () => {
                                       )}
                                     </svg>
                                   </div>
-
                                   {}
                                   <div className="flex-1 min-w-0 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                                     <div className="flex items-center justify-between">
@@ -604,13 +545,11 @@ const InventoryDetail = () => {
                                         {new Date(activity.timestamp).toLocaleString()}
                                       </span>
                                     </div>
-
                                     {activity.performedBy && (
                                       <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
                                         By: <span className="font-semibold">{activity.performedBy.fullName || activity.performedBy.username}</span>
                                       </p>
                                     )}
-
                                     {activity.details && (
                                       <div className="mt-2">
                                         {activity.details.itemName && (
@@ -635,7 +574,6 @@ const InventoryDetail = () => {
                                         )}
                                       </div>
                                     )}
-
                                     {activity.ipAddress && (
                                       <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                                         IP: {activity.ipAddress}
@@ -656,7 +594,6 @@ const InventoryDetail = () => {
           </div>
         </div>
       </div>
-
       {}
       {lightboxOpen && (
         <Modal
@@ -672,7 +609,6 @@ const InventoryDetail = () => {
               alt={item.itemName}
               className="max-w-full max-h-[80vh] object-contain"
             />
-
             {images.length > 1 && (
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                 {images.map((_, index) => (
@@ -689,7 +625,6 @@ const InventoryDetail = () => {
           </div>
         </Modal>
       )}
-
       {}
       {uploadImagesModal && (
         <Modal
@@ -725,7 +660,6 @@ const InventoryDetail = () => {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-
             {selectedFiles.length > 0 && (
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
@@ -747,7 +681,6 @@ const InventoryDetail = () => {
           </div>
         </Modal>
       )}
-
       {}
       {deleteConfirmModal && (
         <Modal
@@ -809,7 +742,6 @@ const InventoryDetail = () => {
           </div>
         </Modal>
       )}
-
       {}
       {deleteImageModal && imageToDelete && (
         <Modal
@@ -864,5 +796,4 @@ const InventoryDetail = () => {
     </div>
   );
 };
-
 export default InventoryDetail;

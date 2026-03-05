@@ -6,19 +6,14 @@ import LoadingSpinner from '../common/LoadingSpinner';
 import api from '../../services/api';
 
 
-
-
-
 const StockReconciliationView = () => {
   const [stockItems, setStockItems] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); 
-
   useEffect(() => {
     fetchStockReconciliation();
   }, []);
-
   const fetchStockReconciliation = async () => {
     setLoading(true);
     try {
@@ -37,9 +32,7 @@ const StockReconciliationView = () => {
       setLoading(false);
     }
   };
-
   const handleDownloadStockReport = () => {
-    
     const headers = 'SKU,Item Name,Purchased Qty,Avg Purchase Price,Sold Qty,Avg Sale Price,Current Stock,Status,Profit Margin %';
     const rows = filteredItems.map(item => {
       const cleanName = (item.name || '').replace(/[\t\r\n,]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -55,10 +48,7 @@ const StockReconciliationView = () => {
         item.stock.profitMargin
       ].join(',');
     });
-
     const csvContent = [headers, ...rows].join('\n');
-
-    
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -69,14 +59,12 @@ const StockReconciliationView = () => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
   };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount || 0);
   };
-
   const getStatusVariant = (status) => {
     const statusMap = {
       'IN_STOCK': 'success',
@@ -85,7 +73,6 @@ const StockReconciliationView = () => {
     };
     return statusMap[status] || 'secondary';
   };
-
   const getStatusLabel = (status) => {
     const labelMap = {
       'IN_STOCK': 'In Stock',
@@ -94,7 +81,6 @@ const StockReconciliationView = () => {
     };
     return labelMap[status] || status;
   };
-
   const filteredItems = stockItems.filter(item => {
     if (filter === 'all') return true;
     if (filter === 'in_stock') return item.stock.status === 'IN_STOCK';
@@ -102,7 +88,6 @@ const StockReconciliationView = () => {
     if (filter === 'oversold') return item.stock.status === 'OVERSOLD';
     return true;
   });
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -110,7 +95,6 @@ const StockReconciliationView = () => {
       </div>
     );
   }
-
   if (stockItems.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-slate-200">
@@ -122,7 +106,6 @@ const StockReconciliationView = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-4">
       {}
@@ -137,7 +120,6 @@ const StockReconciliationView = () => {
               <Package className="w-8 h-8 text-slate-400" />
             </div>
           </div>
-
           <div className="bg-white rounded-lg shadow-sm p-4 border border-green-200">
             <div className="flex items-center justify-between">
               <div>
@@ -147,7 +129,6 @@ const StockReconciliationView = () => {
               <TrendingUp className="w-8 h-8 text-green-400" />
             </div>
           </div>
-
           <div className="bg-white rounded-lg shadow-sm p-4 border border-yellow-200">
             <div className="flex items-center justify-between">
               <div>
@@ -157,7 +138,6 @@ const StockReconciliationView = () => {
               <TrendingDown className="w-8 h-8 text-yellow-400" />
             </div>
           </div>
-
           <div className="bg-white rounded-lg shadow-sm p-4 border border-red-200">
             <div className="flex items-center justify-between">
               <div>
@@ -169,7 +149,6 @@ const StockReconciliationView = () => {
           </div>
         </div>
       )}
-
       {}
       <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -216,7 +195,6 @@ const StockReconciliationView = () => {
               Oversold ({summary?.oversold || 0})
             </button>
           </div>
-
           {}
           <Button
             variant="outline"
@@ -229,7 +207,6 @@ const StockReconciliationView = () => {
           </Button>
         </div>
       </div>
-
       {}
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -329,7 +306,6 @@ const StockReconciliationView = () => {
           </table>
         </div>
       </div>
-
       {filteredItems.length === 0 && (
         <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-slate-200">
           <Package className="w-12 h-12 mx-auto text-slate-300 mb-3" />
@@ -339,5 +315,4 @@ const StockReconciliationView = () => {
     </div>
   );
 };
-
 export default StockReconciliationView;

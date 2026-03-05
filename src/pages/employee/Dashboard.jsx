@@ -13,7 +13,6 @@ const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({
@@ -31,34 +30,22 @@ const EmployeeDashboard = () => {
     action: 'add',
     reason: '',
   });
-
-  
   useEffect(() => {
     fetchDashboardData();
   }, []);
-
   const fetchDashboardData = async () => {
     setLoading(true);
     setError(null);
-
     try {
-      // Fetch all dashboard data in a single API call
       const dashboardResponse = await dashboardService.getDashboardData();
-
       if (dashboardResponse.success && dashboardResponse.data) {
         const { inventoryItems, recentActivity: activities } = dashboardResponse.data;
         const items = inventoryItems || [];
-
-        // Calculate total items
         const totalItems = items.length;
-
-        // Filter low stock items
         const lowStockItemsData = items.filter(
           (item) => item.quantity?.current <= item.quantity?.minimum
         );
         const lowStockCount = lowStockItemsData.length;
-
-        // Calculate items updated today
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const itemsUpdatedToday = items.filter((item) => {
@@ -66,23 +53,16 @@ const EmployeeDashboard = () => {
           updatedDate.setHours(0, 0, 0, 0);
           return updatedDate.getTime() === today.getTime();
         }).length;
-
         setStats({
           totalItems,
           lowStockItems: lowStockCount,
           itemsUpdatedToday,
         });
-
-        // Sort items by most recently updated
         const sortedItems = [...items].sort(
           (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
         );
         setRecentUpdates(sortedItems.slice(0, 5));
-
-        // Set low stock items
         setLowStockItems(lowStockItemsData.slice(0, 5));
-
-        // Set recent activity
         setRecentActivity(activities || []);
       }
     } catch (err) {
@@ -93,8 +73,6 @@ const EmployeeDashboard = () => {
       setLoading(false);
     }
   };
-
-  
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString('en-US', {
@@ -105,8 +83,6 @@ const EmployeeDashboard = () => {
       minute: '2-digit',
     });
   };
-
-  
   const getTimeAgo = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -114,39 +90,29 @@ const EmployeeDashboard = () => {
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
-
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
     if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
     return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
   };
-
-  
   const handleUpdateStock = () => {
     navigate('/inventory');
   };
-
   const handleViewLowStock = () => {
     navigate('/inventory?filter=lowStock');
   };
-
   const handleSearchInventory = () => {
     navigate('/inventory');
   };
-
   const handleViewItem = (itemId) => {
     navigate(`/inventory/${itemId}`);
   };
-
-  
   const handleQuickStockUpdate = async (e) => {
     e.preventDefault();
-
     if (!selectedItem || !quickUpdateData.quantity) {
       showToast('warning', 'Please select an item and enter quantity');
       return;
     }
-
     setQuickUpdateLoading(true);
     try {
       await inventoryService.updateStock(selectedItem._id, {
@@ -154,18 +120,13 @@ const EmployeeDashboard = () => {
         action: quickUpdateData.action,
         reason: quickUpdateData.reason || 'Quick update from employee dashboard',
       });
-
       showToast('success', `Stock ${quickUpdateData.action === 'add' ? 'added to' : quickUpdateData.action === 'remove' ? 'removed from' : 'updated for'} ${selectedItem.itemName}`);
-
-      
       setSelectedItem(null);
       setQuickUpdateData({
         quantity: '',
         action: 'add',
         reason: '',
       });
-
-      
       await fetchDashboardData();
     } catch (err) {
       console.error('Error updating stock:', err);
@@ -174,8 +135,6 @@ const EmployeeDashboard = () => {
       setQuickUpdateLoading(false);
     }
   };
-
-  
   const handleCancelQuickUpdate = () => {
     setSelectedItem(null);
     setQuickUpdateData({
@@ -184,7 +143,6 @@ const EmployeeDashboard = () => {
       reason: '',
     });
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -192,7 +150,6 @@ const EmployeeDashboard = () => {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
@@ -205,7 +162,6 @@ const EmployeeDashboard = () => {
             Here's your inventory overview for today
           </p>
         </div>
-
         {error && (
           <div className="mb-6">
             <Alert
@@ -215,7 +171,6 @@ const EmployeeDashboard = () => {
             />
           </div>
         )}
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card
             padding="normal"
@@ -252,7 +207,6 @@ const EmployeeDashboard = () => {
               Click to search inventory
             </p>
           </Card>
-
           <Card
             padding="normal"
             hover
@@ -320,7 +274,6 @@ const EmployeeDashboard = () => {
               Click to view low stock items
             </p>
           </Card>
-
           <Card
             padding="normal"
             className="sm:col-span-2 lg:col-span-1 hover:shadow-lg transition-shadow"
@@ -355,7 +308,6 @@ const EmployeeDashboard = () => {
             </p>
           </Card>
         </div>
-
         <Card title="Quick Stock Update" className="mb-6 sm:mb-8">
           <form onSubmit={handleQuickStockUpdate} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -392,7 +344,6 @@ const EmployeeDashboard = () => {
                   )}
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Action
@@ -408,7 +359,6 @@ const EmployeeDashboard = () => {
                   <option value="set">Set Stock</option>
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Quantity
@@ -424,7 +374,6 @@ const EmployeeDashboard = () => {
                 />
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Reason (Optional)
@@ -438,7 +387,6 @@ const EmployeeDashboard = () => {
                 disabled={quickUpdateLoading}
               />
             </div>
-
             <div className="flex gap-3">
               <button
                 type="submit"
@@ -470,7 +418,6 @@ const EmployeeDashboard = () => {
             </div>
           </form>
         </Card>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
           <Card title="Low Stock Alerts" className="h-fit">
             {lowStockItems.length === 0 ? (
@@ -537,7 +484,6 @@ const EmployeeDashboard = () => {
               </div>
             )}
           </Card>
-
           <Card title="Recent Inventory Changes" className="h-fit">
             {recentActivity.length === 0 ? (
               <div className="text-center py-12">
@@ -587,7 +533,6 @@ const EmployeeDashboard = () => {
             )}
           </Card>
         </div>
-
         <Card title="Recent Stock Updates" className="mb-6 sm:mb-8">
           {recentUpdates.length === 0 ? (
             <div className="text-center py-12">
@@ -736,7 +681,6 @@ const EmployeeDashboard = () => {
             </div>
           )}
         </Card>
-
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <button
             onClick={handleUpdateStock}
@@ -757,7 +701,6 @@ const EmployeeDashboard = () => {
             </svg>
             <span className="font-medium">Update Stock</span>
           </button>
-
           <button
             onClick={handleViewLowStock}
             className="flex items-center justify-center px-6 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg shadow-md transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
@@ -777,7 +720,6 @@ const EmployeeDashboard = () => {
             </svg>
             <span className="font-medium">View Low Stock</span>
           </button>
-
           <button
             onClick={handleSearchInventory}
             className="flex items-center justify-center px-6 py-4 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-lg shadow-md transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -802,5 +744,4 @@ const EmployeeDashboard = () => {
     </div>
   );
 };
-
 export default EmployeeDashboard;

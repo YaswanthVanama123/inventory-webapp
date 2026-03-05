@@ -17,7 +17,6 @@ const CouponsAndPayments = () => {
   const { showSuccess, showError } = useContext(ToastContext);
   const [activeTab, setActiveTab] = useState('coupons'); 
 
-  
   const [coupons, setCoupons] = useState([]);
   const [couponStats, setCouponStats] = useState({ active: 0, inactive: 0, expired: 0, total: 0 });
   const [loadingCoupons, setLoadingCoupons] = useState(true);
@@ -34,8 +33,6 @@ const CouponsAndPayments = () => {
     expiryDate: '',
     isActive: true,
   });
-
-  
   const [paymentTypes, setPaymentTypes] = useState([]);
   const [loadingPayments, setLoadingPayments] = useState(true);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -48,8 +45,6 @@ const CouponsAndPayments = () => {
     isActive: true,
     order: 0,
   });
-
-  
   useEffect(() => {
     if (activeTab === 'coupons') {
       fetchCoupons();
@@ -58,9 +53,6 @@ const CouponsAndPayments = () => {
       fetchPaymentTypes();
     }
   }, [activeTab]);
-
-  
-
   const fetchCoupons = async () => {
     setLoadingCoupons(true);
     try {
@@ -74,7 +66,6 @@ const CouponsAndPayments = () => {
       setLoadingCoupons(false);
     }
   };
-
   const fetchCouponStats = async () => {
     try {
       const response = await api.get('/coupons/stats');
@@ -84,7 +75,6 @@ const CouponsAndPayments = () => {
       setCouponStats({ active: 0, inactive: 0, expired: 0, total: 0 });
     }
   };
-
   const handleCouponSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -93,7 +83,6 @@ const CouponsAndPayments = () => {
         maxDiscount: couponForm.maxDiscount ? parseFloat(couponForm.maxDiscount) : null,
         usageLimit: couponForm.usageLimit ? parseInt(couponForm.usageLimit) : null,
       };
-
       if (editingCoupon) {
         await api.put(`/coupons/${editingCoupon._id}`, data);
         showSuccess('Coupon updated successfully');
@@ -101,7 +90,6 @@ const CouponsAndPayments = () => {
         await api.post('/coupons', data);
         showSuccess('Coupon created successfully');
       }
-
       setShowCouponModal(false);
       resetCouponForm();
       fetchCoupons();
@@ -111,7 +99,6 @@ const CouponsAndPayments = () => {
       showError(error.response?.data?.message || 'Failed to save coupon');
     }
   };
-
   const handleEditCoupon = (coupon) => {
     setEditingCoupon(coupon);
     setCouponForm({
@@ -127,10 +114,8 @@ const CouponsAndPayments = () => {
     });
     setShowCouponModal(true);
   };
-
   const handleDeleteCoupon = async (id) => {
     if (!window.confirm('Are you sure you want to delete this coupon?')) return;
-
     try {
       await api.delete(`/coupons/${id}`);
       showSuccess('Coupon deleted successfully');
@@ -141,7 +126,6 @@ const CouponsAndPayments = () => {
       showError('Failed to delete coupon');
     }
   };
-
   const resetCouponForm = () => {
     setEditingCoupon(null);
     setCouponForm({
@@ -156,9 +140,6 @@ const CouponsAndPayments = () => {
       isActive: true,
     });
   };
-
-  
-
   const fetchPaymentTypes = async () => {
     setLoadingPayments(true);
     try {
@@ -172,7 +153,6 @@ const CouponsAndPayments = () => {
       setLoadingPayments(false);
     }
   };
-
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -183,7 +163,6 @@ const CouponsAndPayments = () => {
         await api.post('/payment-types', paymentForm);
         showSuccess('Payment type created successfully');
       }
-
       setShowPaymentModal(false);
       resetPaymentForm();
       fetchPaymentTypes();
@@ -192,7 +171,6 @@ const CouponsAndPayments = () => {
       showError(error.response?.data?.message || 'Failed to save payment type');
     }
   };
-
   const handleEditPayment = (payment) => {
     setEditingPayment(payment);
     setPaymentForm({
@@ -205,10 +183,8 @@ const CouponsAndPayments = () => {
     });
     setShowPaymentModal(true);
   };
-
   const handleDeletePayment = async (id) => {
     if (!window.confirm('Are you sure you want to delete this payment type?')) return;
-
     try {
       await api.delete(`/payment-types/${id}`);
       showSuccess('Payment type deleted successfully');
@@ -218,7 +194,6 @@ const CouponsAndPayments = () => {
       showError('Failed to delete payment type');
     }
   };
-
   const resetPaymentForm = () => {
     setEditingPayment(null);
     setPaymentForm({
@@ -230,16 +205,12 @@ const CouponsAndPayments = () => {
       order: 0,
     });
   };
-
-  
   const isCouponExpired = (expiryDate) => {
     return new Date(expiryDate) < new Date();
   };
-
   const isCouponUsedUp = (coupon) => {
     return coupon.usageLimit && coupon.usedCount >= coupon.usageLimit;
   };
-
   return (
     <div className="min-h-screen bg-slate-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-6 lg:px-8 py-8 max-w-[1800px]">
@@ -255,7 +226,6 @@ const CouponsAndPayments = () => {
             Manage discount coupons and payment methods
           </p>
         </div>
-
         {}
         <div className="mb-6 flex gap-4">
           <button
@@ -281,7 +251,6 @@ const CouponsAndPayments = () => {
             Payment Types
           </button>
         </div>
-
         {}
         {activeTab === 'coupons' && (
           <>
@@ -332,7 +301,6 @@ const CouponsAndPayments = () => {
                 </div>
               </Card>
             </div>
-
             {}
             <div className="mb-6">
               <Button
@@ -346,7 +314,6 @@ const CouponsAndPayments = () => {
                 Add New Coupon
               </Button>
             </div>
-
             {}
             {loadingCoupons ? (
               <LoadingSpinner />
@@ -370,7 +337,6 @@ const CouponsAndPayments = () => {
                   const expired = isCouponExpired(coupon.expiryDate);
                   const usedUp = isCouponUsedUp(coupon);
                   const canUse = coupon.isActive && !expired && !usedUp;
-
                   return (
                     <Card
                       key={coupon._id}
@@ -396,7 +362,6 @@ const CouponsAndPayments = () => {
                           <Badge variant="default">Inactive</Badge>
                         )}
                       </div>
-
                       <div className="space-y-2 mb-4">
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-slate-600 dark:text-gray-400">Discount:</span>
@@ -429,7 +394,6 @@ const CouponsAndPayments = () => {
                           </span>
                         </div>
                       </div>
-
                       <div className="flex gap-2 pt-4 border-t border-slate-200 dark:border-gray-700">
                         <Button
                           variant="outline"
@@ -456,7 +420,6 @@ const CouponsAndPayments = () => {
             )}
           </>
         )}
-
         {}
         {activeTab === 'payments' && (
           <>
@@ -473,7 +436,6 @@ const CouponsAndPayments = () => {
                 Add Payment Type
               </Button>
             </div>
-
             {}
             {loadingPayments ? (
               <LoadingSpinner />
@@ -517,13 +479,11 @@ const CouponsAndPayments = () => {
                         {payment.isActive ? 'Active' : 'Inactive'}
                       </Badge>
                     </div>
-
                     {payment.description && (
                       <p className="text-sm text-slate-600 dark:text-gray-400 mb-4">
                         {payment.description}
                       </p>
                     )}
-
                     <div className="flex gap-2 pt-4 border-t border-slate-200 dark:border-gray-700">
                       <Button
                         variant="outline"
@@ -549,7 +509,6 @@ const CouponsAndPayments = () => {
             )}
           </>
         )}
-
         {}
         <Modal
           isOpen={showCouponModal}
@@ -586,7 +545,6 @@ const CouponsAndPayments = () => {
                     </Select>
                   </div>
                 </div>
-
                 <Input
                   label="Description"
                   value={couponForm.description}
@@ -596,7 +554,6 @@ const CouponsAndPayments = () => {
                 />
               </div>
             </div>
-
             {}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Discount Details</h3>
@@ -620,7 +577,6 @@ const CouponsAndPayments = () => {
                     required
                   />
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
                     label="Minimum Purchase ($)"
@@ -642,7 +598,6 @@ const CouponsAndPayments = () => {
                 </div>
               </div>
             </div>
-
             {}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Usage & Validity</h3>
@@ -664,7 +619,6 @@ const CouponsAndPayments = () => {
                 />
               </div>
             </div>
-
             <div className="flex gap-4 pt-4">
               <Button
                 type="button"
@@ -683,7 +637,6 @@ const CouponsAndPayments = () => {
             </div>
           </form>
         </Modal>
-
         {}
         <Modal
           isOpen={showPaymentModal}
@@ -705,7 +658,6 @@ const CouponsAndPayments = () => {
                   placeholder="cash"
                   required
                 />
-
                 <Input
                   label="Display Name"
                   value={paymentForm.displayName}
@@ -713,7 +665,6 @@ const CouponsAndPayments = () => {
                   placeholder="Cash Payment"
                   required
                 />
-
                 <Input
                   label="Description (Optional)"
                   value={paymentForm.description}
@@ -722,7 +673,6 @@ const CouponsAndPayments = () => {
                 />
               </div>
             </div>
-
             {}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Settings</h3>
@@ -741,7 +691,6 @@ const CouponsAndPayments = () => {
                   onChange={(e) => setPaymentForm({ ...paymentForm, order: parseInt(e.target.value) || 0 })}
                 />
               </div>
-
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Status
@@ -755,7 +704,6 @@ const CouponsAndPayments = () => {
                 </Select>
               </div>
             </div>
-
             <div className="flex gap-4 pt-4">
               <Button
                 type="button"
@@ -778,5 +726,4 @@ const CouponsAndPayments = () => {
     </div>
   );
 };
-
 export default CouponsAndPayments;

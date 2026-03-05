@@ -21,8 +21,6 @@ const StockUpdateForm = ({
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(null);
   const [previewStock, setPreviewStock] = useState(item?.currentStock || 0);
-
-  
   const actionConfig = {
     add: {
       label: 'Add Stock',
@@ -61,18 +59,14 @@ const StockUpdateForm = ({
       ),
     },
   };
-
   const actionOptions = [
     { value: 'add', label: 'Add Stock' },
     { value: 'remove', label: 'Remove Stock' },
     { value: 'set', label: 'Set Stock' },
   ];
-
-  
   useEffect(() => {
     const qty = parseInt(formData.quantity) || 0;
     const currentStock = item?.currentStock || 0;
-
     let newStock = currentStock;
     switch (formData.action) {
       case 'add':
@@ -87,15 +81,11 @@ const StockUpdateForm = ({
       default:
         break;
     }
-
     setPreviewStock(newStock);
   }, [formData.action, formData.quantity, item?.currentStock]);
-
   const validateForm = () => {
     const newErrors = {};
     const qty = parseInt(formData.quantity);
-
-    
     if (!formData.quantity) {
       newErrors.quantity = 'Quantity is required';
     } else if (qty <= 0) {
@@ -103,54 +93,40 @@ const StockUpdateForm = ({
     } else if (!Number.isInteger(qty)) {
       newErrors.quantity = 'Quantity must be a whole number';
     }
-
-    
     if (formData.action === 'remove' && qty > (item?.currentStock || 0)) {
       newErrors.quantity = `Cannot remove more than available stock (${item?.currentStock || 0})`;
     }
-
-    
     if (!formData.reason.trim()) {
       newErrors.reason = 'Reason is required';
     } else if (formData.reason.trim().length < 3) {
       newErrors.reason = 'Reason must be at least 3 characters';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
-    
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
         [name]: '',
       }));
     }
-
-    
     if (alert) {
       setAlert(null);
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
     setAlert(null);
-
     try {
       const response = await fetch(`/api/inventory/${item._id}/stock`, {
         method: 'PATCH',
@@ -164,27 +140,19 @@ const StockUpdateForm = ({
           reason: formData.reason.trim(),
         }),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.message || 'Failed to update stock');
       }
-
-      
       setAlert({
         variant: 'success',
         message: `Stock updated successfully! New stock level: ${data.data?.currentStock || previewStock}`,
       });
-
-      
       setFormData({
         action: 'add',
         quantity: '',
         reason: '',
       });
-
-      
       if (onSuccess) {
         setTimeout(() => {
           onSuccess(data.data);
@@ -199,7 +167,6 @@ const StockUpdateForm = ({
       setLoading(false);
     }
   };
-
   const handleCancel = () => {
     setFormData({
       action: 'add',
@@ -212,9 +179,7 @@ const StockUpdateForm = ({
       onCancel();
     }
   };
-
   const currentAction = actionConfig[formData.action];
-
   return (
     <div className={standalone ? 'max-w-2xl mx-auto p-4 sm:p-6' : ''}>
       {}
@@ -234,7 +199,6 @@ const StockUpdateForm = ({
           <p className="text-sm text-gray-600 dark:text-gray-400">SKU: {item.sku}</p>
         )}
       </div>
-
       {}
       {alert && (
         <div className="mb-4">
@@ -243,7 +207,6 @@ const StockUpdateForm = ({
           </Alert>
         </div>
       )}
-
       {}
       <form onSubmit={handleSubmit} className="space-y-5">
         {}
@@ -258,7 +221,6 @@ const StockUpdateForm = ({
             fullWidth
           />
         </div>
-
         {}
         <div
           className={`p-4 rounded-lg border-2 flex items-center gap-3 transition-all duration-200 ${currentAction.bgColor} ${currentAction.borderColor}`}
@@ -275,7 +237,6 @@ const StockUpdateForm = ({
             </p>
           </div>
         </div>
-
         {}
         <div>
           <Input
@@ -292,7 +253,6 @@ const StockUpdateForm = ({
             step="1"
           />
         </div>
-
         {}
         {formData.quantity && (
           <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
@@ -351,7 +311,6 @@ const StockUpdateForm = ({
             </div>
           </div>
         )}
-
         {}
         <div>
           <label
@@ -385,7 +344,6 @@ const StockUpdateForm = ({
             Minimum 3 characters. Be specific for better tracking.
           </p>
         </div>
-
         {}
         <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
           {onCancel && (
@@ -422,7 +380,6 @@ const StockUpdateForm = ({
           </Button>
         </div>
       </form>
-
       {}
       <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
         <div className="flex gap-2">
@@ -451,7 +408,6 @@ const StockUpdateForm = ({
     </div>
   );
 };
-
 StockUpdateForm.propTypes = {
   item: PropTypes.shape({
     _id: PropTypes.string.isRequired,
@@ -463,5 +419,4 @@ StockUpdateForm.propTypes = {
   onCancel: PropTypes.func,
   standalone: PropTypes.bool,
 };
-
 export default StockUpdateForm;

@@ -24,11 +24,9 @@ const SalesReport = () => {
   const [categories, setCategories] = useState([]);
 
   const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
-
   useEffect(() => {
     fetchSalesData();
   }, [dateRange, selectedCategory]);
-
   const fetchSalesData = async () => {
     try {
       setLoading(true);
@@ -39,11 +37,8 @@ const SalesReport = () => {
       if (selectedCategory) {
         params.category = selectedCategory;
       }
-
       const response = await reportService.sales(params);
       setSalesData(response.data);
-
-      
       if (response.data?.categoryBreakdown) {
         const cats = response.data.categoryBreakdown.map(item => item.category);
         setCategories([...new Set(cats)]);
@@ -54,7 +49,6 @@ const SalesReport = () => {
       setLoading(false);
     }
   };
-
   const handleQuickDateRange = (days) => {
     const end = new Date();
     const start = subDays(end, days);
@@ -63,7 +57,6 @@ const SalesReport = () => {
       endDate: format(end, 'yyyy-MM-dd'),
     });
   };
-
   const handleThisMonth = () => {
     const now = new Date();
     setDateRange({
@@ -71,17 +64,14 @@ const SalesReport = () => {
       endDate: format(endOfMonth(now), 'yyyy-MM-dd'),
     });
   };
-
   const exportToCSV = () => {
     if (!salesData) return;
-
     const csvData = salesData.dailySales?.map(item => ({
       Date: item.date,
       Sales: item.sales,
       Orders: item.orders,
       Profit: item.profit,
     })) || [];
-
     const csv = Papa.unparse(csvData);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -91,21 +81,13 @@ const SalesReport = () => {
     link.click();
     URL.revokeObjectURL(url);
   };
-
   const exportToPDF = () => {
     if (!salesData) return;
-
     const doc = new jsPDF();
-
-    
     doc.setFontSize(18);
     doc.text('Sales Report', 14, 22);
-
-    
     doc.setFontSize(11);
     doc.text(`Period: ${dateRange.startDate} to ${dateRange.endDate}`, 14, 32);
-
-    
     doc.setFontSize(12);
     doc.text('Summary', 14, 45);
     doc.setFontSize(10);
@@ -113,8 +95,6 @@ const SalesReport = () => {
     doc.text(`Total Profit: $${salesData.summary?.totalProfit?.toLocaleString() || 0}`, 14, 58);
     doc.text(`Total Orders: ${salesData.summary?.totalOrders?.toLocaleString() || 0}`, 14, 64);
     doc.text(`Average Order Value: $${salesData.summary?.averageOrderValue?.toFixed(2) || 0}`, 14, 70);
-
-    
     if (salesData.dailySales && salesData.dailySales.length > 0) {
       doc.autoTable({
         startY: 80,
@@ -127,8 +107,6 @@ const SalesReport = () => {
         ]),
       });
     }
-
-    
     if (salesData.categoryBreakdown && salesData.categoryBreakdown.length > 0) {
       doc.addPage();
       doc.setFontSize(12);
@@ -144,10 +122,8 @@ const SalesReport = () => {
         ]),
       });
     }
-
     doc.save(`sales_report_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -155,17 +131,14 @@ const SalesReport = () => {
       </div>
     );
   }
-
   const summary = salesData?.summary || {
     totalSales: 0,
     totalProfit: 0,
     totalOrders: 0,
     averageOrderValue: 0,
   };
-
   const dailySales = salesData?.dailySales || [];
   const categoryBreakdown = salesData?.categoryBreakdown || [];
-
   return (
     <div className="space-y-6">
       {}
@@ -193,14 +166,12 @@ const SalesReport = () => {
           </div>
         </div>
       </div>
-
       {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-5 h-5 text-slate-600" />
           <h2 className="text-lg font-semibold text-slate-900">Filters</h2>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {}
           <div>
@@ -214,7 +185,6 @@ const SalesReport = () => {
               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               End Date
@@ -226,7 +196,6 @@ const SalesReport = () => {
               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
           {}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -243,7 +212,6 @@ const SalesReport = () => {
               ))}
             </select>
           </div>
-
           {}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -272,7 +240,6 @@ const SalesReport = () => {
           </div>
         </div>
       </div>
-
       {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm p-6 text-white">
@@ -282,7 +249,6 @@ const SalesReport = () => {
           </div>
           <p className="text-3xl font-bold">${summary.totalSales?.toLocaleString() || 0}</p>
         </div>
-
         <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-sm p-6 text-white">
           <div className="flex items-center justify-between mb-2">
             <p className="text-green-100">Total Profit</p>
@@ -290,7 +256,6 @@ const SalesReport = () => {
           </div>
           <p className="text-3xl font-bold">${summary.totalProfit?.toLocaleString() || 0}</p>
         </div>
-
         <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-sm p-6 text-white">
           <div className="flex items-center justify-between mb-2">
             <p className="text-indigo-100">Total Orders</p>
@@ -298,7 +263,6 @@ const SalesReport = () => {
           </div>
           <p className="text-3xl font-bold">{summary.totalOrders?.toLocaleString() || 0}</p>
         </div>
-
         <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-sm p-6 text-white">
           <div className="flex items-center justify-between mb-2">
             <p className="text-orange-100">Avg Order Value</p>
@@ -307,7 +271,6 @@ const SalesReport = () => {
           <p className="text-3xl font-bold">${summary.averageOrderValue?.toFixed(2) || 0}</p>
         </div>
       </div>
-
       {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <h2 className="text-lg font-semibold text-slate-900 mb-4">Sales Trend</h2>
@@ -347,7 +310,6 @@ const SalesReport = () => {
           </ResponsiveContainer>
         </div>
       </div>
-
       {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <h2 className="text-lg font-semibold text-slate-900 mb-4">Daily Orders</h2>
@@ -374,7 +336,6 @@ const SalesReport = () => {
           </ResponsiveContainer>
         </div>
       </div>
-
       {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {}
@@ -407,7 +368,6 @@ const SalesReport = () => {
             </ResponsiveContainer>
           </div>
         </div>
-
         {}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Category Breakdown</h2>
@@ -452,5 +412,4 @@ const SalesReport = () => {
     </div>
   );
 };
-
 export default SalesReport;

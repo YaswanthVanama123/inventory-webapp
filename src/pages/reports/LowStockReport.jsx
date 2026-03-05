@@ -19,7 +19,6 @@ const LowStockReport = () => {
   useEffect(() => {
     fetchLowStockData();
   }, []);
-
   const fetchLowStockData = async () => {
     try {
       setLoading(true);
@@ -31,7 +30,6 @@ const LowStockReport = () => {
       setLoading(false);
     }
   };
-
   const getPriorityLevel = (currentStock, minStock, reorderPoint) => {
     const stockPercentage = (currentStock / reorderPoint) * 100;
     if (currentStock === 0) return 'critical';
@@ -39,7 +37,6 @@ const LowStockReport = () => {
     if (stockPercentage <= 50) return 'medium';
     return 'low';
   };
-
   const getPriorityBadge = (priority) => {
     const badges = {
       critical: {
@@ -67,7 +64,6 @@ const LowStockReport = () => {
         label: 'Low'
       }
     };
-
     const badge = badges[priority] || badges.low;
     return (
       <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${badge.bg} ${badge.text} ${badge.border}`}>
@@ -76,14 +72,11 @@ const LowStockReport = () => {
       </span>
     );
   };
-
   const handleOrderNow = async (itemId, itemName) => {
     if (window.confirm(`Do you want to order ${itemName}?`)) {
-      
       alert('Order functionality will be implemented based on your ordering workflow');
     }
   };
-
   const exportToCSV = () => {
     const csvData = filteredItems.map(item => ({
       'Item Name': item.itemName,
@@ -97,7 +90,6 @@ const LowStockReport = () => {
       'Supplier Email': item.supplier?.email || 'N/A',
       'Supplier Phone': item.supplier?.phone || 'N/A',
     }));
-
     const csv = Papa.unparse(csvData);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -107,19 +99,12 @@ const LowStockReport = () => {
     link.click();
     URL.revokeObjectURL(url);
   };
-
   const exportToPDF = () => {
     const doc = new jsPDF();
-
-    
     doc.setFontSize(18);
     doc.text('Low Stock Report', 14, 22);
-
-    
     doc.setFontSize(11);
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 32);
-
-    
     doc.setFontSize(12);
     doc.text('Summary', 14, 45);
     doc.setFontSize(10);
@@ -129,12 +114,9 @@ const LowStockReport = () => {
     const highCount = filteredItems.filter(item =>
       getPriorityLevel(item.currentStock, item.minStock, item.reorderPoint) === 'high'
     ).length;
-
     doc.text(`Total Items: ${filteredItems.length}`, 14, 52);
     doc.text(`Critical Priority: ${criticalCount}`, 14, 58);
     doc.text(`High Priority: ${highCount}`, 14, 64);
-
-    
     doc.autoTable({
       startY: 75,
       head: [['Item Name', 'SKU', 'Current', 'Min', 'Priority']],
@@ -148,10 +130,8 @@ const LowStockReport = () => {
       styles: { fontSize: 8 },
       headStyles: { fillColor: [59, 130, 246] }
     });
-
     doc.save(`low_stock_report_${new Date().toISOString().split('T')[0]}.pdf`);
   };
-
   const filteredItems = lowStockItems.filter(item => {
     const priority = getPriorityLevel(item.currentStock, item.minStock, item.reorderPoint);
     const matchesSearch = item.itemName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -159,7 +139,6 @@ const LowStockReport = () => {
     const matchesPriority = filterPriority === 'all' || priority === filterPriority;
     return matchesSearch && matchesPriority;
   });
-
   const stats = {
     total: lowStockItems.length,
     critical: lowStockItems.filter(item =>
@@ -172,7 +151,6 @@ const LowStockReport = () => {
       getPriorityLevel(item.currentStock, item.minStock, item.reorderPoint) === 'medium'
     ).length,
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -180,7 +158,6 @@ const LowStockReport = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {}
@@ -208,7 +185,6 @@ const LowStockReport = () => {
           </div>
         </div>
       </div>
-
       {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
@@ -218,7 +194,6 @@ const LowStockReport = () => {
           </div>
           <p className="text-3xl font-bold text-slate-900">{stats.total}</p>
         </div>
-
         <div className="bg-white rounded-lg shadow-sm p-6 border border-red-200 bg-red-50">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-red-600">Critical</p>
@@ -226,7 +201,6 @@ const LowStockReport = () => {
           </div>
           <p className="text-3xl font-bold text-red-700">{stats.critical}</p>
         </div>
-
         <div className="bg-white rounded-lg shadow-sm p-6 border border-orange-200 bg-orange-50">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-orange-600">High Priority</p>
@@ -234,7 +208,6 @@ const LowStockReport = () => {
           </div>
           <p className="text-3xl font-bold text-orange-700">{stats.high}</p>
         </div>
-
         <div className="bg-white rounded-lg shadow-sm p-6 border border-yellow-200 bg-yellow-50">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-yellow-600">Medium Priority</p>
@@ -243,7 +216,6 @@ const LowStockReport = () => {
           <p className="text-3xl font-bold text-yellow-700">{stats.medium}</p>
         </div>
       </div>
-
       {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -258,7 +230,6 @@ const LowStockReport = () => {
               className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
           {}
           <div>
             <select
@@ -275,7 +246,6 @@ const LowStockReport = () => {
           </div>
         </div>
       </div>
-
       {}
       <div className="hidden lg:block bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -375,7 +345,6 @@ const LowStockReport = () => {
           </table>
         </div>
       </div>
-
       {}
       <div className="lg:hidden space-y-4">
         {filteredItems.map((item, index) => {
@@ -391,7 +360,6 @@ const LowStockReport = () => {
                 </div>
                 {getPriorityBadge(priority)}
               </div>
-
               {}
               <div className="mb-3 p-3 bg-slate-50 rounded-lg">
                 <div className="flex justify-between items-center mb-2">
@@ -418,7 +386,6 @@ const LowStockReport = () => {
                   <span>Reorder: {item.reorderPoint}</span>
                 </div>
               </div>
-
               {}
               {item.supplier && (
                 <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
@@ -438,7 +405,6 @@ const LowStockReport = () => {
                   )}
                 </div>
               )}
-
               {}
               <button
                 onClick={() => handleOrderNow(item._id, item.itemName)}
@@ -451,7 +417,6 @@ const LowStockReport = () => {
           );
         })}
       </div>
-
       {}
       {filteredItems.length === 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-12 text-center">
@@ -467,5 +432,4 @@ const LowStockReport = () => {
     </div>
   );
 };
-
 export default LowStockReport;

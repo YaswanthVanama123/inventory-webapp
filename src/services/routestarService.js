@@ -1,13 +1,6 @@
 import api from './api';
 
 
-
-
-
-
-
-
-
 export const getInvoices = async (params = {}) => {
   try {
     const response = await api.get('/routestar/invoices', { params });
@@ -17,10 +10,6 @@ export const getInvoices = async (params = {}) => {
     throw error;
   }
 };
-
-
-
-
 export const getInvoiceByNumber = async (invoiceNumber) => {
   try {
     const response = await api.get(`/routestar/invoices/${invoiceNumber}`);
@@ -30,10 +19,6 @@ export const getInvoiceByNumber = async (invoiceNumber) => {
     throw error;
   }
 };
-
-
-
-
 export const getInvoiceStats = async (params = {}) => {
   try {
     const response = await api.get('/routestar/stats', { params });
@@ -43,10 +28,6 @@ export const getInvoiceStats = async (params = {}) => {
     throw error;
   }
 };
-
-
-
-
 export const getInvoiceRange = async (invoiceType = null) => {
   try {
     const params = invoiceType ? { invoiceType } : {};
@@ -57,10 +38,6 @@ export const getInvoiceRange = async (invoiceType = null) => {
     throw error;
   }
 };
-
-
-
-
 export const syncPendingInvoices = async (limit = 0, direction = 'new') => {
   try {
     const response = await api.post('/routestar/sync/pending',
@@ -76,10 +53,6 @@ export const syncPendingInvoices = async (limit = 0, direction = 'new') => {
     throw error;
   }
 };
-
-
-
-
 export const syncClosedInvoices = async (limit = 0, direction = 'new') => {
   try {
     const response = await api.post('/routestar/sync/closed',
@@ -95,10 +68,6 @@ export const syncClosedInvoices = async (limit = 0, direction = 'new') => {
     throw error;
   }
 };
-
-
-
-
 export const syncInvoiceDetails = async (invoiceNumber) => {
   try {
     const response = await api.post(`/routestar/sync/details/${invoiceNumber}`,
@@ -114,10 +83,6 @@ export const syncInvoiceDetails = async (invoiceNumber) => {
     throw error;
   }
 };
-
-
-
-
 export const syncPendingInvoicesWithDetails = async (limit = 0, direction = 'new') => {
   try {
     const response = await api.post('/routestar/sync/pending-with-details',
@@ -133,10 +98,6 @@ export const syncPendingInvoicesWithDetails = async (limit = 0, direction = 'new
     throw error;
   }
 };
-
-
-
-
 export const syncClosedInvoicesWithDetails = async (limit = 0, direction = 'new') => {
   try {
     const response = await api.post('/routestar/sync/closed-with-details',
@@ -152,10 +113,6 @@ export const syncClosedInvoicesWithDetails = async (limit = 0, direction = 'new'
     throw error;
   }
 };
-
-
-
-
 export const syncAllInvoiceDetails = async (limit = 0) => {
   try {
     const response = await api.post('/routestar/sync/all-details',
@@ -171,8 +128,6 @@ export const syncAllInvoiceDetails = async (limit = 0) => {
     throw error;
   }
 };
-
-
 export const syncPendingInvoiceDetails = async (limit = 0) => {
   try {
     const response = await api.post('/routestar/sync/pending-details',
@@ -188,8 +143,6 @@ export const syncPendingInvoiceDetails = async (limit = 0) => {
     throw error;
   }
 };
-
-
 export const syncClosedInvoiceDetails = async (limit = 0) => {
   try {
     const response = await api.post('/routestar/sync/closed-details',
@@ -205,8 +158,6 @@ export const syncClosedInvoiceDetails = async (limit = 0) => {
     throw error;
   }
 };
-
-
 export const checkPendingInvoicesInRouteStar = async () => {
   try {
     const response = await api.get('/routestar/check-pending');
@@ -216,10 +167,6 @@ export const checkPendingInvoicesInRouteStar = async () => {
     throw error;
   }
 };
-
-
-
-
 export const processStockMovements = async () => {
   try {
     const response = await api.post('/routestar/sync/stock',
@@ -235,10 +182,6 @@ export const processStockMovements = async () => {
     throw error;
   }
 };
-
-
-
-
 export const fullSync = async (options = {}) => {
   try {
     const response = await api.post('/routestar/sync/full',
@@ -254,10 +197,6 @@ export const fullSync = async (options = {}) => {
     throw error;
   }
 };
-
-
-
-
 export const deleteAllPendingInvoices = async () => {
   try {
     const response = await api.delete('/routestar/invoices/pending/all');
@@ -267,10 +206,6 @@ export const deleteAllPendingInvoices = async () => {
     throw error;
   }
 };
-
-
-
-
 export const deleteAllClosedInvoices = async () => {
   try {
     const response = await api.delete('/routestar/invoices/closed/all');
@@ -280,10 +215,6 @@ export const deleteAllClosedInvoices = async () => {
     throw error;
   }
 };
-
-
-
-
 export const deleteBulkClosedInvoicesByNumbers = async (invoiceNumbers) => {
   try {
     const response = await api.post('/routestar/invoices/bulk-delete-by-numbers', {
@@ -295,8 +226,6 @@ export const deleteBulkClosedInvoicesByNumbers = async (invoiceNumbers) => {
     throw error;
   }
 };
-
-
 export const getItemsInvoiceUsage = async () => {
   try {
     const response = await api.get('/routestar/items/invoice-usage');
@@ -306,7 +235,6 @@ export const getItemsInvoiceUsage = async () => {
     throw error;
   }
 };
-
 export default {
   getInvoices,
   getInvoiceByNumber,

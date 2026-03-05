@@ -26,8 +26,6 @@ import {
 
 
 const API_BASE_URL = 'http://localhost:5001/api';
-
-
 const Card = ({ children, className = '' }) => {
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
@@ -35,8 +33,6 @@ const Card = ({ children, className = '' }) => {
     </div>
   );
 };
-
-
 const ReportCard = ({
   icon: Icon,
   title,
@@ -65,13 +61,11 @@ const ReportCard = ({
             </div>
           )}
         </div>
-
         {}
         <div className="flex-1 mb-4">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
           <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
         </div>
-
         {}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-4 border-t border-gray-100">
           <button
@@ -81,7 +75,6 @@ const ReportCard = ({
             <Eye className="w-4 h-4" />
             <span className="text-sm font-medium">View Report</span>
           </button>
-
           <div className="flex items-center gap-2">
             <button
               onClick={onExportCSV}
@@ -91,7 +84,6 @@ const ReportCard = ({
               <FileSpreadsheet className="w-4 h-4" />
               <span className="text-xs font-medium hidden sm:inline">CSV</span>
             </button>
-
             <button
               onClick={onExportPDF}
               className="flex items-center justify-center gap-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
@@ -106,13 +98,10 @@ const ReportCard = ({
     </Card>
   );
 };
-
-
 const QuickStat = ({ icon: Icon, label, value, change, changeType }) => {
   const isPositive = changeType === 'positive';
   const changeColor = isPositive ? 'text-green-600' : 'text-red-600';
   const changeBgColor = isPositive ? 'bg-green-50' : 'bg-red-50';
-
   return (
     <Card className="p-4 hover:shadow-md transition-shadow">
       <div className="flex items-center gap-3">
@@ -134,8 +123,6 @@ const QuickStat = ({ icon: Icon, label, value, change, changeType }) => {
     </Card>
   );
 };
-
-
 const RecentReportsList = ({ reports, loading, onViewReport }) => {
   if (loading) {
     return (
@@ -152,7 +139,6 @@ const RecentReportsList = ({ reports, loading, onViewReport }) => {
       </div>
     );
   }
-
   if (!reports || reports.length === 0) {
     return (
       <div className="text-center py-12">
@@ -162,7 +148,6 @@ const RecentReportsList = ({ reports, loading, onViewReport }) => {
       </div>
     );
   }
-
   return (
     <div className="space-y-2">
       {reports.map((report, index) => (
@@ -174,7 +159,6 @@ const RecentReportsList = ({ reports, loading, onViewReport }) => {
           <div className={`p-2 rounded-lg ${report.bgColor || 'bg-blue-50'}`}>
             <FileText className={`w-5 h-5 ${report.color || 'text-blue-600'}`} />
           </div>
-
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <h4 className="text-sm font-semibold text-gray-900 truncate">
@@ -199,15 +183,12 @@ const RecentReportsList = ({ reports, loading, onViewReport }) => {
               </span>
             </div>
           </div>
-
           <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
         </button>
       ))}
     </div>
   );
 };
-
-
 const FilterBar = ({ dateRange, setDateRange, reportType, setReportType }) => {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -226,7 +207,6 @@ const FilterBar = ({ dateRange, setDateRange, reportType, setReportType }) => {
           <option value="custom">Custom Range</option>
         </select>
       </div>
-
       <div className="flex items-center gap-2 flex-1">
         <BarChart3 className="w-4 h-4 text-gray-500" />
         <select
@@ -244,8 +224,6 @@ const FilterBar = ({ dateRange, setDateRange, reportType, setReportType }) => {
     </div>
   );
 };
-
-
 const Reports = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -254,8 +232,6 @@ const Reports = () => {
   const [reportType, setReportType] = useState('all');
   const [quickStats, setQuickStats] = useState(null);
   const [recentReports, setRecentReports] = useState([]);
-
-  
   const fetchQuickStats = async () => {
     setLoading(true);
     try {
@@ -266,23 +242,18 @@ const Reports = () => {
           'Content-Type': 'application/json',
         },
       });
-
       if (!response.ok) {
         throw new Error('Failed to fetch stats');
       }
-
       const data = await response.json();
       setQuickStats(data);
     } catch (err) {
       console.error('Error fetching stats:', err);
-      
       setQuickStats(getMockStats());
     } finally {
       setLoading(false);
     }
   };
-
-  
   const fetchRecentReports = async () => {
     try {
       const token = localStorage.getItem('authToken');
@@ -292,33 +263,26 @@ const Reports = () => {
           'Content-Type': 'application/json',
         },
       });
-
       if (!response.ok) {
         throw new Error('Failed to fetch recent reports');
       }
-
       const data = await response.json();
       setRecentReports(data);
     } catch (err) {
       console.error('Error fetching recent reports:', err);
-      
       setRecentReports(getMockRecentReports());
     }
   };
-
   useEffect(() => {
     fetchQuickStats();
     fetchRecentReports();
   }, [dateRange]);
-
-  
   const getMockStats = () => ({
     totalSales: { value: '$125,840', change: '+12.5%', changeType: 'positive' },
     totalInventory: { value: '$84,320', change: '+5.2%', changeType: 'positive' },
     activeCustomers: { value: '1,248', change: '+8.3%', changeType: 'positive' },
     lowStockItems: { value: '23', change: '-15.4%', changeType: 'positive' },
   });
-
   const getMockRecentReports = () => [
     {
       name: 'Monthly Sales Report - January 2026',
@@ -362,8 +326,6 @@ const Reports = () => {
       type: 'inventory',
     },
   ];
-
-  
   const reportTypes = [
     {
       id: 'sales',
@@ -426,18 +388,14 @@ const Reports = () => {
       path: '/reports/profit',
     },
   ];
-
-  
   const handleViewReport = (reportId) => {
     const report = reportTypes.find(r => r.id === reportId);
     if (report && report.path) {
       navigate(report.path);
     } else {
       console.log(`Viewing report: ${reportId}`);
-      
     }
   };
-
   const handleExportCSV = async (reportId) => {
     console.log(`Exporting ${reportId} as CSV`);
     try {
@@ -447,11 +405,9 @@ const Reports = () => {
           'Authorization': `Bearer ${token}`,
         },
       });
-
       if (!response.ok) {
         throw new Error('Failed to export CSV');
       }
-
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -466,7 +422,6 @@ const Reports = () => {
       alert('Export functionality will be implemented soon');
     }
   };
-
   const handleExportPDF = async (reportId) => {
     console.log(`Exporting ${reportId} as PDF`);
     try {
@@ -476,11 +431,9 @@ const Reports = () => {
           'Authorization': `Bearer ${token}`,
         },
       });
-
       if (!response.ok) {
         throw new Error('Failed to export PDF');
       }
-
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -495,19 +448,14 @@ const Reports = () => {
       alert('Export functionality will be implemented soon');
     }
   };
-
   const handleViewRecentReport = (report) => {
     console.log('Viewing recent report:', report);
-    
   };
-
   const handleRefresh = () => {
     fetchQuickStats();
     fetchRecentReports();
   };
-
   const stats = quickStats || getMockStats();
-
   return (
     <div className="space-y-6">
       {}
@@ -532,7 +480,6 @@ const Reports = () => {
           </button>
         </div>
       </div>
-
       {}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <QuickStat
@@ -564,7 +511,6 @@ const Reports = () => {
           changeType={stats.lowStockItems?.changeType || 'positive'}
         />
       </div>
-
       {}
       <Card className="p-4">
         <FilterBar
@@ -574,14 +520,12 @@ const Reports = () => {
           setReportType={setReportType}
         />
       </Card>
-
       {}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-900">Available Reports</h2>
           <span className="text-sm text-gray-500">{reportTypes.length} report types</span>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {reportTypes.map((report) => (
             <ReportCard
@@ -599,7 +543,6 @@ const Reports = () => {
           ))}
         </div>
       </div>
-
       {}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-6">
@@ -612,14 +555,12 @@ const Reports = () => {
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
-
         <RecentReportsList
           reports={recentReports}
           loading={loading}
           onViewReport={handleViewRecentReport}
         />
       </Card>
-
       {}
       <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
@@ -640,5 +581,4 @@ const Reports = () => {
     </div>
   );
 };
-
 export default Reports;

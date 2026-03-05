@@ -44,69 +44,51 @@ const OrdersList = () => {
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [deletingBulk, setDeletingBulk] = useState(false);
-
-  
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [verifyingOrder, setVerifyingOrder] = useState(null);
   const [verificationItems, setVerificationItems] = useState([]);
   const [verificationNotes, setVerificationNotes] = useState('');
   const [submittingVerification, setSubmittingVerification] = useState(false);
-
-  
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
     }, 300);
-
     return () => clearTimeout(timer);
   }, [searchTerm]);
-
   useEffect(() => {
     fetchOrders();
   }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, verifiedFilter, dateFrom, dateTo, debouncedSearchTerm]);
-
   const fetchOrders = async () => {
     setLoading(true);
-
     try {
       const params = {
         page: currentPage,
         limit: itemsPerPage,
       };
-
       if (statusFilter) {
         params.status = statusFilter;
       }
-
       if (stockProcessedFilter !== '') {
         params.stockProcessed = stockProcessedFilter;
       }
-
       if (verifiedFilter !== '') {
         params.verified = verifiedFilter;
       }
-
       if (dateFrom) {
         params.startDate = dateFrom;
       }
-
       if (dateTo) {
         params.endDate = dateTo;
       }
-
       if (debouncedSearchTerm) {
         params.vendor = debouncedSearchTerm;
       }
-
       const response = await getOrders(params);
-
       if (response.success) {
         setOrders(response.data.orders || []);
         setTotalPages(response.data.pagination.pages || 1);
         setTotalItems(response.data.pagination.total || 0);
         setCurrentPage(response.data.pagination.page || 1);
-
-        
         if (response.data.range) {
           setOrderRange({
             highest: response.data.range.highest,
@@ -123,17 +105,13 @@ const OrdersList = () => {
       setLoading(false);
     }
   };
-
   const handleSyncNew = async () => {
     if (!isAdmin) {
       showError('Only administrators can sync orders');
       return;
     }
-
-    
     const limit = syncLimit === 0 || syncLimit === '' ? 0 : parseInt(syncLimit);
     const isUnlimited = limit === 0;
-
     setSyncingNew(true);
     setSyncing(true);
     try {
@@ -154,17 +132,13 @@ const OrdersList = () => {
       setSyncing(false);
     }
   };
-
   const handleSyncOld = async () => {
     if (!isAdmin) {
       showError('Only administrators can sync orders');
       return;
     }
-
-    
     const limit = syncLimit === 0 || syncLimit === '' ? 0 : parseInt(syncLimit);
     const isUnlimited = limit === 0;
-
     setSyncingOld(true);
     setSyncing(true);
     try {
@@ -185,13 +159,11 @@ const OrdersList = () => {
       setSyncing(false);
     }
   };
-
   const handleDeleteAllOrders = async () => {
     if (!isAdmin) {
       showError('Only administrators can delete orders');
       return;
     }
-
     setDeleting(true);
     try {
       const response = await deleteAllOrders();
@@ -207,46 +179,36 @@ const OrdersList = () => {
       setDeleting(false);
     }
   };
-
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
     if (e.target.value === '') {
-      
       return;
     }
     setCurrentPage(1);
   };
-
   const handleSearchClear = () => {
     setSearchTerm('');
-    
   };
-
   const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
     setCurrentPage(1);
   };
-
   const handleStockProcessedFilterChange = (e) => {
     setStockProcessedFilter(e.target.value);
     setCurrentPage(1);
   };
-
   const handleVerifiedFilterChange = (e) => {
     setVerifiedFilter(e.target.value);
     setCurrentPage(1);
   };
-
   const handleDateFromChange = (e) => {
     setDateFrom(e.target.value);
     setCurrentPage(1);
   };
-
   const handleDateToChange = (e) => {
     setDateTo(e.target.value);
     setCurrentPage(1);
   };
-
   const handleClearFilters = () => {
     setSearchTerm('');
     setStatusFilter('');
@@ -256,21 +218,17 @@ const OrdersList = () => {
     setDateTo('');
     setCurrentPage(1);
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
   const handlePageSizeChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
   };
-
   const handleViewOrder = (orderNumber) => {
     navigate(`/orders/${orderNumber}`);
   };
-
   const getStatusBadgeVariant = (status) => {
     const statusMap = {
       'Complete': 'success',
@@ -281,14 +239,12 @@ const OrdersList = () => {
     };
     return statusMap[status] || 'secondary';
   };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount || 0);
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -301,7 +257,6 @@ const OrdersList = () => {
       return 'Invalid Date';
     }
   };
-
   const handleCheckboxChange = (orderNumber) => {
     setSelectedOrders(prev => {
       if (prev.includes(orderNumber)) {
@@ -311,7 +266,6 @@ const OrdersList = () => {
       }
     });
   };
-
   const handleSelectAll = () => {
     if (selectedOrders.length === orders.length) {
       setSelectedOrders([]);
@@ -319,7 +273,6 @@ const OrdersList = () => {
       setSelectedOrders(orders.map(order => order.orderNumber));
     }
   };
-
   const handleBulkDelete = () => {
     if (selectedOrders.length === 0) {
       showError('Please select orders to delete');
@@ -327,14 +280,11 @@ const OrdersList = () => {
     }
     setShowBulkDeleteModal(true);
   };
-
   const confirmBulkDelete = async () => {
     if (selectedOrders.length === 0) return;
-
     setDeletingBulk(true);
     try {
       const response = await deleteBulkOrdersByNumbers(selectedOrders);
-
       if (response.success) {
         showSuccess(`Successfully deleted ${response.data.deletedCount} order(s)`);
         setShowBulkDeleteModal(false);
@@ -350,8 +300,6 @@ const OrdersList = () => {
       setDeletingBulk(false);
     }
   };
-
-  
   const handleOpenVerifyModal = async (order) => {
     try {
       const response = await purchaseOrderService.getOrderById(order.orderNumber);
@@ -371,17 +319,14 @@ const OrdersList = () => {
       showError('Failed to load order details');
     }
   };
-
   const handleQuantityChange = (index, value) => {
     const newItems = [...verificationItems];
     newItems[index].receivedQuantity = value;
     setVerificationItems(newItems);
   };
-
   const hasDiscrepancies = verificationItems.some(
     item => parseFloat(item.receivedQuantity || 0) !== item.qty
   );
-
   const handleVerifyAllGood = async () => {
     try {
       setSubmittingVerification(true);
@@ -389,7 +334,6 @@ const OrdersList = () => {
         allGood: true,
         notes: verificationNotes.trim() || 'All items received as expected'
       });
-
       if (response.success) {
         showSuccess('Order verified successfully - all items correct');
         setShowVerifyModal(false);
@@ -405,11 +349,9 @@ const OrdersList = () => {
       setSubmittingVerification(false);
     }
   };
-
   const handleSubmitWithDiscrepancies = async () => {
     try {
       setSubmittingVerification(true);
-
       const itemsData = verificationItems.map(item => ({
         sku: item.sku,
         itemName: item.itemName || item.name,
@@ -417,13 +359,11 @@ const OrdersList = () => {
         receivedQuantity: parseFloat(item.receivedQuantity) || 0,
         notes: item.notes || ''
       }));
-
       const response = await orderDiscrepancyService.verifyOrder(verifyingOrder._id, {
         allGood: false,
         items: itemsData,
         notes: verificationNotes.trim()
       });
-
       if (response.success) {
         const discrepancyCount = response.data.discrepancies?.length || 0;
         showSuccess(`Order verified with ${discrepancyCount} discrepancy(ies) recorded`);
@@ -440,7 +380,6 @@ const OrdersList = () => {
       setSubmittingVerification(false);
     }
   };
-
   if (loading && orders.length === 0) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -448,7 +387,6 @@ const OrdersList = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {}
@@ -536,7 +474,6 @@ const OrdersList = () => {
             </div>
           )}
         </div>
-
         {}
         {isAdmin && showSyncOptions && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
@@ -600,7 +537,6 @@ const OrdersList = () => {
                 </Button>
               </div>
             </div>
-
             {}
             <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
               <div className="flex items-center justify-between">
@@ -628,7 +564,6 @@ const OrdersList = () => {
           </div>
         )}
       </div>
-
       {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
         {}
@@ -643,7 +578,6 @@ const OrdersList = () => {
               loading={loading && searchTerm !== debouncedSearchTerm}
             />
           </div>
-
           <Select
             value={statusFilter}
             onChange={handleStatusFilterChange}
@@ -656,7 +590,6 @@ const OrdersList = () => {
             <option value="Pending">Pending</option>
             <option value="Cancelled">Cancelled</option>
           </Select>
-
           <Select
             value={stockProcessedFilter}
             onChange={handleStockProcessedFilterChange}
@@ -666,7 +599,6 @@ const OrdersList = () => {
             <option value="true">Stock Processed</option>
             <option value="false">Not Processed</option>
           </Select>
-
           <Select
             value={verifiedFilter}
             onChange={handleVerifiedFilterChange}
@@ -677,7 +609,6 @@ const OrdersList = () => {
             <option value="false">Not Verified</option>
           </Select>
         </div>
-
         {}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -713,7 +644,6 @@ const OrdersList = () => {
           </div>
         </div>
       </div>
-
       {}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
@@ -735,7 +665,6 @@ const OrdersList = () => {
           </p>
         </div>
       </div>
-
       {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         {orders.length === 0 ? (
@@ -772,7 +701,6 @@ const OrdersList = () => {
                       Select All ({selectedOrders.length}/{orders.length})
                     </span>
                   </label>
-
                   {selectedOrders.length > 0 && (
                     <Button
                       variant="danger"
@@ -789,7 +717,6 @@ const OrdersList = () => {
                 </div>
               </div>
             )}
-
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-50 dark:bg-gray-700 border-b border-slate-200 dark:border-gray-600">
@@ -925,7 +852,6 @@ const OrdersList = () => {
                 </tbody>
               </table>
             </div>
-
             {}
             <div className="border-t border-slate-200 dark:border-gray-700">
               <Pagination
@@ -940,7 +866,6 @@ const OrdersList = () => {
           </>
         )}
       </div>
-
       {}
       <Modal
         isOpen={showDeleteModal}
@@ -963,7 +888,6 @@ const OrdersList = () => {
               </div>
             </div>
           </div>
-
           <div className="space-y-2">
             <p className="text-sm text-slate-700 dark:text-gray-300">
               This will remove:
@@ -977,7 +901,6 @@ const OrdersList = () => {
               <strong>Note:</strong> This will NOT affect your inventory stock levels. Only order records will be deleted.
             </p>
           </div>
-
           <div className="flex justify-end gap-3 mt-6">
             <Button
               onClick={() => setShowDeleteModal(false)}
@@ -1008,7 +931,6 @@ const OrdersList = () => {
           </div>
         </div>
       </Modal>
-
       {}
       <Modal
         isOpen={showBulkDeleteModal}
@@ -1035,7 +957,6 @@ const OrdersList = () => {
               </div>
             </div>
           </div>
-
           <div className="space-y-2">
             <p className="text-sm text-slate-700 dark:text-gray-300 font-medium">
               Selected Orders:
@@ -1063,7 +984,6 @@ const OrdersList = () => {
               </ul>
             </div>
           </div>
-
           <div className="flex justify-end gap-3 mt-6">
             <Button
               onClick={() => setShowBulkDeleteModal(false)}
@@ -1094,7 +1014,6 @@ const OrdersList = () => {
           </div>
         </div>
       </Modal>
-
       {}
       <Modal
         isOpen={showVerifyModal}
@@ -1133,14 +1052,12 @@ const OrdersList = () => {
                 </div>
               </div>
             </div>
-
             {}
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
               <p className="text-xs text-gray-700 dark:text-gray-300">
                 <strong>Instructions:</strong> Enter the actual quantity received for each item. If all items match exactly, click "All Good". Otherwise, the differences will be recorded as discrepancies for admin approval.
               </p>
             </div>
-
             {}
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
               <div className="max-h-96 overflow-y-auto">
@@ -1170,7 +1087,6 @@ const OrdersList = () => {
                       const expected = item.qty;
                       const difference = received - expected;
                       const hasDiscrepancy = difference !== 0;
-
                       return (
                         <tr
                           key={index}
@@ -1232,7 +1148,6 @@ const OrdersList = () => {
                 </table>
               </div>
             </div>
-
             {}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1246,7 +1161,6 @@ const OrdersList = () => {
                 placeholder="Add any notes about this order verification..."
               />
             </div>
-
             {}
             {hasDiscrepancies && (
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
@@ -1255,7 +1169,6 @@ const OrdersList = () => {
                 </p>
               </div>
             )}
-
             {}
             <div className="flex justify-end gap-3 pt-2">
               <Button
@@ -1265,7 +1178,6 @@ const OrdersList = () => {
               >
                 Cancel
               </Button>
-
               {!hasDiscrepancies ? (
                 <Button
                   variant="success"
@@ -1298,5 +1210,4 @@ const OrdersList = () => {
     </div>
   );
 };
-
 export default OrdersList;

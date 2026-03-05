@@ -23,15 +23,12 @@ const Modal = ({
       document.addEventListener('keydown', handleEscape);
       document.body.style.overflow = 'hidden';
     }
-
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
   }, [isOpen, onClose]);
-
   if (!isOpen) return null;
-
   const sizes = {
     sm: 'max-w-sm sm:max-w-md',
     md: 'max-w-md sm:max-w-lg',
@@ -39,13 +36,11 @@ const Modal = ({
     xl: 'max-w-xl sm:max-w-4xl',
     full: 'max-w-full mx-4',
   };
-
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget && closeOnOverlayClick) {
       onClose();
     }
   };
-
   return (
     <div
       className="fixed inset-0 z-50 overflow-y-auto"
@@ -58,7 +53,6 @@ const Modal = ({
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity backdrop-blur-sm"
         onClick={handleOverlayClick}
       />
-
       {}
       <div className="flex min-h-screen items-end sm:items-center justify-center p-0 sm:p-4">
         <div
@@ -99,12 +93,10 @@ const Modal = ({
               )}
             </div>
           )}
-
           {}
           <div className="p-4 sm:p-6 overflow-y-auto flex-1">
             {children}
           </div>
-
           {}
           {footer && (
             <div className="flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-b-lg">
@@ -116,7 +108,6 @@ const Modal = ({
     </div>
   );
 };
-
 Modal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
@@ -128,5 +119,4 @@ Modal.propTypes = {
   showCloseButton: PropTypes.bool,
   className: PropTypes.string,
 };
-
 export default Modal;

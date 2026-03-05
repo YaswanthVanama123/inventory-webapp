@@ -28,11 +28,9 @@ const ItemsInvoiceUsage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredItems, setFilteredItems] = useState([]);
   const [expandedItems, setExpandedItems] = useState(new Set());
-
   useEffect(() => {
     loadData();
   }, []);
-
   useEffect(() => {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -45,7 +43,6 @@ const ItemsInvoiceUsage = () => {
       setFilteredItems(items);
     }
   }, [searchQuery, items]);
-
   const loadData = async () => {
     try {
       setLoading(true);
@@ -61,7 +58,6 @@ const ItemsInvoiceUsage = () => {
       setLoading(false);
     }
   };
-
   const handleItemClick = (itemName) => {
     const newExpanded = new Set(expandedItems);
     if (newExpanded.has(itemName)) {
@@ -71,11 +67,9 @@ const ItemsInvoiceUsage = () => {
     }
     setExpandedItems(newExpanded);
   };
-
   const handleInvoiceClick = (invoiceNumber) => {
     navigate(`/invoices/routestar/${invoiceNumber}`);
   };
-
   const formatDate = (date) => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleDateString('en-US', {
@@ -84,11 +78,9 @@ const ItemsInvoiceUsage = () => {
       day: 'numeric'
     });
   };
-
   if (loading) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="p-6 space-y-6">
       {}
@@ -106,7 +98,6 @@ const ItemsInvoiceUsage = () => {
           Refresh
         </Button>
       </div>
-
       {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
@@ -120,7 +111,6 @@ const ItemsInvoiceUsage = () => {
             </div>
           </div>
         </div>
-
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -132,7 +122,6 @@ const ItemsInvoiceUsage = () => {
             </div>
           </div>
         </div>
-
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -144,7 +133,6 @@ const ItemsInvoiceUsage = () => {
             </div>
           </div>
         </div>
-
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -157,7 +145,6 @@ const ItemsInvoiceUsage = () => {
           </div>
         </div>
       </div>
-
       {}
       <Card>
         <div className="relative">
@@ -171,13 +158,11 @@ const ItemsInvoiceUsage = () => {
           />
         </div>
       </Card>
-
       {}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Items ({filteredItems.length} items)
         </h2>
-
         {filteredItems.length === 0 ? (
           <div className="text-center py-12">
             <CubeIcon className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
@@ -253,7 +238,6 @@ const ItemsInvoiceUsage = () => {
                         </span>
                       </td>
                     </tr>
-
                     {}
                     {expandedItems.has(item.itemName) && item.aliases.length > 0 && (
                       <tr className="bg-purple-50 dark:bg-purple-900/10">
@@ -274,7 +258,6 @@ const ItemsInvoiceUsage = () => {
                         </td>
                       </tr>
                     )}
-
                     {}
                     {expandedItems.has(item.itemName) && item.invoices.length > 0 && (
                       <tr className="bg-gray-50 dark:bg-gray-800">
@@ -360,5 +343,4 @@ const ItemsInvoiceUsage = () => {
     </div>
   );
 };
-
 export default ItemsInvoiceUsage;

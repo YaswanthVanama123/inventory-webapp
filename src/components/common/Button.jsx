@@ -23,15 +23,12 @@ const Button = ({
     outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-500 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20',
     ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500 dark:text-gray-300 dark:hover:bg-gray-800',
   };
-
   const sizes = {
     sm: 'px-3 py-2 text-sm min-h-[40px]',
     md: 'px-4 py-2.5 text-base min-h-[44px]',
     lg: 'px-6 py-3 text-lg min-h-[48px]',
   };
-
   const widthClass = fullWidth ? 'w-full' : '';
-
   return (
     <button
       type={type}
@@ -67,7 +64,6 @@ const Button = ({
     </button>
   );
 };
-
 Button.propTypes = {
   children: PropTypes.node,
   variant: PropTypes.oneOf(['primary', 'secondary', 'danger', 'outline', 'ghost']),
@@ -80,5 +76,4 @@ Button.propTypes = {
   className: PropTypes.string,
   icon: PropTypes.node,
 };
-
 export default Button;

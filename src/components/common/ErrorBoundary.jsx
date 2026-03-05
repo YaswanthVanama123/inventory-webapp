@@ -14,62 +14,41 @@ class ErrorBoundary extends React.Component {
       errorCount: 0,
     };
   }
-
   static getDerivedStateFromError(error) {
-    
     return { hasError: true };
   }
-
   componentDidCatch(error, errorInfo) {
-    
     console.error('ErrorBoundary caught an error:', error);
     console.error('Error component stack:', errorInfo.componentStack);
-
-    
     this.setState(prevState => ({
       error,
       errorInfo,
       errorCount: prevState.errorCount + 1,
     }));
-
-    
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
-
-    
-    
   }
-
   handleReload = () => {
-    
     this.setState({
       hasError: false,
       error: null,
       errorInfo: null,
     });
-
-    
     window.location.reload();
   };
-
   handleReset = () => {
-    
     this.setState({
       hasError: false,
       error: null,
       errorInfo: null,
     });
   };
-
   render() {
     if (this.state.hasError) {
-      
       if (this.props.fallback) {
         return this.props.fallback;
       }
-
-      
       return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4">
           <div className="w-full max-w-2xl">
@@ -93,7 +72,6 @@ class ErrorBoundary extends React.Component {
                   </svg>
                 </div>
               </div>
-
               {}
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
@@ -104,7 +82,6 @@ class ErrorBoundary extends React.Component {
                     "We're sorry, but something unexpected happened. Please try reloading the page."}
                 </p>
               </div>
-
               {}
               {process.env.NODE_ENV === 'development' && this.state.error && (
                 <div className="mb-6">
@@ -112,14 +89,12 @@ class ErrorBoundary extends React.Component {
                     <summary className="cursor-pointer font-semibold text-red-900 dark:text-red-300 mb-2">
                       Error Details (Development Mode)
                     </summary>
-
                     {}
                     <div className="mb-4">
                       <p className="font-mono text-sm text-red-800 dark:text-red-400 font-semibold">
                         {this.state.error.name}: {this.state.error.message}
                       </p>
                     </div>
-
                     {}
                     {this.state.error.stack && (
                       <div className="mb-4">
@@ -131,7 +106,6 @@ class ErrorBoundary extends React.Component {
                         </pre>
                       </div>
                     )}
-
                     {}
                     {this.state.errorInfo && this.state.errorInfo.componentStack && (
                       <div>
@@ -146,7 +120,6 @@ class ErrorBoundary extends React.Component {
                   </details>
                 </div>
               )}
-
               {}
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button
@@ -171,7 +144,6 @@ class ErrorBoundary extends React.Component {
                   </svg>
                   Reload Page
                 </Button>
-
                 {this.props.showReset && (
                   <Button
                     variant="outline"
@@ -182,7 +154,6 @@ class ErrorBoundary extends React.Component {
                     Try Again
                   </Button>
                 )}
-
                 {this.props.onReport && (
                   <Button
                     variant="ghost"
@@ -208,7 +179,6 @@ class ErrorBoundary extends React.Component {
                   </Button>
                 )}
               </div>
-
               {}
               {process.env.NODE_ENV === 'development' && this.state.errorCount > 1 && (
                 <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
@@ -220,12 +190,9 @@ class ErrorBoundary extends React.Component {
         </div>
       );
     }
-
-    
     return this.props.children;
   }
 }
-
 ErrorBoundary.propTypes = {
   children: PropTypes.node.isRequired,
   fallback: PropTypes.node,
@@ -234,7 +201,6 @@ ErrorBoundary.propTypes = {
   onReport: PropTypes.func,
   showReset: PropTypes.bool,
 };
-
 ErrorBoundary.defaultProps = {
   fallback: null,
   errorMessage: null,
@@ -242,5 +208,4 @@ ErrorBoundary.defaultProps = {
   onReport: null,
   showReset: false,
 };
-
 export default ErrorBoundary;

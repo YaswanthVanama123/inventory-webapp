@@ -12,7 +12,6 @@ const discrepancyService = {
       if (params.type) queryParams.append('type', params.type);
       if (params.startDate) queryParams.append('startDate', params.startDate);
       if (params.endDate) queryParams.append('endDate', params.endDate);
-
       const response = await api.get(`/discrepancies?${queryParams.toString()}`);
       return response;
     } catch (error) {
@@ -22,14 +21,11 @@ const discrepancyService = {
       });
     }
   },
-
-  
   getSummary: async (startDate, endDate) => {
     try {
       const queryParams = new URLSearchParams();
       if (startDate) queryParams.append('startDate', startDate);
       if (endDate) queryParams.append('endDate', endDate);
-
       const response = await api.get(`/discrepancies/summary?${queryParams.toString()}`);
       return response;
     } catch (error) {
@@ -39,8 +35,6 @@ const discrepancyService = {
       });
     }
   },
-
-  
   createDiscrepancy: async (data) => {
     try {
       const response = await api.post('/discrepancies', data);
@@ -52,8 +46,6 @@ const discrepancyService = {
       });
     }
   },
-
-  
   updateDiscrepancy: async (id, data) => {
     try {
       const response = await api.put(`/discrepancies/${id}`, data);
@@ -65,8 +57,6 @@ const discrepancyService = {
       });
     }
   },
-
-  
   approveDiscrepancy: async (id, notes = '') => {
     try {
       const response = await api.post(`/discrepancies/${id}/approve`, { notes });
@@ -78,8 +68,6 @@ const discrepancyService = {
       });
     }
   },
-
-  
   rejectDiscrepancy: async (id, notes = '') => {
     try {
       const response = await api.post(`/discrepancies/${id}/reject`, { notes });
@@ -91,8 +79,6 @@ const discrepancyService = {
       });
     }
   },
-
-  
   bulkApproveDiscrepancies: async (discrepancyIds, notes = '') => {
     try {
       const response = await api.post('/discrepancies/bulk-approve', {
@@ -107,8 +93,6 @@ const discrepancyService = {
       });
     }
   },
-
-  
   deleteDiscrepancy: async (id) => {
     try {
       const response = await api.delete(`/discrepancies/${id}`);
@@ -120,8 +104,6 @@ const discrepancyService = {
       });
     }
   },
-
-  
   searchInvoices: async (searchTerm, limit = 10) => {
     try {
       const response = await api.get(`/routestar/invoices?search=${searchTerm}&limit=${limit}`);
@@ -134,5 +116,4 @@ const discrepancyService = {
     }
   },
 };
-
 export default discrepancyService;

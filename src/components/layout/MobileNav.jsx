@@ -11,8 +11,6 @@ import {
 } from '@heroicons/react/24/outline';
 
 
-
-
 const getNavItems = (isAdmin) => {
   const baseItems = [
     {
@@ -28,63 +26,44 @@ const getNavItems = (isAdmin) => {
       showFor: ['admin', 'employee'],
     },
   ];
-
   const adminItem = {
     label: 'Invoices',
     path: '/invoices',
     icon: DocumentTextIcon,
     showFor: ['admin'],
   };
-
-  
   if (isAdmin) {
     return [...baseItems, adminItem];
   }
-
   return baseItems;
 };
-
-
 const getMoreMenuItems = (isAdmin) => {
   const adminItems = [
     { label: 'Users', path: '/users' },
     { label: 'Reports', path: '/reports' },
     { label: 'Invoices', path: '/invoices' },
   ];
-
   const employeeItems = [
     { label: 'Stock Update', path: '/stock-update' },
   ];
-
   return isAdmin ? adminItems : employeeItems;
 };
-
 const MobileNav = () => {
   const { isAdmin } = useAuth();
   const location = useLocation();
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
-
   const navItems = getNavItems(isAdmin);
   const moreMenuItems = getMoreMenuItems(isAdmin);
-
-  
   const isActiveRoute = (path) => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
-
-  
   const isMoreMenuActive = moreMenuItems.some(item => isActiveRoute(item.path));
-
-  
   const toggleMoreMenu = () => {
     setIsMoreMenuOpen(!isMoreMenuOpen);
   };
-
-  
   const handleMoreMenuItemClick = () => {
     setIsMoreMenuOpen(false);
   };
-
   return (
     <>
       {}
@@ -95,7 +74,6 @@ const MobileNav = () => {
           aria-hidden="true"
         />
       )}
-
       {}
       <div
         className={`
@@ -110,7 +88,6 @@ const MobileNav = () => {
         <div className="flex justify-center pt-3 pb-2">
           <div className="w-12 h-1.5 bg-slate-300 rounded-full" />
         </div>
-
         {}
         <div className="flex items-center justify-between px-6 pb-3 border-b border-slate-200">
           <h3 className="text-lg font-semibold text-slate-900">More Options</h3>
@@ -122,7 +99,6 @@ const MobileNav = () => {
             <XMarkIcon className="w-5 h-5 text-slate-600" />
           </button>
         </div>
-
         {}
         <nav className="px-4 py-4 pb-6">
           <ul className="space-y-1">
@@ -150,7 +126,6 @@ const MobileNav = () => {
           </ul>
         </nav>
       </div>
-
       {}
       <nav
         className="fixed bottom-0 left-0 right-0 z-30 md:hidden bg-white border-t border-slate-200 shadow-lg"
@@ -162,7 +137,6 @@ const MobileNav = () => {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = isActiveRoute(item.path);
-
             return (
               <NavLink
                 key={item.path}
@@ -182,7 +156,6 @@ const MobileNav = () => {
                 {isActive && (
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full" />
                 )}
-
                 {}
                 <div
                   className={`
@@ -195,7 +168,6 @@ const MobileNav = () => {
                     aria-hidden="true"
                   />
                 </div>
-
                 {}
                 <span
                   className={`
@@ -206,7 +178,6 @@ const MobileNav = () => {
                 >
                   {item.label}
                 </span>
-
                 {}
                 {isActive && (
                   <div className="absolute inset-0 bg-blue-50 rounded-xl -z-10 scale-95" />
@@ -214,7 +185,6 @@ const MobileNav = () => {
               </NavLink>
             );
           })}
-
           {}
           <button
             onClick={toggleMoreMenu}
@@ -235,7 +205,6 @@ const MobileNav = () => {
             {isMoreMenuActive && (
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full" />
             )}
-
             {}
             <div
               className={`
@@ -255,7 +224,6 @@ const MobileNav = () => {
                 />
               )}
             </div>
-
             {}
             <span
               className={`
@@ -266,7 +234,6 @@ const MobileNav = () => {
             >
               More
             </span>
-
             {}
             {(isMoreMenuActive || isMoreMenuOpen) && (
               <div className="absolute inset-0 bg-blue-50 rounded-xl -z-10 scale-95" />
@@ -277,5 +244,4 @@ const MobileNav = () => {
     </>
   );
 };
-
 export default MobileNav;

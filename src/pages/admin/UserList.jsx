@@ -18,7 +18,6 @@ const UserList = () => {
   const { isAdmin, user: currentUser } = useAuth();
   const { showSuccess, showError, showInfo } = useContext(ToastContext);
 
-  
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,33 +25,24 @@ const UserList = () => {
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [viewMode, setViewMode] = useState('table'); 
-
-
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showToggleStatusModal, setShowToggleStatusModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState(null);
-
-  
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(15);
-
-  
   useEffect(() => {
     if (isAdmin) {
       fetchUsers();
     }
   }, [isAdmin]);
-
   const fetchUsers = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const response = await api.get('/users');
-      
       const usersData = response.data?.data?.users || response.data?.users || [];
       setUsers(Array.isArray(usersData) ? usersData : []);
     } catch (err) {
@@ -63,70 +53,54 @@ const UserList = () => {
       setLoading(false);
     }
   };
-
-  
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       !searchTerm ||
       user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchTerm.toLowerCase());
-
     const matchesRole = !roleFilter || user.role === roleFilter;
     const matchesStatus = !statusFilter || (statusFilter === 'active' ? user.isActive : !user.isActive);
-
     return matchesSearch && matchesRole && matchesStatus;
   });
-
-  
   const totalItems = filteredUsers.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-
   const handleSearch = (value) => {
     setSearchTerm(value);
     setCurrentPage(1); 
   };
-
   const handleRoleFilterChange = (e) => {
     setRoleFilter(e.target.value);
     setCurrentPage(1); 
   };
-
   const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
     setCurrentPage(1); 
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
   const handlePageSizeChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1); 
   };
-
   const handleAddUser = () => {
     navigate('/users/new');
   };
-
   const handleViewUser = (userId) => {
     navigate(`/users/${userId}`);
   };
-
   const handleEditUser = (userId) => {
     navigate(`/users/${userId}/edit`);
   };
-
   const handleResetPassword = (user) => {
     setSelectedUser(user);
     setShowResetPasswordModal(true);
   };
-
   const handleResetPasswordClose = (success) => {
     setShowResetPasswordModal(false);
     setSelectedUser(null);
@@ -134,29 +108,23 @@ const UserList = () => {
       fetchUsers(); 
     }
   };
-
   const handleDeleteUser = (user) => {
     setSelectedUser(user);
     setModalError(null);
     setShowDeleteModal(true);
   };
-
   const handleToggleStatus = (user) => {
     if (currentUser?._id === user._id) {
       showError('You cannot deactivate your own account');
       return;
     }
-
     setSelectedUser(user);
     setShowToggleStatusModal(true);
   };
-
   const confirmToggleStatus = async () => {
     if (!selectedUser) return;
-
     setModalLoading(true);
     setModalError(null);
-
     try {
       await api.patch(`/users/${selectedUser._id}/status`, { isActive: !selectedUser.isActive });
       showSuccess(`User ${selectedUser.isActive ? 'deactivated' : 'activated'} successfully`);
@@ -172,17 +140,14 @@ const UserList = () => {
       setModalLoading(false);
     }
   };
-
   const confirmDelete = async () => {
     if (currentUser?._id === selectedUser._id) {
       setModalError('You cannot delete your own account');
       showError('You cannot delete your own account');
       return;
     }
-
     setModalLoading(true);
     setModalError(null);
-
     try {
       await api.delete(`/users/${selectedUser._id}`);
       showSuccess(`User ${selectedUser.fullName} deleted successfully`);
@@ -198,15 +163,12 @@ const UserList = () => {
       setModalLoading(false);
     }
   };
-
   const getRoleBadgeVariant = (role) => {
     return role === 'admin' ? 'primary' : 'info';
   };
-
   const getStatusBadgeVariant = (isActive) => {
     return isActive ? 'success' : 'danger';
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return 'Never';
     const date = new Date(dateString);
@@ -218,7 +180,6 @@ const UserList = () => {
       minute: '2-digit',
     });
   };
-
   const getInitials = (fullName) => {
     if (!fullName) return '?';
     const names = fullName.split(' ');
@@ -227,20 +188,14 @@ const UserList = () => {
     }
     return fullName.substring(0, 2).toUpperCase();
   };
-
-  
   const roleOptions = [
     { value: 'admin', label: 'Admin' },
     { value: 'employee', label: 'Employee' },
   ];
-
-  
   const statusOptions = [
     { value: 'active', label: 'Active' },
     { value: 'inactive', label: 'Inactive' },
   ];
-
-  
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -254,8 +209,6 @@ const UserList = () => {
       </div>
     );
   }
-
-  
   if (loading && users.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -263,7 +216,6 @@ const UserList = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {}
@@ -283,7 +235,6 @@ const UserList = () => {
           </Button>
         </div>
       </div>
-
       {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="space-y-4">
@@ -296,7 +247,6 @@ const UserList = () => {
               fullWidth
             />
           </div>
-
           {}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {}
@@ -308,7 +258,6 @@ const UserList = () => {
               placeholder="All Roles"
               fullWidth
             />
-
             {}
             <Select
               name="status"
@@ -318,7 +267,6 @@ const UserList = () => {
               placeholder="All Statuses"
               fullWidth
             />
-
             {}
             {(searchTerm || roleFilter || statusFilter) && (
               <Button
@@ -332,7 +280,6 @@ const UserList = () => {
                 Clear Filters
               </Button>
             )}
-
             {}
             <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1">
               <button
@@ -369,7 +316,6 @@ const UserList = () => {
           </div>
         </div>
       </div>
-
       {}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -391,7 +337,6 @@ const UserList = () => {
           </div>
         </div>
       )}
-
       {}
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
@@ -540,7 +485,6 @@ const UserList = () => {
               </div>
             </div>
           )}
-
           {}
           {viewMode === 'card' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -558,14 +502,12 @@ const UserList = () => {
                       </div>
                     </div>
                   </div>
-
                   {}
                   <div className="p-4">
                     <div className="text-center mb-4">
                       <h3 className="text-lg font-semibold text-slate-900">{user.fullName || 'N/A'}</h3>
                       <p className="text-sm text-slate-500">@{user.username}</p>
                     </div>
-
                     <div className="space-y-3 mb-4">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-slate-500">Email:</span>
@@ -588,7 +530,6 @@ const UserList = () => {
                         <span className="text-slate-900 text-xs">{formatDate(user.lastLogin)}</span>
                       </div>
                     </div>
-
                     {}
                     <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2">
@@ -639,7 +580,6 @@ const UserList = () => {
               ))}
             </div>
           )}
-
           {}
           <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
             <Pagination
@@ -656,14 +596,12 @@ const UserList = () => {
           </div>
         </>
       )}
-
       {}
       <ResetPasswordModal
         isOpen={showResetPasswordModal}
         onClose={handleResetPasswordClose}
         user={selectedUser}
       />
-
       {}
       <Modal
         isOpen={showDeleteModal}
@@ -725,7 +663,6 @@ const UserList = () => {
                 </div>
               </div>
             </div>
-
             <div className="space-y-2">
               <p className="text-sm text-gray-700">
                 Are you sure you want to delete the following user?
@@ -753,7 +690,6 @@ const UserList = () => {
                 </div>
               </div>
             </div>
-
             {modalError && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                 <p className="text-sm text-red-800">{modalError}</p>
@@ -762,7 +698,6 @@ const UserList = () => {
           </div>
         )}
       </Modal>
-
       {}
       <Modal
         isOpen={showToggleStatusModal}
@@ -820,7 +755,6 @@ const UserList = () => {
                 </div>
               </div>
             </div>
-
             {modalError && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                 <p className="text-sm text-red-800">{modalError}</p>
@@ -832,5 +766,4 @@ const UserList = () => {
     </div>
   );
 };
-
 export default UserList;

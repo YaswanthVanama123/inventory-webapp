@@ -2,9 +2,7 @@ import api from './api';
 import { handleApiError } from './errorHandler';
 
 
-
 const userService = {
-  
   getAll: async (params = {}) => {
     try {
       const response = await api.get('/users', { params });
@@ -16,8 +14,6 @@ const userService = {
       });
     }
   },
-
-  
   getById: async (id) => {
     try {
       const response = await api.get(`/users/${id}`);
@@ -29,8 +25,6 @@ const userService = {
       });
     }
   },
-
-  
   create: async (userData) => {
     try {
       const response = await api.post('/users', userData);
@@ -43,8 +37,6 @@ const userService = {
       });
     }
   },
-
-  
   update: async (id, userData) => {
     try {
       const response = await api.put(`/users/${id}`, userData);
@@ -58,8 +50,6 @@ const userService = {
       });
     }
   },
-
-  
   delete: async (id) => {
     try {
       const response = await api.delete(`/users/${id}`);
@@ -72,8 +62,6 @@ const userService = {
       });
     }
   },
-
-  
   resetPassword: async (id, newPassword) => {
     try {
       const response = await api.post(`/users/${id}/reset-password`, {
@@ -88,8 +76,6 @@ const userService = {
       });
     }
   },
-
-  
   getByRole: async (role) => {
     try {
       const response = await api.get('/users', {
@@ -102,8 +88,6 @@ const userService = {
       });
     }
   },
-
-  
   getActive: async () => {
     try {
       const response = await api.get('/users', {
@@ -116,8 +100,6 @@ const userService = {
       });
     }
   },
-
-  
   getInactive: async () => {
     try {
       const response = await api.get('/users', {
@@ -131,5 +113,4 @@ const userService = {
     }
   },
 };
-
 export default userService;

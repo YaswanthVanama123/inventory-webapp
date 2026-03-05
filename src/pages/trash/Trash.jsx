@@ -16,12 +16,9 @@ const Trash = () => {
   useEffect(() => {
     fetchDeletedItems();
   }, []);
-
   const fetchDeletedItems = async () => {
     setLoading(true);
     try {
-      
-      
       setDeletedItems([]);
       showInfo('Trash feature coming soon');
     } catch (error) {
@@ -31,10 +28,8 @@ const Trash = () => {
       setLoading(false);
     }
   };
-
   const handleRestore = async (item) => {
     try {
-      
       showSuccess(`${item.name} restored successfully`);
       fetchDeletedItems();
     } catch (error) {
@@ -42,14 +37,11 @@ const Trash = () => {
       showError('Failed to restore item');
     }
   };
-
   const handlePermanentDelete = async (item) => {
     if (!window.confirm('Are you sure you want to permanently delete this item? This action cannot be undone.')) {
       return;
     }
-
     try {
-      
       showSuccess('Item permanently deleted');
       fetchDeletedItems();
     } catch (error) {
@@ -57,14 +49,11 @@ const Trash = () => {
       showError('Failed to delete item');
     }
   };
-
   const handleEmptyTrash = async () => {
     if (!window.confirm('Are you sure you want to empty the entire trash? This will permanently delete all items and cannot be undone.')) {
       return;
     }
-
     try {
-      
       showSuccess('Trash emptied successfully');
       fetchDeletedItems();
     } catch (error) {
@@ -72,13 +61,11 @@ const Trash = () => {
       showError('Failed to empty trash');
     }
   };
-
   const filteredItems = deletedItems.filter(item => {
     const matchesFilter = filter === 'all' || item.type === filter;
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -86,7 +73,6 @@ const Trash = () => {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-gray-900">
       <div className="container mx-auto px-6 lg:px-8 py-8 max-w-[1800px]">
@@ -102,7 +88,6 @@ const Trash = () => {
             Restore or permanently delete items
           </p>
         </div>
-
         {}
         <Card padding="lg" className="mb-6 border border-slate-200 dark:border-gray-700">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -118,7 +103,6 @@ const Trash = () => {
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                 />
               </div>
-
               {}
               <select
                 value={filter}
@@ -131,7 +115,6 @@ const Trash = () => {
                 <option value="users">Users</option>
               </select>
             </div>
-
             {}
             {deletedItems.length > 0 && (
               <Button
@@ -145,7 +128,6 @@ const Trash = () => {
             )}
           </div>
         </Card>
-
         {}
         {filteredItems.length === 0 ? (
           <Card padding="lg" className="text-center py-20 border border-slate-200 dark:border-gray-700">
@@ -184,7 +166,6 @@ const Trash = () => {
                       </p>
                     )}
                   </div>
-
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
@@ -210,7 +191,6 @@ const Trash = () => {
             ))}
           </div>
         )}
-
         {}
         <Card padding="lg" className="mt-8 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
           <div className="flex gap-3">
@@ -230,5 +210,4 @@ const Trash = () => {
     </div>
   );
 };
-
 export default Trash;

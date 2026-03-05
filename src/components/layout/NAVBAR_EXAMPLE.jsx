@@ -4,61 +4,51 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '../../contexts/AuthContext';
 import Navbar from './Navbar';
-
-
 const Dashboard = () => (
   <div className="p-6">
     <h1 className="text-2xl font-bold">Dashboard</h1>
     <p>Welcome to your dashboard</p>
   </div>
 );
-
 const Users = () => (
   <div className="p-6">
     <h1 className="text-2xl font-bold">Users Management</h1>
     <p>Manage system users (Admin only)</p>
   </div>
 );
-
 const Reports = () => (
   <div className="p-6">
     <h1 className="text-2xl font-bold">Reports</h1>
     <p>View and generate reports</p>
   </div>
 );
-
 const Analytics = () => (
   <div className="p-6">
     <h1 className="text-2xl font-bold">Analytics</h1>
     <p>System analytics and insights (Admin only)</p>
   </div>
 );
-
 const Settings = () => (
   <div className="p-6">
     <h1 className="text-2xl font-bold">Settings</h1>
     <p>Configure system settings</p>
   </div>
 );
-
 const Profile = () => (
   <div className="p-6">
     <h1 className="text-2xl font-bold">Profile</h1>
     <p>Manage your profile</p>
   </div>
 );
-
 const Tasks = () => (
   <div className="p-6">
     <h1 className="text-2xl font-bold">My Tasks</h1>
     <p>View and manage your assigned tasks</p>
   </div>
 );
-
 const SearchResults = () => {
   const queryParams = new URLSearchParams(window.location.search);
   const query = queryParams.get('q');
-
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold">Search Results</h1>
@@ -66,7 +56,6 @@ const SearchResults = () => {
     </div>
   );
 };
-
 const Login = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
     <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
@@ -92,34 +81,24 @@ const Login = () => (
     </div>
   </div>
 );
-
-
 function AppWithNavbar() {
   return (
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-gray-50">
           <Navbar />
-
           <main className="pt-16">
             <Routes>
               <Route path="/dashboard" element={<Dashboard />} />
-
               <Route path="/users" element={<Users />} />
               <Route path="/analytics" element={<Analytics />} />
-
               <Route path="/reports" element={<Reports />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/profile" element={<Profile />} />
-
               <Route path="/tasks" element={<Tasks />} />
-
               <Route path="/search" element={<SearchResults />} />
-
               <Route path="/login" element={<Login />} />
-
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
               <Route
                 path="*"
                 element={
@@ -136,15 +115,9 @@ function AppWithNavbar() {
     </AuthProvider>
   );
 }
-
-
-
-
 import { useAuth } from '../../hooks/useAuth';
-
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -155,11 +128,9 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
       </div>
     );
   }
-
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-
   if (requireAdmin && !isAdmin) {
     return (
       <div className="p-6 text-center">
@@ -168,21 +139,17 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
       </div>
     );
   }
-
   return children;
 };
-
 function AppWithProtectedRoutes() {
   return (
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-gray-50">
           <Navbar />
-
           <main className="pt-16">
             <Routes>
               <Route path="/login" element={<Login />} />
-
               <Route
                 path="/dashboard"
                 element={
@@ -207,7 +174,6 @@ function AppWithProtectedRoutes() {
                   </ProtectedRoute>
                 }
               />
-
               <Route
                 path="/users"
                 element={
@@ -232,7 +198,6 @@ function AppWithProtectedRoutes() {
                   </ProtectedRoute>
                 }
               />
-
               <Route
                 path="/tasks"
                 element={
@@ -241,7 +206,6 @@ function AppWithProtectedRoutes() {
                   </ProtectedRoute>
                 }
               />
-
               <Route
                 path="/search"
                 element={
@@ -250,9 +214,7 @@ function AppWithProtectedRoutes() {
                   </ProtectedRoute>
                 }
               />
-
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
               <Route
                 path="*"
                 element={
@@ -269,14 +231,12 @@ function AppWithProtectedRoutes() {
     </AuthProvider>
   );
 }
-
 function AppWithContainer() {
   return (
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-gray-50">
           <Navbar />
-
           <main className="pt-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <Routes>
@@ -298,7 +258,5 @@ function AppWithContainer() {
     </AuthProvider>
   );
 }
-
 export default AppWithNavbar;
-
 export { AppWithProtectedRoutes, AppWithContainer };

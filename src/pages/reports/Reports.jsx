@@ -23,7 +23,6 @@ const Reports = () => {
   useEffect(() => {
     fetchDashboardData();
   }, [dateRange]);
-
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -35,7 +34,6 @@ const Reports = () => {
       setLoading(false);
     }
   };
-
   const handleQuickDateRange = (days) => {
     const end = new Date();
     const start = subDays(end, days);
@@ -44,7 +42,6 @@ const Reports = () => {
       endDate: format(end, 'yyyy-MM-dd'),
     });
   };
-
   const handleThisMonth = () => {
     const now = new Date();
     setDateRange({
@@ -52,7 +49,6 @@ const Reports = () => {
       endDate: format(endOfMonth(now), 'yyyy-MM-dd'),
     });
   };
-
   const reportCards = [
     {
       title: 'Sales Report',
@@ -75,18 +71,14 @@ const Reports = () => {
         : 'Loading...',
     },
   ];
-
-  
   const getPreviewChartData = () => {
     if (!dashboardData?.recentSales) return [];
-
     return dashboardData.recentSales.slice(0, 7).map(item => ({
       date: format(new Date(item.date), 'MMM dd'),
       sales: item.sales || 0,
       orders: item.orders || 0,
     }));
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -94,11 +86,9 @@ const Reports = () => {
       </div>
     );
   }
-
   const chartData = getPreviewChartData();
   const summary = dashboardData?.summary || {};
   const lowStock = dashboardData?.lowStock || {};
-
   return (
     <div className="space-y-6">
       {}
@@ -108,7 +98,6 @@ const Reports = () => {
             <h1 className="text-3xl font-bold text-slate-900 mb-2">Reports</h1>
             <p className="text-slate-600">View and analyze business reports</p>
           </div>
-
           {}
           <div className="flex flex-wrap items-center gap-2">
             <Calendar className="w-5 h-5 text-slate-400" />
@@ -127,7 +116,6 @@ const Reports = () => {
             />
           </div>
         </div>
-
         {}
         <div className="mt-4 flex flex-wrap gap-2">
           <button
@@ -150,7 +138,6 @@ const Reports = () => {
           </button>
         </div>
       </div>
-
       {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm p-6 text-white">
@@ -165,7 +152,6 @@ const Reports = () => {
             {Number(summary.salesChange || 0) >= 0 ? '+' : ''}{Number(summary.salesChange || 0).toFixed(1)}% from last period
           </p>
         </div>
-
         <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg shadow-sm p-6 text-white">
           <div className="flex items-center justify-between mb-2">
             <p className="text-white">Total Profit</p>
@@ -178,7 +164,6 @@ const Reports = () => {
             {Number(summary.profitMargin || 0).toFixed(1)}% profit margin
           </p>
         </div>
-
         <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-sm p-6 text-white">
           <div className="flex items-center justify-between mb-2">
             <p className="text-white">Total Orders</p>
@@ -191,7 +176,6 @@ const Reports = () => {
             Avg: ${Number(summary.averageOrderValue || 0).toFixed(2)}
           </p>
         </div>
-
         <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg shadow-sm p-6 text-white">
           <div className="flex items-center justify-between mb-2">
             <p className="text-white">Low Stock Items</p>
@@ -205,7 +189,6 @@ const Reports = () => {
           </p>
         </div>
       </div>
-
       {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {}
@@ -253,7 +236,6 @@ const Reports = () => {
             )}
           </div>
         </div>
-
         {}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
           <div className="flex items-center justify-between mb-4">
@@ -294,7 +276,6 @@ const Reports = () => {
           </div>
         </div>
       </div>
-
       {}
       <div>
         <h2 className="text-xl font-semibold text-slate-900 mb-4">Detailed Reports</h2>
@@ -318,7 +299,6 @@ const Reports = () => {
               </div>
             );
           })}
-
           {}
           <div className="bg-slate-50 rounded-lg border-2 border-dashed border-slate-300 p-6 flex flex-col items-center justify-center text-center cursor-not-allowed opacity-60">
             <BarChart3 className="w-12 h-12 text-slate-400 mb-3" />
@@ -327,7 +307,6 @@ const Reports = () => {
           </div>
         </div>
       </div>
-
       {}
       {lowStock.count > 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
@@ -358,5 +337,4 @@ const Reports = () => {
     </div>
   );
 };
-
 export default Reports;

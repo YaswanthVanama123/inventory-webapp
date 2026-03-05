@@ -24,22 +24,17 @@ const FetchHistory = () => {
   const [statistics, setStatistics] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-
-  // Filters
   const [sourceFilter, setSourceFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [daysFilter, setDaysFilter] = useState('7');
-
   useEffect(() => {
     loadData();
     const interval = setInterval(loadData, 30000);
     return () => clearInterval(interval);
   }, [sourceFilter, statusFilter, daysFilter]);
-
   const loadData = async () => {
     try {
       setLoading(true);
-
       const params = {
         source: sourceFilter !== 'all' ? sourceFilter : null,
         status: statusFilter !== 'all' ? statusFilter : null,
@@ -47,14 +42,10 @@ const FetchHistory = () => {
         limit: 100,
         page: 1
       };
-
       const data = await fetchHistoryService.getPageData(params);
-
       setHistory(data?.history || []);
       setActiveFetches(data?.activeFetches || []);
       setStatistics(data?.summary || null);
-
-      // Auto-select first fetch if none selected
       if (!selectedFetch && data?.history?.length > 0) {
         setSelectedFetch(data.history[0]);
       }
@@ -65,13 +56,11 @@ const FetchHistory = () => {
       setLoading(false);
     }
   };
-
   const formatDuration = (ms) => {
     if (!ms) return '0s';
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
-
     if (hours > 0) {
       return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
     } else if (minutes > 0) {
@@ -80,14 +69,10 @@ const FetchHistory = () => {
       return `${seconds}s`;
     }
   };
-
   const getSourceLabel = (source, fetchType) => {
-    // Customer Connect always shows as Orders
     if (source === 'customer_connect') {
       return 'Orders';
     }
-
-    // RouteStar Invoices shows based on fetch type
     if (source === 'routestar_invoices') {
       if (fetchType === 'pending' || fetchType === 'pending_with_details') {
         return 'Pending Invoices';
@@ -97,15 +82,11 @@ const FetchHistory = () => {
         return 'Invoices';
       }
     }
-
-    // RouteStar Items
     if (source === 'routestar_items') {
       return 'Items';
     }
-
     return source;
   };
-
   const getStatusIcon = (status) => {
     switch (status) {
       case 'completed':
@@ -118,7 +99,6 @@ const FetchHistory = () => {
         return <ClockIcon className="w-4 h-4 text-gray-400" />;
     }
   };
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'completed':
@@ -131,60 +111,45 @@ const FetchHistory = () => {
         return 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700';
     }
   };
-
   const getStageData = (fetch) => {
     const stages = [];
     const totalDuration = fetch.duration || 0;
-
-    // Stage 1: Initialization
     stages.push({
       name: 'Initialize',
       duration: totalDuration * 0.05,
       status: fetch.status === 'failed' ? 'failed' : 'completed'
     });
-
-    // Stage 2: Data Fetch
     stages.push({
       name: 'Fetch Data',
       duration: totalDuration * 0.40,
       status: fetch.status === 'failed' && !fetch.results?.totalFetched ? 'failed' : 'completed'
     });
-
-    // Stage 3: Processing
     stages.push({
       name: 'Process',
       duration: totalDuration * 0.35,
       status: fetch.status === 'failed' ? 'failed' : 'completed'
     });
-
-    // Stage 4: Database Update
     stages.push({
       name: 'Database',
       duration: totalDuration * 0.15,
       status: fetch.status
     });
-
-    // Stage 5: Finalize
     stages.push({
       name: 'Finalize',
       duration: totalDuration * 0.05,
       status: fetch.status
     });
-
     return stages;
   };
-
   const filteredHistory = history.filter(fetch => {
     const matchesSearch = searchTerm === '' ||
       getSourceLabel(fetch.source, fetch.fetchType).toLowerCase().includes(searchTerm.toLowerCase()) ||
       fetch._id.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
-
   if (loading && history.length === 0) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="h-screen flex flex-col bg-slate-50 dark:bg-gray-900">
       {/* Header */}
@@ -218,7 +183,6 @@ const FetchHistory = () => {
             </Button>
           </div>
         </div>
-
         {/* Filters Panel */}
         {showFilters && (
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -238,7 +202,6 @@ const FetchHistory = () => {
                   <option value="routestar_items">RouteStar Items</option>
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Status
@@ -254,7 +217,6 @@ const FetchHistory = () => {
                   <option value="failed">Failed</option>
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Time Period
@@ -274,7 +236,6 @@ const FetchHistory = () => {
           </div>
         )}
       </div>
-
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar - Builds List */}
@@ -292,7 +253,6 @@ const FetchHistory = () => {
               />
             </div>
           </div>
-
           {/* Builds List */}
           <div className="flex-1 overflow-y-auto">
             {/* Active Fetches */}
@@ -331,7 +291,6 @@ const FetchHistory = () => {
                 ))}
               </div>
             )}
-
             {/* Historical Fetches */}
             <div className="p-2">
               <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 py-1">
@@ -377,7 +336,6 @@ const FetchHistory = () => {
             </div>
           </div>
         </div>
-
         {/* Right Content - Stage View */}
         <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-gray-900">
           {selectedFetch ? (
@@ -405,7 +363,6 @@ const FetchHistory = () => {
                     </div>
                   </div>
                 </div>
-
                 {/* Stats Grid */}
                 <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <div>
@@ -430,13 +387,11 @@ const FetchHistory = () => {
                   </div>
                 </div>
               </div>
-
               {/* Stage View */}
               <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
                   Stage View
                 </h3>
-
                 {/* Stage Timeline */}
                 <div className="space-y-4">
                   {getStageData(selectedFetch).map((stage, index) => (
@@ -461,7 +416,6 @@ const FetchHistory = () => {
                     </div>
                   ))}
                 </div>
-
                 {/* Average Times (if available) */}
                 <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                   <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -469,7 +423,6 @@ const FetchHistory = () => {
                   </div>
                 </div>
               </div>
-
               {/* Results Details */}
               {selectedFetch.results && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 mt-6">
@@ -508,7 +461,6 @@ const FetchHistory = () => {
                   </div>
                 </div>
               )}
-
               {/* Error Message */}
               {selectedFetch.errorMessage && (
                 <div className="bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 p-6 mt-6">
@@ -531,5 +483,4 @@ const FetchHistory = () => {
     </div>
   );
 };
-
 export default FetchHistory;

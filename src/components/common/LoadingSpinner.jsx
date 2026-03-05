@@ -22,7 +22,6 @@ const LoadingSpinner = ({
     green: 'border-green-600',
     red: 'border-red-600',
   };
-
   const spinner = (
     <div className={`flex flex-col items-center justify-center ${className}`}>
       <div
@@ -37,7 +36,6 @@ const LoadingSpinner = ({
       )}
     </div>
   );
-
   if (fullScreen) {
     return (
       <div className="fixed inset-0 bg-white dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75 flex items-center justify-center z-50 backdrop-blur-sm">
@@ -45,10 +43,8 @@ const LoadingSpinner = ({
       </div>
     );
   }
-
   return spinner;
 };
-
 LoadingSpinner.propTypes = {
   size: PropTypes.oneOf(['sm', 'md', 'lg', 'xl']),
   color: PropTypes.oneOf(['blue', 'gray', 'white', 'green', 'red']),
@@ -56,5 +52,4 @@ LoadingSpinner.propTypes = {
   text: PropTypes.string,
   className: PropTypes.string,
 };
-
 export default LoadingSpinner;

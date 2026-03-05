@@ -14,20 +14,12 @@ const ImageUpload = ({
   const { showToast } = useToast();
   const fileInputRef = useRef(null);
 
-  
   const [isDragging, setIsDragging] = useState(false);
-
-  
   const [uploadProgress, setUploadProgress] = useState({});
-
-  
   const [previews, setPreviews] = useState([]);
-
-  
   useEffect(() => {
     if (images && images.length > 0) {
       const newPreviews = images.map((img) => {
-        
         if (img instanceof File) {
           return {
             url: URL.createObjectURL(img),
@@ -36,7 +28,6 @@ const ImageUpload = ({
             size: img.size,
           };
         }
-        
         return {
           url: img,
           file: null,
@@ -49,12 +40,8 @@ const ImageUpload = ({
       setPreviews([]);
     }
   }, [images]);
-
-  
   const validateFile = (file) => {
     const errors = [];
-
-    
     if (!allowedTypes.includes(file.type)) {
       const allowedExtensions = allowedTypes
         .map((type) => type.split('/')[1])
@@ -63,21 +50,14 @@ const ImageUpload = ({
         `Invalid file type. Allowed types: ${allowedExtensions.toUpperCase()}`
       );
     }
-
-    
     const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
     if (file.size > maxSizeInBytes) {
       errors.push(`File size exceeds ${maxSizeInMB}MB limit`);
     }
-
     return errors;
   };
-
-  
   const processFiles = async (files) => {
     const fileArray = Array.from(files);
-
-    
     if (images.length + fileArray.length > maxImages) {
       showToast(
         `You can only upload up to ${maxImages} images. Currently: ${images.length}`,
@@ -85,11 +65,8 @@ const ImageUpload = ({
       );
       return;
     }
-
     const validFiles = [];
     const invalidFiles = [];
-
-    
     fileArray.forEach((file) => {
       const errors = validateFile(file);
       if (errors.length === 0) {
@@ -98,22 +75,15 @@ const ImageUpload = ({
         invalidFiles.push({ file, errors });
       }
     });
-
-    
     if (invalidFiles.length > 0) {
       invalidFiles.forEach(({ file, errors }) => {
         showToast(`${file.name}: ${errors.join(', ')}`, 'error');
       });
     }
-
-    
     if (validFiles.length > 0) {
-      
       const newProgress = {};
       validFiles.forEach((file, index) => {
         newProgress[file.name] = 0;
-
-        
         const interval = setInterval(() => {
           setUploadProgress((prev) => {
             const currentProgress = prev[file.name] || 0;
@@ -128,14 +98,9 @@ const ImageUpload = ({
           });
         }, 100);
       });
-
       setUploadProgress(newProgress);
-
-      
       const updatedImages = [...images, ...validFiles];
       onImagesChange(updatedImages);
-
-      
       setTimeout(() => {
         setUploadProgress({});
         showToast(
@@ -147,65 +112,48 @@ const ImageUpload = ({
       }, 1500);
     }
   };
-
-  
   const handleFileInputChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       processFiles(e.target.files);
       e.target.value = ''; 
     }
   };
-
-  
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
   };
-
   const handleDragLeave = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
   };
-
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
   };
-
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       processFiles(e.dataTransfer.files);
     }
   };
-
-  
   const handleRemoveImage = (index) => {
     const updatedImages = images.filter((_, i) => i !== index);
     onImagesChange(updatedImages);
-
-    
     if (primaryImageIndex === index) {
       onPrimaryImageChange(0);
     } else if (primaryImageIndex > index) {
       onPrimaryImageChange(primaryImageIndex - 1);
     }
-
     showToast('Image removed', 'info');
   };
-
-  
   const handleSetPrimary = (index) => {
     onPrimaryImageChange(index);
     showToast('Primary image updated', 'success');
   };
-
-  
   const getFileSizeDisplay = (bytes) => {
     if (bytes === 0) return '';
     const kb = bytes / 1024;
@@ -215,7 +163,6 @@ const ImageUpload = ({
     const mb = kb / 1024;
     return `${mb.toFixed(1)} MB`;
   };
-
   return (
     <div className="space-y-4">
       {}
@@ -244,7 +191,6 @@ const ImageUpload = ({
           className="hidden"
           disabled={images.length >= maxImages}
         />
-
         <div className="space-y-3">
           {}
           <div className="flex justify-center">
@@ -277,7 +223,6 @@ const ImageUpload = ({
               </svg>
             </div>
           </div>
-
           {}
           <div>
             <p className="text-base font-medium text-gray-700 dark:text-gray-300">
@@ -303,7 +248,6 @@ const ImageUpload = ({
           </div>
         </div>
       </div>
-
       {}
       {showProgress && Object.keys(uploadProgress).length > 0 && (
         <div className="space-y-2">
@@ -330,7 +274,6 @@ const ImageUpload = ({
           ))}
         </div>
       )}
-
       {}
       {previews.length > 0 && (
         <div>
@@ -358,7 +301,6 @@ const ImageUpload = ({
                     className="w-full h-full object-cover"
                   />
                 </div>
-
                 {}
                 {primaryImageIndex === index && (
                   <div className="absolute top-2 left-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md">
@@ -374,14 +316,12 @@ const ImageUpload = ({
                     </span>
                   </div>
                 )}
-
                 {}
                 {preview.file && (
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 text-center truncate">
                     {getFileSizeDisplay(preview.size)}
                   </div>
                 )}
-
                 {}
                 <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2">
                   {primaryImageIndex !== index && (
@@ -434,7 +374,6 @@ const ImageUpload = ({
           </div>
         </div>
       )}
-
       {}
       {previews.length === 0 && Object.keys(uploadProgress).length === 0 && (
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -457,5 +396,4 @@ const ImageUpload = ({
     </div>
   );
 };
-
 export default ImageUpload;

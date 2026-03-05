@@ -10,8 +10,6 @@ export const modelCategoryService = {
       throw new Error(error.message || 'Failed to fetch models');
     }
   },
-
-  
   async getRouteStarItems() {
     try {
       const response = await api.get('/model-category/routestar-items');
@@ -20,8 +18,6 @@ export const modelCategoryService = {
       throw new Error(error.message || 'Failed to fetch RouteStar items');
     }
   },
-
-  
   async saveMapping(data) {
     try {
       const response = await api.post('/model-category/mapping', data);
@@ -30,8 +26,6 @@ export const modelCategoryService = {
       throw new Error(error.message || 'Failed to save mapping');
     }
   },
-
-  
   async deleteMapping(modelNumber) {
     try {
       const response = await api.delete(`/model-category/mapping/${modelNumber}`);
@@ -40,8 +34,6 @@ export const modelCategoryService = {
       throw new Error(error.message || 'Failed to delete mapping');
     }
   },
-
-  
   async getAllMappings() {
     try {
       const response = await api.get('/model-category/mappings');
@@ -51,5 +43,4 @@ export const modelCategoryService = {
     }
   }
 };
-
 export default modelCategoryService;

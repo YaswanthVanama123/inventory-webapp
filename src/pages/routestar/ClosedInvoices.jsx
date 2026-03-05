@@ -40,12 +40,10 @@ const ClosedInvoices = () => {
   const [selectedInvoices, setSelectedInvoices] = useState([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [deletingBulk, setDeletingBulk] = useState(false);
-
   useEffect(() => {
     fetchInvoices();
     fetchInvoiceRange();
   }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, dateFrom, dateTo]);
-
   const fetchInvoiceRange = async () => {
     try {
       const response = await getInvoiceRange('closed');
@@ -56,39 +54,30 @@ const ClosedInvoices = () => {
       console.error('Error fetching invoice range:', err);
     }
   };
-
   const fetchInvoices = async () => {
     setLoading(true);
-
     try {
       const params = {
         page: currentPage,
         limit: itemsPerPage,
         invoiceType: 'closed',
       };
-
       if (statusFilter) {
         params.status = statusFilter;
       }
-
       if (stockProcessedFilter !== '') {
         params.stockProcessed = stockProcessedFilter;
       }
-
       if (dateFrom) {
         params.startDate = dateFrom;
       }
-
       if (dateTo) {
         params.endDate = dateTo;
       }
-
       if (searchTerm) {
         params.customer = searchTerm;
       }
-
       const response = await getInvoices(params);
-
       if (response?.success && response?.data) {
         setInvoices(response.data.invoices || []);
         setTotalPages(response.data.pagination?.pages || 1);
@@ -105,16 +94,13 @@ const ClosedInvoices = () => {
       setLoading(false);
     }
   };
-
   const handleSyncNew = async () => {
     if (!isAdmin) {
       showError('Only administrators can sync invoices');
       return;
     }
-
     const limit = syncLimit === 0 || syncLimit === '' ? 0 : parseInt(syncLimit);
     const isUnlimited = limit === 0;
-
     setSyncingNew(true);
     setSyncing(true);
     try {
@@ -136,16 +122,13 @@ const ClosedInvoices = () => {
       setSyncing(false);
     }
   };
-
   const handleSyncOld = async () => {
     if (!isAdmin) {
       showError('Only administrators can sync invoices');
       return;
     }
-
     const limit = syncLimit === 0 || syncLimit === '' ? 0 : parseInt(syncLimit);
     const isUnlimited = limit === 0;
-
     setSyncingOld(true);
     setSyncing(true);
     try {
@@ -167,24 +150,20 @@ const ClosedInvoices = () => {
       setSyncing(false);
     }
   };
-
   const handleSyncAll = async () => {
     if (!isAdmin) {
       showError('Only administrators can sync invoices');
       return;
     }
-
     setSyncingAll(true);
     setSyncing(true);
     try {
-      
       const response = await syncClosedInvoicesWithDetails(0, 'new');
       if (response.success) {
         const invoices = response.data.invoices || {};
         const details = response.data.details || {};
         const totalInvoices = (invoices.created || 0) + (invoices.updated || 0);
         const totalDetails = details.synced || 0;
-
         showSuccess(`Synced ${totalInvoices} invoices (${invoices.created || 0} created, ${invoices.updated || 0} updated) and ${totalDetails} details`);
         fetchInvoices();
         fetchInvoiceRange();
@@ -197,13 +176,11 @@ const ClosedInvoices = () => {
       setSyncing(false);
     }
   };
-
   const handleSyncDetails = async () => {
     if (!isAdmin) {
       showError('Only administrators can sync invoice details');
       return;
     }
-
     setSyncingDetails(true);
     setSyncing(true);
     try {
@@ -220,13 +197,11 @@ const ClosedInvoices = () => {
       setSyncing(false);
     }
   };
-
   const handleClearInvoices = async () => {
     if (!isAdmin) {
       showError('Only administrators can delete invoices');
       return;
     }
-
     setDeleting(true);
     try {
       const response = await deleteAllClosedInvoices();
@@ -243,32 +218,26 @@ const ClosedInvoices = () => {
       setDeleting(false);
     }
   };
-
   const handleSearch = (value) => {
     setSearchTerm(value);
     setCurrentPage(1);
   };
-
   const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
     setCurrentPage(1);
   };
-
   const handleStockProcessedFilterChange = (e) => {
     setStockProcessedFilter(e.target.value);
     setCurrentPage(1);
   };
-
   const handleDateFromChange = (e) => {
     setDateFrom(e.target.value);
     setCurrentPage(1);
   };
-
   const handleDateToChange = (e) => {
     setDateTo(e.target.value);
     setCurrentPage(1);
   };
-
   const handleClearFilters = () => {
     setSearchTerm('');
     setStatusFilter('');
@@ -277,21 +246,17 @@ const ClosedInvoices = () => {
     setDateTo('');
     setCurrentPage(1);
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
   const handlePageSizeChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
   };
-
   const handleViewInvoice = (invoiceNumber) => {
     navigate(`/invoices/routestar/${invoiceNumber}`);
   };
-
   const getStatusBadgeVariant = (status) => {
     const statusMap = {
       'Completed': 'success',
@@ -301,14 +266,12 @@ const ClosedInvoices = () => {
     };
     return statusMap[status] || 'secondary';
   };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount || 0);
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -321,7 +284,6 @@ const ClosedInvoices = () => {
       return 'Invalid Date';
     }
   };
-
   const handleCheckboxChange = (invoiceNumber) => {
     setSelectedInvoices(prev => {
       if (prev.includes(invoiceNumber)) {
@@ -331,7 +293,6 @@ const ClosedInvoices = () => {
       }
     });
   };
-
   const handleSelectAll = () => {
     if (selectedInvoices.length === invoices.length) {
       setSelectedInvoices([]);
@@ -339,7 +300,6 @@ const ClosedInvoices = () => {
       setSelectedInvoices(invoices.map(invoice => invoice.invoiceNumber));
     }
   };
-
   const handleBulkDelete = () => {
     if (selectedInvoices.length === 0) {
       showError('Please select invoices to delete');
@@ -347,14 +307,11 @@ const ClosedInvoices = () => {
     }
     setShowBulkDeleteModal(true);
   };
-
   const confirmBulkDelete = async () => {
     if (selectedInvoices.length === 0) return;
-
     setDeletingBulk(true);
     try {
       const response = await deleteBulkClosedInvoicesByNumbers(selectedInvoices);
-
       if (response.success) {
         showSuccess(`Successfully deleted ${response.data.deletedCount} invoice(s)`);
         setShowBulkDeleteModal(false);
@@ -371,7 +328,6 @@ const ClosedInvoices = () => {
       setDeletingBulk(false);
     }
   };
-
   if (loading && invoices.length === 0) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -379,7 +335,6 @@ const ClosedInvoices = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {}
@@ -532,7 +487,6 @@ const ClosedInvoices = () => {
             </div>
           )}
         </div>
-
         {}
         {isAdmin && showSyncOptions && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
@@ -565,7 +519,6 @@ const ClosedInvoices = () => {
                 <Button onClick={() => setSyncLimit(500)} variant="secondary" size="sm">500</Button>
               </div>
             </div>
-
             {}
             <div className="border-t border-blue-200 dark:border-blue-800 mt-4 pt-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -592,7 +545,6 @@ const ClosedInvoices = () => {
             </div>
           </div>
         )}
-
         {}
         {showDeleteConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -612,7 +564,6 @@ const ClosedInvoices = () => {
                   </p>
                 </div>
               </div>
-
               <div className="mb-6">
                 <p className="text-slate-700 dark:text-gray-300 mb-2">
                   Are you sure you want to delete all <strong>{totalItems} closed invoices</strong>?
@@ -623,7 +574,6 @@ const ClosedInvoices = () => {
                   </p>
                 </div>
               </div>
-
               <div className="flex gap-3 justify-end">
                 <Button
                   onClick={() => setShowDeleteConfirm(false)}
@@ -656,7 +606,6 @@ const ClosedInvoices = () => {
           </div>
         )}
       </div>
-
       {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -666,7 +615,6 @@ const ClosedInvoices = () => {
             placeholder="Search by customer..."
             className="w-full"
           />
-
           <Select
             value={statusFilter}
             onChange={handleStatusFilterChange}
@@ -678,7 +626,6 @@ const ClosedInvoices = () => {
             <option value="Closed">Closed</option>
             <option value="Cancelled">Cancelled</option>
           </Select>
-
           <Select
             value={stockProcessedFilter}
             onChange={handleStockProcessedFilterChange}
@@ -688,12 +635,10 @@ const ClosedInvoices = () => {
             <option value="true">Stock Processed</option>
             <option value="false">Not Processed</option>
           </Select>
-
           <Button onClick={handleClearFilters} variant="secondary" className="w-full">
             Clear Filters
           </Button>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
@@ -719,7 +664,6 @@ const ClosedInvoices = () => {
           </div>
         </div>
       </div>
-
       {}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
@@ -741,7 +685,6 @@ const ClosedInvoices = () => {
           </p>
         </div>
       </div>
-
       {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         {invoices.length === 0 ? (
@@ -778,7 +721,6 @@ const ClosedInvoices = () => {
                       Select All ({selectedInvoices.length}/{invoices.length})
                     </span>
                   </label>
-
                   {selectedInvoices.length > 0 && (
                     <Button
                       variant="danger"
@@ -795,7 +737,6 @@ const ClosedInvoices = () => {
                 </div>
               </div>
             )}
-
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-50 dark:bg-gray-700 border-b border-slate-200 dark:border-gray-600">
@@ -908,7 +849,6 @@ const ClosedInvoices = () => {
                 </tbody>
               </table>
             </div>
-
             {}
             <div className="border-t border-slate-200 dark:border-gray-700">
               <Pagination
@@ -923,7 +863,6 @@ const ClosedInvoices = () => {
           </>
         )}
       </div>
-
       {}
       {showBulkDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -943,7 +882,6 @@ const ClosedInvoices = () => {
                 </p>
               </div>
             </div>
-
             <div className="mb-6">
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
                 <div className="flex items-start">
@@ -960,7 +898,6 @@ const ClosedInvoices = () => {
                   </div>
                 </div>
               </div>
-
               <div className="space-y-2">
                 <p className="text-sm text-slate-700 dark:text-gray-300 font-medium">
                   Selected Invoices:
@@ -989,7 +926,6 @@ const ClosedInvoices = () => {
                 </div>
               </div>
             </div>
-
             <div className="flex gap-3 justify-end">
               <Button
                 onClick={() => setShowBulkDeleteModal(false)}
@@ -1024,5 +960,4 @@ const ClosedInvoices = () => {
     </div>
   );
 };
-
 export default ClosedInvoices;

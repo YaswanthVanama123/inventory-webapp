@@ -12,7 +12,6 @@ const Textarea = React.forwardRef(({
   const errorClasses = "border-red-500 focus:ring-red-500 focus:border-red-500";
 
   const textareaClasses = `${baseClasses} ${error ? errorClasses : normalClasses} ${className}`;
-
   return (
     <div className="w-full">
       {label && (
@@ -32,7 +31,5 @@ const Textarea = React.forwardRef(({
     </div>
   );
 });
-
 Textarea.displayName = 'Textarea';
-
 export default Textarea;

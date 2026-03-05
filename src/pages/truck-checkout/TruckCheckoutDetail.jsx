@@ -32,34 +32,24 @@ const TruckCheckoutDetail = () => {
   const [loading, setLoading] = useState(true);
   const [checkout, setCheckout] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
-
-  
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [invoiceNumbers, setInvoiceNumbers] = useState([]);
   const [currentInput, setCurrentInput] = useState('');
   const [invoiceType, setInvoiceType] = useState('closed');
   const [comparisonData, setComparisonData] = useState(null);
   const [checkWorkDone, setCheckWorkDone] = useState(false);
-
-  
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
-
-  
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  
   const [showAddInvoicesModal, setShowAddInvoicesModal] = useState(false);
   const [additionalInvoices, setAdditionalInvoices] = useState([]);
   const [additionalInput, setAdditionalInput] = useState('');
   const [additionalInvoiceType, setAdditionalInvoiceType] = useState('closed');
   const [additionalComparisonData, setAdditionalComparisonData] = useState(null);
   const [additionalCheckWorkDone, setAdditionalCheckWorkDone] = useState(false);
-
   useEffect(() => {
     loadCheckout();
   }, [id]);
-
   const loadCheckout = async () => {
     try {
       setLoading(true);
@@ -72,13 +62,11 @@ const TruckCheckoutDetail = () => {
       setLoading(false);
     }
   };
-
   const handleCheckWork = async () => {
     if (invoiceNumbers.length === 0) {
       showError('Please enter at least one invoice number');
       return;
     }
-
     try {
       setActionLoading('check-work');
       const response = await truckCheckoutService.checkWork(id, invoiceNumbers, invoiceType);
@@ -88,14 +76,11 @@ const TruckCheckoutDetail = () => {
       loadCheckout(); 
     } catch (error) {
       const errorData = error.response?.data;
-
-      
       if (errorData?.duplicateCheckouts && errorData.duplicateCheckouts.length > 0) {
         const duplicates = errorData.duplicateCheckouts;
         const duplicateDetails = duplicates.map(dup =>
           `${dup.employeeName} (Checkout #${dup.checkoutId}): ${dup.invoices.join(', ')}`
         ).join('\n');
-
         showError(
           `${errorData.message}\n\nDuplicate invoices found in:\n${duplicateDetails}`,
           10000
@@ -107,13 +92,11 @@ const TruckCheckoutDetail = () => {
       setActionLoading(null);
     }
   };
-
   const handleComplete = async () => {
     if (!checkWorkDone) {
       showError('Please click "Check Work" first to review the comparison');
       return;
     }
-
     try {
       setActionLoading('complete');
       await truckCheckoutService.completeCheckout(id, invoiceNumbers, invoiceType);
@@ -130,32 +113,26 @@ const TruckCheckoutDetail = () => {
       setActionLoading(null);
     }
   };
-
   const handleAddInvoice = (value) => {
     const trimmedValue = value.trim();
     if (trimmedValue && !invoiceNumbers.includes(trimmedValue)) {
       setInvoiceNumbers([...invoiceNumbers, trimmedValue]);
     }
   };
-
   const handleRemoveInvoice = (invoiceToRemove) => {
     setInvoiceNumbers(invoiceNumbers.filter(inv => inv !== invoiceToRemove));
   };
-
   const handleInvoiceInputKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       handleAddInvoice(currentInput);
       setCurrentInput('');
     } else if (e.key === 'Backspace' && currentInput === '' && invoiceNumbers.length > 0) {
-      
       setInvoiceNumbers(invoiceNumbers.slice(0, -1));
     }
   };
-
   const handleInvoiceInputChange = (e) => {
     const value = e.target.value;
-    
     if (value.includes(',')) {
       const parts = value.split(',').map(p => p.trim()).filter(p => p);
       parts.forEach(part => handleAddInvoice(part));
@@ -164,19 +141,16 @@ const TruckCheckoutDetail = () => {
       setCurrentInput(value);
     }
   };
-
   const handleInvoiceInputBlur = () => {
     if (currentInput.trim()) {
       handleAddInvoice(currentInput);
       setCurrentInput('');
     }
   };
-
   const handleTally = async () => {
     try {
       setActionLoading('tally');
       const response = await truckCheckoutService.tallyCheckout(id);
-
       const { summary } = response.data;
       showSuccess(
         `Tally completed! Fetched ${summary.fetchedInvoices}/${summary.totalInvoices} invoices. ` +
@@ -189,14 +163,11 @@ const TruckCheckoutDetail = () => {
       setActionLoading(null);
     }
   };
-
   const handleProcessStock = async () => {
     try {
       setActionLoading('stock');
       const response = await truckCheckoutService.processStock(id);
-
       const { soldAdjustments, usedMovements, errors } = response.data;
-
       showSuccess(
         `Stock movements processed successfully! ` +
         `Added back ${soldAdjustments} sold items, tracked ${usedMovements} used items.` +
@@ -209,7 +180,6 @@ const TruckCheckoutDetail = () => {
       setActionLoading(null);
     }
   };
-
   const handleCancel = async () => {
     try {
       setActionLoading('cancel');
@@ -224,11 +194,9 @@ const TruckCheckoutDetail = () => {
       setActionLoading(null);
     }
   };
-
   const handleDelete = () => {
     setShowDeleteModal(true);
   };
-
   const confirmDelete = async () => {
     try {
       setActionLoading('delete');
@@ -242,8 +210,6 @@ const TruckCheckoutDetail = () => {
       setShowDeleteModal(false);
     }
   };
-
-  
   const handleAddMoreInvoices = () => {
     setShowAddInvoicesModal(true);
     setAdditionalInvoices([]);
@@ -252,18 +218,15 @@ const TruckCheckoutDetail = () => {
     setAdditionalComparisonData(null);
     setAdditionalCheckWorkDone(false);
   };
-
   const handleAddAdditionalInvoice = (value) => {
     const trimmedValue = value.trim();
     if (trimmedValue && !additionalInvoices.includes(trimmedValue)) {
       setAdditionalInvoices([...additionalInvoices, trimmedValue]);
     }
   };
-
   const handleRemoveAdditionalInvoice = (invoiceToRemove) => {
     setAdditionalInvoices(additionalInvoices.filter(inv => inv !== invoiceToRemove));
   };
-
   const handleAdditionalInvoiceInputKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
@@ -273,7 +236,6 @@ const TruckCheckoutDetail = () => {
       setAdditionalInvoices(additionalInvoices.slice(0, -1));
     }
   };
-
   const handleAdditionalInvoiceInputChange = (e) => {
     const value = e.target.value;
     if (value.includes(',')) {
@@ -284,23 +246,19 @@ const TruckCheckoutDetail = () => {
       setAdditionalInput(value);
     }
   };
-
   const handleAdditionalInvoiceInputBlur = () => {
     if (additionalInput.trim()) {
       handleAddAdditionalInvoice(additionalInput);
       setAdditionalInput('');
     }
   };
-
   const handleCheckAdditionalWork = async () => {
     if (additionalInvoices.length === 0) {
       showError('Please enter at least one invoice number');
       return;
     }
-
     try {
       setActionLoading('check-additional-work');
-      
       const allInvoices = [...(checkout.invoiceNumbers || []), ...additionalInvoices];
       const response = await truckCheckoutService.checkWork(id, allInvoices, additionalInvoiceType);
       showSuccess('Invoices fetched successfully. Review the comparison below.');
@@ -321,24 +279,16 @@ const TruckCheckoutDetail = () => {
       setActionLoading(null);
     }
   };
-
   const handleUpdateWithAdditionalInvoices = async () => {
     if (!additionalCheckWorkDone) {
       showError('Please click "Check Work" first to review the comparison');
       return;
     }
-
     try {
       setActionLoading('update-invoices');
-      
       const allInvoices = [...(checkout.invoiceNumbers || []), ...additionalInvoices];
-
-      
       await truckCheckoutService.completeCheckout(id, allInvoices, additionalInvoiceType);
-
-      
       await truckCheckoutService.tallyCheckout(id);
-
       showSuccess('Checkout updated successfully with additional invoices and tally completed');
       setShowAddInvoicesModal(false);
       setAdditionalInvoices([]);
@@ -352,16 +302,13 @@ const TruckCheckoutDetail = () => {
       setActionLoading(null);
     }
   };
-
   const getStatusBadge = (status) => {
     const config = {
       checked_out: { variant: 'warning', label: 'Checked Out', icon: ClockIcon },
       completed: { variant: 'success', label: 'Completed', icon: CheckCircleIcon },
       cancelled: { variant: 'danger', label: 'Cancelled', icon: XCircleIcon }
     };
-
     const { variant, label, icon: Icon } = config[status] || config.checked_out;
-
     return (
       <Badge variant={variant} size="lg">
         <Icon className="w-5 h-5 mr-2" />
@@ -369,7 +316,6 @@ const TruckCheckoutDetail = () => {
       </Badge>
     );
   };
-
   const formatDate = (date) => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleString('en-US', {
@@ -380,11 +326,9 @@ const TruckCheckoutDetail = () => {
       minute: '2-digit'
     });
   };
-
   if (loading) {
     return <LoadingSpinner />;
   }
-
   if (!checkout) {
     return (
       <div className="p-6">
@@ -397,11 +341,9 @@ const TruckCheckoutDetail = () => {
       </div>
     );
   }
-
   const hasTally = checkout.tallyResults && checkout.tallyResults.discrepancies && checkout.tallyResults.discrepancies.length > 0;
   const canTally = checkout.status === 'completed' && checkout.invoiceNumbers && checkout.invoiceNumbers.length > 0;
   const canProcessStock = hasTally && !checkout.stockProcessed;
-
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       {}
@@ -432,7 +374,6 @@ const TruckCheckoutDetail = () => {
         </div>
         {getStatusBadge(checkout.status)}
       </div>
-
       {}
       {checkout.status === 'checked_out' && (
         <Card>
@@ -465,7 +406,6 @@ const TruckCheckoutDetail = () => {
           </div>
         </Card>
       )}
-
       {checkout.status === 'completed' && (
         <Card>
           <div className="flex items-center gap-3 flex-wrap">
@@ -522,7 +462,6 @@ const TruckCheckoutDetail = () => {
           )}
         </Card>
       )}
-
       {checkout.status === 'cancelled' && (
         <Card>
           <div className="flex items-center gap-3 flex-wrap">
@@ -537,7 +476,6 @@ const TruckCheckoutDetail = () => {
           </div>
         </Card>
       )}
-
       {}
       <Card>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -574,7 +512,6 @@ const TruckCheckoutDetail = () => {
           </div>
         )}
       </Card>
-
       {}
       <Card>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -616,7 +553,6 @@ const TruckCheckoutDetail = () => {
                   </td>
                 </tr>
               ) : (
-                
                 checkout.itemsTaken?.map((item, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
@@ -649,7 +585,6 @@ const TruckCheckoutDetail = () => {
           </table>
         </div>
       </Card>
-
       {}
       {checkout.invoiceNumbers && checkout.invoiceNumbers.length > 0 && (
         <Card>
@@ -676,7 +611,6 @@ const TruckCheckoutDetail = () => {
           </div>
         </Card>
       )}
-
       {}
       {hasTally && (
         <Card>
@@ -684,7 +618,6 @@ const TruckCheckoutDetail = () => {
             <CalculatorIcon className="w-6 h-6" />
             Tally Results
           </h2>
-
           {}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
@@ -715,7 +648,6 @@ const TruckCheckoutDetail = () => {
               </p>
             </div>
           </div>
-
           {}
           {checkout.tallyResults.discrepancies && checkout.tallyResults.discrepancies.length > 0 && (
             <>
@@ -787,7 +719,6 @@ const TruckCheckoutDetail = () => {
           )}
         </Card>
       )}
-
       {}
       <Modal
         isOpen={showCompleteModal}
@@ -846,7 +777,6 @@ const TruckCheckoutDetail = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Invoice Numbers
                 </label>
-
                 {}
                 <div className="min-h-[120px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
                   <div className="flex flex-wrap gap-2 mb-2">
@@ -876,12 +806,10 @@ const TruckCheckoutDetail = () => {
                     />
                   </div>
                 </div>
-
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Press Enter or comma to add multiple invoice numbers. Click × to remove. You can add as many invoices as needed.
                 </p>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Invoice Type
@@ -894,20 +822,17 @@ const TruckCheckoutDetail = () => {
                   <option value="pending">Pending Invoices</option>
                 </Select>
               </div>
-
               <Alert variant="info" title="Next Steps">
                 Click "Check Work" to fetch invoices and compare quantities with checked out items.
               </Alert>
             </>
           )}
-
           {}
           {checkWorkDone && comparisonData && (
             <>
               <Alert variant="success" title="Invoices Fetched">
                 {comparisonData.summary.fetchedInvoices} of {comparisonData.summary.totalInvoices} invoices fetched successfully. Review the comparison below.
               </Alert>
-
               {}
               <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                 <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
@@ -916,7 +841,6 @@ const TruckCheckoutDetail = () => {
                     Matched: {comparisonData.summary.matched} | Discrepancies: {comparisonData.summary.discrepancies}
                   </p>
                 </div>
-
                 <div className="overflow-x-auto max-h-96">
                   <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
@@ -956,7 +880,6 @@ const TruckCheckoutDetail = () => {
                   </table>
                 </div>
               </div>
-
               <Alert variant="warning" title="Important">
                 Review the comparison carefully. Click "Complete Checkout" to finalize. Stock movements will be recorded without double-decreasing inventory.
               </Alert>
@@ -964,7 +887,6 @@ const TruckCheckoutDetail = () => {
           )}
         </div>
       </Modal>
-
       {}
       <Modal
         isOpen={showCancelModal}
@@ -1006,7 +928,6 @@ const TruckCheckoutDetail = () => {
           </div>
         </div>
       </Modal>
-
       {}
       <Modal
         isOpen={showDeleteModal}
@@ -1035,7 +956,6 @@ const TruckCheckoutDetail = () => {
           This will permanently delete this checkout. This action cannot be undone!
         </Alert>
       </Modal>
-
       {}
       <Modal
         isOpen={showAddInvoicesModal}
@@ -1093,12 +1013,10 @@ const TruckCheckoutDetail = () => {
               <Alert variant="info" title="Current Invoices">
                 This checkout already has {checkout.invoiceNumbers?.length || 0} invoice(s): {checkout.invoiceNumbers?.join(', ')}
               </Alert>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Additional Invoice Numbers
                 </label>
-
                 {}
                 <div className="min-h-[120px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
                   <div className="flex flex-wrap gap-2 mb-2">
@@ -1128,12 +1046,10 @@ const TruckCheckoutDetail = () => {
                     />
                   </div>
                 </div>
-
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Press Enter or comma to add multiple invoice numbers. Click × to remove. You can add as many invoices as needed.
                 </p>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Invoice Type
@@ -1146,20 +1062,17 @@ const TruckCheckoutDetail = () => {
                   <option value="pending">Pending Invoices</option>
                 </Select>
               </div>
-
               <Alert variant="info" title="Next Steps">
                 Click "Check Work" to fetch the additional invoices and see the updated comparison.
               </Alert>
             </>
           )}
-
           {}
           {additionalCheckWorkDone && additionalComparisonData && (
             <>
               <Alert variant="success" title="Invoices Fetched">
                 Total of {additionalComparisonData.summary.totalInvoices} invoices ({checkout.invoiceNumbers?.length || 0} existing + {additionalInvoices.length} new). Review the updated comparison below.
               </Alert>
-
               {}
               <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                 <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
@@ -1168,7 +1081,6 @@ const TruckCheckoutDetail = () => {
                     Matched: {additionalComparisonData.summary.matched} | Discrepancies: {additionalComparisonData.summary.discrepancies}
                   </p>
                 </div>
-
                 <div className="overflow-x-auto max-h-96">
                   <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
@@ -1208,7 +1120,6 @@ const TruckCheckoutDetail = () => {
                   </table>
                 </div>
               </div>
-
               <Alert variant="warning" title="Important">
                 This will update the checkout with all invoices and recalculate the tally. Click "Update Checkout" to finalize.
               </Alert>
@@ -1219,5 +1130,4 @@ const TruckCheckoutDetail = () => {
     </div>
   );
 };
-
 export default TruckCheckoutDetail;

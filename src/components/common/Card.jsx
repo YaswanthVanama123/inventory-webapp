@@ -21,7 +21,6 @@ const Card = ({
 
   const baseStyles = 'bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 transition-shadow duration-200';
   const hoverStyles = hover ? 'hover:shadow-lg cursor-pointer' : '';
-
   return (
     <div
       className={`${baseStyles} ${hoverStyles} ${className}`}
@@ -48,11 +47,9 @@ const Card = ({
           )}
         </div>
       )}
-
       <div className={paddingStyles[padding]}>
         {children}
       </div>
-
       {footer && (
         <div className={`border-t border-gray-200 dark:border-gray-700 ${paddingStyles[padding]} bg-gray-50 dark:bg-gray-900/50 rounded-b-lg`}>
           {footer}
@@ -61,7 +58,6 @@ const Card = ({
     </div>
   );
 };
-
 Card.propTypes = {
   children: PropTypes.node.isRequired,
   title: PropTypes.string,
@@ -72,5 +68,4 @@ Card.propTypes = {
   hover: PropTypes.bool,
   className: PropTypes.string,
 };
-
 export default Card;

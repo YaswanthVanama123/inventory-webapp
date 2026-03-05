@@ -24,20 +24,16 @@ const EmployeeCheckouts = () => {
   const [loading, setLoading] = useState(true);
   const [checkouts, setCheckouts] = useState([]);
   const [stats, setStats] = useState(null);
-
   useEffect(() => {
     loadData();
   }, [employeeName]);
-
   const loadData = async () => {
     try {
       setLoading(true);
-
       const [checkoutsResponse, statsResponse] = await Promise.all([
         truckCheckoutService.getEmployeeCheckouts(employeeName, 100),
         truckCheckoutService.getEmployeeStats(employeeName)
       ]);
-
       setCheckouts(checkoutsResponse.data || []);
       setStats(statsResponse.data);
     } catch (error) {
@@ -47,16 +43,13 @@ const EmployeeCheckouts = () => {
       setLoading(false);
     }
   };
-
   const getStatusBadge = (status) => {
     const config = {
       checked_out: { variant: 'warning', label: 'Checked Out', icon: ClockIcon },
       completed: { variant: 'success', label: 'Completed', icon: CheckCircleIcon },
       cancelled: { variant: 'danger', label: 'Cancelled', icon: XCircleIcon }
     };
-
     const { variant, label, icon: Icon } = config[status] || config.checked_out;
-
     return (
       <Badge variant={variant}>
         <Icon className="w-4 h-4 mr-1" />
@@ -64,7 +57,6 @@ const EmployeeCheckouts = () => {
       </Badge>
     );
   };
-
   const formatDate = (date) => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleString('en-US', {
@@ -75,11 +67,9 @@ const EmployeeCheckouts = () => {
       minute: '2-digit'
     });
   };
-
   if (loading) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       {}
@@ -107,7 +97,6 @@ const EmployeeCheckouts = () => {
           </div>
         </div>
       </div>
-
       {}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -123,7 +112,6 @@ const EmployeeCheckouts = () => {
               </div>
             </div>
           </div>
-
           {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between">
@@ -136,7 +124,6 @@ const EmployeeCheckouts = () => {
               </div>
             </div>
           </div>
-
           {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between">
@@ -149,7 +136,6 @@ const EmployeeCheckouts = () => {
               </div>
             </div>
           </div>
-
           {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between">
@@ -164,13 +150,11 @@ const EmployeeCheckouts = () => {
           </div>
         </div>
       )}
-
       {}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Checkout History ({checkouts.length} records)
         </h2>
-
         {checkouts.length === 0 ? (
           <div className="text-center py-12">
             <TruckIcon className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
@@ -198,7 +182,6 @@ const EmployeeCheckouts = () => {
                     </Badge>
                   )}
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Items Taken</p>
@@ -209,7 +192,6 @@ const EmployeeCheckouts = () => {
                       </span>
                     </p>
                   </div>
-
                   {checkout.invoiceNumbers && checkout.invoiceNumbers.length > 0 && (
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Invoices</p>
@@ -227,7 +209,6 @@ const EmployeeCheckouts = () => {
                       </div>
                     </div>
                   )}
-
                   {checkout.stockProcessed && (
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Stock Status</p>
@@ -238,7 +219,6 @@ const EmployeeCheckouts = () => {
                     </div>
                   )}
                 </div>
-
                 {checkout.notes && (
                   <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -254,5 +234,4 @@ const EmployeeCheckouts = () => {
     </div>
   );
 };
-
 export default EmployeeCheckouts;

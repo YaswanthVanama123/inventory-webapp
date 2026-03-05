@@ -15,90 +15,68 @@ const Login = () => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
-  
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
       window.location.href = '/dashboard';
     }
   }, [isAuthenticated, authLoading]);
-
   const validateForm = () => {
     const errors = {};
-
     if (!formData.username.trim()) {
       errors.username = 'Username is required';
     } else if (formData.username.length < 3) {
       errors.username = 'Username must be at least 3 characters';
     }
-
     if (!formData.password) {
       errors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       errors.password = 'Password must be at least 6 characters';
     }
-
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
-    
     if (fieldErrors[name]) {
       setFieldErrors((prev) => ({
         ...prev,
         [name]: '',
       }));
     }
-
-    
     if (error) {
       setError('');
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
-
     try {
       let result;
-
-      
       if (loginType === 'admin') {
         result = await authService.loginAdmin(formData.username, formData.password);
       } else {
         result = await authService.loginEmployee(formData.username, formData.password);
       }
-
       if (result.success) {
-        
         if (rememberMe) {
           localStorage.setItem('rememberMe', 'true');
         } else {
           localStorage.removeItem('rememberMe');
         }
-
-        
         if (setUser && result.data?.user) {
           setUser(result.data.user);
         }
         if (setIsAuthenticated) {
           setIsAuthenticated(true);
         }
-
-        
         window.location.href = '/dashboard';
       } else {
         setError(result.error || 'Invalid credentials. Please try again.');
@@ -110,7 +88,6 @@ const Login = () => {
       setLoading(false);
     }
   };
-
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -118,18 +95,15 @@ const Login = () => {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 relative">
       {}
       <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] opacity-20"></div>
-
       <div className="max-w-md w-full space-y-6 relative z-10">
         {}
         <div className="bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
           {}
           <div className="h-2 bg-gradient-to-r from-blue-600 to-blue-500"></div>
-
           <div className="p-8 sm:p-10">
             {}
             <div className="text-center mb-8">
@@ -155,7 +129,6 @@ const Login = () => {
               Sign in to access your dashboard
             </p>
           </div>
-
           {}
           <div className="flex rounded-lg bg-slate-100 p-1 mb-6">
             <button
@@ -219,7 +192,6 @@ const Login = () => {
               </div>
             </button>
           </div>
-
           {}
           {error && (
             <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200">
@@ -239,7 +211,6 @@ const Login = () => {
               </div>
             </div>
           )}
-
           {}
           <form onSubmit={handleSubmit} className="space-y-6">
             {}
@@ -287,7 +258,6 @@ const Login = () => {
                 <p className="mt-1 text-sm text-red-600">{fieldErrors.username}</p>
               )}
             </div>
-
             {}
             <div>
               <label
@@ -365,7 +335,6 @@ const Login = () => {
                 <p className="mt-1 text-sm text-red-600">{fieldErrors.password}</p>
               )}
             </div>
-
             {}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
@@ -385,7 +354,6 @@ const Login = () => {
                   Remember me
                 </label>
               </div>
-
               <div className="text-sm">
                 <a
                   href="/forgot-password"
@@ -395,7 +363,6 @@ const Login = () => {
                 </a>
               </div>
             </div>
-
             {}
             <div>
               <button
@@ -448,7 +415,6 @@ const Login = () => {
               </button>
             </div>
           </form>
-
           {}
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-600">
@@ -463,14 +429,12 @@ const Login = () => {
           </div>
         </div>
       </div>
-
       <div className="text-center">
         <p className="text-xs text-slate-500">
           Protected by enterprise-grade security
         </p>
       </div>
     </div>
-
     <style>{`
       .bg-grid-slate-100 {
         background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http:
@@ -479,5 +443,4 @@ const Login = () => {
   </div>
 );
 };
-
 export default Login;

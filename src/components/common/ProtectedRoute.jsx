@@ -8,7 +8,6 @@ import UnauthorizedPage from './UnauthorizedPage';
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
   const { user, loading, isAuthenticated } = useAuth();
 
-  
   if (loading) {
     return (
       <LoadingSpinner
@@ -19,35 +18,23 @@ const ProtectedRoute = ({ element, allowedRoles = [] }) => {
       />
     );
   }
-
-  
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-
-  
   if (!allowedRoles || allowedRoles.length === 0) {
     return element;
   }
-
-  
   const userRole = user?.role?.toLowerCase();
   const hasRequiredRole = allowedRoles.some(
     (role) => role.toLowerCase() === userRole
   );
-
-  
   if (!hasRequiredRole) {
     return <UnauthorizedPage userRole={userRole} requiredRoles={allowedRoles} />;
   }
-
-  
   return element;
 };
-
 ProtectedRoute.propTypes = {
   element: PropTypes.element.isRequired,
   allowedRoles: PropTypes.arrayOf(PropTypes.string),
 };
-
 export default ProtectedRoute;

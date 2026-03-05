@@ -25,8 +25,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
   });
 
   const [errors, setErrors] = useState({});
-
-  
   useEffect(() => {
     if (inventoryItem) {
       setFormData(prev => ({
@@ -39,7 +37,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
       }));
     }
   }, [inventoryItem]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -47,43 +44,32 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
-
   const validate = () => {
     const newErrors = {};
-
     if (!formData.quantity || formData.quantity <= 0) {
       newErrors.quantity = 'Quantity must be greater than 0';
     }
-
     if (!formData.purchasePrice || formData.purchasePrice <= 0) {
       newErrors.purchasePrice = 'Purchase price must be greater than 0';
     }
-
     if (!formData.sellingPrice || formData.sellingPrice <= 0) {
       newErrors.sellingPrice = 'Selling price must be greater than 0';
     }
-
     if (!formData.supplierName.trim()) {
       newErrors.supplierName = 'Supplier name is required';
     }
-
     if (!formData.purchaseDate) {
       newErrors.purchaseDate = 'Purchase date is required';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validate()) {
       return;
     }
-
     setLoading(true);
-
     try {
       const submitData = {
         purchaseDate: formData.purchaseDate,
@@ -100,15 +86,10 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
         expiryDate: formData.expiryDate || null,
         notes: formData.notes,
       };
-
-      
       await api.post(`/inventory/${inventoryItem._id}/purchases`, submitData);
-
       showSuccess('Purchase added successfully');
       onSuccess();
       onClose();
-
-      
       setFormData({
         purchaseDate: new Date().toISOString().split('T')[0],
         quantity: '',
@@ -129,11 +110,9 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
       setLoading(false);
     }
   };
-
   const totalCost = (formData.quantity && formData.purchasePrice)
     ? (parseFloat(formData.quantity) * parseFloat(formData.purchasePrice)).toFixed(2)
     : '0.00';
-
   return (
     <Modal
       isOpen={isOpen}
@@ -163,7 +142,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
             required
             fullWidth
           />
-
           <Input
             label={`Quantity (${inventoryItem?.quantity?.unit || 'units'})`}
             type="number"
@@ -177,7 +155,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
             min="0"
             step="0.01"
           />
-
           <Input
             label="Purchase Price (per unit)"
             type="number"
@@ -191,7 +168,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
             min="0"
             step="0.01"
           />
-
           <div className="flex items-end">
             <div className="w-full p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">Total Cost</span>
@@ -199,14 +175,12 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
             </div>
           </div>
         </div>
-
         {}
         <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
           <div className="flex items-center gap-2 mb-3">
             <DollarSign className="w-5 h-5 text-blue-600" />
             <h4 className="text-sm font-semibold text-gray-900 dark:text-white">Selling Price</h4>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label="Selling Price (per unit)"
@@ -222,7 +196,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
               step="0.01"
               helperText="Enter the price at which you'll sell this item"
             />
-
             {}
             {formData.sellingPrice && formData.purchasePrice && (
               <div className="flex items-end">
@@ -242,7 +215,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
             )}
           </div>
         </div>
-
         <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
           <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Supplier Information</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -256,7 +228,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
               required
               fullWidth
             />
-
             <Input
               label="Contact Person"
               name="contactPerson"
@@ -265,7 +236,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
               placeholder="Enter contact person"
               fullWidth
             />
-
             <Input
               label="Email"
               type="email"
@@ -275,7 +245,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
               placeholder="supplier@example.com"
               fullWidth
             />
-
             <Input
               label="Phone"
               type="tel"
@@ -286,7 +255,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
               fullWidth
             />
           </div>
-
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Address
@@ -301,7 +269,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
             />
           </div>
         </div>
-
         <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
           <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Additional Details</h4>
           <div className="grid grid-cols-1 gap-4">
@@ -314,7 +281,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
               fullWidth
             />
           </div>
-
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Notes
@@ -333,5 +299,4 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
     </Modal>
   );
 };
-
 export default AddPurchaseModal;

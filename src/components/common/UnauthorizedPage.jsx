@@ -11,16 +11,13 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
   const handleGoBack = () => {
     navigate(-1);
   };
-
   const handleGoHome = () => {
     navigate('/');
   };
-
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 text-center">
@@ -43,7 +40,6 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
             </svg>
           </div>
         </div>
-
         {}
         <div>
           <h1 className="text-6xl font-bold text-gray-900 dark:text-white">
@@ -53,13 +49,11 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
             Access Denied
           </h2>
         </div>
-
         {}
         <div className="space-y-2">
           <p className="text-base text-gray-600 dark:text-gray-400">
             You don't have permission to access this page.
           </p>
-
           {userRole && requiredRoles.length > 0 && (
             <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mt-4">
               <p className="text-sm text-yellow-800 dark:text-yellow-200">
@@ -75,7 +69,6 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
             </div>
           )}
         </div>
-
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
           <Button
             onClick={handleGoBack}
@@ -98,7 +91,6 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
             </svg>
             Go Back
           </Button>
-
           <Button
             onClick={handleGoHome}
             variant="primary"
@@ -120,7 +112,6 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
             </svg>
             Go Home
           </Button>
-
           <Button
             onClick={handleLogout}
             variant="danger"
@@ -143,7 +134,6 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
             Logout
           </Button>
         </div>
-
         <p className="text-xs text-gray-500 dark:text-gray-500 mt-6">
           If you believe this is a mistake, please contact your administrator.
         </p>
@@ -151,10 +141,8 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
     </div>
   );
 };
-
 UnauthorizedPage.propTypes = {
   userRole: PropTypes.string,
   requiredRoles: PropTypes.arrayOf(PropTypes.string),
 };
-
 export default UnauthorizedPage;

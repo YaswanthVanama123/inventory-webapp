@@ -41,8 +41,6 @@ const PRIORITY_COLORS = {
     dot: 'bg-yellow-500',
   },
 };
-
-
 const Card = ({ children, className = '' }) => {
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
@@ -50,8 +48,6 @@ const Card = ({ children, className = '' }) => {
     </div>
   );
 };
-
-
 const StatCard = ({ title, value, icon: Icon, iconColor, loading }) => {
   if (loading) {
     return (
@@ -66,7 +62,6 @@ const StatCard = ({ title, value, icon: Icon, iconColor, loading }) => {
       </Card>
     );
   }
-
   return (
     <Card className="p-6 hover:shadow-md transition-shadow duration-200">
       <div className="flex items-start justify-between">
@@ -81,11 +76,8 @@ const StatCard = ({ title, value, icon: Icon, iconColor, loading }) => {
     </Card>
   );
 };
-
-
 const PriorityBadge = ({ priority }) => {
   const colors = PRIORITY_COLORS[priority] || PRIORITY_COLORS.Low;
-
   return (
     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${colors.bg} ${colors.text} ${colors.border}`}>
       <span className={`w-2 h-2 rounded-full ${colors.dot}`}></span>
@@ -93,12 +85,9 @@ const PriorityBadge = ({ priority }) => {
     </span>
   );
 };
-
-
 const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
   const [expanded, setExpanded] = useState(false);
   const colors = PRIORITY_COLORS[item.priority] || PRIORITY_COLORS.Low;
-
   return (
     <Card className={`p-4 border-l-4 ${colors.border.replace('border-', 'border-l-')}`}>
       <div className="space-y-3">
@@ -112,7 +101,6 @@ const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
           </div>
           <PriorityBadge priority={item.priority} />
         </div>
-
         {}
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -128,7 +116,6 @@ const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
             </p>
           </div>
         </div>
-
         {}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
@@ -148,7 +135,6 @@ const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
             </span>
           </div>
         </div>
-
         {}
         {item.supplier.email && (
           <button
@@ -159,7 +145,6 @@ const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
             {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
         )}
-
         {expanded && (
           <div className="pt-3 border-t border-gray-100 space-y-2">
             {item.supplier.contactPerson && (
@@ -198,7 +183,6 @@ const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
             )}
           </div>
         )}
-
         {}
         <div className="flex gap-2 pt-3 border-t border-gray-100">
           <button
@@ -220,41 +204,28 @@ const ItemCard = ({ item, onEmailSupplier, onCreateOrder }) => {
     </Card>
   );
 };
-
-
 const LowStockReport = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [filteredItems, setFilteredItems] = useState([]);
   const [error, setError] = useState(null);
-
-  
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
   const [supplierFilter, setSupplierFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-
-  
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
-
-  
   const fetchLowStockReport = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const response = await api.get('/reports/low-stock');
-
       if (response.success) {
         setData(response.data);
         setFilteredItems(response.data.items);
-
-        
         const uniqueCategories = [...new Set(response.data.items.map(item => item.category))];
         const uniqueSuppliers = [...new Set(response.data.items.map(item => item.supplier.name))];
-
         setCategories(uniqueCategories.sort());
         setSuppliers(uniqueSuppliers.sort());
       }
@@ -265,18 +236,12 @@ const LowStockReport = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchLowStockReport();
   }, []);
-
-  
   useEffect(() => {
     if (!data) return;
-
     let filtered = [...data.items];
-
-    
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -286,26 +251,17 @@ const LowStockReport = () => {
           item.supplier.name.toLowerCase().includes(query)
       );
     }
-
-    
     if (categoryFilter) {
       filtered = filtered.filter(item => item.category === categoryFilter);
     }
-
-    
     if (priorityFilter) {
       filtered = filtered.filter(item => item.priority === priorityFilter);
     }
-
-    
     if (supplierFilter) {
       filtered = filtered.filter(item => item.supplier.name === supplierFilter);
     }
-
     setFilteredItems(filtered);
   }, [searchQuery, categoryFilter, priorityFilter, supplierFilter, data]);
-
-  
   const handleEmailSupplier = (item) => {
     const subject = encodeURIComponent(`Reorder Request: ${item.itemName}`);
     const body = encodeURIComponent(
@@ -318,18 +274,13 @@ const LowStockReport = () => {
       `Please confirm availability and delivery timeline.\n\n` +
       `Best regards`
     );
-
     window.location.href = `mailto:${item.supplier.email}?subject=${subject}&body=${body}`;
   };
-
   const handleCreateOrder = (item) => {
-    
     alert(`Creating order for ${item.itemName} - ${item.suggestedOrderQuantity} ${item.unit}`);
   };
-
   const handleExportCSV = () => {
     if (!filteredItems.length) return;
-
     const headers = [
       'Item Name',
       'SKU',
@@ -345,7 +296,6 @@ const LowStockReport = () => {
       'Email',
       'Phone',
     ];
-
     const rows = filteredItems.map(item => [
       item.itemName,
       item.skuCode,
@@ -361,28 +311,22 @@ const LowStockReport = () => {
       item.supplier.email || '',
       item.supplier.phone || '',
     ]);
-
     const csv = [headers, ...rows]
       .map(row => row.map(cell => `"${cell}"`).join(','))
       .join('\n');
-
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `low-stock-report-${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
   };
-
   const clearFilters = () => {
     setSearchQuery('');
     setCategoryFilter('');
     setPriorityFilter('');
     setSupplierFilter('');
   };
-
   const hasActiveFilters = searchQuery || categoryFilter || priorityFilter || supplierFilter;
-
-  
   if (loading) {
     return (
       <div className="space-y-6">
@@ -393,14 +337,12 @@ const LowStockReport = () => {
             <div className="h-4 bg-white/20 rounded w-96"></div>
           </div>
         </div>
-
         {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
           {[...Array(5)].map((_, i) => (
             <StatCard key={i} loading={true} />
           ))}
         </div>
-
         {}
         <Card className="p-6">
           <div className="animate-pulse space-y-4">
@@ -411,8 +353,6 @@ const LowStockReport = () => {
       </div>
     );
   }
-
-  
   if (error && !data) {
     return (
       <div className="space-y-6">
@@ -436,9 +376,7 @@ const LowStockReport = () => {
       </div>
     );
   }
-
   const summary = data?.summary || {};
-
   return (
     <div className="space-y-6">
       {}
@@ -460,7 +398,6 @@ const LowStockReport = () => {
           </button>
         </div>
       </div>
-
       {}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
         <StatCard
@@ -494,7 +431,6 @@ const LowStockReport = () => {
           iconColor="bg-green-600"
         />
       </div>
-
       {}
       <Card className="p-6">
         <div className="space-y-4">
@@ -511,7 +447,6 @@ const LowStockReport = () => {
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-
             {}
             <div className="flex gap-2">
               <button
@@ -540,7 +475,6 @@ const LowStockReport = () => {
               </button>
             </div>
           </div>
-
           {}
           {showFilters && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-gray-200">
@@ -560,7 +494,6 @@ const LowStockReport = () => {
                   ))}
                 </select>
               </div>
-
               {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -577,7 +510,6 @@ const LowStockReport = () => {
                   <option value="Low">Low</option>
                 </select>
               </div>
-
               {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -594,7 +526,6 @@ const LowStockReport = () => {
                   ))}
                 </select>
               </div>
-
               {}
               {hasActiveFilters && (
                 <div className="sm:col-span-3 flex justify-end">
@@ -611,7 +542,6 @@ const LowStockReport = () => {
           )}
         </div>
       </Card>
-
       {}
       {filteredItems.length === 0 ? (
         <Card className="p-12">
@@ -649,7 +579,6 @@ const LowStockReport = () => {
               />
             ))}
           </div>
-
           {}
           <Card className="hidden lg:block overflow-hidden">
             <div className="overflow-x-auto">
@@ -683,7 +612,6 @@ const LowStockReport = () => {
                       <td className="py-4 px-4">
                         <PriorityBadge priority={item.priority} />
                       </td>
-
                       {}
                       <td className="py-4 px-4">
                         <div>
@@ -692,7 +620,6 @@ const LowStockReport = () => {
                           <p className="text-xs text-gray-400 mt-1">{item.category}</p>
                         </div>
                       </td>
-
                       {}
                       <td className="py-4 px-4">
                         <div className="space-y-1">
@@ -710,7 +637,6 @@ const LowStockReport = () => {
                           </div>
                         </div>
                       </td>
-
                       {}
                       <td className="py-4 px-4">
                         <div className="space-y-1">
@@ -736,7 +662,6 @@ const LowStockReport = () => {
                           )}
                         </div>
                       </td>
-
                       {}
                       <td className="py-4 px-4">
                         <div className="space-y-1">
@@ -760,7 +685,6 @@ const LowStockReport = () => {
                           )}
                         </div>
                       </td>
-
                       {}
                       <td className="py-4 px-4">
                         <div className="flex items-center justify-end gap-2">
@@ -786,7 +710,6 @@ const LowStockReport = () => {
               </table>
             </div>
           </Card>
-
           {}
           <div className="flex items-center justify-between text-sm text-gray-600">
             <p>
@@ -806,5 +729,4 @@ const LowStockReport = () => {
     </div>
   );
 };
-
 export default LowStockReport;

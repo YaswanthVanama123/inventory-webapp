@@ -27,21 +27,15 @@ const ItemNameAliasMapping = () => {
   const [stats, setStats] = useState({ totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 });
   const [searchText, setSearchText] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-
-  
   const [selectedItems, setSelectedItems] = useState(new Set());
   const [showBulkMapModal, setShowBulkMapModal] = useState(false);
   const [bulkCanonicalName, setBulkCanonicalName] = useState('');
-
-  
   const [showQuickMapModal, setShowQuickMapModal] = useState(false);
   const [quickMapItem, setQuickMapItem] = useState(null);
   const [quickCanonicalName, setQuickCanonicalName] = useState('');
   const [quickMapSelectedItems, setQuickMapSelectedItems] = useState(new Set());
   const [quickMapSearchText, setQuickMapSearchText] = useState('');
   const [existingMapping, setExistingMapping] = useState(null);
-
-  
   const [showModal, setShowModal] = useState(false);
   const [editingMapping, setEditingMapping] = useState(null);
   const [modalData, setModalData] = useState({
@@ -50,26 +44,17 @@ const ItemNameAliasMapping = () => {
     description: '',
     autoMerge: true
   });
-
-  
   useEffect(() => {
     loadData();
   }, []);
-
-  
   useEffect(() => {
     filterItems();
   }, [uniqueItems, searchText, filterStatus]);
-
   const loadData = async () => {
     try {
       setLoading(true);
-
-      
       const pageData = await routeStarItemAliasService.getPageData();
-
       console.log('Combined API response:', pageData);
-
       setMappings(pageData.mappings?.mappings || []);
       setUniqueItems(pageData.uniqueItems?.items || []);
       setStats(pageData.uniqueItems?.stats || pageData.stats || {
@@ -77,7 +62,6 @@ const ItemNameAliasMapping = () => {
         mappedItems: 0,
         unmappedItems: 0
       });
-
       console.log('State after setting:', {
         mappings: pageData.mappings?.mappings?.length,
         uniqueItems: pageData.uniqueItems?.items?.length,
@@ -90,11 +74,8 @@ const ItemNameAliasMapping = () => {
       setLoading(false);
     }
   };
-
   const filterItems = () => {
     let filtered = [...uniqueItems];
-
-    
     if (searchText) {
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter(item =>
@@ -102,17 +83,13 @@ const ItemNameAliasMapping = () => {
         (item.canonicalName && item.canonicalName.toLowerCase().includes(searchLower))
       );
     }
-
-    
     if (filterStatus === 'mapped') {
       filtered = filtered.filter(item => item.isMapped);
     } else if (filterStatus === 'unmapped') {
       filtered = filtered.filter(item => !item.isMapped);
     }
-
     setFilteredItems(filtered);
   };
-
   const openCreateModal = () => {
     setEditingMapping(null);
     setModalData({
@@ -123,7 +100,6 @@ const ItemNameAliasMapping = () => {
     });
     setShowModal(true);
   };
-
   const openEditModal = (mapping) => {
     setEditingMapping(mapping);
     setModalData({
@@ -134,54 +110,44 @@ const ItemNameAliasMapping = () => {
     });
     setShowModal(true);
   };
-
   const handleModalChange = (field, value) => {
     setModalData(prev => ({ ...prev, [field]: value }));
   };
-
   const handleAliasChange = (index, value) => {
     const newAliases = [...modalData.aliases];
     newAliases[index] = value;
     setModalData(prev => ({ ...prev, aliases: newAliases }));
   };
-
   const addAliasField = () => {
     setModalData(prev => ({
       ...prev,
       aliases: [...prev.aliases, '']
     }));
   };
-
   const removeAliasField = (index) => {
     if (modalData.aliases.length > 1) {
       const newAliases = modalData.aliases.filter((_, i) => i !== index);
       setModalData(prev => ({ ...prev, aliases: newAliases }));
     }
   };
-
   const saveMapping = async () => {
-    
     if (!modalData.canonicalName.trim()) {
       showError('Canonical name is required');
       return;
     }
-
     const cleanAliases = modalData.aliases.filter(a => a.trim() !== '');
     if (cleanAliases.length === 0) {
       showError('At least one alias is required');
       return;
     }
-
     try {
       setSaving(true);
-
       const data = {
         canonicalName: modalData.canonicalName.trim(),
         aliases: cleanAliases.map(a => a.trim()),
         description: modalData.description.trim(),
         autoMerge: modalData.autoMerge
       };
-
       if (editingMapping) {
         await routeStarItemAliasService.updateMapping(editingMapping._id, data);
         showSuccess('Mapping updated successfully');
@@ -189,7 +155,6 @@ const ItemNameAliasMapping = () => {
         await routeStarItemAliasService.saveMapping(data);
         showSuccess('Mapping created successfully');
       }
-
       setShowModal(false);
       loadData();
     } catch (error) {
@@ -198,12 +163,10 @@ const ItemNameAliasMapping = () => {
       setSaving(false);
     }
   };
-
   const deleteMapping = async (id, canonicalName) => {
     if (!window.confirm(`Are you sure you want to delete the mapping for "${canonicalName}"?`)) {
       return;
     }
-
     try {
       await routeStarItemAliasService.deleteMapping(id);
       showSuccess(`Mapping deleted for ${canonicalName}`);
@@ -212,42 +175,30 @@ const ItemNameAliasMapping = () => {
       showError('Failed to delete mapping: ' + error.message);
     }
   };
-
   const openQuickMapModal = (itemName) => {
     setQuickMapItem(itemName);
     setQuickCanonicalName(itemName);
     setQuickMapSearchText('');
-
-    
     const currentMapping = mappings.find(m =>
       m.aliases.some(a => a.name === itemName)
     );
-
     if (currentMapping) {
-      
       setExistingMapping(currentMapping);
       setQuickCanonicalName(currentMapping.canonicalName);
-      
       const aliasNames = new Set(currentMapping.aliases.map(a => a.name));
       setQuickMapSelectedItems(aliasNames);
     } else {
-      
       setExistingMapping(null);
       setQuickMapSelectedItems(new Set([itemName]));
     }
-
     setShowQuickMapModal(true);
   };
-
   const toggleQuickMapItem = (itemName) => {
     const newSelected = new Set(quickMapSelectedItems);
-
-    
     if (itemName === quickMapItem && newSelected.has(itemName) && newSelected.size === 1) {
       showWarning('You must select at least the current item');
       return;
     }
-
     if (newSelected.has(itemName)) {
       newSelected.delete(itemName);
     } else {
@@ -255,34 +206,26 @@ const ItemNameAliasMapping = () => {
     }
     setQuickMapSelectedItems(newSelected);
   };
-
   const quickMapItemSubmit = async () => {
     if (!quickCanonicalName.trim()) {
       showError('Please enter a canonical name');
       return;
     }
-
     if (quickMapSelectedItems.size === 0) {
       showError('Please select at least one item');
       return;
     }
-
     try {
       setSaving(true);
-
-      
       if (existingMapping) {
         await routeStarItemAliasService.deleteMapping(existingMapping._id);
       }
-
-      
       await routeStarItemAliasService.saveMapping({
         canonicalName: quickCanonicalName.trim(),
         aliases: Array.from(quickMapSelectedItems),
         description: existingMapping ? 'Updated mapping' : 'Quick mapped',
         autoMerge: true
       });
-
       showSuccess(`Mapped ${quickMapSelectedItems.size} items to "${quickCanonicalName}"`);
       setShowQuickMapModal(false);
       setQuickMapItem(null);
@@ -297,15 +240,10 @@ const ItemNameAliasMapping = () => {
       setSaving(false);
     }
   };
-
-  
   const getFilteredItemsForQuickMap = () => {
     return uniqueItems.filter(item => {
-      
       if (item.isMapped && !existingMapping) return false;
       if (item.isMapped && existingMapping && item.canonicalName !== existingMapping.canonicalName) return false;
-
-      
       if (quickMapSearchText) {
         const searchLower = quickMapSearchText.toLowerCase();
         return item.itemName.toLowerCase().includes(searchLower) ||
@@ -314,8 +252,6 @@ const ItemNameAliasMapping = () => {
       return true;
     });
   };
-
-  
   const toggleItemSelection = (itemName) => {
     const newSelected = new Set(selectedItems);
     if (newSelected.has(itemName)) {
@@ -325,34 +261,28 @@ const ItemNameAliasMapping = () => {
     }
     setSelectedItems(newSelected);
   };
-
   const selectAllFiltered = () => {
     const unmappedItems = filteredItems.filter(item => !item.isMapped);
     const newSelected = new Set(unmappedItems.map(item => item.itemName));
     setSelectedItems(newSelected);
   };
-
   const clearSelection = () => {
     setSelectedItems(new Set());
   };
-
   const openBulkMapModal = () => {
     if (selectedItems.size === 0) {
       showWarning('Please select at least one item');
       return;
     }
-    
     const firstItem = Array.from(selectedItems)[0];
     setBulkCanonicalName(firstItem);
     setShowBulkMapModal(true);
   };
-
   const bulkMapItems = async () => {
     if (!bulkCanonicalName.trim()) {
       showError('Please enter a canonical name');
       return;
     }
-
     try {
       setSaving(true);
       await routeStarItemAliasService.saveMapping({
@@ -372,11 +302,9 @@ const ItemNameAliasMapping = () => {
       setSaving(false);
     }
   };
-
   if (loading) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="p-6 space-y-6">
       {}
@@ -391,7 +319,6 @@ const ItemNameAliasMapping = () => {
           📦 Items shown below are from the RouteStarItem master list
         </p>
       </div>
-
       {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {}
@@ -408,7 +335,6 @@ const ItemNameAliasMapping = () => {
             </div>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -428,7 +354,6 @@ const ItemNameAliasMapping = () => {
             </p>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -448,7 +373,6 @@ const ItemNameAliasMapping = () => {
             </p>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -469,7 +393,6 @@ const ItemNameAliasMapping = () => {
           </div>
         </div>
       </div>
-
       {}
       <Card>
         <div className="flex flex-col lg:flex-row justify-between gap-4">
@@ -493,7 +416,6 @@ const ItemNameAliasMapping = () => {
               Unmapped
             </Button>
           </div>
-
           <div className="flex flex-wrap gap-2">
             <div className="relative flex-1 min-w-[200px]">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -546,7 +468,6 @@ const ItemNameAliasMapping = () => {
           </div>
         </div>
       </Card>
-
       {}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
@@ -627,7 +548,6 @@ const ItemNameAliasMapping = () => {
           </table>
         </div>
       </Card>
-
       {}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
@@ -761,7 +681,6 @@ const ItemNameAliasMapping = () => {
           </table>
         </div>
       </Card>
-
       {}
       <Modal
         isOpen={showModal}
@@ -786,7 +705,6 @@ const ItemNameAliasMapping = () => {
               This is the master name that will be displayed in reports
             </p>
           </div>
-
           {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -822,7 +740,6 @@ const ItemNameAliasMapping = () => {
               All these variations will be mapped to the canonical name
             </p>
           </div>
-
           {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -836,7 +753,6 @@ const ItemNameAliasMapping = () => {
               className="w-full"
             />
           </div>
-
           {}
           <div className="flex items-center">
             <input
@@ -850,7 +766,6 @@ const ItemNameAliasMapping = () => {
               Automatically merge in reports and analytics
             </label>
           </div>
-
           {}
           <div className="flex justify-end gap-2 mt-6">
             <Button variant="secondary" onClick={() => setShowModal(false)}>
@@ -862,7 +777,6 @@ const ItemNameAliasMapping = () => {
           </div>
         </div>
       </Modal>
-
       {}
       <Modal
         isOpen={showBulkMapModal}
@@ -885,7 +799,6 @@ const ItemNameAliasMapping = () => {
               </ul>
             </div>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Canonical Name <span className="text-red-500">*</span>
@@ -902,7 +815,6 @@ const ItemNameAliasMapping = () => {
               All selected items will be mapped to this name in reports
             </p>
           </div>
-
           <div className="flex justify-end gap-2 mt-6">
             <Button variant="secondary" onClick={() => setShowBulkMapModal(false)}>
               Cancel
@@ -913,7 +825,6 @@ const ItemNameAliasMapping = () => {
           </div>
         </div>
       </Modal>
-
       {}
       <Modal
         isOpen={showQuickMapModal}
@@ -933,7 +844,6 @@ const ItemNameAliasMapping = () => {
               </p>
             )}
           </div>
-
           {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -950,7 +860,6 @@ const ItemNameAliasMapping = () => {
               All selected items will be displayed as this name in reports
             </p>
           </div>
-
           {}
           <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded">
             <p className="text-sm font-medium text-green-800 dark:text-green-300 mb-2">
@@ -964,7 +873,6 @@ const ItemNameAliasMapping = () => {
               ))}
             </div>
           </div>
-
           {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -981,7 +889,6 @@ const ItemNameAliasMapping = () => {
               />
             </div>
           </div>
-
           {}
           <div className="border border-gray-200 dark:border-gray-700 rounded-lg max-h-96 overflow-y-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -1040,7 +947,6 @@ const ItemNameAliasMapping = () => {
               </tbody>
             </table>
           </div>
-
           {}
           <div className="flex justify-between items-center pt-4 border-t">
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -1060,5 +966,4 @@ const ItemNameAliasMapping = () => {
     </div>
   );
 };
-
 export default ItemNameAliasMapping;

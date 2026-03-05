@@ -16,11 +16,9 @@ const RouteStarInvoiceDetail = () => {
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
-
   useEffect(() => {
     fetchInvoice();
   }, [invoiceNumber]);
-
   const fetchInvoice = async () => {
     setLoading(true);
     try {
@@ -35,13 +33,11 @@ const RouteStarInvoiceDetail = () => {
       setLoading(false);
     }
   };
-
   const handleSyncDetails = async () => {
     if (!isAdmin) {
       showError('Only administrators can sync invoice details');
       return;
     }
-
     setSyncing(true);
     try {
       const response = await syncInvoiceDetails(invoiceNumber);
@@ -56,7 +52,6 @@ const RouteStarInvoiceDetail = () => {
       setSyncing(false);
     }
   };
-
   const getStatusBadgeVariant = (status) => {
     const statusMap = {
       'Completed': 'success',
@@ -66,14 +61,12 @@ const RouteStarInvoiceDetail = () => {
     };
     return statusMap[status] || 'secondary';
   };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount || 0);
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -86,7 +79,6 @@ const RouteStarInvoiceDetail = () => {
       return 'Invalid Date';
     }
   };
-
   const handleBack = () => {
     if (invoice?.invoiceType === 'closed') {
       navigate('/invoices/routestar/closed');
@@ -94,7 +86,6 @@ const RouteStarInvoiceDetail = () => {
       navigate('/invoices/routestar/pending');
     }
   };
-
   if (loading && !invoice) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -102,7 +93,6 @@ const RouteStarInvoiceDetail = () => {
       </div>
     );
   }
-
   if (!invoice) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -123,7 +113,6 @@ const RouteStarInvoiceDetail = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {}
@@ -184,7 +173,6 @@ const RouteStarInvoiceDetail = () => {
           )}
         </div>
       </div>
-
       {}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {}
@@ -215,7 +203,6 @@ const RouteStarInvoiceDetail = () => {
               )}
             </div>
           </div>
-
           {}
           {(invoice.assignedTo || invoice.signedBy || invoice.serviceNotes || invoice.invoiceMemo) && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
@@ -267,7 +254,6 @@ const RouteStarInvoiceDetail = () => {
             </div>
           )}
         </div>
-
         {}
         <div className="space-y-6">
           {}
@@ -304,7 +290,6 @@ const RouteStarInvoiceDetail = () => {
               )}
             </div>
           </div>
-
           {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -335,7 +320,6 @@ const RouteStarInvoiceDetail = () => {
           </div>
         </div>
       </div>
-
       {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-200 dark:border-gray-700">
@@ -348,7 +332,6 @@ const RouteStarInvoiceDetail = () => {
             )}
           </h2>
         </div>
-
         {!invoice.lineItems || invoice.lineItems.length === 0 ? (
           <div className="p-8 text-center">
             <svg className="w-12 h-12 mx-auto text-slate-400 dark:text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -448,7 +431,6 @@ const RouteStarInvoiceDetail = () => {
           </div>
         )}
       </div>
-
       {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -482,5 +464,4 @@ const RouteStarInvoiceDetail = () => {
     </div>
   );
 };
-
 export default RouteStarInvoiceDetail;

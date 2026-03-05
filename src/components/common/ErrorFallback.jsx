@@ -36,7 +36,6 @@ const ErrorFallback = ({
       message: 'text-lg',
     },
   };
-
   const icons = {
     alert: (
       <svg
@@ -87,17 +86,14 @@ const ErrorFallback = ({
       </svg>
     ),
   };
-
   const handleReload = () => {
     window.location.reload();
   };
-
   const handleRetry = () => {
     if (onRetry) {
       onRetry();
     }
   };
-
   return (
     <div
       className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm ${sizeStyles[size].container} ${className}`}
@@ -108,7 +104,6 @@ const ErrorFallback = ({
           {icons[icon] || icons.alert}
         </div>
       </div>
-
       {}
       <div className="text-center mb-4">
         <h3 className={`${sizeStyles[size].title} font-semibold text-gray-900 dark:text-white mb-2`}>
@@ -118,7 +113,6 @@ const ErrorFallback = ({
           {message}
         </p>
       </div>
-
       {}
       {(showReload || showRetry) && (
         <div className="flex flex-col sm:flex-row gap-2 justify-center">
@@ -141,7 +135,6 @@ const ErrorFallback = ({
               Try Again
             </Button>
           )}
-
           {showReload && (
             <Button
               variant={showRetry ? 'outline' : 'primary'}
@@ -170,7 +163,6 @@ const ErrorFallback = ({
     </div>
   );
 };
-
 ErrorFallback.propTypes = {
   title: PropTypes.string,
   message: PropTypes.string,
@@ -181,5 +173,4 @@ ErrorFallback.propTypes = {
   onRetry: PropTypes.func,
   className: PropTypes.string,
 };
-
 export default ErrorFallback;

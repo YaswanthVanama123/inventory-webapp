@@ -15,22 +15,15 @@ const Settings = () => {
   const [stockCutoffLoading, setStockCutoffLoading] = useState(false);
   const [lowStockThreshold, setLowStockThreshold] = useState('');
   const [thresholdLoading, setThresholdLoading] = useState(false);
-
   useEffect(() => {
     fetchSettings();
   }, []);
-
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      // Use combined endpoint to fetch both settings in one call
       const settingsRes = await settingsService.getGeneralSettings();
-
-      // Extract cutoff date
       const cutoffData = settingsRes?.data?.stockCalculationCutoffDate || null;
       setStockCutoffDate(cutoffData ? new Date(cutoffData).toISOString().split('T')[0] : '');
-
-      // Extract low stock threshold
       const thresholdData = settingsRes?.data?.lowStockThreshold || '';
       setLowStockThreshold(thresholdData?.toString() || '');
     } catch (error) {
@@ -42,13 +35,11 @@ const Settings = () => {
       setLoading(false);
     }
   };
-
   const handleUpdateStockCutoffDate = async () => {
     if (!stockCutoffDate) {
       showError('Please select a cutoff date');
       return;
     }
-
     setStockCutoffLoading(true);
     try {
       await settingsService.updateStockCutoffDate(stockCutoffDate);
@@ -61,13 +52,11 @@ const Settings = () => {
       setStockCutoffLoading(false);
     }
   };
-
   const handleUpdateLowStockThreshold = async () => {
     if (!lowStockThreshold || lowStockThreshold <= 0) {
       showError('Please enter a valid threshold value greater than 0');
       return;
     }
-
     setThresholdLoading(true);
     try {
       await settingsService.updateLowStockThreshold(parseInt(lowStockThreshold));
@@ -80,7 +69,6 @@ const Settings = () => {
       setThresholdLoading(false);
     }
   };
-
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900">
@@ -91,7 +79,6 @@ const Settings = () => {
       </div>
     );
   }
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -99,7 +86,6 @@ const Settings = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {}
@@ -111,7 +97,6 @@ const Settings = () => {
           </div>
         </div>
       </div>
-
       {}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-slate-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Stock Calculation Cutoff Date</h3>
@@ -120,7 +105,6 @@ const Settings = () => {
           Invoices <strong>before</strong> this date will decrease stock (old behavior).
           Invoices <strong>after</strong> this date will NOT decrease stock (new checkout system).
         </p>
-
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
           <div className="flex items-start gap-3">
             <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -135,7 +119,6 @@ const Settings = () => {
             </div>
           </div>
         </div>
-
         <div className="flex items-end gap-4">
           <div className="flex-1">
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
@@ -162,14 +145,12 @@ const Settings = () => {
           </Button>
         </div>
       </div>
-
       {/* Low Stock Threshold Setting */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-slate-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Low Stock Threshold</h3>
         <p className="text-sm text-slate-600 dark:text-gray-400 mb-4">
           Set the quantity threshold for RouteStar items. Items with quantities <strong>below</strong> this value will be marked as "Low Stock" on the dashboard.
         </p>
-
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-4">
           <div className="flex items-start gap-3">
             <svg className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -185,7 +166,6 @@ const Settings = () => {
             </div>
           </div>
         </div>
-
         <div className="flex items-end gap-4">
           <div className="flex-1">
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
@@ -217,5 +197,4 @@ const Settings = () => {
     </div>
   );
 };
-
 export default Settings;

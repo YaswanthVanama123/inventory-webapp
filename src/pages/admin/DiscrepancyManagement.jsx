@@ -37,30 +37,23 @@ const DiscrepancyManagement = () => {
   const [prefilledItem, setPrefilledItem] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [discrepancyToDelete, setDiscrepancyToDelete] = useState(null);
-
-  
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 50,
     total: 0,
     totalPages: 0
   });
-
   useEffect(() => {
     fetchDiscrepancies();
     fetchSummary();
   }, [filters, pagination.page]);
-
-  
   useEffect(() => {
     if (location.state?.prefilledItem) {
       setPrefilledItem(location.state.prefilledItem);
       setShowRecordModal(true);
-      
       window.history.replaceState({}, document.title);
     }
   }, [location]);
-
   const fetchDiscrepancies = async () => {
     try {
       setLoading(true);
@@ -70,7 +63,6 @@ const DiscrepancyManagement = () => {
         status: filters.status,
         type: filters.type,
       });
-
       if (response.success) {
         setDiscrepancies(response.data.discrepancies);
         setPagination(prev => ({
@@ -86,7 +78,6 @@ const DiscrepancyManagement = () => {
       setLoading(false);
     }
   };
-
   const fetchSummary = async () => {
     try {
       const response = await discrepancyService.getSummary();
@@ -97,11 +88,9 @@ const DiscrepancyManagement = () => {
       console.error('Fetch summary error:', error);
     }
   };
-
   const handleApprove = async (discrepancyId) => {
     try {
       const response = await discrepancyService.approveDiscrepancy(discrepancyId, 'Approved from webapp');
-
       if (response.success) {
         showSuccess?.('Discrepancy approved successfully');
         fetchDiscrepancies();
@@ -114,11 +103,9 @@ const DiscrepancyManagement = () => {
       console.error('Approve error:', error);
     }
   };
-
   const handleReject = async (discrepancyId) => {
     try {
       const response = await discrepancyService.rejectDiscrepancy(discrepancyId, 'Rejected from webapp');
-
       if (response.success) {
         showSuccess?.('Discrepancy rejected successfully');
         fetchDiscrepancies();
@@ -131,18 +118,14 @@ const DiscrepancyManagement = () => {
       console.error('Reject error:', error);
     }
   };
-
   const handleDelete = async (discrepancyId) => {
     setDiscrepancyToDelete(discrepancyId);
     setShowDeleteModal(true);
   };
-
   const confirmDelete = async () => {
     if (!discrepancyToDelete) return;
-
     try {
       const response = await discrepancyService.deleteDiscrepancy(discrepancyToDelete);
-
       if (response.success) {
         showSuccess?.('Discrepancy deleted successfully');
         fetchDiscrepancies();
@@ -158,19 +141,16 @@ const DiscrepancyManagement = () => {
       setDiscrepancyToDelete(null);
     }
   };
-
   const handleBulkApprove = async () => {
     if (selectedDiscrepancies.length === 0) {
       showError?.('Please select discrepancies to approve');
       return;
     }
-
     try {
       const response = await discrepancyService.bulkApproveDiscrepancies(
         selectedDiscrepancies,
         'Bulk approved from webapp'
       );
-
       if (response.success) {
         showSuccess?.(response.message);
         setSelectedDiscrepancies([]);
@@ -184,7 +164,6 @@ const DiscrepancyManagement = () => {
       console.error('Bulk approve error:', error);
     }
   };
-
   const getStatusColor = (status) => {
     const colors = {
       'Pending': 'text-amber-700 bg-amber-100',
@@ -194,7 +173,6 @@ const DiscrepancyManagement = () => {
     };
     return colors[status] || 'text-gray-700 bg-gray-100';
   };
-
   const getStatusIcon = (status) => {
     const icons = {
       'Pending': <Clock className="w-4 h-4" />,
@@ -204,7 +182,6 @@ const DiscrepancyManagement = () => {
     };
     return icons[status] || <Clock className="w-4 h-4" />;
   };
-
   const getTypeColor = (type) => {
     const colors = {
       'Overage': 'text-blue-700 bg-blue-50',
@@ -214,7 +191,6 @@ const DiscrepancyManagement = () => {
     };
     return colors[type] || 'text-gray-700 bg-gray-50';
   };
-
   const filteredDiscrepancies = discrepancies.filter(d => {
     if (filters.search) {
       const search = filters.search.toLowerCase();
@@ -224,7 +200,6 @@ const DiscrepancyManagement = () => {
     }
     return true;
   });
-
   if (loading && discrepancies.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -235,7 +210,6 @@ const DiscrepancyManagement = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {}
@@ -256,7 +230,6 @@ const DiscrepancyManagement = () => {
           </button>
         </div>
       </div>
-
       {}
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -271,7 +244,6 @@ const DiscrepancyManagement = () => {
               </div>
             </div>
           </div>
-
           {summary.byStatus?.map((item, index) => (
             <div key={index} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
               <div className="flex items-center justify-between">
@@ -287,7 +259,6 @@ const DiscrepancyManagement = () => {
           ))}
         </div>
       )}
-
       {}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <div className="flex flex-col lg:flex-row gap-4">
@@ -304,7 +275,6 @@ const DiscrepancyManagement = () => {
               />
             </div>
           </div>
-
           {}
           <select
             value={filters.status}
@@ -317,7 +287,6 @@ const DiscrepancyManagement = () => {
             <option value="Rejected">Rejected</option>
             <option value="Resolved">Resolved</option>
           </select>
-
           {}
           <select
             value={filters.type}
@@ -330,7 +299,6 @@ const DiscrepancyManagement = () => {
             <option value="Damage">Damage</option>
             <option value="Missing">Missing</option>
           </select>
-
           {}
           {selectedDiscrepancies.length > 0 && (
             <button
@@ -343,7 +311,6 @@ const DiscrepancyManagement = () => {
           )}
         </div>
       </div>
-
       {}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -543,7 +510,6 @@ const DiscrepancyManagement = () => {
             </tbody>
           </table>
         </div>
-
         {}
         {pagination.totalPages > 1 && (
           <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
@@ -569,7 +535,6 @@ const DiscrepancyManagement = () => {
           </div>
         )}
       </div>
-
       {}
       {!loading && filteredDiscrepancies.length === 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
@@ -589,7 +554,6 @@ const DiscrepancyManagement = () => {
           </button>
         </div>
       )}
-
       {}
       {showRecordModal && (
         <RecordDiscrepancyModal
@@ -606,7 +570,6 @@ const DiscrepancyManagement = () => {
           prefilledItem={prefilledItem}
         />
       )}
-
       {}
       {showDeleteModal && (
         <DeleteConfirmationModal
@@ -620,8 +583,6 @@ const DiscrepancyManagement = () => {
     </div>
   );
 };
-
-
 const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
   const { showSuccess, showError } = useContext(ToastContext);
   const [loading, setLoading] = useState(false);
@@ -641,14 +602,11 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     reason: '',
     notes: prefilledItem ? `Reported from Stock Management for ${prefilledItem.categoryName}` : ''
   });
-
-  
   const searchInvoices = async (searchTerm) => {
     if (!searchTerm || searchTerm.length < 2) {
       setInvoices([]);
       return;
     }
-
     try {
       setSearchingInvoice(true);
       const response = await discrepancyService.searchInvoices(searchTerm, 10);
@@ -661,8 +619,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
       setSearchingInvoice(false);
     }
   };
-
-  
   const handleInvoiceSelect = (invoice) => {
     setSelectedInvoice(invoice);
     setFormData({
@@ -676,8 +632,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     });
     setInvoices([]);
   };
-
-  
   const handleLineItemSelect = (item) => {
     setFormData({
       ...formData,
@@ -686,8 +640,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
       systemQuantity: item.quantity || 0
     });
   };
-
-  
   useEffect(() => {
     if (formData.systemQuantity && formData.actualQuantity) {
       const diff = formData.actualQuantity - formData.systemQuantity;
@@ -698,35 +650,27 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
       }
     }
   }, [formData.systemQuantity, formData.actualQuantity]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    
     if (!prefilledItem && !formData.invoiceNumber) {
       showError?.('Please select an invoice');
       return;
     }
-
     if (!formData.itemName) {
       showError?.('Please select an item');
       return;
     }
-
     if (formData.actualQuantity === formData.systemQuantity) {
       showError?.('Actual quantity matches system quantity - no discrepancy to record');
       return;
     }
-
     if (!formData.discrepancyType) {
       showError?.('Please select a discrepancy type');
       return;
     }
-
     try {
       setLoading(true);
       const response = await discrepancyService.createDiscrepancy(formData);
-
       if (response.success) {
         showSuccess?.('Discrepancy recorded successfully');
         onSuccess();
@@ -740,9 +684,7 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
       setLoading(false);
     }
   };
-
   const difference = formData.actualQuantity - formData.systemQuantity;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -750,7 +692,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
           <h2 className="text-xl font-bold text-slate-900">Record Stock Discrepancy</h2>
           <p className="text-sm text-slate-600 mt-1">Enter the details of the stock count difference</p>
         </div>
-
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {}
           {!prefilledItem && (
@@ -778,7 +719,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                     </div>
                   )}
                 </div>
-
                 {}
                 {invoices.length > 0 && (
                   <div className="mt-2 border border-slate-200 rounded-lg max-h-48 overflow-y-auto">
@@ -798,7 +738,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   </div>
                 )}
               </div>
-
               {}
               {selectedInvoice && selectedInvoice.lineItems && selectedInvoice.lineItems.length > 0 && (
                 <div>
@@ -826,7 +765,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
               )}
             </>
           )}
-
           {}
           {prefilledItem && (
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -844,7 +782,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
               </div>
             </div>
           )}
-
           {}
           {formData.itemName && (
             <>
@@ -859,7 +796,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-600"
                 />
               </div>
-
               {}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -876,7 +812,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   step="1"
                 />
               </div>
-
               {}
               {formData.actualQuantity !== 0 && (
                 <div className="p-4 bg-slate-50 rounded-lg">
@@ -888,7 +823,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   </div>
                 </div>
               )}
-
               {}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -907,7 +841,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   <option value="Missing">Missing</option>
                 </select>
               </div>
-
               {}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -921,7 +854,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-
               {}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -938,7 +870,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
             </>
           )}
         </form>
-
         <div className="p-6 border-t border-slate-200 flex justify-end gap-3">
           <button
             type="button"
@@ -970,8 +901,6 @@ const RecordDiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     </div>
   );
 };
-
-
 const DeleteConfirmationModal = ({ onClose, onConfirm }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -1004,5 +933,4 @@ const DeleteConfirmationModal = ({ onClose, onConfirm }) => {
     </div>
   );
 };
-
 export default DiscrepancyManagement;

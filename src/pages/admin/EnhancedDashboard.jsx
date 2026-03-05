@@ -64,12 +64,9 @@ const CustomTooltip = ({ active, payload, label }) => {
   }
   return null;
 };
-
-
 const EnhancedStatCard = ({ title, value, subtitle, change, changeType, icon: Icon, trend, color = 'blue' }) => {
   const isPositive = changeType === 'positive';
   const ChangeIcon = isPositive ? TrendingUp : TrendingDown;
-
   const colorClasses = {
     blue: 'from-blue-500 to-blue-600',
     green: 'from-emerald-500 to-emerald-600',
@@ -78,12 +75,10 @@ const EnhancedStatCard = ({ title, value, subtitle, change, changeType, icon: Ic
     red: 'from-red-500 to-red-600',
     teal: 'from-teal-500 to-teal-600',
   };
-
   return (
     <div className="group relative bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-xl transition-all duration-300 overflow-hidden">
       {}
       <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses[color]} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
-
       <div className="relative z-10">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
@@ -95,7 +90,6 @@ const EnhancedStatCard = ({ title, value, subtitle, change, changeType, icon: Ic
             <Icon className="w-6 h-6 text-white" />
           </div>
         </div>
-
         {change && (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
@@ -107,7 +101,6 @@ const EnhancedStatCard = ({ title, value, subtitle, change, changeType, icon: Ic
             </div>
           </div>
         )}
-
         {}
         {trend && (
           <div className="mt-3 h-8">
@@ -134,8 +127,6 @@ const EnhancedStatCard = ({ title, value, subtitle, change, changeType, icon: Ic
     </div>
   );
 };
-
-
 const EnhancedDashboard = () => {
   const { user } = useContext(AuthContext);
   const { showError } = useContext(ToastContext);
@@ -144,28 +135,21 @@ const EnhancedDashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [dashboardData, setDashboardData] = useState(null);
   const [error, setError] = useState(null);
-
-  
   const fetchDashboardData = async () => {
     console.log('EnhancedDashboard: Fetching data from API...');
     setLoading(true);
     setError(null);
-
     try {
       const response = await dashboardService.getDashboardData();
       console.log('EnhancedDashboard: API response:', response);
-
       if (response.success && response.data) {
         const { summary, recentActivity, topSellingItems, topSellingItemsDetailed, salesTrend, invoiceStatusStats } = response.data;
-
-        
         const statusColors = {
           'Pending': '#F59E0B',
           'Completed': '#10B981',
           'Closed': '#3B82F6',
           'Cancelled': '#EF4444',
         };
-
         const statusDistribution = invoiceStatusStats ? Object.keys(invoiceStatusStats)
           .filter(status => invoiceStatusStats[status] > 0)
           .map(status => ({
@@ -173,8 +157,6 @@ const EnhancedDashboard = () => {
             value: invoiceStatusStats[status],
             color: statusColors[status] || '#64748B'
           })) : [];
-
-
         const transformedData = {
           kpis: {
             totalRevenue: summary.totalRevenue || 0,
@@ -193,25 +175,20 @@ const EnhancedDashboard = () => {
             purchaseCostChange: `${summary.purchaseCostChange >= 0 ? '+' : ''}${summary.purchaseCostChange}%`,
             totalProfit: summary.totalProfit || 0,
           },
-
           revenueTrend: salesTrend?.map(item => ({
             month: item.month,
             revenue: item.revenue || 0,
             orders: item.orders || 0,
             profit: item.profit || 0,
           })) || [],
-
           topProducts: (topSellingItemsDetailed || []).slice(0, 5).map(item => ({
             name: item.itemName,
             sales: item.value || 0,
             units: item.quantity || 0,
             margin: 0,
           })) || [],
-
-          
           statusDistribution: statusDistribution,
         };
-
         console.log('EnhancedDashboard: Transformed data:', transformedData);
         setDashboardData(transformedData);
       }
@@ -223,20 +200,15 @@ const EnhancedDashboard = () => {
       setLoading(false);
     }
   };
-
-  
   useEffect(() => {
     console.log('EnhancedDashboard: Component mounted, fetching data...');
     fetchDashboardData();
   }, []);
-
   const handleRefresh = async () => {
     setRefreshing(true);
     await fetchDashboardData();
     setRefreshing(false);
   };
-
-  
   if (loading && !dashboardData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -247,8 +219,6 @@ const EnhancedDashboard = () => {
       </div>
     );
   }
-
-  
   const data = dashboardData || {
     kpis: {
       totalRevenue: 0,
@@ -271,12 +241,9 @@ const EnhancedDashboard = () => {
     topProducts: [],
     statusDistribution: [],
   };
-
-  
   const revenueTrendMini = [
     { value: 28 }, { value: 32 }, { value: 29 }, { value: 35 }, { value: 38 }, { value: 42 }, { value: 45 }
   ];
-
   return (
     <div className="space-y-6">
       {}
@@ -287,7 +254,6 @@ const EnhancedDashboard = () => {
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
           }}></div>
         </div>
-
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">
@@ -309,7 +275,6 @@ const EnhancedDashboard = () => {
           </div>
         </div>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <EnhancedStatCard
           title="Sales Revenue"
@@ -371,7 +336,6 @@ const EnhancedDashboard = () => {
           color="indigo"
         />
       </div>
-
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-300">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -440,7 +404,6 @@ const EnhancedDashboard = () => {
         </ResponsiveContainer>
         </div>
       </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-300">
           <div className="mb-6">
@@ -464,7 +427,6 @@ const EnhancedDashboard = () => {
           </ResponsiveContainer>
           </div>
         </div>
-
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-300">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-slate-900">Invoice Status</h2>
@@ -492,7 +454,6 @@ const EnhancedDashboard = () => {
             </PieChart>
           </ResponsiveContainer>
           </div>
-
           <div className="grid grid-cols-2 gap-3 mt-4">
             {data.statusDistribution.map((status, index) => (
               <div key={index} className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg">
@@ -507,7 +468,6 @@ const EnhancedDashboard = () => {
           </div>
         </div>
       </div>
-
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <button
           onClick={() => navigate('/inventory/new')}
@@ -517,7 +477,6 @@ const EnhancedDashboard = () => {
           <h3 className="font-bold text-lg text-white">Add Item</h3>
           <p className="text-xs text-white mt-1">New inventory item</p>
         </button>
-
         <button
           onClick={() => navigate('/invoices/new')}
           className="group bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl p-6 transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
@@ -526,7 +485,6 @@ const EnhancedDashboard = () => {
           <h3 className="font-bold text-lg text-white">New Invoice</h3>
           <p className="text-xs text-white mt-1">Create invoice</p>
         </button>
-
         <button
           onClick={() => navigate('/users')}
           className="group bg-gradient-to-br from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-xl p-6 transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
@@ -535,7 +493,6 @@ const EnhancedDashboard = () => {
           <h3 className="font-bold text-lg text-white">Manage Users</h3>
           <p className="text-xs text-white mt-1">User accounts</p>
         </button>
-
         <button
           onClick={() => navigate('/reports')}
           className="group bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl p-6 transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
@@ -548,5 +505,4 @@ const EnhancedDashboard = () => {
     </div>
   );
 };
-
 export default EnhancedDashboard;

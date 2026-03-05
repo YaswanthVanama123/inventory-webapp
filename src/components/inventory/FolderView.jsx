@@ -9,9 +9,6 @@ import { ToastContext } from '../../contexts/ToastContext';
 import api from '../../services/api';
 
 
-
-
-
 const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useContext(ToastContext);
@@ -23,12 +20,9 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  
   useEffect(() => {
     fetchGroupedItems();
   }, []);
-
   const fetchGroupedItems = async () => {
     setLoading(true);
     try {
@@ -36,8 +30,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
       console.log('[FolderView] Full API response:', response);
       console.log('[FolderView] response.data:', response.data);
       console.log('[FolderView] response.data.data:', response.data?.data);
-
-      
       const items = response.data?.data?.items || response.data?.items || [];
       console.log('[FolderView] Parsed items:', items.length, 'items', items);
       setGroupedItems(items);
@@ -48,35 +40,23 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
       setLoading(false);
     }
   };
-
   const toggleItemFolder = async (sku) => {
     const isCurrentlyExpanded = expandedItems[sku];
-
-    
     setExpandedItems(prev => ({
       ...prev,
       [sku]: !prev[sku]
     }));
-
-    
     if (!isCurrentlyExpanded) {
       const item = groupedItems.find(i => i.sku === sku);
-
-      
       if (!item.orders) {
         setLoadingOrders(prev => ({ ...prev, [sku]: true }));
-
         try {
           const response = await api.get(`/customerconnect/items/${encodeURIComponent(sku)}/orders`);
           console.log('[FolderView] Orders response for SKU', sku, ':', response);
           console.log('[FolderView] response.data:', response.data);
           console.log('[FolderView] response.data.data:', response.data?.data);
-
-          
           const orders = response.data?.data?.entries || response.data?.entries || [];
           console.log('[FolderView] Extracted orders:', orders.length, 'orders', orders);
-
-          
           setGroupedItems(prev => {
             const updated = prev.map(item => {
               if (item.sku === sku) {
@@ -91,8 +71,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
         } catch (error) {
           console.error(`Error fetching orders for SKU ${sku}:`, error);
           showError('Failed to load order details');
-
-          
           setGroupedItems(prev => prev.map(item =>
             item.sku === sku
               ? { ...item, orders: [] }
@@ -104,22 +82,14 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
       }
     }
   };
-
   const handleDownloadItemNames = () => {
-    
     const uniqueNames = groupedItems.map(item => {
-      
       let cleanName = item.name || '';
       cleanName = cleanName.replace(/[\t\r\n,]/g, ' ');
-      
       cleanName = cleanName.replace(/\s+/g, ' ').trim();
       return cleanName;
     });
-
-    
     const csvContent = uniqueNames.join('\n');
-
-    
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -130,14 +100,12 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
   };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount || 0);
   };
-
   const formatFullDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -150,7 +118,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
       return 'Invalid Date';
     }
   };
-
   const getStockStatus = (stockProcessed) => {
     if (stockProcessed) {
       return { label: 'Processed', variant: 'success' };
@@ -158,7 +125,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
       return { label: 'Pending', variant: 'warning' };
     }
   };
-
   const getOrderStatusVariant = (status) => {
     const statusMap = {
       'Complete': 'success',
@@ -170,7 +136,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
     };
     return statusMap[status] || 'secondary';
   };
-
   const handleCheckboxChange = (sku) => {
     setSelectedItems(prev => {
       if (prev.includes(sku)) {
@@ -180,7 +145,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
       }
     });
   };
-
   const handleDeleteSelected = () => {
     if (selectedItems.length === 0) {
       showError('Please select items to delete');
@@ -188,22 +152,16 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
     }
     setDeleteModalOpen(true);
   };
-
   const confirmBulkDelete = async () => {
     if (selectedItems.length === 0) return;
-
     setDeleting(true);
     try {
-      
       await api.post('/customerconnect/orders/bulk-delete', {
         skus: selectedItems
       });
-
       showSuccess(`Successfully deleted ${selectedItems.length} item(s)`);
       setDeleteModalOpen(false);
       setSelectedItems([]);
-
-      
       fetchGroupedItems();
     } catch (err) {
       console.error('Error deleting items:', err);
@@ -212,17 +170,14 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
       setDeleting(false);
     }
   };
-
   const filteredItems = groupedItems.filter(item => {
     if (!searchTerm) return true;
-
     const search = searchTerm.toLowerCase();
     return (
       item.name?.toLowerCase().includes(search) ||
       item.sku?.toLowerCase().includes(search)
     );
   });
-
   const handleSelectAll = () => {
     if (selectedItems.length === filteredItems.length && filteredItems.length > 0) {
       setSelectedItems([]);
@@ -230,7 +185,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
       setSelectedItems(filteredItems.map(item => item.sku));
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -238,7 +192,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
       </div>
     );
   }
-
   if (groupedItems.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-slate-200">
@@ -250,7 +203,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
       </div>
     );
   }
-
   return (
     <div className="space-y-3">
       {}
@@ -293,7 +245,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
           </p>
         )}
       </div>
-
       {}
       {groupedItems.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
@@ -312,7 +263,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                     Select All ({selectedItems.length}/{filteredItems.length})
                   </span>
                 </label>
-
                 {selectedItems.length > 0 && (
                   <Button
                     variant="danger"
@@ -326,7 +276,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                 )}
               </div>
             )}
-
             {}
             <Button
               variant="outline"
@@ -340,11 +289,9 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
           </div>
         </div>
       )}
-
       {filteredItems.map((group) => {
         const isExpanded = expandedItems[group.sku];
         const isSelected = selectedItems.includes(group.sku);
-
         return (
           <div
             key={group.sku}
@@ -368,7 +315,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                   />
                 </div>
               )}
-
               {}
               <button
                 className="flex-shrink-0 p-1.5 hover:bg-slate-100 rounded transition-colors"
@@ -383,7 +329,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                   <ChevronRight className="w-5 h-5 text-slate-600" />
                 )}
               </button>
-
               {}
               <div
                 className="flex-shrink-0 cursor-pointer"
@@ -393,7 +338,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                   <Package className="w-7 h-7 text-indigo-600" />
                 </div>
               </div>
-
               {}
               <div
                 className="flex-1 min-w-0 cursor-pointer"
@@ -408,7 +352,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                   <span className="text-slate-600">{group.orderCount} {group.orderCount === 1 ? 'order' : 'orders'}</span>
                 </p>
               </div>
-
               {}
               <div
                 className="hidden lg:flex items-center gap-6 mr-2 cursor-pointer"
@@ -434,7 +377,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
                 </div>
               </div>
             </div>
-
             {}
             {isExpanded && (
               <div className="border-t border-slate-200 bg-slate-50">
@@ -564,7 +506,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
           </div>
         );
       })}
-
       {}
       {filteredItems.length === 0 && groupedItems.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-slate-200">
@@ -581,7 +522,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
           </button>
         </div>
       )}
-
       {}
       <Modal
         isOpen={deleteModalOpen}
@@ -638,7 +578,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
               </div>
             </div>
           </div>
-
           <div className="space-y-2">
             <p className="text-sm text-gray-700 font-medium">
               You are about to delete {selectedItems.length} item(s):
@@ -663,5 +602,4 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl }) => {
     </div>
   );
 };
-
 export default FolderView;

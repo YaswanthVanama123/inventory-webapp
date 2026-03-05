@@ -10,7 +10,6 @@ const ToastDemo = () => {
       <p className="text-slate-600 mb-8">
         Click the buttons below to test different types of toast notifications.
       </p>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <button
           onClick={() => showSuccess('Operation completed successfully!')}
@@ -18,21 +17,18 @@ const ToastDemo = () => {
         >
           Success Toast
         </button>
-
         <button
           onClick={() => showError('An error occurred. Please try again.')}
           className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-sm"
         >
           Error Toast
         </button>
-
         <button
           onClick={() => showWarning('This action cannot be undone.')}
           className="px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-medium shadow-sm"
         >
           Warning Toast
         </button>
-
         <button
           onClick={() => showInfo('New updates are available.')}
           className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
@@ -40,7 +36,6 @@ const ToastDemo = () => {
           Info Toast
         </button>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <button
           onClick={() => showToast('This toast lasts 2 seconds', 'info', 2000)}
@@ -48,7 +43,6 @@ const ToastDemo = () => {
         >
           Short Duration (2s)
         </button>
-
         <button
           onClick={() => showToast('This toast lasts 8 seconds', 'info', 8000)}
           className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium shadow-sm"
@@ -56,7 +50,6 @@ const ToastDemo = () => {
           Long Duration (8s)
         </button>
       </div>
-
       <div className="mb-8">
         <button
           onClick={() => {
@@ -69,19 +62,15 @@ const ToastDemo = () => {
           Multiple Toasts (Stacked)
         </button>
       </div>
-
       <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
         <h2 className="text-xl font-bold text-slate-900 mb-4">Usage Examples</h2>
-
         <div className="space-y-4">
           <div>
             <h3 className="font-semibold text-slate-700 mb-2">Basic Usage:</h3>
             <pre className="bg-slate-900 text-green-400 p-4 rounded-lg overflow-x-auto text-sm">
 {`import { useToast } from '../hooks/useToast';
-
 function MyComponent() {
   const { showToast, showSuccess, showError } = useToast();
-
   const handleSave = async () => {
     try {
       await saveData();
@@ -90,12 +79,10 @@ function MyComponent() {
       showError('Failed to save item.');
     }
   };
-
   return <button onClick={handleSave}>Save</button>;
 }`}
             </pre>
           </div>
-
           <div>
             <h3 className="font-semibold text-slate-700 mb-2">Available Methods:</h3>
             <ul className="list-disc list-inside space-y-2 text-slate-600">
@@ -106,7 +93,6 @@ function MyComponent() {
               <li><code className="bg-slate-200 px-2 py-1 rounded text-sm">showToast(message, type, duration?)</code> - Generic toast with custom type</li>
             </ul>
           </div>
-
           <div>
             <h3 className="font-semibold text-slate-700 mb-2">Features:</h3>
             <ul className="list-disc list-inside space-y-2 text-slate-600">
@@ -124,5 +110,4 @@ function MyComponent() {
     </div>
   );
 };
-
 export default ToastDemo;

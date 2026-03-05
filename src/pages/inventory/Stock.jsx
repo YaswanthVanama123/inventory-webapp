@@ -15,43 +15,32 @@ const Stock = () => {
   const [activeTab, setActiveTab] = useState('use'); 
   const [useStockData, setUseStockData] = useState({ items: [], totals: {} });
   const [sellStockData, setSellStockData] = useState({ items: [], totals: {} });
-
-  
   const [expandedCategories, setExpandedCategories] = useState(new Set());
   const [expandedSKUs, setExpandedSKUs] = useState(new Set());
   const [categorySkuData, setCategorySkuData] = useState({});
   const [loadingCategories, setLoadingCategories] = useState(new Set());
-
-  
   const [showDiscrepancyModal, setShowDiscrepancyModal] = useState(false);
   const [prefilledItem, setPrefilledItem] = useState(null);
-
   useEffect(() => {
     loadData();
   }, []);
-
-  
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         loadData();
       }
     };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
-
   const loadData = async (showToast = false) => {
     try {
       setLoading(true);
       const response = await stockService.getStockSummary();
-
       setUseStockData(response.useStock || { items: [], totals: {} });
       setSellStockData(response.sellStock || { items: [], totals: {} });
-
       if (showToast) {
         showSuccess('Stock data refreshed successfully');
       }
@@ -62,42 +51,31 @@ const Stock = () => {
       setLoading(false);
     }
   };
-
   const handleCategoryClick = async (categoryName) => {
     const newExpanded = new Set(expandedCategories);
-
     if (newExpanded.has(categoryName)) {
-      
       newExpanded.delete(categoryName);
       setExpandedCategories(newExpanded);
     } else {
-      
       newExpanded.add(categoryName);
       setExpandedCategories(newExpanded);
-
-      
       if (!categorySkuData[categoryName]) {
         try {
           const newLoadingCategories = new Set(loadingCategories);
           newLoadingCategories.add(categoryName);
           setLoadingCategories(newLoadingCategories);
-
-          
           const response = activeTab === 'use'
             ? await stockService.getCategorySKUs(categoryName)
             : await stockService.getCategorySales(categoryName);
-
           setCategorySkuData(prev => ({
             ...prev,
             [categoryName]: response.skus || []
           }));
-
           newLoadingCategories.delete(categoryName);
           setLoadingCategories(newLoadingCategories);
         } catch (error) {
           console.error('Error loading category data:', error);
           showError(`Failed to load category data: ${error.message}`);
-
           const newLoadingCategories = new Set(loadingCategories);
           newLoadingCategories.delete(categoryName);
           setLoadingCategories(newLoadingCategories);
@@ -105,25 +83,19 @@ const Stock = () => {
       }
     }
   };
-
   const handleSKUClick = (skuId) => {
     const newExpanded = new Set(expandedSKUs);
-
     if (newExpanded.has(skuId)) {
       newExpanded.delete(skuId);
     } else {
       newExpanded.add(skuId);
     }
-
     setExpandedSKUs(newExpanded);
   };
-
   const currentData = activeTab === 'use' ? useStockData : sellStockData;
-
   if (loading) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="p-6 space-y-6">
       {}
@@ -145,14 +117,12 @@ const Stock = () => {
           Refresh
         </Button>
       </div>
-
       {}
       <Card>
         <div className="flex border-b border-gray-200 dark:border-gray-700">
           <button
             onClick={() => {
               setActiveTab('use');
-              
               setExpandedCategories(new Set());
               setExpandedSKUs(new Set());
               setCategorySkuData({});
@@ -169,7 +139,6 @@ const Stock = () => {
           <button
             onClick={() => {
               setActiveTab('sell');
-              
               setExpandedCategories(new Set());
               setExpandedSKUs(new Set());
               setCategorySkuData({});
@@ -185,7 +154,6 @@ const Stock = () => {
           </button>
         </div>
       </Card>
-
       {}
       <div className={`grid grid-cols-1 ${activeTab === 'sell' ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-6`}>
         {activeTab === 'use' ? (
@@ -207,7 +175,6 @@ const Stock = () => {
                 </p>
               </div>
             </div>
-
             {}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-between">
@@ -225,7 +192,6 @@ const Stock = () => {
                 </p>
               </div>
             </div>
-
             {}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-between">
@@ -263,7 +229,6 @@ const Stock = () => {
                 </p>
               </div>
             </div>
-
             {}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-between">
@@ -281,7 +246,6 @@ const Stock = () => {
                 </p>
               </div>
             </div>
-
             {}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-between">
@@ -299,7 +263,6 @@ const Stock = () => {
                 </p>
               </div>
             </div>
-
             {}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-between">
@@ -320,7 +283,6 @@ const Stock = () => {
           </>
         )}
       </div>
-
       {}
       <Card>
         {currentData.items.length === 0 ? (
@@ -461,7 +423,6 @@ const Stock = () => {
                         </>
                       )}
                     </tr>
-
                     {}
                     {expandedCategories.has(item.categoryName) && (
                       <>
@@ -549,13 +510,8 @@ const Stock = () => {
                                             onClick={(e) => {
                                               e.stopPropagation();
                                               const stockRemaining = (sku.totalPurchased || 0) - (sku.totalSold || 0) - (sku.totalCheckedOut || 0);
-
-                                              
-                                              
                                               let actualCategory = item.categoryName;
                                               const itemNameUpper = sku.itemName.toUpperCase();
-
-                                              
                                               const categoryKeywords = ['WHITE', 'BLACK', 'BLUE', 'RED', 'GREEN', 'YELLOW', 'BROWN', 'GRAY', 'GREY', 'ORANGE', 'PINK', 'PURPLE'];
                                               for (const keyword of categoryKeywords) {
                                                 if (itemNameUpper.includes(keyword)) {
@@ -563,7 +519,6 @@ const Stock = () => {
                                                   break;
                                                 }
                                               }
-
                                               setPrefilledItem({
                                                 itemName: sku.itemName,
                                                 itemSku: sku.sku,
@@ -593,7 +548,6 @@ const Stock = () => {
                                   </>
                                 )}
                               </tr>
-
                               {}
                               {expandedSKUs.has(sku.sku) && (
                                 <>
@@ -627,9 +581,7 @@ const Stock = () => {
                                       </td>
                                     </tr>
                                   )}
-
                                   {(activeTab === 'use' && sku.purchaseHistory && sku.purchaseHistory.length > 0) && (
-
                                     <tr>
                                       <td colSpan="4" className="px-0 py-0">
                                         <div className="bg-white dark:bg-gray-900 border-l-4 border-blue-300 dark:border-blue-700 ml-6">
@@ -704,7 +656,6 @@ const Stock = () => {
                                       </td>
                                     </tr>
                                   )}
-
                                   {activeTab === 'sell' && (
                                     <>
                                       {}
@@ -784,7 +735,6 @@ const Stock = () => {
                                           </td>
                                         </tr>
                                       )}
-
                                       {}
                                       {sku.salesHistory && sku.salesHistory.length > 0 && (
                                         <tr>
@@ -862,7 +812,6 @@ const Stock = () => {
                                           </td>
                                         </tr>
                                       )}
-
                                       {}
                                       {sku.checkoutHistory && sku.checkoutHistory.length > 0 && (
                                         <tr>
@@ -920,7 +869,6 @@ const Stock = () => {
                                           </td>
                                         </tr>
                                       )}
-
                                       {}
                                       {sku.discrepancyHistory && sku.discrepancyHistory.length > 0 && (
                                         <tr>
@@ -1084,7 +1032,6 @@ const Stock = () => {
           </div>
         )}
       </Card>
-
       {}
       <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
         <div className="flex items-start gap-3">
@@ -1100,7 +1047,6 @@ const Stock = () => {
           </div>
         </div>
       </Card>
-
       {}
       {showDiscrepancyModal && (
         <DiscrepancyModal
@@ -1120,8 +1066,6 @@ const Stock = () => {
     </div>
   );
 };
-
-
 const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
   const { showSuccess, showError } = useContext(ToastContext);
   const [loading, setLoading] = useState(false);
@@ -1141,14 +1085,11 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     reason: '',
     notes: prefilledItem ? `Reported from Stock Management for ${prefilledItem.categoryName}` : ''
   });
-
-  
   const searchInvoices = async (searchTerm) => {
     if (!searchTerm || searchTerm.length < 2) {
       setInvoices([]);
       return;
     }
-
     try {
       setSearchingInvoice(true);
       const response = await discrepancyService.searchInvoices(searchTerm, 10);
@@ -1161,8 +1102,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
       setSearchingInvoice(false);
     }
   };
-
-  
   const handleInvoiceSelect = (invoice) => {
     setSelectedInvoice(invoice);
     setFormData({
@@ -1176,8 +1115,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     });
     setInvoices([]);
   };
-
-  
   const handleLineItemSelect = (item) => {
     setFormData({
       ...formData,
@@ -1186,8 +1123,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
       systemQuantity: item.quantity || 0
     });
   };
-
-  
   useEffect(() => {
     if (formData.systemQuantity && formData.actualQuantity) {
       const diff = formData.actualQuantity - formData.systemQuantity;
@@ -1198,34 +1133,27 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
       }
     }
   }, [formData.systemQuantity, formData.actualQuantity, formData.discrepancyType]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!prefilledItem && !formData.invoiceNumber) {
       showError?.('Please select an invoice');
       return;
     }
-
     if (!formData.itemName) {
       showError?.('Please select an item');
       return;
     }
-
     if (formData.actualQuantity === formData.systemQuantity) {
       showError?.('Actual quantity matches system quantity - no discrepancy to record');
       return;
     }
-
     if (!formData.discrepancyType) {
       showError?.('Please select a discrepancy type');
       return;
     }
-
     try {
       setLoading(true);
       const response = await discrepancyService.createDiscrepancy(formData);
-
       if (response.success) {
         onSuccess();
       } else {
@@ -1238,9 +1166,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
       setLoading(false);
     }
   };
-
   const difference = formData.actualQuantity - formData.systemQuantity;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -1248,7 +1174,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Record Stock Discrepancy</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Enter the details of the stock count difference</p>
         </div>
-
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {}
           {!prefilledItem && (
@@ -1276,7 +1201,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                     </div>
                   )}
                 </div>
-
                 {}
                 {invoices.length > 0 && (
                   <div className="mt-2 border border-gray-200 dark:border-gray-700 rounded-lg max-h-48 overflow-y-auto">
@@ -1296,7 +1220,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   </div>
                 )}
               </div>
-
               {}
               {selectedInvoice && selectedInvoice.lineItems && selectedInvoice.lineItems.length > 0 && (
                 <div>
@@ -1324,7 +1247,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
               )}
             </>
           )}
-
           {}
           {prefilledItem && (
             <div className="p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
@@ -1345,7 +1267,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
               </div>
             </div>
           )}
-
           {}
           {formData.itemName && (
             <>
@@ -1360,7 +1281,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
                 />
               </div>
-
               {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1377,7 +1297,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   step="1"
                 />
               </div>
-
               {}
               {formData.actualQuantity !== 0 && (
                 <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -1389,7 +1308,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   </div>
                 </div>
               )}
-
               {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1408,7 +1326,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   <option value="Missing">Missing</option>
                 </select>
               </div>
-
               {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1422,7 +1339,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
               </div>
-
               {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1439,7 +1355,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
             </>
           )}
         </form>
-
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
           <button
             type="button"
@@ -1471,5 +1386,4 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     </div>
   );
 };
-
 export default Stock;

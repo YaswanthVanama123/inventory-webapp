@@ -17,12 +17,9 @@ const SalesReport = () => {
   const [searchText, setSearchText] = useState('');
   const [filteredItems, setFilteredItems] = useState([]);
   const [expandedItems, setExpandedItems] = useState(new Set());
-
   useEffect(() => {
     loadData();
   }, []);
-
-  
   useEffect(() => {
     if (searchText) {
       const filtered = items.filter(item =>
@@ -35,16 +32,13 @@ const SalesReport = () => {
       setFilteredItems(items);
     }
   }, [searchText, items]);
-
   const loadData = async () => {
     try {
       setLoading(true);
       const response = await routeStarItemsService.getSalesReport();
-
       setItems(response.items || []);
       setFilteredItems(response.items || []);
       setTotals(response.totals || {});
-
       showSuccess('Sales report loaded successfully');
     } catch (error) {
       console.error('Error loading sales report:', error);
@@ -53,7 +47,6 @@ const SalesReport = () => {
       setLoading(false);
     }
   };
-
   const handleItemClick = (itemId) => {
     const newExpanded = new Set(expandedItems);
     if (newExpanded.has(itemId)) {
@@ -63,11 +56,9 @@ const SalesReport = () => {
     }
     setExpandedItems(newExpanded);
   };
-
   if (loading) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="p-6 space-y-6">
       {}
@@ -89,7 +80,6 @@ const SalesReport = () => {
           Refresh
         </Button>
       </div>
-
       {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {}
@@ -109,7 +99,6 @@ const SalesReport = () => {
             </p>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -127,7 +116,6 @@ const SalesReport = () => {
             </p>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -145,7 +133,6 @@ const SalesReport = () => {
             </p>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -164,7 +151,6 @@ const SalesReport = () => {
           </div>
         </div>
       </div>
-
       {}
       <Card>
         <div className="relative">
@@ -178,7 +164,6 @@ const SalesReport = () => {
           />
         </div>
       </Card>
-
       {}
       <Card>
         <div className="overflow-x-auto">
@@ -269,7 +254,6 @@ const SalesReport = () => {
                         </span>
                       </td>
                     </tr>
-
                     {}
                     {expandedItems.has(item._id) && (
                       <tr>
@@ -377,7 +361,6 @@ const SalesReport = () => {
           </table>
         </div>
       </Card>
-
       {}
       <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
         <div className="flex items-start gap-3">
@@ -398,5 +381,4 @@ const SalesReport = () => {
     </div>
   );
 };
-
 export default SalesReport;

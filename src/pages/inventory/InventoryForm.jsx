@@ -18,90 +18,54 @@ const InventoryForm = () => {
   const { showSuccess, showError, showWarning, showInfo } = useContext(ToastContext);
   const { isAdmin } = useAuth();
 
-  
   const getImageUrl = (image) => {
-    
     if (typeof image === 'string' && image.startsWith('blob:')) return image;
-
-    
     if (image === '/placeholder-product.png') return image;
-
-    
     const path = typeof image === 'object' ? image?.path : image;
-
     if (!path) return '/placeholder-product.png';
-
-    
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
-
-    
     if (path.startsWith('/uploads')) {
       const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5001';
       return `${backendUrl}${path}`;
     }
-
     return path;
   };
-
-  
   const [currentStep, setCurrentStep] = useState(0);
-
-  
   const [formData, setFormData] = useState({
-
     itemName: '',
     skuCode: '',
     description: '',
     category: '',
     unit: 'pieces', 
     tags: [],
-
     images: [],
     primaryImageIndex: 0,
   });
-
-
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
-
-  
   const [tagInput, setTagInput] = useState('');
-
-  
   const [imagePreviews, setImagePreviews] = useState([]);
   const [uploadingImages, setUploadingImages] = useState(false);
-
-
   const [categories, setCategories] = useState([]);
   const [loadingSettings, setLoadingSettings] = useState(true);
-
-  
   const [showCancelModal, setShowCancelModal] = useState(false);
-
-  
   const steps = [
     { id: 0, title: 'Basic Information', icon: FileText },
     { id: 1, title: 'Images', icon: Image },
   ];
-
-  
   useEffect(() => {
     if (isEditMode) {
       loadInventoryData();
     }
   }, [id]);
-
-  
   useEffect(() => {
     fetchCategories();
   }, []);
-
-
   useEffect(() => {
     if (!isEditMode && !formData.skuCode) {
       const generateUniqueSKU = () => {
@@ -113,59 +77,44 @@ const InventoryForm = () => {
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const seconds = String(now.getSeconds()).padStart(2, '0');
         const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
-
-
         return `SKU-${year}${month}${day}-${hours}${minutes}${seconds}-${milliseconds}`;
       };
-
       setFormData((prev) => ({
         ...prev,
         skuCode: generateUniqueSKU(),
       }));
     }
   }, [isEditMode]);
-
   const fetchCategories = async () => {
     setLoadingSettings(true);
     try {
-      
       setCategories([]);
     } catch (error) {
       console.error('Error fetching settings:', error);
-
       setCategories([]);
       showError('Failed to load categories. Please ensure the server is running.');
     } finally {
       setLoadingSettings(false);
     }
   };
-
-  
   useEffect(() => {
     if (!isEditMode) {
       const timer = setTimeout(() => {
         saveDraft();
       }, 5000); 
-
       return () => clearTimeout(timer);
     }
   }, [formData]);
-
-  
   useEffect(() => {
     if (!isEditMode) {
       loadDraft();
     }
   }, []);
-
   const loadInventoryData = async () => {
     setLoading(true);
     try {
       const response = await api.get(`/inventory/${id}`);
-      
       const item = response.data.item || response.data.data?.item || response.data;
-
-
       setFormData({
         itemName: item.itemName || '',
         skuCode: item.skuCode || '',
@@ -176,7 +125,6 @@ const InventoryForm = () => {
         images: item.images || [],
         primaryImageIndex: item.primaryImageIndex || 0,
       });
-
       if (item.images && item.images.length > 0) {
         setImagePreviews(item.images);
       }
@@ -189,7 +137,6 @@ const InventoryForm = () => {
       setLoading(false);
     }
   };
-
   const saveDraft = () => {
     try {
       localStorage.setItem('inventoryDraft', JSON.stringify(formData));
@@ -199,21 +146,17 @@ const InventoryForm = () => {
       console.error('Failed to save draft:', error);
     }
   };
-
   const loadDraft = () => {
     try {
       const draft = localStorage.getItem('inventoryDraft');
       if (draft) {
         const parsedDraft = JSON.parse(draft);
-
         setFormData((prev) => ({
           ...prev,
           ...parsedDraft,
-
           category: parsedDraft.category || '',
           tags: parsedDraft.tags || [],
           images: parsedDraft.images || [],
-
           skuCode: parsedDraft.skuCode || prev.skuCode,
         }));
         setAutoSaveStatus('Draft loaded');
@@ -223,20 +166,15 @@ const InventoryForm = () => {
       console.error('Failed to load draft:', error);
     }
   };
-
   const clearDraft = () => {
     localStorage.removeItem('inventoryDraft');
   };
-
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -244,19 +182,15 @@ const InventoryForm = () => {
       }));
     }
   };
-
-  
   const handleTagInputChange = (e) => {
     setTagInput(e.target.value);
   };
-
   const handleTagInputKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       addTag();
     }
   };
-
   const addTag = () => {
     const tag = tagInput.trim().toLowerCase();
     if (tag && !formData.tags.includes(tag)) {
@@ -267,62 +201,43 @@ const InventoryForm = () => {
       setTagInput('');
     }
   };
-
   const removeTag = (tagToRemove) => {
     setFormData((prev) => ({
       ...prev,
       tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
   };
-
-  
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
-
     setUploadingImages(true);
-
     try {
-      
       const newPreviews = [];
       const newImages = [];
       let hasErrors = false;
-
       for (const file of files) {
-        
         if (!file.type.startsWith('image/')) {
           showWarning(`${file.name} is not an image file`);
           hasErrors = true;
           continue;
         }
-
-        
         if (file.size > 5 * 1024 * 1024) {
           showWarning(`${file.name} is too large (max 5MB)`);
           hasErrors = true;
           continue;
         }
-
-        
         const previewUrl = URL.createObjectURL(file);
         newPreviews.push(previewUrl);
-
-        
-        
         newImages.push(file);
       }
-
       setImagePreviews((prev) => [...prev, ...newPreviews]);
       setFormData((prev) => ({
         ...prev,
         images: [...prev.images, ...newImages],
       }));
-
       if (newImages.length > 0) {
         showSuccess(`${newImages.length} image(s) uploaded successfully`);
       }
-
-      
       e.target.value = '';
     } catch (error) {
       showError('Failed to upload images');
@@ -330,14 +245,12 @@ const InventoryForm = () => {
       setUploadingImages(false);
     }
   };
-
   const handleSetPrimaryImage = (index) => {
     setFormData((prev) => ({
       ...prev,
       primaryImageIndex: index,
     }));
   };
-
   const handleDeleteImage = (index) => {
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
     setFormData((prev) => ({
@@ -351,11 +264,8 @@ const InventoryForm = () => {
           : prev.primaryImageIndex,
     }));
   };
-
-
   const validateStep = (step) => {
     const newErrors = {};
-
     switch (step) {
       case 0:
         if (!formData.itemName.trim()) {
@@ -363,7 +273,6 @@ const InventoryForm = () => {
         } else if (formData.itemName.trim().length < 2) {
           newErrors.itemName = 'Item name must be at least 2 characters';
         }
-
         if (!formData.skuCode.trim()) {
           newErrors.skuCode = 'SKU code is required';
         } else if (formData.skuCode.trim().length < 3) {
@@ -371,57 +280,41 @@ const InventoryForm = () => {
         } else if (!/^[A-Z0-9-_]+$/i.test(formData.skuCode)) {
           newErrors.skuCode = 'SKU code can only contain letters, numbers, hyphens, and underscores';
         }
-
         if (!formData.category) {
           newErrors.category = 'Category is required';
         }
-
         if (!formData.unit) {
           newErrors.unit = 'Unit of measurement is required';
         }
         break;
-
       case 1:
-        
         break;
-
       default:
         break;
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-
   const isCurrentStepValid = () => {
     return validateStep(currentStep);
   };
-
-  
   const handleNext = () => {
     if (validateStep(currentStep)) {
       setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
       window.scrollTo(0, 0);
     }
   };
-
   const handlePrevious = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
     window.scrollTo(0, 0);
   };
-
   const handleStepClick = (stepIndex) => {
-    
     if (stepIndex <= currentStep) {
       setCurrentStep(stepIndex);
       window.scrollTo(0, 0);
     }
   };
-
-  
   const handleKeyDown = (e) => {
-    
     if (e.target.type === 'file') {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -429,44 +322,29 @@ const InventoryForm = () => {
       }
       return;
     }
-
     if (e.key === 'Enter' && e.target.type !== 'textarea') {
-      
-      
       if (currentStep === steps.length - 1) {
-        
         if (e.target.type !== 'submit') {
           e.preventDefault();
           e.stopPropagation();
         }
         return;
       }
-
-      
       if (currentStep < steps.length - 1 || e.target.type !== 'submit') {
         e.preventDefault();
-
-        
         if (currentStep < steps.length - 1 && validateStep(currentStep)) {
           handleNext();
         }
       }
     }
   };
-
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    
-    
     if (currentStep !== steps.length - 1) {
       console.warn('Form submission blocked: not on final step');
       e.stopPropagation();
       return false;
     }
-
-    
     let isValid = true;
     for (let i = 0; i < steps.length; i++) {
       if (!validateStep(i)) {
@@ -475,7 +353,6 @@ const InventoryForm = () => {
         break;
       }
     }
-
     if (!isValid) {
       showError('Please fix all validation errors before submitting');
       setAlert({
@@ -484,30 +361,22 @@ const InventoryForm = () => {
       });
       return;
     }
-
     setSubmitLoading(true);
     setAlert(null);
-
     try {
-
       const submitData = new FormData();
-
       submitData.append('itemName', formData.itemName);
       submitData.append('skuCode', formData.skuCode);
       submitData.append('description', formData.description);
       submitData.append('category', formData.category);
       submitData.append('unit', formData.unit);
       submitData.append('tags', JSON.stringify(formData.tags));
-
-
       formData.images.forEach((image, index) => {
         if (image instanceof File) {
           submitData.append('images', image);
         }
       });
       submitData.append('primaryImageIndex', formData.primaryImageIndex);
-
-
       let response;
       if (isEditMode) {
         response = await api.put(`/inventory/${id}`, submitData, {
@@ -518,22 +387,15 @@ const InventoryForm = () => {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
       }
-
-
       clearDraft();
-
-
       const successMessage = isEditMode
         ? 'Inventory item updated successfully'
         : 'Inventory item created successfully';
-
       showSuccess(successMessage);
       setAlert({
         type: 'success',
         message: successMessage,
       });
-
-
       setTimeout(() => {
         navigate('/inventory');
       }, 1500);
@@ -548,17 +410,13 @@ const InventoryForm = () => {
       setSubmitLoading(false);
     }
   };
-
-
   const handleCancel = () => {
     setShowCancelModal(true);
   };
-
   const confirmCancel = () => {
     clearDraft();
     navigate('/inventory');
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -569,7 +427,6 @@ const InventoryForm = () => {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8 px-4 sm:px-6 lg:px-8 pb-20 sm:pb-8">
       <div className="max-w-4xl mx-auto">
@@ -583,7 +440,6 @@ const InventoryForm = () => {
               ? 'Update the details of your inventory item'
               : 'Fill in the details to add a new item to your inventory'}
           </p>
-
           {}
           {formData.skuCode && (
             <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg">
@@ -596,14 +452,12 @@ const InventoryForm = () => {
               </div>
             </div>
           )}
-
           {autoSaveStatus && (
             <p className="mt-2 text-sm text-green-600 dark:text-green-400">
               {autoSaveStatus}
             </p>
           )}
         </div>
-
         {}
         <div className="mb-6 sm:mb-8 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
           <div className="flex items-center justify-between min-w-max sm:min-w-0">
@@ -649,7 +503,6 @@ const InventoryForm = () => {
             ))}
           </div>
         </div>
-
         {}
         {alert && (
           <div className="mb-6">
@@ -662,7 +515,6 @@ const InventoryForm = () => {
             </Alert>
           </div>
         )}
-
         {}
         <form onSubmit={handleSubmit} onKeyDown={handleKeyDown}>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
@@ -672,7 +524,6 @@ const InventoryForm = () => {
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                   Basic Information
                 </h2>
-
                 <Input
                   label="Item Name"
                   name="itemName"
@@ -683,7 +534,6 @@ const InventoryForm = () => {
                   required
                   fullWidth
                 />
-
                 <Input
                   label="SKU"
                   name="skuCode"
@@ -696,7 +546,6 @@ const InventoryForm = () => {
                   fullWidth
                   disabled={!isEditMode}
                 />
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                     Description
@@ -710,7 +559,6 @@ const InventoryForm = () => {
                     className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                   />
                 </div>
-
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -743,7 +591,6 @@ const InventoryForm = () => {
                     Categories are managed by administrators
                   </p>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Unit of Measurement <span className="text-red-500">*</span>
@@ -781,7 +628,6 @@ const InventoryForm = () => {
                     How this item is measured (e.g., pieces, kg, liters)
                   </p>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                     Tags
@@ -820,20 +666,17 @@ const InventoryForm = () => {
                 </div>
               </div>
             )}
-
             {}
             {currentStep === 1 && (
               <div
                 className="space-y-6"
                 onClick={(e) => {
-                  
                   e.stopPropagation();
                 }}
               >
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                   Images
                 </h2>
-
                 {}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
@@ -843,7 +686,6 @@ const InventoryForm = () => {
                     <label
                       className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
                       onClick={(e) => {
-                        
                         e.stopPropagation();
                       }}
                     >
@@ -878,7 +720,6 @@ const InventoryForm = () => {
                     </label>
                   </div>
                 </div>
-
                 {imagePreviews.length > 0 && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
@@ -899,14 +740,12 @@ const InventoryForm = () => {
                             alt={`Preview ${index + 1}`}
                             className="w-full h-32 object-cover"
                           />
-
                           {}
                           {formData.primaryImageIndex === index && (
                             <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
                               Primary
                             </div>
                           )}
-
                           {}
                           <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                             {formData.primaryImageIndex !== index && (
@@ -941,7 +780,6 @@ const InventoryForm = () => {
                     </div>
                   </div>
                 )}
-
                 {imagePreviews.length === 0 && (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     No images uploaded yet
@@ -950,7 +788,6 @@ const InventoryForm = () => {
               </div>
             )}
           </div>
-
           {}
           <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
             <div className="flex gap-3 order-2 sm:order-1">
@@ -960,12 +797,10 @@ const InventoryForm = () => {
                 </Button>
               )}
             </div>
-
             <div className="flex gap-3 order-1 sm:order-2">
               <Button type="button" variant="ghost" onClick={handleCancel} fullWidth className="sm:w-auto flex-1 sm:flex-none">
                 Cancel
               </Button>
-
               {currentStep < steps.length - 1 ? (
                 <Button
                   type="button"
@@ -992,7 +827,6 @@ const InventoryForm = () => {
           </div>
         </form>
       </div>
-
       {}
       <Modal
         isOpen={showCancelModal}
@@ -1045,5 +879,4 @@ const InventoryForm = () => {
     </div>
   );
 };
-
 export default InventoryForm;

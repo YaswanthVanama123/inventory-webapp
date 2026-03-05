@@ -14,8 +14,6 @@ const LoadingFallback = () => (
     </div>
   </div>
 );
-
-
 const Login = lazy(() => import('./pages/Login'));
 const AdminDashboard = lazy(() => import('./pages/admin/EnhancedDashboard'));
 const EmployeeDashboard = lazy(() => import('./pages/employee/Dashboard'));
@@ -62,61 +60,40 @@ const TruckCheckoutDetail = lazy(() => import('./pages/truck-checkout/TruckCheck
 const EmployeeCheckouts = lazy(() => import('./pages/truck-checkout/EmployeeCheckouts'));
 const DiscrepancyPage = lazy(() => import('./pages/admin/DiscrepancyPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
-
-
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
   const { isAuthenticated, isAdmin, loading } = React.useContext(AuthContext);
-
   if (loading) {
     return <LoadingFallback />;
   }
-
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-
   if (requireAdmin && !isAdmin) {
     return <Navigate to="/dashboard" replace />;
   }
-
   return <MainLayout>{children}</MainLayout>;
 };
-
-
-
-
-
 const DashboardRoute = () => {
   const { isAdmin, loading } = React.useContext(AuthContext);
-
   if (loading) {
     return <LoadingFallback />;
   }
-
-  
   if (isAdmin) {
     return <AdminDashboard />;
   } else {
     return <EmployeeDashboard />;
   }
 };
-
-
 const RootRoute = () => {
   const { isAuthenticated, loading } = React.useContext(AuthContext);
-
   if (loading) {
     return <LoadingFallback />;
   }
-
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
-
   return <Navigate to="/login" replace />;
 };
-
-
 function App() {
   return (
     <ErrorBoundary>
@@ -134,7 +111,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/login"
@@ -144,7 +120,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/dashboard"
@@ -156,7 +131,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/inventory"
@@ -248,7 +222,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/pos"
@@ -260,7 +233,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/categories"
@@ -272,7 +244,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/units"
@@ -284,7 +255,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/coupons"
@@ -296,7 +266,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/invoices"
@@ -358,7 +327,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/routestar/model-mapping"
@@ -370,7 +338,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/routestar/item-alias-mapping"
@@ -382,7 +349,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/routestar/items"
@@ -394,7 +360,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/routestar/sales-report"
@@ -406,7 +371,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/routestar/items-invoice-usage"
@@ -418,7 +382,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/approvals"
@@ -430,7 +393,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/users"
@@ -462,7 +424,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/reports"
@@ -494,7 +455,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/settings"
@@ -506,7 +466,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/toast-demo"
@@ -518,7 +477,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/error-boundary-demo"
@@ -530,7 +488,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/trash"
@@ -542,7 +499,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/activities"
@@ -554,7 +510,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/system/fetch-history"
@@ -566,7 +521,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/profile"
@@ -578,7 +532,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/my-work"
@@ -590,7 +543,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="/truck-checkouts"
@@ -632,7 +584,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-
                 {}
                 <Route
                   path="*"
@@ -650,5 +601,4 @@ function App() {
     </ErrorBoundary>
   );
 }
-
 export default App;

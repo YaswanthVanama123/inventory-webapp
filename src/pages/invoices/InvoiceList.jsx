@@ -18,10 +18,7 @@ const InvoiceList = () => {
   const { isAdmin } = useAuth();
   const { showSuccess, showError, showInfo } = useContext(ToastContext);
 
-  
   const [searchParams, setSearchParams] = useSearchParams();
-  
-  
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,58 +34,42 @@ const InvoiceList = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [viewMode, setViewMode] = useState('table'); 
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
-
-  
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [emailAddress, setEmailAddress] = useState('');
   const [emailMessage, setEmailMessage] = useState('');
   const [sendingEmail, setSendingEmail] = useState(false);
-
-  
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [invoiceToDelete, setInvoiceToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
-
   const [itemsPerPage, setItemsPerPage] = useState(15);
-
-  
   useEffect(() => {
     fetchInvoices();
   }, [searchTerm, statusFilter, paymentStatusFilter, dateFrom, dateTo, currentPage, itemsPerPage]);
-
   const fetchInvoices = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const params = {
         page: currentPage,
         limit: itemsPerPage,
       };
-
       if (searchTerm) {
         params.search = searchTerm;
       }
-
       if (statusFilter) {
         params.status = statusFilter;
       }
-
       if (paymentStatusFilter) {
         params.paymentStatus = paymentStatusFilter;
       }
-
       if (dateFrom) {
         params.dateFrom = dateFrom;
       }
-
       if (dateTo) {
         params.dateTo = dateTo;
       }
-
       const response = await api.get('/invoices', { params });
-
       setInvoices(response.data.invoices || response.data || []);
       setTotalPages(response.data.totalPages || 1);
       setTotalItems(response.data.total || (response.data.invoices || response.data || []).length);
@@ -101,32 +82,26 @@ const InvoiceList = () => {
       setLoading(false);
     }
   };
-
   const handleSearch = (value) => {
     setSearchTerm(value);
     setCurrentPage(1);
   };
-
   const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
     setCurrentPage(1);
   };
-
   const handlePaymentStatusFilterChange = (e) => {
     setPaymentStatusFilter(e.target.value);
     setCurrentPage(1);
   };
-
   const handleDateFromChange = (e) => {
     setDateFrom(e.target.value);
     setCurrentPage(1);
   };
-
   const handleDateToChange = (e) => {
     setDateTo(e.target.value);
     setCurrentPage(1);
   };
-
   const handleClearFilters = () => {
     setSearchTerm('');
     setStatusFilter('');
@@ -135,46 +110,37 @@ const InvoiceList = () => {
     setDateTo('');
     setCurrentPage(1);
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
   const handlePageSizeChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1); 
   };
-
   const handleCreateInvoice = () => {
     navigate('/invoices/new');
   };
-
   const handleView = (id) => {
     navigate(`/invoices/${id}`);
   };
-
   const handleEdit = (id) => {
     navigate(`/invoices/${id}/edit`);
   };
-
   const handleEmailClick = (invoice) => {
     setSelectedInvoice(invoice);
     setEmailAddress(invoice.customer?.email || '');
     setEmailMessage(`Please find attached invoice ${invoice.invoiceNumber}.`);
     setEmailModalOpen(true);
   };
-
   const handleSendEmail = async () => {
     if (!emailAddress || !selectedInvoice) return;
-
     setSendingEmail(true);
     try {
       await api.post(`/invoices/${selectedInvoice._id}/email`, {
         email: emailAddress,
         message: emailMessage,
       });
-
       showSuccess(`Invoice ${selectedInvoice.invoiceNumber} sent successfully to ${emailAddress}`);
       setEmailModalOpen(false);
       setEmailAddress('');
@@ -188,15 +154,12 @@ const InvoiceList = () => {
       setSendingEmail(false);
     }
   };
-
   const handleDelete = (invoice) => {
     setInvoiceToDelete(invoice);
     setDeleteModalOpen(true);
   };
-
   const confirmDelete = async () => {
     if (!invoiceToDelete) return;
-
     setDeleting(true);
     try {
       await api.delete(`/invoices/${invoiceToDelete._id}`);
@@ -211,10 +174,8 @@ const InvoiceList = () => {
       setDeleting(false);
     }
   };
-
   const handleDownloadPDF = (id, invoiceNumber) => {
     try {
-      
       const pdfUrl = `${api.defaults.baseURL}/invoices/${id}/pdf`;
       window.open(pdfUrl, '_blank');
       showInfo(`Downloading invoice ${invoiceNumber}`);
@@ -222,8 +183,6 @@ const InvoiceList = () => {
       showError('Failed to download PDF');
     }
   };
-
-  
   const getStatusBadgeVariant = (status) => {
     const variants = {
       draft: 'default',
@@ -233,7 +192,6 @@ const InvoiceList = () => {
     };
     return variants[status?.toLowerCase()] || 'default';
   };
-
   const getPaymentStatusBadgeVariant = (paymentStatus) => {
     const variants = {
       pending: 'warning',
@@ -242,16 +200,12 @@ const InvoiceList = () => {
     };
     return variants[paymentStatus?.toLowerCase()] || 'default';
   };
-
-  
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount || 0);
   };
-
-  
   const formatDate = (date) => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleDateString('en-US', {
@@ -260,8 +214,6 @@ const InvoiceList = () => {
       day: 'numeric',
     });
   };
-
-  
   const statusOptions = [
     { value: '', label: 'All Statuses' },
     { value: 'draft', label: 'Draft' },
@@ -269,19 +221,13 @@ const InvoiceList = () => {
     { value: 'paid', label: 'Paid' },
     { value: 'cancelled', label: 'Cancelled' },
   ];
-
-  
   const paymentStatusOptions = [
     { value: '', label: 'All Payment Statuses' },
     { value: 'pending', label: 'Pending' },
     { value: 'paid', label: 'Paid' },
     { value: 'overdue', label: 'Overdue' },
   ];
-
-  
   const hasActiveFilters = searchTerm || statusFilter || paymentStatusFilter || dateFrom || dateTo;
-
-  
   if (loading && invoices.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -289,7 +235,6 @@ const InvoiceList = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {}
@@ -315,7 +260,6 @@ const InvoiceList = () => {
           )}
         </div>
       </div>
-
       {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="space-y-4">
@@ -328,7 +272,6 @@ const InvoiceList = () => {
               fullWidth
             />
           </div>
-
           {}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {}
@@ -339,7 +282,6 @@ const InvoiceList = () => {
               options={statusOptions}
               fullWidth
             />
-
             {}
             <Select
               name="paymentStatus"
@@ -348,7 +290,6 @@ const InvoiceList = () => {
               options={paymentStatusOptions}
               fullWidth
             />
-
             {}
             <Input
               type="date"
@@ -358,7 +299,6 @@ const InvoiceList = () => {
               placeholder="From Date"
               fullWidth
             />
-
             {}
             <Input
               type="date"
@@ -369,7 +309,6 @@ const InvoiceList = () => {
               fullWidth
             />
           </div>
-
           {}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             {hasActiveFilters && (
@@ -385,7 +324,6 @@ const InvoiceList = () => {
                 Clear Filters
               </Button>
             )}
-
             {}
             <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1 ml-auto">
               <button
@@ -418,7 +356,6 @@ const InvoiceList = () => {
           </div>
         </div>
       </div>
-
       {}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -430,7 +367,6 @@ const InvoiceList = () => {
           </div>
         </div>
       )}
-
       {}
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
@@ -538,7 +474,6 @@ const InvoiceList = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                               </svg>
                             </button>
-
                             {}
                             <button
                               onClick={() => handleDownloadPDF(invoice._id, invoice.invoiceNumber)}
@@ -549,7 +484,6 @@ const InvoiceList = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                               </svg>
                             </button>
-
                             {}
                             <button
                               onClick={() => handleEmailClick(invoice)}
@@ -560,7 +494,6 @@ const InvoiceList = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                               </svg>
                             </button>
-
                             {}
                             {isAdmin && (
                               <button
@@ -573,7 +506,6 @@ const InvoiceList = () => {
                                 </svg>
                               </button>
                             )}
-
                             {}
                             {isAdmin && (
                               <button
@@ -595,7 +527,6 @@ const InvoiceList = () => {
               </div>
             </div>
           )}
-
           {}
           {viewMode === 'card' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -619,7 +550,6 @@ const InvoiceList = () => {
                       </Badge>
                     </div>
                   </div>
-
                   {}
                   <div className="p-4 space-y-3">
                     {}
@@ -632,7 +562,6 @@ const InvoiceList = () => {
                         <div className="text-xs text-gray-500">{invoice.customer.email}</div>
                       )}
                     </div>
-
                     {}
                     <div className="grid grid-cols-2 gap-3">
                       <div>
@@ -646,7 +575,6 @@ const InvoiceList = () => {
                         </div>
                       </div>
                     </div>
-
                     {}
                     <div>
                       <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Payment Status</div>
@@ -655,7 +583,6 @@ const InvoiceList = () => {
                       </Badge>
                     </div>
                   </div>
-
                   {}
                   <div className="border-t border-gray-200 bg-gray-50 p-3">
                     <div className="flex items-center justify-between gap-2">
@@ -671,7 +598,6 @@ const InvoiceList = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
                         </button>
-
                         <button
                           onClick={() => handleDownloadPDF(invoice._id, invoice.invoiceNumber)}
                           className="text-green-600 hover:text-green-800 p-2 rounded-lg hover:bg-green-50 transition-colors"
@@ -681,7 +607,6 @@ const InvoiceList = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                         </button>
-
                         <button
                           onClick={() => handleEmailClick(invoice)}
                           className="text-teal-600 hover:text-teal-800 p-2 rounded-lg hover:bg-teal-50 transition-colors"
@@ -692,7 +617,6 @@ const InvoiceList = () => {
                           </svg>
                         </button>
                       </div>
-
                       {}
                       {isAdmin && (
                         <div className="flex items-center gap-2">
@@ -705,7 +629,6 @@ const InvoiceList = () => {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                           </button>
-
                           <button
                             onClick={() => handleDelete(invoice._id, invoice.invoiceNumber)}
                             className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-colors"
@@ -723,7 +646,6 @@ const InvoiceList = () => {
               ))}
             </div>
           )}
-
           {}
           <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
             <Pagination
@@ -740,7 +662,6 @@ const InvoiceList = () => {
           </div>
         </>
       )}
-
       {}
       <Modal
         isOpen={emailModalOpen}
@@ -773,7 +694,6 @@ const InvoiceList = () => {
               Send invoice <span className="font-mono font-semibold">{selectedInvoice?.invoiceNumber}</span> to the customer via email.
             </p>
           </div>
-
           <Input
             type="email"
             name="email"
@@ -784,7 +704,6 @@ const InvoiceList = () => {
             required
             fullWidth
           />
-
           <div>
             <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
               Message (Optional)
@@ -801,7 +720,6 @@ const InvoiceList = () => {
           </div>
         </div>
       </Modal>
-
       {}
       <Modal
         isOpen={deleteModalOpen}
@@ -861,7 +779,6 @@ const InvoiceList = () => {
                 </div>
               </div>
             </div>
-
             <div className="space-y-2">
               <p className="text-sm text-gray-700">
                 Are you sure you want to delete the following invoice?
@@ -898,5 +815,4 @@ const InvoiceList = () => {
     </div>
   );
 };
-
 export default InvoiceList;

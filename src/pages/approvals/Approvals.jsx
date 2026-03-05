@@ -21,11 +21,9 @@ const Approvals = () => {
     fetchPendingInvoices();
     fetchPendingPurchaseDeletions();
   }, []);
-
   const fetchPendingInvoices = async () => {
     setLoading(true);
     try {
-
       const response = await api.get('/invoices?status=pending');
       setPendingInvoices(response.data.invoices || []);
     } catch (error) {
@@ -35,7 +33,6 @@ const Approvals = () => {
       setLoading(false);
     }
   };
-
   const fetchPendingPurchaseDeletions = async () => {
     try {
       const response = await api.get('/approvals/purchases/pending');
@@ -45,7 +42,6 @@ const Approvals = () => {
       showError('Failed to load pending purchase deletions');
     }
   };
-
   const handleApprove = async (invoiceId) => {
     setProcessing(true);
     try {
@@ -62,11 +58,9 @@ const Approvals = () => {
       setProcessing(false);
     }
   };
-
   const handleReject = async (invoiceId) => {
     const reason = prompt('Please enter rejection reason:');
     if (!reason) return;
-
     setProcessing(true);
     try {
       await api.patch(`/invoices/${invoiceId}`, {
@@ -82,11 +76,9 @@ const Approvals = () => {
       setProcessing(false);
     }
   };
-
   const handleView = (invoiceId) => {
     navigate(`/invoices/${invoiceId}`);
   };
-
   const handleApprovePurchaseDeletion = async (purchaseId) => {
     setProcessing(true);
     try {
@@ -100,11 +92,9 @@ const Approvals = () => {
       setProcessing(false);
     }
   };
-
   const handleRejectPurchaseDeletion = async (purchaseId) => {
     const reason = prompt('Please enter rejection reason:');
     if (!reason) return;
-
     setProcessing(true);
     try {
       await api.post(`/approvals/purchases/${purchaseId}/reject`, { reason });
@@ -117,11 +107,9 @@ const Approvals = () => {
       setProcessing(false);
     }
   };
-
   if (loading) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="min-h-screen bg-slate-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 max-w-[1800px]">
@@ -147,7 +135,6 @@ const Approvals = () => {
             </div>
           </div>
         </div>
-
         {}
         <div className="mb-4 sm:mb-6">
           <div className="border-b border-slate-200 dark:border-gray-700">
@@ -197,7 +184,6 @@ const Approvals = () => {
             </nav>
           </div>
         </div>
-
         {}
         {activeTab === 'invoices' && (
           <>
@@ -254,7 +240,6 @@ const Approvals = () => {
                             </div>
                           </div>
                         </div>
-
                         {}
                         <div className="bg-blue-50 dark:bg-gray-750 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-blue-200 dark:border-blue-800">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
@@ -279,7 +264,6 @@ const Approvals = () => {
                           </div>
                         </div>
                       </div>
-
                       {}
                       <div className="flex flex-col sm:flex-row lg:flex-col gap-2 sm:gap-3 lg:min-w-[180px]">
                         <Button
@@ -318,7 +302,6 @@ const Approvals = () => {
             )}
           </>
         )}
-
         {}
         {activeTab === 'purchase-deletions' && (
           <>
@@ -376,7 +359,6 @@ const Approvals = () => {
                             </div>
                           </div>
                         </div>
-
                         {}
                         <div className="bg-orange-50 dark:bg-gray-750 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-orange-200 dark:border-orange-800">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
@@ -407,7 +389,6 @@ const Approvals = () => {
                           </div>
                         </div>
                       </div>
-
                       {}
                       <div className="flex flex-col sm:flex-row lg:flex-col gap-2 sm:gap-3 lg:min-w-[180px]">
                         <Button
@@ -442,5 +423,4 @@ const Approvals = () => {
     </div>
   );
 };
-
 export default Approvals;

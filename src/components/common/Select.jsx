@@ -21,10 +21,8 @@ const Select = ({
 
   const normalStyles = 'border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600';
   const errorStyles = 'border-red-500 focus:border-red-500 focus:ring-red-500 dark:border-red-400';
-
   const selectStyles = error ? errorStyles : normalStyles;
   const widthClass = fullWidth ? 'w-full' : '';
-
   return (
     <div className={`${widthClass} ${className}`}>
       {label && (
@@ -36,7 +34,6 @@ const Select = ({
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
-
       <div className="relative">
         <select
           name={name}
@@ -72,13 +69,11 @@ const Select = ({
           </svg>
         </div>
       </div>
-
       {error && (
         <p id={`${name}-error`} className="mt-1 text-sm text-red-600 dark:text-red-400">
           {error}
         </p>
       )}
-
       {helperText && !error && (
         <p id={`${name}-helper`} className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           {helperText}
@@ -87,7 +82,6 @@ const Select = ({
     </div>
   );
 };
-
 Select.propTypes = {
   label: PropTypes.string,
   name: PropTypes.string.isRequired,
@@ -109,5 +103,4 @@ Select.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node,
 };
-
 export default Select;

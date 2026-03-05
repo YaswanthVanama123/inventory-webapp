@@ -14,7 +14,6 @@ const EmployeeActivities = () => {
   const { showSuccess, showError } = useContext(ToastContext);
   const [searchParams, setSearchParams] = useSearchParams();
 
-
   const [loading, setLoading] = useState(true);
   const [activities, setActivities] = useState([]);
   const [stats, setStats] = useState(null);
@@ -25,8 +24,6 @@ const EmployeeActivities = () => {
     pages: 1,
     limit: 20,
   });
-
-
   const [filters, setFilters] = useState({
     employeeId: '',
     action: '',
@@ -36,24 +33,17 @@ const EmployeeActivities = () => {
     search: '',
     page: 1,
   });
-
   const [activeTab, setActiveTab] = useState('all');
-
-
-  
   useEffect(() => {
     if (activeTab === 'all') {
       fetchPageData();
     } else {
-      
       fetchActivities();
     }
   }, [filters, activeTab]);
-
   const fetchPageData = async () => {
     try {
       setLoading(true);
-
       const params = new URLSearchParams();
       if (filters.employeeId) params.append('employeeId', filters.employeeId);
       if (filters.action) params.append('action', filters.action);
@@ -63,10 +53,8 @@ const EmployeeActivities = () => {
       if (filters.search) params.append('search', filters.search);
       params.append('page', filters.page);
       params.append('limit', pagination.limit);
-
       const response = await api.get(`/activities/page-data?${params.toString()}`);
       const data = response.data;
-
       setActivities(data.activities || []);
       setPagination(data.pagination);
       setStats(data.stats);
@@ -78,14 +66,10 @@ const EmployeeActivities = () => {
       setLoading(false);
     }
   };
-
   const fetchActivities = async () => {
     try {
       setLoading(true);
-
       let endpoint = '/activities';
-
-
       if (activeTab === 'sales') {
         endpoint = '/activities/sales';
       } else if (activeTab === 'stock') {
@@ -93,7 +77,6 @@ const EmployeeActivities = () => {
       } else if (activeTab === 'deletions') {
         endpoint = '/activities/deletions';
       }
-
       const params = new URLSearchParams();
       if (filters.employeeId) params.append('employeeId', filters.employeeId);
       if (filters.action) params.append('action', filters.action);
@@ -103,9 +86,7 @@ const EmployeeActivities = () => {
       if (filters.search) params.append('search', filters.search);
       params.append('page', filters.page);
       params.append('limit', pagination.limit);
-
       const response = await api.get(`${endpoint}?${params.toString()}`);
-
       const data = response.data;
       setActivities(data.activities || data.sales || data.deletions || []);
       setPagination(data.pagination);
@@ -116,7 +97,6 @@ const EmployeeActivities = () => {
       setLoading(false);
     }
   };
-
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({
       ...prev,
@@ -124,7 +104,6 @@ const EmployeeActivities = () => {
       page: 1, 
     }));
   };
-
   const clearFilters = () => {
     setFilters({
       employeeId: '',
@@ -136,7 +115,6 @@ const EmployeeActivities = () => {
       page: 1,
     });
   };
-
   const getActionBadgeVariant = (action) => {
     switch (action) {
       case 'CREATE':
@@ -153,7 +131,6 @@ const EmployeeActivities = () => {
         return 'default';
     }
   };
-
   const getActionIcon = (action) => {
     switch (action) {
       case 'CREATE':
@@ -168,23 +145,17 @@ const EmployeeActivities = () => {
         return <Activity className="w-4 h-4" />;
     }
   };
-
   const formatDate = (date) => {
     return new Date(date).toLocaleString();
   };
-
-  
   const getAvailableActions = () => {
     if (!stats || !stats.actionBreakdown) return [];
     return stats.actionBreakdown.map(item => item._id).filter(Boolean);
   };
-
-  
   const getAvailableResources = () => {
     if (!stats || !stats.resourceBreakdown) return [];
     return stats.resourceBreakdown.map(item => item._id).filter(Boolean);
   };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 py-8">
       <div className="container mx-auto px-6 max-w-7xl">
@@ -197,7 +168,6 @@ const EmployeeActivities = () => {
             Track and monitor all employee actions and performance
           </p>
         </div>
-
         {}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -210,7 +180,6 @@ const EmployeeActivities = () => {
                 <Activity className="w-12 h-12 text-blue-200" />
               </div>
             </Card>
-
             <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
               <div className="flex items-center justify-between">
                 <div>
@@ -225,7 +194,6 @@ const EmployeeActivities = () => {
                 <Users className="w-12 h-12 text-green-200" />
               </div>
             </Card>
-
             <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
               <div className="flex items-center justify-between">
                 <div>
@@ -240,7 +208,6 @@ const EmployeeActivities = () => {
                 <TrendingUp className="w-12 h-12 text-purple-200" />
               </div>
             </Card>
-
             <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white">
               <div className="flex items-center justify-between">
                 <div>
@@ -257,7 +224,6 @@ const EmployeeActivities = () => {
             </Card>
           </div>
         )}
-
         {}
         <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
           <nav className="-mb-px flex space-x-8">
@@ -285,7 +251,6 @@ const EmployeeActivities = () => {
             })}
           </nav>
         </div>
-
         {}
         <Card className="mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -308,7 +273,6 @@ const EmployeeActivities = () => {
                 ))}
               </select>
             </div>
-
             {}
             {activeTab === 'all' && (
               <div>
@@ -330,7 +294,6 @@ const EmployeeActivities = () => {
                 </select>
               </div>
             )}
-
             {}
             {activeTab === 'all' && (
               <div>
@@ -352,7 +315,6 @@ const EmployeeActivities = () => {
                 </select>
               </div>
             )}
-
             {}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -366,7 +328,6 @@ const EmployeeActivities = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Calendar className="w-4 h-4 inline mr-1" />
@@ -379,7 +340,6 @@ const EmployeeActivities = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
-
             {}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -394,7 +354,6 @@ const EmployeeActivities = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
-
             {}
             <div className="flex items-end">
               <button
@@ -406,7 +365,6 @@ const EmployeeActivities = () => {
             </div>
           </div>
         </Card>
-
         {}
         <Card>
           <div className="flex items-center justify-between mb-6">
@@ -417,7 +375,6 @@ const EmployeeActivities = () => {
               {pagination.total} total activities
             </span>
           </div>
-
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -444,7 +401,6 @@ const EmployeeActivities = () => {
                   }`}>
                     {getActionIcon(activity.action)}
                   </div>
-
                   {}
                   <div className="flex-grow">
                     <div className="flex items-center justify-between mb-2">
@@ -458,7 +414,6 @@ const EmployeeActivities = () => {
                         {formatDate(activity.timestamp)}
                       </span>
                     </div>
-
                     <div className="flex items-center space-x-2 mb-1">
                       <span className="font-medium text-gray-900 dark:text-white">
                         {activity.performedBy?.fullName || 'Unknown'}
@@ -467,7 +422,6 @@ const EmployeeActivities = () => {
                         ({activity.performedBy?.username || 'unknown'})
                       </span>
                     </div>
-
                     {activity.details && (
                       <div className="text-sm text-gray-600 dark:text-gray-400 overflow-x-auto">
                         <pre className="whitespace-pre-wrap break-words font-mono text-xs bg-gray-100 dark:bg-gray-900 p-2 rounded">
@@ -480,7 +434,6 @@ const EmployeeActivities = () => {
               ))}
             </div>
           )}
-
           {}
           {!loading && activities.length > 0 && pagination.pages > 1 && (
             <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -512,5 +465,4 @@ const EmployeeActivities = () => {
     </div>
   );
 };
-
 export default EmployeeActivities;

@@ -3,13 +3,10 @@
 import React from 'react';
 import ErrorBoundary from '../components/common/ErrorBoundary';
 import ErrorFallback from '../components/common/ErrorFallback';
-
-
 export const FormWithErrorBoundary = () => {
   return (
     <div className="container">
       <h1>Product Form</h1>
-
       <ErrorBoundary
         errorMessage="Unable to load the form. Please refresh and try again."
         showReset={true}
@@ -19,8 +16,6 @@ export const FormWithErrorBoundary = () => {
     </div>
   );
 };
-
-
 export const TableWithErrorBoundary = () => {
   const tableFallback = (
     <ErrorFallback
@@ -31,24 +26,19 @@ export const TableWithErrorBoundary = () => {
       onRetry={() => window.location.reload()}
     />
   );
-
   return (
     <div className="container">
       <h1>Inventory List</h1>
-
       <ErrorBoundary fallback={tableFallback}>
         <InventoryTable />
       </ErrorBoundary>
     </div>
   );
 };
-
-
 export const DashboardWithMultipleErrorBoundaries = () => {
   return (
     <div className="container">
       <h1>Dashboard</h1>
-
       {}
       <ErrorBoundary
         errorMessage="Unable to load statistics"
@@ -62,7 +52,6 @@ export const DashboardWithMultipleErrorBoundaries = () => {
       >
         <StatsSection />
       </ErrorBoundary>
-
       {}
       <ErrorBoundary
         errorMessage="Unable to load recent activity"
@@ -76,7 +65,6 @@ export const DashboardWithMultipleErrorBoundaries = () => {
       >
         <RecentActivitySection />
       </ErrorBoundary>
-
       {}
       <ErrorBoundary
         errorMessage="Unable to load charts"
@@ -93,24 +81,13 @@ export const DashboardWithMultipleErrorBoundaries = () => {
     </div>
   );
 };
-
-
 export const FormWithErrorReporting = () => {
   const handleFormError = (error, errorInfo) => {
-    
     console.log('Form error:', error.message);
-
-    
-    
-    
-    
-    
   };
-
   return (
     <div className="container">
       <h1>Invoice Form</h1>
-
       <ErrorBoundary
         onError={handleFormError}
         errorMessage="There was an error with the invoice form."
@@ -120,13 +97,10 @@ export const FormWithErrorReporting = () => {
     </div>
   );
 };
-
-
 export const NestedErrorBoundaries = () => {
   return (
     <div className="container">
       <h1>Complex Page Layout</h1>
-
       <div className="grid grid-cols-2 gap-4">
         {}
         <div>
@@ -134,14 +108,12 @@ export const NestedErrorBoundaries = () => {
             <Sidebar />
           </ErrorBoundary>
         </div>
-
         {}
         <div>
           {}
           <ErrorBoundary>
             <MainContent />
           </ErrorBoundary>
-
           {}
           <ErrorBoundary
             fallback={
@@ -159,13 +131,10 @@ export const NestedErrorBoundaries = () => {
     </div>
   );
 };
-
-
 export const ConditionalErrorBoundary = ({ isComplexView }) => {
   return (
     <div className="container">
       <h1>Dynamic View</h1>
-
       {}
       {isComplexView ? (
         <ErrorBoundary>
@@ -177,15 +146,11 @@ export const ConditionalErrorBoundary = ({ isComplexView }) => {
     </div>
   );
 };
-
-
 export const ErrorBoundaryWithRetry = () => {
   const [retryCount, setRetryCount] = React.useState(0);
-
   const handleRetry = () => {
     setRetryCount(retryCount + 1);
   };
-
   const retryFallback = (
     <ErrorFallback
       title="Failed to Load"
@@ -194,21 +159,15 @@ export const ErrorBoundaryWithRetry = () => {
       onRetry={handleRetry}
     />
   );
-
   return (
     <div className="container">
       <h1>Component with Retry</h1>
-
       <ErrorBoundary key={retryCount} fallback={retryFallback}>
         <DataComponent />
       </ErrorBoundary>
     </div>
   );
 };
-
-
-
-
 const ComplexProductForm = () => <div>Form</div>;
 const InventoryTable = () => <div>Table</div>;
 const StatsSection = () => <div>Stats</div>;

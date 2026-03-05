@@ -10,37 +10,27 @@ const UserProfile = () => {
   const { user, changePassword, loading } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [message, setMessage] = useState({ type: '', text: '' });
-
-  
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
-
-  
   const [preferences, setPreferences] = useState({
     emailNotifications: true,
     language: 'en',
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
-
-  
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     label: '',
     color: '',
   });
-
-  
   useEffect(() => {
     const savedPreferences = localStorage.getItem('userPreferences');
     if (savedPreferences) {
       setPreferences(JSON.parse(savedPreferences));
     }
   }, []);
-
-  
   useEffect(() => {
     if (message.text) {
       const timer = setTimeout(() => {
@@ -49,31 +39,21 @@ const UserProfile = () => {
       return () => clearTimeout(timer);
     }
   }, [message]);
-
-  
   useEffect(() => {
     const password = passwordForm.newPassword;
     if (!password) {
       setPasswordStrength({ score: 0, label: '', color: '' });
       return;
     }
-
     let score = 0;
-
-    
     if (password.length >= 8) score++;
     if (password.length >= 12) score++;
-
-    
     if (/[a-z]/.test(password)) score++;
     if (/[A-Z]/.test(password)) score++;
     if (/[0-9]/.test(password)) score++;
     if (/[^a-zA-Z0-9]/.test(password)) score++;
-
-    
     let label = '';
     let color = '';
-
     if (score <= 2) {
       label = 'Weak';
       color = 'bg-red-500';
@@ -84,11 +64,8 @@ const UserProfile = () => {
       label = 'Strong';
       color = 'bg-green-500';
     }
-
     setPasswordStrength({ score, label, color });
   }, [passwordForm.newPassword]);
-
-  
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
     setPasswordForm((prev) => ({
@@ -96,8 +73,6 @@ const UserProfile = () => {
       [name]: value,
     }));
   };
-
-  
   const handlePreferencesChange = (e) => {
     const { name, value, type, checked } = e.target;
     setPreferences((prev) => ({
@@ -105,48 +80,36 @@ const UserProfile = () => {
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
-
-  
   const validatePasswordForm = () => {
     const { currentPassword, newPassword, confirmPassword } = passwordForm;
-
     if (!currentPassword || !newPassword || !confirmPassword) {
       setMessage({ type: 'danger', text: 'Please fill in all password fields' });
       return false;
     }
-
     if (newPassword.length < 8) {
       setMessage({ type: 'danger', text: 'New password must be at least 8 characters long' });
       return false;
     }
-
     if (newPassword !== confirmPassword) {
       setMessage({ type: 'danger', text: 'New passwords do not match' });
       return false;
     }
-
     if (currentPassword === newPassword) {
       setMessage({ type: 'danger', text: 'New password must be different from current password' });
       return false;
     }
-
     return true;
   };
-
-  
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     setMessage({ type: '', text: '' });
-
     if (!validatePasswordForm()) {
       return;
     }
-
     const result = await changePassword(
       passwordForm.currentPassword,
       passwordForm.newPassword
     );
-
     if (result.success) {
       setMessage({ type: 'success', text: result.message || 'Password changed successfully' });
       setPasswordForm({
@@ -158,12 +121,9 @@ const UserProfile = () => {
       setMessage({ type: 'danger', text: result.error || 'Failed to change password' });
     }
   };
-
-  
   const handlePreferencesSave = (e) => {
     e.preventDefault();
     setMessage({ type: '', text: '' });
-
     try {
       localStorage.setItem('userPreferences', JSON.stringify(preferences));
       setMessage({ type: 'success', text: 'Preferences saved successfully' });
@@ -171,8 +131,6 @@ const UserProfile = () => {
       setMessage({ type: 'danger', text: 'Failed to save preferences' });
     }
   };
-
-  
   const formatDate = (dateString) => {
     if (!dateString) return 'Never';
     const date = new Date(dateString);
@@ -184,8 +142,6 @@ const UserProfile = () => {
       minute: '2-digit',
     });
   };
-
-  
   const getUserInitials = () => {
     if (user?.fullName) {
       const names = user.fullName.split(' ');
@@ -193,14 +149,11 @@ const UserProfile = () => {
     }
     return user?.username?.slice(0, 2).toUpperCase() || 'U';
   };
-
-  
   const tabs = [
     { id: 'profile', label: 'Profile Information', icon: UserIcon },
     { id: 'password', label: 'Change Password', icon: LockClosedIcon },
     { id: 'preferences', label: 'Preferences', icon: Cog6ToothIcon },
   ];
-
   return (
     <div className="space-y-6">
       {}
@@ -208,14 +161,12 @@ const UserProfile = () => {
         <h1 className="text-3xl font-bold text-slate-900 mb-2">My Profile</h1>
         <p className="text-slate-600">Manage your account settings and preferences</p>
       </div>
-
       {}
       {message.text && (
         <Alert variant={message.type} dismissible onDismiss={() => setMessage({ type: '', text: '' })}>
           {message.text}
         </Alert>
       )}
-
       {}
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
         {}
@@ -240,7 +191,6 @@ const UserProfile = () => {
             ))}
           </nav>
         </div>
-
         {}
         <div className="p-6 sm:p-8">
           {}
@@ -251,7 +201,6 @@ const UserProfile = () => {
                 <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
                   {getUserInitials()}
                 </div>
-
                 {}
                 <div className="flex-1 text-center sm:text-left">
                   <h2 className="text-2xl font-bold text-slate-900">{user?.fullName}</h2>
@@ -269,29 +218,24 @@ const UserProfile = () => {
                   </div>
                 </div>
               </div>
-
               {}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
                   <label className="block text-sm font-medium text-slate-600 mb-1">Username</label>
                   <p className="text-lg font-semibold text-slate-900">{user?.username || 'N/A'}</p>
                 </div>
-
                 <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
                   <label className="block text-sm font-medium text-slate-600 mb-1">Email</label>
                   <p className="text-lg font-semibold text-slate-900">{user?.email || 'N/A'}</p>
                 </div>
-
                 <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
                   <label className="block text-sm font-medium text-slate-600 mb-1">Full Name</label>
                   <p className="text-lg font-semibold text-slate-900">{user?.fullName || 'N/A'}</p>
                 </div>
-
                 <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
                   <label className="block text-sm font-medium text-slate-600 mb-1">Role</label>
                   <p className="text-lg font-semibold text-slate-900 capitalize">{user?.role || 'N/A'}</p>
                 </div>
-
                 <div className="bg-slate-50 rounded-lg p-4 border border-slate-200 md:col-span-2">
                   <label className="block text-sm font-medium text-slate-600 mb-1">Last Login</label>
                   <p className="text-lg font-semibold text-slate-900">{formatDate(user?.lastLogin)}</p>
@@ -299,7 +243,6 @@ const UserProfile = () => {
               </div>
             </div>
           )}
-
           {}
           {activeTab === 'password' && (
             <div className="max-w-2xl">
@@ -307,7 +250,6 @@ const UserProfile = () => {
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">Change Password</h3>
                 <p className="text-slate-600">Update your password to keep your account secure</p>
               </div>
-
               <form onSubmit={handlePasswordSubmit} className="space-y-6">
                 <Input
                   label="Current Password"
@@ -324,7 +266,6 @@ const UserProfile = () => {
                     </svg>
                   }
                 />
-
                 <Input
                   label="New Password"
                   type="password"
@@ -341,7 +282,6 @@ const UserProfile = () => {
                     </svg>
                   }
                 />
-
                 {}
                 {passwordForm.newPassword && (
                   <div className="space-y-2">
@@ -380,7 +320,6 @@ const UserProfile = () => {
                     </ul>
                   </div>
                 )}
-
                 <Input
                   label="Confirm New Password"
                   type="password"
@@ -402,7 +341,6 @@ const UserProfile = () => {
                     </svg>
                   }
                 />
-
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   <Button
                     type="submit"
@@ -439,7 +377,6 @@ const UserProfile = () => {
               </form>
             </div>
           )}
-
           {}
           {activeTab === 'preferences' && (
             <div className="max-w-2xl">
@@ -447,7 +384,6 @@ const UserProfile = () => {
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">Preferences</h3>
                 <p className="text-slate-600">Customize your application experience</p>
               </div>
-
               <form onSubmit={handlePreferencesSave} className="space-y-6">
                 {}
                 <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
@@ -484,7 +420,6 @@ const UserProfile = () => {
                     </button>
                   </div>
                 </div>
-
                 {}
                 <div className="space-y-2">
                   <label htmlFor="language" className="block text-sm font-medium text-slate-700">
@@ -507,7 +442,6 @@ const UserProfile = () => {
                     <option value="ja">Japanese</option>
                   </select>
                 </div>
-
                 {}
                 <div className="space-y-2">
                   <label htmlFor="timezone" className="block text-sm font-medium text-slate-700">
@@ -537,7 +471,6 @@ const UserProfile = () => {
                     <option value="Australia/Sydney">Sydney (AEDT)</option>
                   </select>
                 </div>
-
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   <Button
                     type="submit"
@@ -571,5 +504,4 @@ const UserProfile = () => {
     </div>
   );
 };
-
 export default UserProfile;

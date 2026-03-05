@@ -23,22 +23,17 @@ const InventoryList = () => {
   const { isAdmin } = useAuth();
   const { showSuccess, showError, showInfo } = useContext(ToastContext);
 
-  
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '/placeholder-product.png';
-    
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
-    
     if (imagePath.startsWith('/uploads')) {
       const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5001';
       return `${backendUrl}${imagePath}`;
     }
     return imagePath || '/placeholder-product.png';
   };
-
-  
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -53,13 +48,10 @@ const InventoryList = () => {
   const [categories, setCategories] = useState([]);
   const [viewMode, setViewMode] = useState('folder');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
-
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
-
   const [itemsPerPage, setItemsPerPage] = useState(20);
-
   const [expandedItems, setExpandedItems] = useState({});
   const [purchases, setPurchases] = useState({});
   const [loadingPurchases, setLoadingPurchases] = useState({});
@@ -68,23 +60,16 @@ const InventoryList = () => {
   const [deletePurchaseModalOpen, setDeletePurchaseModalOpen] = useState(false);
   const [purchaseToDelete, setPurchaseToDelete] = useState(null);
   const [deletingPurchase, setDeletingPurchase] = useState(false);
-
-  
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'purchases');
   const [expandedSales, setExpandedSales] = useState({});
   const [sales, setSales] = useState({});
   const [loadingSales, setLoadingSales] = useState({});
-
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
     }, 300);
-
     return () => clearTimeout(timer);
   }, [searchTerm]);
-
-
   useEffect(() => {
     const params = {};
     if (debouncedSearchTerm) params.search = debouncedSearchTerm;
@@ -94,41 +79,27 @@ const InventoryList = () => {
     if (sortOrder !== 'asc') params.sortOrder = sortOrder;
     if (currentPage > 1) params.page = currentPage.toString();
     if (activeTab !== 'purchases') params.tab = activeTab;
-
     setSearchParams(params, { replace: true });
   }, [debouncedSearchTerm, selectedCategory, statusFilter, sortBy, sortOrder, currentPage, activeTab, setSearchParams]);
-
-  
   useEffect(() => {
     fetchCategories();
   }, []);
-
-
-  
-  
   useEffect(() => {
     if (activeTab === 'purchases' && viewMode !== 'folder') {
       fetchInventoryItems();
     } else if (activeTab === 'purchases' && viewMode === 'folder') {
-      
       setLoading(false);
     }
   }, [debouncedSearchTerm, selectedCategory, statusFilter, sortBy, sortOrder, currentPage, itemsPerPage, activeTab, viewMode]);
-
-
   useEffect(() => {
     setError(null);
   }, [activeTab]);
-
   const fetchCategories = async () => {
-    
     setCategories([]);
   };
-
   const fetchInventoryItems = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const params = {
         page: currentPage,
@@ -136,30 +107,22 @@ const InventoryList = () => {
         sortBy,
         sortOrder,
       };
-
       if (debouncedSearchTerm) {
         params.search = debouncedSearchTerm;
       }
-
       if (selectedCategory) {
         params.category = selectedCategory;
       }
-
-      
       if (statusFilter === 'low') {
         params.lowStock = true;
       } else if (statusFilter === 'adequate') {
         params.adequateStock = true;
       }
-
       const response = await api.get('/inventory', { params });
-
       setItems(response.data.items || response.data || []);
       setTotalPages(response.data.totalPages || 1);
       setTotalItems(response.data.total || (response.data.items || response.data || []).length);
       setCurrentPage(response.data.currentPage || 1);
-
-      
       if (statusFilter === 'low' && (response.data.items || response.data || []).length > 0) {
         showInfo(`Found ${(response.data.items || response.data || []).length} low stock items`);
       }
@@ -173,59 +136,47 @@ const InventoryList = () => {
       setLoading(false);
     }
   };
-
   const handleSearch = (value) => {
     setSearchTerm(value);
     setCurrentPage(1); 
   };
-
   const handleCategoryChange = (e) => {
     setSelectedCategory(e.target.value);
     setCurrentPage(1);
   };
-
   const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
     setCurrentPage(1);
   };
-
   const handleSortChange = (e) => {
     const [newSortBy, newSortOrder] = e.target.value.split('-');
     setSortBy(newSortBy);
     setSortOrder(newSortOrder);
     setCurrentPage(1);
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
   const handlePageSizeChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1); 
   };
-
   const handleAddNew = () => {
     navigate('/inventory/new');
   };
-
   const handleView = (id) => {
     navigate(`/inventory/${id}`);
   };
-
   const handleEdit = (id) => {
     navigate(`/inventory/${id}/edit`);
   };
-
   const handleDelete = (item) => {
     setItemToDelete(item);
     setDeleteModalOpen(true);
   };
-
   const confirmDelete = async () => {
     if (!itemToDelete) return;
-
     setDeleting(true);
     try {
       await api.delete(`/inventory/${itemToDelete._id}`);
@@ -240,34 +191,25 @@ const InventoryList = () => {
       setDeleting(false);
     }
   };
-
   const toggleExpand = async (itemId) => {
-    
     if (activeTab !== 'purchases') return;
-
     const isExpanded = expandedItems[itemId];
-
     setExpandedItems(prev => ({
       ...prev,
       [itemId]: !prev[itemId]
     }));
-
-    
     if (!isExpanded && !purchases[itemId]) {
       await fetchPurchasesForItem(itemId);
     }
   };
-
   const toggleInvoiceExpand = (invoiceId) => {
     setExpandedInvoices(prev => ({
       ...prev,
       [invoiceId]: !prev[invoiceId]
     }));
   };
-
   const fetchPurchasesForItem = async (itemId) => {
     setLoadingPurchases(prev => ({ ...prev, [itemId]: true }));
-
     try {
       const response = await api.get(`/inventory/${itemId}/purchases`);
       const purchaseData = response.data?.data?.purchases || response.data?.purchases || [];
@@ -282,41 +224,34 @@ const InventoryList = () => {
       setLoadingPurchases(prev => ({ ...prev, [itemId]: false }));
     }
   };
-
   const toggleSaleExpand = (saleId) => {
     setExpandedSales(prev => ({
       ...prev,
       [saleId]: !prev[saleId]
     }));
   };
-
   const handleAddPurchase = (item) => {
     setSelectedItemForPurchase(item);
     setPurchaseModalOpen(true);
   };
-
   const handlePurchaseSuccess = () => {
     if (selectedItemForPurchase) {
       fetchPurchasesForItem(selectedItemForPurchase._id);
       fetchInventoryItems();
     }
   };
-
   const handleDeletePurchase = (purchase, itemId) => {
     setPurchaseToDelete({ purchase, itemId });
     setDeletePurchaseModalOpen(true);
   };
-
   const confirmDeletePurchase = async () => {
     if (!purchaseToDelete) return;
-
     setDeletingPurchase(true);
     try {
       await api.delete(`/purchases/${purchaseToDelete.purchase._id}`);
       showSuccess('Purchase deletion request submitted for approval');
       setDeletePurchaseModalOpen(false);
       setPurchaseToDelete(null);
-      
       fetchPurchasesForItem(purchaseToDelete.itemId);
     } catch (err) {
       console.error('Error deleting purchase:', err);
@@ -325,16 +260,13 @@ const InventoryList = () => {
       setDeletingPurchase(false);
     }
   };
-
   const toggleExpandSales = async (itemId) => {
     const isExpanded = expandedSales[itemId];
-
     setExpandedSales(prev => ({
       ...prev,
       [itemId]: !prev[itemId]
     }));
   };
-
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -342,11 +274,9 @@ const InventoryList = () => {
       day: 'numeric'
     });
   };
-
   const isLowStock = (item) => {
     return item.quantity <= (item.lowStockThreshold || 10);
   };
-
   const getCategoryBadgeVariant = (category) => {
     const variants = {
       'Electronics': 'info',
@@ -357,13 +287,10 @@ const InventoryList = () => {
     };
     return variants[category] || 'default';
   };
-
-  
   const InvoiceItemCards = ({ invoiceItems, itemId, itemName }) => {
     const filteredItems = invoiceItems.filter(
       invoiceItem => invoiceItem.inventory?._id === itemId || invoiceItem.item?._id === itemId || invoiceItem.itemId === itemId
     );
-
     if (filteredItems.length === 0) {
       return (
         <div className="text-center py-3 text-emerald-600 text-xs">
@@ -371,7 +298,6 @@ const InventoryList = () => {
         </div>
       );
     }
-
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         {filteredItems.map((invoiceItem, idx) => (
@@ -398,12 +324,10 @@ const InventoryList = () => {
                 </svg>
               </div>
             )}
-
             {}
             <h6 className="text-xs font-semibold text-slate-800 mb-2 line-clamp-2 min-h-[2rem]">
               {invoiceItem.itemName || invoiceItem.item?.name || itemName}
             </h6>
-
             {}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
@@ -426,8 +350,6 @@ const InventoryList = () => {
       </div>
     );
   };
-
-  
   const AllInvoiceItemCards = ({ invoiceItems }) => {
     if (!invoiceItems || invoiceItems.length === 0) {
       return (
@@ -436,7 +358,6 @@ const InventoryList = () => {
         </div>
       );
     }
-
     return (
       <div className="bg-white rounded-lg border border-emerald-200 overflow-hidden">
         <table className="min-w-full">
@@ -451,12 +372,10 @@ const InventoryList = () => {
           </thead>
           <tbody className="divide-y divide-emerald-200">
             {invoiceItems.map((invoiceItem, idx) => {
-              
               const inventoryItem = invoiceItem.inventory || invoiceItem.item;
               const itemName = invoiceItem.itemName || inventoryItem?.itemName || inventoryItem?.name || 'Unknown Item';
               const itemImage = inventoryItem?.image;
               const itemSku = invoiceItem.skuCode || inventoryItem?.skuCode || 'N/A';
-
               return (
                 <tr key={idx} className="hover:bg-emerald-50">
                   <td className="px-4 py-3">
@@ -496,7 +415,6 @@ const InventoryList = () => {
       </div>
     );
   };
-
   const sortOptions = [
     { value: 'name-asc', label: 'Name (A-Z)' },
     { value: 'name-desc', label: 'Name (Z-A)' },
@@ -507,22 +425,15 @@ const InventoryList = () => {
     { value: 'price-asc', label: 'Price (Low to High)' },
     { value: 'price-desc', label: 'Price (High to Low)' },
   ];
-
-  
   const categoryOptions = categories.map(cat => ({
     value: cat,
     label: cat,
   }));
-
-  
   const statusOptions = [
     { value: '', label: 'All Items' },
     { value: 'low', label: 'Low Stock' },
     { value: 'adequate', label: 'Adequate Stock' },
   ];
-
-
-  
   if (loading && items.length === 0 && viewMode !== 'folder') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -530,7 +441,6 @@ const InventoryList = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {}
@@ -556,7 +466,6 @@ const InventoryList = () => {
           )}
         </div>
       </div>
-
       {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="space-y-4">
@@ -573,7 +482,6 @@ const InventoryList = () => {
                   loading={loading && searchTerm !== debouncedSearchTerm}
                 />
               </div>
-
               {}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 {}
@@ -585,7 +493,6 @@ const InventoryList = () => {
                   placeholder="All Categories"
                   fullWidth
                 />
-
                 {}
                 <Select
                   name="status"
@@ -595,7 +502,6 @@ const InventoryList = () => {
                   placeholder="All Items"
                   fullWidth
                 />
-
                 {}
                 <Select
                   name="sort"
@@ -605,7 +511,6 @@ const InventoryList = () => {
                   placeholder="Sort by..."
                   fullWidth
                 />
-
                 {}
                 <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1">
                   <button
@@ -651,7 +556,6 @@ const InventoryList = () => {
                     </svg>
                   </button>
                 </div>
-
                 {}
                 {(searchTerm || selectedCategory || statusFilter) && (
                   <Button
@@ -676,7 +580,6 @@ const InventoryList = () => {
           )}
         </div>
       </div>
-
       {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="flex items-center gap-3 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-1.5 max-w-2xl border border-slate-200 dark:border-gray-700">
@@ -706,7 +609,6 @@ const InventoryList = () => {
           </button>
         </div>
       </div>
-
       {}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -718,10 +620,8 @@ const InventoryList = () => {
           </div>
         </div>
       )}
-
       {}
       {activeTab === 'purchases' ? (
-        
         <>
           {}
           {viewMode === 'folder' ? (
@@ -768,7 +668,6 @@ const InventoryList = () => {
                   <thead className="bg-slate-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider w-12">
-
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
                         Item
@@ -887,7 +786,6 @@ const InventoryList = () => {
                           </div>
                         </td>
                       </tr>
-
                       {}
                       {activeTab === 'purchases' && expandedItems[item._id] && (
                         <tr>
@@ -970,7 +868,6 @@ const InventoryList = () => {
                           </td>
                         </tr>
                       )}
-
                       {}
                       {activeTab === 'sells' && expandedSales[item._id] && (
                         <tr>
@@ -1063,7 +960,6 @@ const InventoryList = () => {
               </div>
             </div>
           )}
-
           {}
           {viewMode === 'card' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
@@ -1091,7 +987,6 @@ const InventoryList = () => {
                       </div>
                     )}
                   </div>
-
                   {}
                   <div className="p-4">
                     <div className="flex items-start justify-between mb-2">
@@ -1102,20 +997,17 @@ const InventoryList = () => {
                         {item.category}
                       </Badge>
                     </div>
-
                     {item.description && (
                       <p className="text-sm text-slate-600 mb-3 line-clamp-2">
                         {item.description}
                       </p>
                     )}
-
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-slate-500">SKU:</span>
                         <span className="font-mono text-slate-900">{item.skuCode}</span>
                       </div>
                     </div>
-
                     {}
                     <button
                       onClick={() => toggleExpand(item._id)}
@@ -1135,7 +1027,6 @@ const InventoryList = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </button>
-
                     {}
                     {expandedItems[item._id] && (
                       <>
@@ -1217,7 +1108,6 @@ const InventoryList = () => {
                             )}
                           </div>
                         )}
-
                         {}
                         {activeTab === 'sells' && (
                           <div className="mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
@@ -1270,7 +1160,6 @@ const InventoryList = () => {
                                           </svg>
                                         </div>
                                       </button>
-
                                       {}
                                       {expandedSales[compoundKey] && invoice.items && (
                                         <div className="px-3 pb-3 pt-2 bg-emerald-50 border-t border-emerald-200">
@@ -1299,7 +1188,6 @@ const InventoryList = () => {
                         )}
                       </>
                     )}
-
                     {}
                     <div className="flex items-center gap-2">
                       <Button
@@ -1337,7 +1225,6 @@ const InventoryList = () => {
               ))}
             </div>
           )}
-
           {}
           {viewMode !== 'folder' && (
             <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
@@ -1358,10 +1245,8 @@ const InventoryList = () => {
           )}
         </>
       ) : activeTab === 'sells' ? (
-        
         <SalesFolderView />
       ) : null}
-
       {}
       <Modal
         isOpen={deleteModalOpen}
@@ -1421,7 +1306,6 @@ const InventoryList = () => {
                 </div>
               </div>
             </div>
-
             <div className="space-y-2">
               <p className="text-sm text-gray-700">
                 Are you sure you want to delete the following item?
@@ -1455,7 +1339,6 @@ const InventoryList = () => {
           </div>
         )}
       </Modal>
-
       <AddPurchaseModal
         isOpen={purchaseModalOpen}
         onClose={() => {
@@ -1465,7 +1348,6 @@ const InventoryList = () => {
         inventoryItem={selectedItemForPurchase}
         onSuccess={handlePurchaseSuccess}
       />
-
       {}
       <Modal
         isOpen={deletePurchaseModalOpen}
@@ -1525,7 +1407,6 @@ const InventoryList = () => {
                 </div>
               </div>
             </div>
-
             <div className="space-y-2">
               <p className="text-sm text-gray-700">
                 Are you sure you want to delete the following purchase entry?
@@ -1571,5 +1452,4 @@ const InventoryList = () => {
     </div>
   );
 };
-
 export default InventoryList;

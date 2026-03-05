@@ -5,28 +5,18 @@ import { ToastContext } from '../contexts/ToastContext';
 const useErrorHandler = () => {
   const [error, setError] = useState(null);
   const toast = useContext(ToastContext);
-
-  
   const parseError = useCallback((err) => {
     console.error('Error occurred:', err);
-
-    
     let message = 'An unexpected error occurred. Please try again.';
     let statusCode = null;
-
-    
     if (err.response) {
       statusCode = err.response.status;
-
-      
       if (err.response.data) {
         message = err.response.data.message ||
                  err.response.data.error ||
                  err.response.data.msg ||
                  message;
       }
-
-      
       switch (statusCode) {
         case 400:
           message = err.response.data?.message || 'Invalid request. Please check your input.';
@@ -65,18 +55,13 @@ const useErrorHandler = () => {
           message = err.response.data?.message || message;
       }
     } else if (err.request) {
-      
       message = 'Network error. Please check your connection and try again.';
       statusCode = 0;
     } else if (err.message) {
-      
       message = err.message;
     }
-
     return { message, statusCode };
   }, []);
-
-  
   const handleError = useCallback((err, options = {}) => {
     const {
       showToast = true,
@@ -84,42 +69,27 @@ const useErrorHandler = () => {
       customMessage = null,
       onError = null,
     } = options;
-
     const { message, statusCode } = parseError(err);
     const finalMessage = customMessage || message;
-
-    
     if (persistError) {
       setError({ message: finalMessage, statusCode });
     }
-
-    
     if (showToast && toast) {
       toast.showError(finalMessage, 5000);
     }
-
-    
     if (onError) {
       onError({ message: finalMessage, statusCode, originalError: err });
     }
-
-    
     if (statusCode === 401) {
-      
       setTimeout(() => {
         window.location.href = '/login';
       }, 1500);
     }
-
     return { message: finalMessage, statusCode };
   }, [parseError, toast]);
-
-  
   const clearError = useCallback(() => {
     setError(null);
   }, []);
-
-  
   const executeAsync = useCallback(async (
     asyncFn,
     options = {}
@@ -132,61 +102,44 @@ const useErrorHandler = () => {
       onError = null,
       finallyCallback = null,
     } = options;
-
     try {
-      
       if (persistError) {
         clearError();
       }
-
-      
       const result = await asyncFn();
-
-      
       if (onSuccess) {
         onSuccess(result);
       }
-
       return { success: true, data: result, error: null };
     } catch (err) {
-      
       const errorInfo = handleError(err, {
         showToast,
         persistError,
         customMessage: customErrorMessage,
         onError,
       });
-
       return { success: false, data: null, error: errorInfo };
     } finally {
-      
       if (finallyCallback) {
         finallyCallback();
       }
     }
   }, [handleError, clearError]);
-
-  
   const showSuccess = useCallback((message, duration = 3000) => {
     if (toast) {
       toast.showSuccess(message, duration);
     }
   }, [toast]);
-
-  
   const showInfo = useCallback((message, duration = 3000) => {
     if (toast) {
       toast.showInfo(message, duration);
     }
   }, [toast]);
-
-  
   const showWarning = useCallback((message, duration = 4000) => {
     if (toast) {
       toast.showWarning(message, duration);
     }
   }, [toast]);
-
   return {
     error,
     setError,
@@ -199,5 +152,4 @@ const useErrorHandler = () => {
     parseError,
   };
 };
-
 export default useErrorHandler;

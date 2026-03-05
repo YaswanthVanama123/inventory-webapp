@@ -12,73 +12,50 @@ const InvoiceForm = () => {
   const isEditMode = Boolean(id);
   const { showSuccess, showError, showInfo } = useContext(ToastContext);
 
-  
   const [formData, setFormData] = useState({
-    
     customerName: '',
     customerEmail: '',
     customerPhone: '',
     customerAddress: '',
-
-    
     invoiceDate: new Date().toISOString().split('T')[0],
     dueDate: '',
     notes: '',
-
-    
     items: [],
-
-    
     discountType: 'percentage', 
     discountValue: 0,
     taxRate: 0,
   });
-
-  
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
-
-  
   const [inventoryItems, setInventoryItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
-
-  
   useEffect(() => {
     if (isEditMode) {
       loadInvoiceData();
     }
   }, [id]);
-
-  
   useEffect(() => {
     loadInventoryItems();
   }, []);
-
-  
   useEffect(() => {
     if (!isEditMode) {
       const timer = setTimeout(() => {
         saveDraft();
       }, 5000); 
-
       return () => clearTimeout(timer);
     }
   }, [formData]);
-
-  
   useEffect(() => {
     if (!isEditMode) {
       loadDraft();
     }
   }, []);
-
-  
   useEffect(() => {
     if (searchQuery.trim()) {
       performSearch();
@@ -87,13 +64,11 @@ const InvoiceForm = () => {
       setShowSearchDropdown(false);
     }
   }, [searchQuery]);
-
   const loadInvoiceData = async () => {
     setLoading(true);
     try {
       const response = await api.get(`/invoices/${id}`);
       const data = response.data;
-
       setFormData({
         customerName: data.customer?.name || '',
         customerEmail: data.customer?.email || '',
@@ -116,7 +91,6 @@ const InvoiceForm = () => {
       setLoading(false);
     }
   };
-
   const loadInventoryItems = async () => {
     try {
       const response = await api.get('/inventory');
@@ -125,7 +99,6 @@ const InvoiceForm = () => {
       console.error('Failed to load inventory items:', error);
     }
   };
-
   const performSearch = () => {
     setSearchLoading(true);
     const query = searchQuery.toLowerCase();
@@ -139,7 +112,6 @@ const InvoiceForm = () => {
     setShowSearchDropdown(results.length > 0);
     setSearchLoading(false);
   };
-
   const saveDraft = () => {
     try {
       localStorage.setItem('invoiceDraft', JSON.stringify(formData));
@@ -149,7 +121,6 @@ const InvoiceForm = () => {
       console.error('Failed to save draft:', error);
     }
   };
-
   const loadDraft = () => {
     try {
       const draft = localStorage.getItem('invoiceDraft');
@@ -162,20 +133,15 @@ const InvoiceForm = () => {
       console.error('Failed to load draft:', error);
     }
   };
-
   const clearDraft = () => {
     localStorage.removeItem('invoiceDraft');
   };
-
-  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
-    
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -183,8 +149,6 @@ const InvoiceForm = () => {
       }));
     }
   };
-
-  
   const handleAddItem = (inventoryItem) => {
     const newItem = {
       id: Date.now(), 
@@ -195,25 +159,20 @@ const InvoiceForm = () => {
       unitPrice: inventoryItem.sellingPrice || 0,
       availableStock: inventoryItem.currentQuantity || 0,
     };
-
     setFormData((prev) => ({
       ...prev,
       items: [...prev.items, newItem],
     }));
-
-    
     setSearchQuery('');
     setSearchResults([]);
     setShowSearchDropdown(false);
   };
-
   const handleRemoveItem = (itemId) => {
     setFormData((prev) => ({
       ...prev,
       items: prev.items.filter((item) => item.id !== itemId),
     }));
   };
-
   const handleItemChange = (itemId, field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -224,16 +183,12 @@ const InvoiceForm = () => {
       ),
     }));
   };
-
-  
   const calculateItemSubtotal = (item) => {
     return (item.quantity || 0) * (item.unitPrice || 0);
   };
-
   const calculateSubtotal = () => {
     return formData.items.reduce((sum, item) => sum + calculateItemSubtotal(item), 0);
   };
-
   const calculateDiscount = () => {
     const subtotal = calculateSubtotal();
     if (formData.discountType === 'percentage') {
@@ -241,57 +196,43 @@ const InvoiceForm = () => {
     }
     return formData.discountValue || 0;
   };
-
   const calculateTax = () => {
     const subtotalAfterDiscount = calculateSubtotal() - calculateDiscount();
     return (subtotalAfterDiscount * (formData.taxRate || 0)) / 100;
   };
-
   const calculateTotal = () => {
     return calculateSubtotal() - calculateDiscount() + calculateTax();
   };
-
-  
   const validateForm = () => {
     const newErrors = {};
-
-    
     if (!formData.customerName.trim()) {
       newErrors.customerName = 'Customer name is required';
     } else if (formData.customerName.trim().length < 2) {
       newErrors.customerName = 'Customer name must be at least 2 characters';
     }
-
     if (!formData.customerEmail.trim()) {
       newErrors.customerEmail = 'Customer email is required';
     } else if (!isValidEmail(formData.customerEmail)) {
       newErrors.customerEmail = 'Invalid email format (e.g., example@domain.com)';
     }
-
     if (!formData.customerPhone.trim()) {
       newErrors.customerPhone = 'Customer phone is required';
     } else if (!isValidPhone(formData.customerPhone)) {
       newErrors.customerPhone = 'Invalid phone format (minimum 10 digits)';
     }
-
     if (!formData.customerAddress.trim()) {
       newErrors.customerAddress = 'Customer address is required';
     } else if (formData.customerAddress.trim().length < 10) {
       newErrors.customerAddress = 'Please provide a complete address';
     }
-
-    
     if (!formData.invoiceDate) {
       newErrors.invoiceDate = 'Invoice date is required';
     }
-
     if (!formData.dueDate) {
       newErrors.dueDate = 'Due date is required';
     } else if (new Date(formData.dueDate) < new Date(formData.invoiceDate)) {
       newErrors.dueDate = 'Due date must be on or after invoice date';
     }
-
-    
     if (formData.items.length === 0) {
       newErrors.items = 'At least one item is required';
     } else {
@@ -303,7 +244,6 @@ const InvoiceForm = () => {
         } else if (item.quantity > item.availableStock) {
           newErrors[`item_${index}_quantity`] = `Only ${item.availableStock} available in stock`;
         }
-
         if (item.unitPrice === '' || item.unitPrice === null) {
           newErrors[`item_${index}_unitPrice`] = 'Unit price is required';
         } else if (isNaN(item.unitPrice)) {
@@ -313,8 +253,6 @@ const InvoiceForm = () => {
         }
       });
     }
-
-    
     if (formData.discountValue < 0) {
       newErrors.discountValue = 'Discount cannot be negative';
     } else if (isNaN(formData.discountValue)) {
@@ -322,33 +260,25 @@ const InvoiceForm = () => {
     } else if (formData.discountType === 'percentage' && formData.discountValue > 100) {
       newErrors.discountValue = 'Discount percentage cannot exceed 100%';
     }
-
     if (formData.taxRate === '' || formData.taxRate === null) {
-      
     } else if (isNaN(formData.taxRate)) {
       newErrors.taxRate = 'Tax rate must be a valid number';
     } else if (formData.taxRate < 0 || formData.taxRate > 100) {
       newErrors.taxRate = 'Tax rate must be between 0 and 100';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
-
   const isValidPhone = (phone) => {
     const cleaned = phone.replace(/\D/g, '');
     return cleaned.length >= 10;
   };
-
-  
   const handleSubmit = async (e, isDraft = false) => {
     e.preventDefault();
-
     if (!isDraft && !validateForm()) {
       showError('Please fix all validation errors before submitting');
       setAlert({
@@ -358,10 +288,8 @@ const InvoiceForm = () => {
       window.scrollTo(0, 0);
       return;
     }
-
     setSubmitLoading(true);
     setAlert(null);
-
     try {
       const submitData = {
         customer: {
@@ -387,33 +315,25 @@ const InvoiceForm = () => {
         taxRate: formData.taxRate,
         status: isDraft ? 'draft' : 'pending',
       };
-
       let response;
       if (isEditMode) {
         response = await api.put(`/invoices/${id}`, submitData);
       } else {
         response = await api.post('/invoices', submitData);
       }
-
-      
       if (!isDraft) {
         clearDraft();
       }
-
-      
       const successMessage = isDraft
         ? 'Invoice draft saved successfully'
         : isEditMode
         ? 'Invoice updated successfully'
         : 'Invoice created successfully';
-
       showSuccess(successMessage);
       setAlert({
         type: 'success',
         message: successMessage,
       });
-
-      
       setTimeout(() => {
         navigate('/invoices');
       }, 1500);
@@ -429,18 +349,15 @@ const InvoiceForm = () => {
       setSubmitLoading(false);
     }
   };
-
   const handleSaveDraft = (e) => {
     handleSubmit(e, true);
   };
-
   const handleCancel = () => {
     if (window.confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
       clearDraft();
       navigate('/invoices');
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -451,7 +368,6 @@ const InvoiceForm = () => {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
@@ -471,7 +387,6 @@ const InvoiceForm = () => {
             </p>
           )}
         </div>
-
         {}
         {alert && (
           <div className="mb-6">
@@ -484,7 +399,6 @@ const InvoiceForm = () => {
             </Alert>
           </div>
         )}
-
         {}
         <form onSubmit={handleSubmit}>
           {}
@@ -495,7 +409,6 @@ const InvoiceForm = () => {
               </svg>
               Customer Information
             </h2>
-
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Input
@@ -508,7 +421,6 @@ const InvoiceForm = () => {
                   required
                   fullWidth
                 />
-
                 <Input
                   label="Email"
                   type="email"
@@ -521,7 +433,6 @@ const InvoiceForm = () => {
                   fullWidth
                 />
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Input
                   label="Phone"
@@ -535,7 +446,6 @@ const InvoiceForm = () => {
                   fullWidth
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Address <span className="text-red-500">*</span>
@@ -560,7 +470,6 @@ const InvoiceForm = () => {
               </div>
             </div>
           </div>
-
           {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
@@ -569,7 +478,6 @@ const InvoiceForm = () => {
               </svg>
               Invoice Details
             </h2>
-
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Input
@@ -582,7 +490,6 @@ const InvoiceForm = () => {
                   required
                   fullWidth
                 />
-
                 <Input
                   label="Due Date"
                   type="date"
@@ -595,7 +502,6 @@ const InvoiceForm = () => {
                   min={formData.invoiceDate}
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Notes
@@ -611,7 +517,6 @@ const InvoiceForm = () => {
               </div>
             </div>
           </div>
-
           {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
@@ -620,7 +525,6 @@ const InvoiceForm = () => {
               </svg>
               Items
             </h2>
-
             {}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
@@ -640,7 +544,6 @@ const InvoiceForm = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-
                 {}
                 {showSearchDropdown && searchResults.length > 0 && (
                   <div className="absolute z-10 mt-2 w-full bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 max-h-64 overflow-y-auto">
@@ -686,7 +589,6 @@ const InvoiceForm = () => {
                 </p>
               )}
             </div>
-
             {}
             {formData.items.length > 0 ? (
               <div className="overflow-x-auto">
@@ -786,7 +688,6 @@ const InvoiceForm = () => {
                     ))}
                   </tbody>
                 </table>
-
                 {}
                 <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <div className="flex justify-between items-center text-lg">
@@ -808,7 +709,6 @@ const InvoiceForm = () => {
               </div>
             )}
           </div>
-
           {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
@@ -817,7 +717,6 @@ const InvoiceForm = () => {
               </svg>
               Financial Summary
             </h2>
-
             <div className="space-y-6">
               {}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -835,7 +734,6 @@ const InvoiceForm = () => {
                     <option value="fixed">Fixed Amount ($)</option>
                   </select>
                 </div>
-
                 <div className="md:col-span-2">
                   <Input
                     label={`Discount ${formData.discountType === 'percentage' ? '(%)' : '($)'}`}
@@ -852,7 +750,6 @@ const InvoiceForm = () => {
                   />
                 </div>
               </div>
-
               {}
               <Input
                 label="Tax Rate (%)"
@@ -867,7 +764,6 @@ const InvoiceForm = () => {
                 step="0.01"
                 fullWidth
               />
-
               {}
               <div className="mt-8 space-y-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex justify-between items-center text-base">
@@ -876,7 +772,6 @@ const InvoiceForm = () => {
                     ${calculateSubtotal().toFixed(2)}
                   </span>
                 </div>
-
                 {calculateDiscount() > 0 && (
                   <div className="flex justify-between items-center text-base">
                     <span className="text-gray-700 dark:text-gray-300">
@@ -887,7 +782,6 @@ const InvoiceForm = () => {
                     </span>
                   </div>
                 )}
-
                 {formData.taxRate > 0 && (
                   <div className="flex justify-between items-center text-base">
                     <span className="text-gray-700 dark:text-gray-300">
@@ -898,7 +792,6 @@ const InvoiceForm = () => {
                     </span>
                   </div>
                 )}
-
                 <div className="flex justify-between items-center text-xl font-bold pt-3 border-t border-gray-200 dark:border-gray-700">
                   <span className="text-gray-900 dark:text-white">Total:</span>
                   <span className="text-blue-600 dark:text-blue-400">
@@ -908,7 +801,6 @@ const InvoiceForm = () => {
               </div>
             </div>
           </div>
-
           {}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <Button
@@ -918,7 +810,6 @@ const InvoiceForm = () => {
             >
               Cancel
             </Button>
-
             <div className="flex gap-3">
               <Button
                 type="button"
@@ -928,7 +819,6 @@ const InvoiceForm = () => {
               >
                 Save as Draft
               </Button>
-
               <Button
                 type="submit"
                 variant="primary"
@@ -944,5 +834,4 @@ const InvoiceForm = () => {
     </div>
   );
 };
-
 export default InvoiceForm;

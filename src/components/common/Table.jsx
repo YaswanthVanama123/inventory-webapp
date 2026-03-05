@@ -15,30 +15,24 @@ const Table = ({
 
   const handleSort = (columnKey) => {
     if (!sortable) return;
-
     let direction = 'asc';
     if (sortConfig.key === columnKey && sortConfig.direction === 'asc') {
       direction = 'desc';
     }
     setSortConfig({ key: columnKey, direction });
   };
-
   const sortedData = React.useMemo(() => {
     if (!sortable || !sortConfig.key) return data;
-
     return [...data].sort((a, b) => {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
-
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
     });
   }, [data, sortConfig, sortable]);
-
   const SortIcon = ({ columnKey }) => {
     if (!sortable) return null;
-
     if (sortConfig.key !== columnKey) {
       return (
         <svg className="w-4 h-4 ml-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,7 +40,6 @@ const Table = ({
         </svg>
       );
     }
-
     return sortConfig.direction === 'asc' ? (
       <svg className="w-4 h-4 ml-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -57,7 +50,6 @@ const Table = ({
       </svg>
     );
   };
-
   const tableContent = (
     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
       <thead className="bg-gray-50 dark:bg-gray-900">
@@ -109,7 +101,6 @@ const Table = ({
       </tbody>
     </table>
   );
-
   if (responsive) {
     return (
       <div className={`shadow-md rounded-lg ${className}`}>
@@ -123,10 +114,8 @@ const Table = ({
       </div>
     );
   }
-
   return <div className={`shadow-md rounded-lg ${className}`}>{tableContent}</div>;
 };
-
 Table.propTypes = {
   columns: PropTypes.arrayOf(
     PropTypes.shape({
@@ -144,5 +133,4 @@ Table.propTypes = {
   className: PropTypes.string,
   emptyMessage: PropTypes.string,
 };
-
 export default Table;

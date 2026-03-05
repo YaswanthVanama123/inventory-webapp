@@ -44,14 +44,11 @@ const Card = ({ children, className = '' }) => {
     </div>
   );
 };
-
-
 const StatCard = ({ title, value, change, changeType, icon: Icon, loading }) => {
   const isPositive = changeType === 'positive';
   const ChangeIcon = isPositive ? TrendingUp : TrendingDown;
   const changeColor = isPositive ? 'text-green-600' : 'text-red-600';
   const changeBgColor = isPositive ? 'bg-green-50' : 'bg-red-50';
-
   if (loading) {
     return (
       <Card className="p-6 animate-pulse" style={{ minHeight: '140px' }}>
@@ -66,7 +63,6 @@ const StatCard = ({ title, value, change, changeType, icon: Icon, loading }) => 
       </Card>
     );
   }
-
   return (
     <Card className="p-6 hover:shadow-md transition-shadow duration-200" style={{ minHeight: '140px' }}>
       <div className="flex items-start justify-between">
@@ -90,16 +86,12 @@ const StatCard = ({ title, value, change, changeType, icon: Icon, loading }) => 
     </Card>
   );
 };
-
-
 const ChartSkeleton = () => (
   <div className="animate-pulse" style={{ minHeight: '428px' }}>
     <div className="h-4 bg-gray-200 rounded w-32 mb-4"></div>
     <div className="h-80 bg-gray-100 rounded"></div>
   </div>
 );
-
-
 const RecentActivityTable = ({ activities, loading }) => {
   if (loading) {
     return (
@@ -116,7 +108,6 @@ const RecentActivityTable = ({ activities, loading }) => {
       </div>
     );
   }
-
   if (!activities || activities.length === 0) {
     return (
       <div className="text-center py-12" style={{ minHeight: '300px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
@@ -125,7 +116,6 @@ const RecentActivityTable = ({ activities, loading }) => {
       </div>
     );
   }
-
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -169,8 +159,6 @@ const RecentActivityTable = ({ activities, loading }) => {
     </div>
   );
 };
-
-
 const QuickActions = () => {
   const actions = [
     { icon: Plus, label: 'Add Item', color: 'bg-blue-600 hover:bg-blue-700', path: '/items/new' },
@@ -178,7 +166,6 @@ const QuickActions = () => {
     { icon: Users, label: 'Manage Users', color: 'bg-indigo-600 hover:bg-indigo-700', path: '/users' },
     { icon: Activity, label: 'View Reports', color: 'bg-orange-600 hover:bg-orange-700', path: '/reports' },
   ];
-
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
       {actions.map((action, index) => {
@@ -196,8 +183,6 @@ const QuickActions = () => {
     </div>
   );
 };
-
-
 const ErrorState = ({ message, onRetry }) => (
   <div className="text-center py-12">
     <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
@@ -212,8 +197,6 @@ const ErrorState = ({ message, onRetry }) => (
     </button>
   </div>
 );
-
-
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
   const { showError } = useContext(ToastContext);
@@ -221,28 +204,21 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const hasFetchedRef = useRef(false);
-
-
   const fetchDashboardData = async () => {
     console.log('fetchDashboardData called - starting API request...');
     setLoading(true);
     setError(null);
-
     try {
       console.log('Making API request to dashboardService.getDashboardData()...');
       const response = await dashboardService.getDashboardData();
-
       console.log('=== FRONTEND DASHBOARD DEBUG ===');
       console.log('Raw API response:', response);
       console.log('Response data:', response.data);
-
       if (response.success && response.data) {
         const { summary, categoryStats, recentActivity, topSellingItems, salesTrend } = response.data;
         console.log('Summary data:', summary);
         console.log('Sales trend:', salesTrend);
         console.log('Top selling items:', topSellingItems);
-
-
         const transformedData = {
           stats: {
             totalRevenue: summary.totalRevenue || 0,
@@ -253,7 +229,6 @@ const Dashboard = () => {
             ordersChange: summary.ordersChange || 0,
             lowStockChange: summary.lowStockChange || 0,
             profitMarginChange: summary.profitMarginChange || 0,
-
             totalPurchaseAmount: summary.totalPurchaseAmount || 0,
             totalPurchaseOrders: summary.totalPurchaseOrders || 0,
             avgPurchaseValue: summary.avgPurchaseValue || 0,
@@ -278,10 +253,8 @@ const Dashboard = () => {
           })) || [],
           topSellingItems: topSellingItems || [],
         };
-
         console.log('Transformed data:', transformedData);
         console.log('=== END FRONTEND DASHBOARD DEBUG ===');
-
         setDashboardData(transformedData);
       }
     } catch (err) {
@@ -292,19 +265,14 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-
-
   const getColorForIndex = (index) => {
     const colors = ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EF4444', '#EC4899', '#14B8A6', '#6B7280'];
     return colors[index % colors.length];
   };
-
-
   const formatActivityDescription = (activity) => {
     const action = activity.action || '';
     const resource = activity.resource || '';
     const details = activity.details || {};
-
     switch (action) {
       case 'CREATE':
         return `Created ${resource.toLowerCase()} ${details.itemName || details.skuCode || ''}`;
@@ -316,43 +284,33 @@ const Dashboard = () => {
         return `${action} on ${resource.toLowerCase()}`;
     }
   };
-
-
   const formatTimeAgo = (timestamp) => {
     if (!timestamp) return 'Unknown';
-
     const now = new Date();
     const then = new Date(timestamp);
     const diffMs = now - then;
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
-
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
     if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
     return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
   };
-
   useEffect(() => {
-    
     if (hasFetchedRef.current) {
       console.log('Dashboard data already fetched, skipping duplicate call');
       return;
     }
-
     console.log('Dashboard component mounted, calling fetchDashboardData...');
     hasFetchedRef.current = true;
     fetchDashboardData();
   }, []);
-
   const data = dashboardData || {};
-  const stats = data.summary || data.stats || {}; // Support both summary and stats for backwards compatibility
+  const stats = data.summary || data.stats || {};
   const salesTrend = data.salesTrend || [];
   const categoryDistribution = data.categoryDistribution || [];
   const recentActivities = data.recentActivities || [];
-
-  
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -361,7 +319,6 @@ const Dashboard = () => {
       maximumFractionDigits: 0,
     }).format(value || 0);
   };
-
   return (
     <div className="space-y-6" style={{ contain: 'layout' }}>
       {}
@@ -389,7 +346,6 @@ const Dashboard = () => {
           </button>
         </div>
       </div>
-
       {}
       {error && !dashboardData && (
         <Card className="p-6">
@@ -402,7 +358,6 @@ const Dashboard = () => {
           />
         </Card>
       )}
-
       {}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-3">
@@ -464,7 +419,6 @@ const Dashboard = () => {
           />
         </div>
       </div>
-
       {}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-3">
@@ -496,7 +450,6 @@ const Dashboard = () => {
           />
         </div>
       </div>
-
       {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         {}
@@ -554,7 +507,6 @@ const Dashboard = () => {
             </div>
           )}
         </Card>
-
         {}
         <Card className="p-6" style={{ minHeight: '500px' }}>
           {loading ? (
@@ -595,7 +547,6 @@ const Dashboard = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-
               {}
               <div className="grid grid-cols-2 gap-2 mt-4">
                 {categoryDistribution.map((category, index) => (
@@ -617,7 +568,6 @@ const Dashboard = () => {
           )}
         </Card>
       </div>
-
       {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <Card className="p-6" style={{ minHeight: '480px' }}>
@@ -671,7 +621,6 @@ const Dashboard = () => {
             </div>
           )}
         </Card>
-
         {}
         <Card className="p-6" style={{ minHeight: '280px' }}>
           <div className="mb-6" style={{ minHeight: '60px' }}>
@@ -681,7 +630,6 @@ const Dashboard = () => {
           <QuickActions />
         </Card>
       </div>
-
       {}
       <Card className="p-6" style={{ minHeight: '400px' }}>
         <div className="flex items-center justify-between mb-6" style={{ minHeight: '48px' }}>
@@ -698,5 +646,4 @@ const Dashboard = () => {
     </div>
   );
 };
-
 export default Dashboard;

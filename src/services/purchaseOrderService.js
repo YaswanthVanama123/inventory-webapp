@@ -3,7 +3,6 @@ import api from './api';
 
 export const getOrderById = async (orderIdOrNumber) => {
   try {
-    
     const response = await api.get(`/customerconnect/orders/${orderIdOrNumber}`);
     return response;
   } catch (error) {
@@ -11,8 +10,6 @@ export const getOrderById = async (orderIdOrNumber) => {
     throw error;
   }
 };
-
-
 export const getOrderByNumber = async (orderNumber) => {
   try {
     const response = await api.get(`/customerconnect/orders/${orderNumber}`);
@@ -22,7 +19,6 @@ export const getOrderByNumber = async (orderNumber) => {
     throw error;
   }
 };
-
 export default {
   getOrderById,
   getOrderByNumber,

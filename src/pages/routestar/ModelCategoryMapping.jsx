@@ -23,22 +23,15 @@ const ModelCategoryMapping = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [pendingChanges, setPendingChanges] = useState(new Set());
   const [stats, setStats] = useState({ total: 0, mapped: 0, unmapped: 0 });
-
-  
   useEffect(() => {
     loadData();
   }, []);
-
-  
   useEffect(() => {
     filterModels();
   }, [models, searchText, filterStatus]);
-
-  
   useEffect(() => {
     updateStats();
   }, [models]);
-
   const loadData = async () => {
     try {
       setLoading(true);
@@ -46,7 +39,6 @@ const ModelCategoryMapping = () => {
         modelCategoryService.getUniqueModels(),
         modelCategoryService.getRouteStarItems()
       ]);
-
       setModels(modelsData.models || []);
       setRouteStarItems(itemsData.items || []);
     } catch (error) {
@@ -55,17 +47,13 @@ const ModelCategoryMapping = () => {
       setLoading(false);
     }
   };
-
   const updateStats = () => {
     const mapped = models.filter(m => m.categoryItemName).length;
     const unmapped = models.length - mapped;
     setStats({ total: models.length, mapped, unmapped });
   };
-
   const filterModels = () => {
     let filtered = [...models];
-
-    
     if (searchText) {
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter(m =>
@@ -74,17 +62,13 @@ const ModelCategoryMapping = () => {
         (m.categoryItemName && m.categoryItemName.toLowerCase().includes(searchLower))
       );
     }
-
-    
     if (filterStatus === 'mapped') {
       filtered = filtered.filter(m => m.categoryItemName);
     } else if (filterStatus === 'unmapped') {
       filtered = filtered.filter(m => !m.categoryItemName);
     }
-
     setFilteredModels(filtered);
   };
-
   const handleCategoryChange = (modelNumber, categoryItemId) => {
     const item = routeStarItems.find(i => i._id === categoryItemId);
     setModels(prevModels =>
@@ -100,7 +84,6 @@ const ModelCategoryMapping = () => {
     );
     setPendingChanges(prev => new Set([...prev, modelNumber]));
   };
-
   const handleNotesChange = (modelNumber, notes) => {
     setModels(prevModels =>
       prevModels.map(m =>
@@ -109,14 +92,12 @@ const ModelCategoryMapping = () => {
     );
     setPendingChanges(prev => new Set([...prev, modelNumber]));
   };
-
   const saveMapping = async (modelNumber) => {
     const model = models.find(m => m.modelNumber === modelNumber);
     if (!model || !model.categoryItemId) {
       showError('Please select a category first');
       return;
     }
-
     try {
       setSaving(true);
       await modelCategoryService.saveMapping({
@@ -125,7 +106,6 @@ const ModelCategoryMapping = () => {
         categoryItemId: model.categoryItemId,
         notes: model.notes || ''
       });
-
       showSuccess(`Mapping saved for ${modelNumber}`);
       setPendingChanges(prev => {
         const newSet = new Set(prev);
@@ -138,13 +118,11 @@ const ModelCategoryMapping = () => {
       setSaving(false);
     }
   };
-
   const saveAllChanges = async () => {
     if (pendingChanges.size === 0) {
       showWarning('No changes to save');
       return;
     }
-
     try {
       setSaving(true);
       const promises = Array.from(pendingChanges).map(modelNumber =>
@@ -160,12 +138,10 @@ const ModelCategoryMapping = () => {
       setSaving(false);
     }
   };
-
   const deleteMapping = async (modelNumber) => {
     if (!window.confirm(`Are you sure you want to delete the mapping for ${modelNumber}?`)) {
       return;
     }
-
     try {
       await modelCategoryService.deleteMapping(modelNumber);
       showSuccess(`Mapping deleted for ${modelNumber}`);
@@ -174,11 +150,9 @@ const ModelCategoryMapping = () => {
       showError('Failed to delete mapping: ' + error.message);
     }
   };
-
   if (loading) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="p-6 space-y-6">
       {}
@@ -190,7 +164,6 @@ const ModelCategoryMapping = () => {
           Map order model numbers (SKUs) to RouteStar item categories
         </p>
       </div>
-
       {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {}
@@ -207,7 +180,6 @@ const ModelCategoryMapping = () => {
             </div>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -227,7 +199,6 @@ const ModelCategoryMapping = () => {
             </p>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -247,7 +218,6 @@ const ModelCategoryMapping = () => {
             </p>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -268,7 +238,6 @@ const ModelCategoryMapping = () => {
           </div>
         </div>
       </div>
-
       {}
       <Card>
         <div className="flex flex-col lg:flex-row justify-between gap-4">
@@ -292,7 +261,6 @@ const ModelCategoryMapping = () => {
               Unmapped
             </Button>
           </div>
-
           <div className="flex flex-wrap gap-2">
             <div className="relative flex-1 min-w-[200px]">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -321,7 +289,6 @@ const ModelCategoryMapping = () => {
           </div>
         </div>
       </Card>
-
       {}
       <Card>
         <div className="overflow-x-auto">
@@ -501,5 +468,4 @@ const ModelCategoryMapping = () => {
     </div>
   );
 };
-
 export default ModelCategoryMapping;

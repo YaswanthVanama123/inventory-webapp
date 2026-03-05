@@ -21,40 +21,28 @@ const TruckCheckoutForm = () => {
     notes: '',
     checkoutDate: new Date().toISOString().split('T')[0]
   });
-
-  
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [showItemPicker, setShowItemPicker] = useState(false);
-
-  
   const [quantityTaking, setQuantityTaking] = useState('');
   const [remainingQuantity, setRemainingQuantity] = useState('');
   const [validationError, setValidationError] = useState('');
-
-  
   const [showDiscrepancyModal, setShowDiscrepancyModal] = useState(false);
   const [discrepancyInfo, setDiscrepancyInfo] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-
-  
   useEffect(() => {
     if (!showItemPicker) {
       setSearchQuery(''); 
       setSearchResults([]);
       return;
     }
-
-    
     const delayDebounce = setTimeout(() => {
       searchItems();
     }, searchQuery ? 300 : 0); 
-
     return () => clearTimeout(delayDebounce);
   }, [showItemPicker, searchQuery]);
-
   const searchItems = async () => {
     try {
       setSearching(true);
@@ -68,7 +56,6 @@ const TruckCheckoutForm = () => {
       setSearching(false);
     }
   };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -76,7 +63,6 @@ const TruckCheckoutForm = () => {
       [name]: value
     }));
   };
-
   const handleItemSelect = (item) => {
     setSelectedItem(item);
     setShowItemPicker(false);
@@ -84,77 +70,58 @@ const TruckCheckoutForm = () => {
     setQuantityTaking('');
     setRemainingQuantity('');
   };
-
   const handleQuantityTakingChange = (e) => {
     setQuantityTaking(e.target.value);
     setValidationError('');
   };
-
   const handleRemainingQuantityChange = (e) => {
     setRemainingQuantity(e.target.value);
     setValidationError('');
   };
-
   const validateStockMath = () => {
     if (!selectedItem || !quantityTaking || !remainingQuantity) {
       return true; 
     }
-
     const taking = parseFloat(quantityTaking);
     const remaining = parseFloat(remainingQuantity);
     const currentStock = selectedItem.currentStock || 0;
-
     const expectedRemaining = currentStock - taking;
-
     if (Math.abs(remaining - expectedRemaining) > 0.001) {
       const error = `Math Error: Current stock (${currentStock}) - Taking (${taking}) should equal ${expectedRemaining.toFixed(2)}, but you entered ${remaining}`;
       setValidationError(error);
       return false;
     }
-
     setValidationError('');
     return true;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    
     if (!user || !user.fullName?.trim()) {
       showError('Employee name is required. Please update your profile.');
       return;
     }
-
     if (!user.truckNumber?.trim()) {
       showError('Truck number is required. Please update your profile.');
       return;
     }
-
     if (!selectedItem) {
       showError('Please select an item');
       return;
     }
-
     const taking = parseFloat(quantityTaking);
     const remaining = parseFloat(remainingQuantity);
-
     if (!taking || taking <= 0) {
       showError('Please enter a valid quantity to take');
       return;
     }
-
     if (isNaN(remaining)) {
       showError('Please enter remaining quantity');
       return;
     }
-
-    
     if (!validateStockMath()) {
-      
       const currentStock = selectedItem.currentStock || 0;
       const expectedRemaining = currentStock - taking;
       const difference = remaining - expectedRemaining;
-
       setDiscrepancyInfo({
         itemName: selectedItem.itemName,
         currentStock,
@@ -167,15 +134,11 @@ const TruckCheckoutForm = () => {
       setShowDiscrepancyModal(true);
       return;
     }
-
-    
     await submitCheckout(false);
   };
-
   const submitCheckout = async (acceptDiscrepancy) => {
     try {
       setSubmitting(true);
-
       const checkoutData = {
         employeeName: user.fullName.trim(),
         truckNumber: user.truckNumber.trim(),
@@ -186,13 +149,9 @@ const TruckCheckoutForm = () => {
         checkoutDate: formData.checkoutDate ? new Date(formData.checkoutDate).toISOString() : new Date().toISOString(),
         acceptDiscrepancy,
       };
-
       console.log('[TruckCheckout] Submitting:', checkoutData);
-
       const response = await truckCheckoutService.createCheckoutNew(checkoutData);
-
       if (!response.success && response.requiresConfirmation) {
-        
         const validation = response.validation;
         setDiscrepancyInfo({
           itemName: selectedItem.itemName,
@@ -206,7 +165,6 @@ const TruckCheckoutForm = () => {
         setShowDiscrepancyModal(true);
         return;
       }
-
       if (response.success) {
         setShowDiscrepancyModal(false);
         showSuccess(
@@ -223,7 +181,6 @@ const TruckCheckoutForm = () => {
       setSubmitting(false);
     }
   };
-
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <div className="mb-6">
@@ -237,7 +194,6 @@ const TruckCheckoutForm = () => {
           Select single item to check out with stock validation
         </p>
       </div>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         {}
         <Card>
@@ -256,7 +212,6 @@ const TruckCheckoutForm = () => {
                 className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Truck Number <span className="text-red-500">*</span>
@@ -268,7 +223,6 @@ const TruckCheckoutForm = () => {
                 className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Checkout Date
@@ -282,13 +236,11 @@ const TruckCheckoutForm = () => {
             </div>
           </div>
         </Card>
-
         {}
         <Card>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Select Item
           </h2>
-
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Select Item <span className="text-red-500">*</span>
@@ -315,7 +267,6 @@ const TruckCheckoutForm = () => {
               </button>
             </div>
           </div>
-
           {selectedItem && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -331,7 +282,6 @@ const TruckCheckoutForm = () => {
                   required
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Remaining Quantity After Taking <span className="text-red-500">*</span>
@@ -354,7 +304,6 @@ const TruckCheckoutForm = () => {
               </div>
             </div>
           )}
-
           {validationError && (
             <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
               <ExclamationTriangleIcon className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
@@ -362,7 +311,6 @@ const TruckCheckoutForm = () => {
             </div>
           )}
         </Card>
-
         {}
         <Card>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -376,7 +324,6 @@ const TruckCheckoutForm = () => {
             rows={4}
           />
         </Card>
-
         {}
         <div className="flex items-center justify-end gap-3">
           <Button
@@ -397,7 +344,6 @@ const TruckCheckoutForm = () => {
           </Button>
         </div>
       </form>
-
       {}
       <Modal
         isOpen={showItemPicker}
@@ -418,20 +364,17 @@ const TruckCheckoutForm = () => {
               autoFocus
             />
           </div>
-
           <div className="max-h-96 overflow-y-auto space-y-2">
             {searching && (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 Loading items...
               </div>
             )}
-
             {!searching && searchResults.length === 0 && (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 {searchQuery ? `No items found matching "${searchQuery}"` : 'No RouteStarItems available'}
               </div>
             )}
-
             {!searching && searchResults.map((item, index) => (
               <button
                 key={`${item.itemName}-${index}`}
@@ -456,7 +399,6 @@ const TruckCheckoutForm = () => {
           </div>
         </div>
       </Modal>
-
       {}
       <Modal
         isOpen={showDiscrepancyModal}
@@ -476,7 +418,6 @@ const TruckCheckoutForm = () => {
               </p>
             </div>
           </div>
-
           {discrepancyInfo && (
             <div className="space-y-3">
               <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
@@ -485,35 +426,30 @@ const TruckCheckoutForm = () => {
                   {discrepancyInfo.itemName}
                 </span>
               </div>
-
               <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Current Stock:</span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
                   {discrepancyInfo.currentStock}
                 </span>
               </div>
-
               <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Taking:</span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
                   {discrepancyInfo.taking}
                 </span>
               </div>
-
               <div className="flex justify-between py-2 border-b-2 border-gray-300 dark:border-gray-600">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Expected Remaining:</span>
                 <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
                   {discrepancyInfo.expectedRemaining}
                 </span>
               </div>
-
               <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
                 <span className="text-sm text-gray-600 dark:text-gray-400">You Entered:</span>
                 <span className="text-sm font-bold text-red-600 dark:text-red-400">
                   {discrepancyInfo.userEnteredRemaining}
                 </span>
               </div>
-
               <div className="flex justify-between py-2">
                 <span className="text-sm font-medium text-gray-900 dark:text-white">Difference:</span>
                 <span
@@ -527,7 +463,6 @@ const TruckCheckoutForm = () => {
                   {discrepancyInfo.difference} ({discrepancyInfo.discrepancyType})
                 </span>
               </div>
-
               <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                 <p className="text-sm text-yellow-800 dark:text-yellow-200">
                   ⚠️ Accepting this will automatically create an <strong>Approved</strong> discrepancy
@@ -536,7 +471,6 @@ const TruckCheckoutForm = () => {
               </div>
             </div>
           )}
-
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <Button
               type="button"
@@ -561,5 +495,4 @@ const TruckCheckoutForm = () => {
     </div>
   );
 };
-
 export default TruckCheckoutForm;

@@ -33,7 +33,6 @@ const EmployeeWorkDashboard = () => {
     start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     end: new Date().toISOString().split('T')[0]
   });
-
   useEffect(() => {
     if (user?.truckNumber) {
       loadDashboardData();
@@ -41,17 +40,14 @@ const EmployeeWorkDashboard = () => {
       setLoading(false);
     }
   }, [user?.truckNumber, dateRange]);
-
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      // Use combined dashboard API - single call instead of three separate ones
       const response = await employeeDataService.getMyCombinedDashboard(
         dateRange.start,
         dateRange.end,
         10
       );
-
       if (response.data) {
         setStatistics(response.data.statistics);
         setRecentActivity(response.data.recentActivity);
@@ -64,13 +60,11 @@ const EmployeeWorkDashboard = () => {
       setLoading(false);
     }
   };
-
   const handleSaveTruckNumber = async () => {
     if (!truckNumberInput.trim()) {
       showError('Please enter a truck number');
       return;
     }
-
     setSavingTruckNumber(true);
     try {
       const token = localStorage.getItem('authToken');
@@ -84,18 +78,13 @@ const EmployeeWorkDashboard = () => {
           truckNumber: truckNumberInput.toUpperCase(),
         }),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.error?.message || data.message || 'Failed to update truck number');
       }
-
-      
       const updatedUser = { ...user, truckNumber: truckNumberInput.toUpperCase() };
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
-
       showSuccess('Truck number assigned successfully!');
       setTruckNumberInput('');
     } catch (error) {
@@ -105,14 +94,12 @@ const EmployeeWorkDashboard = () => {
       setSavingTruckNumber(false);
     }
   };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
     }).format(amount || 0);
   };
-
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-US', {
       month: 'short',
@@ -120,7 +107,6 @@ const EmployeeWorkDashboard = () => {
       year: 'numeric'
     });
   };
-
   const getStatusVariant = (status) => {
     const variants = {
       'Completed': 'success',
@@ -130,11 +116,9 @@ const EmployeeWorkDashboard = () => {
     };
     return variants[status] || 'secondary';
   };
-
   if (loading) {
     return <LoadingSpinner />;
   }
-
   if (!user?.truckNumber) {
     return (
       <div className="p-6">
@@ -147,7 +131,6 @@ const EmployeeWorkDashboard = () => {
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               Please enter your truck number to access your work dashboard.
             </p>
-
             <div className="mt-6">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-2">
                 Truck Number
@@ -164,7 +147,6 @@ const EmployeeWorkDashboard = () => {
                 Enter the unique truck/vehicle identifier assigned to you
               </p>
             </div>
-
             <div className="mt-6 flex gap-3">
               <Button
                 onClick={handleSaveTruckNumber}
@@ -175,7 +157,6 @@ const EmployeeWorkDashboard = () => {
                 {savingTruckNumber ? 'Assigning...' : 'Assign Truck Number'}
               </Button>
             </div>
-
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 If you're unsure about your truck number, please contact your administrator.
@@ -186,7 +167,6 @@ const EmployeeWorkDashboard = () => {
       </div>
     );
   }
-
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -216,7 +196,6 @@ const EmployeeWorkDashboard = () => {
           />
         </div>
       </div>
-
       {/* Statistics Cards */}
       {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -244,7 +223,6 @@ const EmployeeWorkDashboard = () => {
               </div>
             </div>
           </Card>
-
           {/* Total Revenue */}
           <Card className="hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
@@ -264,7 +242,6 @@ const EmployeeWorkDashboard = () => {
               </div>
             </div>
           </Card>
-
           {/* Total Items Serviced */}
           <Card className="hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
@@ -284,7 +261,6 @@ const EmployeeWorkDashboard = () => {
               </div>
             </div>
           </Card>
-
           {/* Completion Rate */}
           <Card className="hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
@@ -308,7 +284,6 @@ const EmployeeWorkDashboard = () => {
           </Card>
         </div>
       )}
-
       {/* Performance and Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Services */}
@@ -342,7 +317,6 @@ const EmployeeWorkDashboard = () => {
             </div>
           </Card>
         )}
-
         {/* Recent Activity */}
         <Card>
           <div className="flex items-center justify-between mb-4">
@@ -402,7 +376,6 @@ const EmployeeWorkDashboard = () => {
           </div>
         </Card>
       </div>
-
       {/* Daily Revenue Chart */}
       {performance?.dailyRevenue && performance.dailyRevenue.length > 0 && (
         <Card>
@@ -415,7 +388,6 @@ const EmployeeWorkDashboard = () => {
               {performance.dailyRevenue.map((day, index) => {
                 const maxRevenue = Math.max(...performance.dailyRevenue.map(d => d.revenue));
                 const height = (day.revenue / maxRevenue) * 100;
-
                 return (
                   <div key={index} className="flex flex-col items-center gap-1 flex-1 min-w-[60px]">
                     <div className="text-xs font-semibold text-gray-900 dark:text-white mb-1">
@@ -442,5 +414,4 @@ const EmployeeWorkDashboard = () => {
     </div>
   );
 };
-
 export default EmployeeWorkDashboard;

@@ -15,7 +15,6 @@ const TailwindDemo = () => {
           </p>
         </div>
       </section>
-
       {}
       <section className="section">
         <div className="container-custom">
@@ -36,7 +35,6 @@ const TailwindDemo = () => {
           </div>
         </div>
       </section>
-
       {}
       <section className="section bg-dark-50">
         <div className="container-custom">
@@ -66,7 +64,6 @@ const TailwindDemo = () => {
           </div>
         </div>
       </section>
-
       {}
       <section className="section">
         <div className="container-custom">
@@ -87,7 +84,6 @@ const TailwindDemo = () => {
           </div>
         </div>
       </section>
-
       {}
       <section className="section bg-dark-50">
         <div className="container-custom">
@@ -101,7 +97,6 @@ const TailwindDemo = () => {
           </div>
         </div>
       </section>
-
       {}
       <section className="section">
         <div className="container-custom">
@@ -141,7 +136,6 @@ const TailwindDemo = () => {
           </div>
         </div>
       </section>
-
       {}
       <section className="section bg-dark-50">
         <div className="container-custom text-center">
@@ -154,7 +148,6 @@ const TailwindDemo = () => {
           </p>
         </div>
       </section>
-
       {}
       <section className="section">
         <div className="container-custom">
@@ -168,7 +161,6 @@ const TailwindDemo = () => {
           </div>
         </div>
       </section>
-
       {}
       <section className="section bg-dark-50">
         <div className="container-custom">
@@ -189,7 +181,6 @@ const TailwindDemo = () => {
           </div>
         </div>
       </section>
-
       {}
       <section className="section">
         <div className="container-custom">
@@ -223,7 +214,6 @@ const TailwindDemo = () => {
           </div>
         </div>
       </section>
-
       {}
       <footer className="bg-dark-900 text-white py-8">
         <div className="container-custom text-center">
@@ -233,5 +223,4 @@ const TailwindDemo = () => {
     </div>
   );
 };
-
 export default TailwindDemo;

@@ -28,27 +28,21 @@ const OrderVerification = () => {
   const [items, setItems] = useState([]);
   const [notes, setNotes] = useState('');
   const [hasDiscrepancies, setHasDiscrepancies] = useState(false);
-
   useEffect(() => {
     fetchOrder();
   }, [orderId]);
-
   useEffect(() => {
-    
     const discrepancies = items.some(item =>
       parseFloat(item.receivedQuantity || 0) !== item.qty
     );
     setHasDiscrepancies(discrepancies);
   }, [items]);
-
   const fetchOrder = async () => {
     try {
       setLoading(true);
       const response = await purchaseOrderService.getOrderById(orderId);
-
       if (response.success) {
         setOrder(response.data);
-        
         setItems(response.data.items.map(item => ({
           ...item,
           receivedQuantity: item.qty, 
@@ -62,22 +56,18 @@ const OrderVerification = () => {
       setLoading(false);
     }
   };
-
   const handleQuantityChange = (index, value) => {
     const newItems = [...items];
     newItems[index].receivedQuantity = value;
     setItems(newItems);
   };
-
   const handleAllGood = async () => {
     try {
       setSubmitting(true);
-
       const response = await orderDiscrepancyService.verifyOrder(orderId, {
         allGood: true,
         notes: notes.trim() || 'All items received as expected'
       });
-
       if (response.success) {
         showSuccess('Order verified successfully - all items correct');
         navigate('/orders');
@@ -89,12 +79,9 @@ const OrderVerification = () => {
       setSubmitting(false);
     }
   };
-
   const handleSubmitWithDiscrepancies = async () => {
     try {
       setSubmitting(true);
-
-      
       const itemsData = items.map(item => ({
         sku: item.sku,
         itemName: item.itemName || item.name,
@@ -102,13 +89,11 @@ const OrderVerification = () => {
         receivedQuantity: parseFloat(item.receivedQuantity) || 0,
         notes: item.notes || ''
       }));
-
       const response = await orderDiscrepancyService.verifyOrder(orderId, {
         allGood: false,
         items: itemsData,
         notes: notes.trim()
       });
-
       if (response.success) {
         const discrepancyCount = response.data.discrepancies?.length || 0;
         showSuccess(`Order verified with ${discrepancyCount} discrepancy(ies) recorded`);
@@ -121,11 +106,9 @@ const OrderVerification = () => {
       setSubmitting(false);
     }
   };
-
   if (loading) {
     return <LoadingSpinner />;
   }
-
   if (!order) {
     return (
       <div className="p-6">
@@ -135,7 +118,6 @@ const OrderVerification = () => {
       </div>
     );
   }
-
   if (order.status === 'received' || order.status === 'completed') {
     return (
       <div className="p-6 space-y-6">
@@ -148,7 +130,6 @@ const OrderVerification = () => {
       </div>
     );
   }
-
   return (
     <div className="p-6 space-y-5">
       {}
@@ -165,7 +146,6 @@ const OrderVerification = () => {
           Back to Orders
         </Button>
       </div>
-
       {}
       <Card variant="elevated" padding="lg">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -185,7 +165,6 @@ const OrderVerification = () => {
           </div>
         </div>
       </Card>
-
       {}
       <Alert variant="info" title="Instructions">
         <ul className="list-disc list-inside space-y-1 mt-2 text-sm">
@@ -194,7 +173,6 @@ const OrderVerification = () => {
           <li>If there are differences, they will be recorded as discrepancies for admin approval</li>
         </ul>
       </Alert>
-
       {}
       <Card variant="elevated" padding="none">
         <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
@@ -202,7 +180,6 @@ const OrderVerification = () => {
             Order Items ({items.length})
           </h2>
         </div>
-
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800">
@@ -230,7 +207,6 @@ const OrderVerification = () => {
                 const expected = item.qty;
                 const difference = received - expected;
                 const hasDiscrepancy = difference !== 0;
-
                 return (
                   <tr key={index} className={hasDiscrepancy ? 'bg-yellow-50 dark:bg-yellow-900/10' : ''}>
                     <td className="px-6 py-4">
@@ -241,11 +217,9 @@ const OrderVerification = () => {
                         {item.sku}
                       </div>
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-700 dark:text-gray-300">
                       {expected}
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <Input
                         type="number"
@@ -257,7 +231,6 @@ const OrderVerification = () => {
                         required
                       />
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       {hasDiscrepancy && (
                         <span className={`text-sm font-bold ${
@@ -272,7 +245,6 @@ const OrderVerification = () => {
                         <span className="text-sm text-green-600 dark:text-green-400">-</span>
                       )}
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap">
                       {hasDiscrepancy ? (
                         <Badge variant={difference > 0 ? 'info' : 'warning'}>
@@ -289,7 +261,6 @@ const OrderVerification = () => {
           </table>
         </div>
       </Card>
-
       {}
       <Card variant="elevated" padding="lg">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -303,7 +274,6 @@ const OrderVerification = () => {
           placeholder="Add any notes about this order verification..."
         />
       </Card>
-
       {}
       {hasDiscrepancies && (
         <Alert variant="warning" title="Discrepancies Detected">
@@ -312,7 +282,6 @@ const OrderVerification = () => {
           </p>
         </Alert>
       )}
-
       {}
       <div className="flex justify-end gap-4">
         <Button
@@ -322,7 +291,6 @@ const OrderVerification = () => {
         >
           Cancel
         </Button>
-
         {!hasDiscrepancies && (
           <Button
             variant="success"
@@ -334,7 +302,6 @@ const OrderVerification = () => {
             All Good - Everything Matches
           </Button>
         )}
-
         {hasDiscrepancies && (
           <Button
             variant="primary"
@@ -350,5 +317,4 @@ const OrderVerification = () => {
     </div>
   );
 };
-
 export default OrderVerification;

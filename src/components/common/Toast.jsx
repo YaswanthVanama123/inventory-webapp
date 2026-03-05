@@ -5,18 +5,15 @@ const Toast = ({ message, type = 'info', onClose }) => {
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
   }, []);
-
   const handleClose = () => {
     setIsExiting(true);
     setTimeout(() => {
       onClose();
     }, 300);
   };
-
   const getTypeStyles = () => {
     switch (type) {
       case 'success':
@@ -78,9 +75,7 @@ const Toast = ({ message, type = 'info', onClose }) => {
         };
     }
   };
-
   const styles = getTypeStyles();
-
   return (
     <div
       className={`
@@ -108,12 +103,10 @@ const Toast = ({ message, type = 'info', onClose }) => {
           {styles.iconPath}
         </svg>
       </div>
-
       {}
       <div className={`flex-1 ${styles.text} text-sm font-medium`}>
         {message}
       </div>
-
       {}
       <button
         onClick={handleClose}
@@ -142,5 +135,4 @@ const Toast = ({ message, type = 'info', onClose }) => {
     </div>
   );
 };
-
 export default Toast;

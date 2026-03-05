@@ -14,8 +14,6 @@ const UserForm = () => {
   const { id } = useParams();
   const isEditMode = !!id;
   const { showSuccess, showError, showInfo } = useContext(ToastContext);
-
-  
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -26,29 +24,22 @@ const UserForm = () => {
     truckNumber: '',
     isActive: true,
   });
-
-  
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState(null);
-
-  
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     label: '',
     color: '',
   });
-
-  
   useEffect(() => {
     if (isEditMode) {
       fetchUser();
     }
   }, [id, isEditMode]);
-
   const fetchUser = async () => {
     setFetchLoading(true);
     try {
@@ -59,11 +50,9 @@ const UserForm = () => {
           'Content-Type': 'application/json',
         },
       });
-
       if (!response.ok) {
         throw new Error('Failed to fetch user');
       }
-
       const data = await response.json();
       const user = data.data.user;  
       setFormData({
@@ -86,28 +75,19 @@ const UserForm = () => {
       setFetchLoading(false);
     }
   };
-
-  
   const calculatePasswordStrength = (password) => {
     if (!password) {
       return { score: 0, label: '', color: '' };
     }
-
     let score = 0;
-
-    
     if (password.length >= 8) score++;
     if (password.length >= 12) score++;
-
-    
     if (/[a-z]/.test(password)) score++;
     if (/[A-Z]/.test(password)) score++;
     if (/[0-9]/.test(password)) score++;
     if (/[^a-zA-Z0-9]/.test(password)) score++;
-
     let label = '';
     let color = '';
-
     if (score <= 2) {
       label = 'Weak';
       color = 'bg-red-500';
@@ -118,37 +98,26 @@ const UserForm = () => {
       label = 'Strong';
       color = 'bg-green-500';
     }
-
     return { score, label, color };
   };
-
-  
   useEffect(() => {
     if (!isEditMode && formData.password) {
       const strength = calculatePasswordStrength(formData.password);
       setPasswordStrength(strength);
     }
   }, [formData.password, isEditMode]);
-
-  
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-
-    
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
-
-  
   const validateForm = () => {
     const newErrors = {};
-
-    
     if (!formData.username.trim()) {
       newErrors.username = 'Username is required';
     } else if (formData.username.length < 3) {
@@ -158,15 +127,11 @@ const UserForm = () => {
     } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
       newErrors.username = 'Username can only contain letters, numbers, and underscores';
     }
-
-    
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Invalid email format (e.g., user@example.com)';
     }
-
-    
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full name is required';
     } else if (formData.fullName.trim().length < 2) {
@@ -174,8 +139,6 @@ const UserForm = () => {
     } else if (formData.fullName.trim().length > 50) {
       newErrors.fullName = 'Full name must not exceed 50 characters';
     }
-
-    
     if (!isEditMode) {
       if (!formData.password) {
         newErrors.password = 'Password is required';
@@ -190,15 +153,12 @@ const UserForm = () => {
       } else if (!/(?=.*[0-9])/.test(formData.password)) {
         newErrors.password = 'Password must contain at least one number';
       }
-
-      
       if (!formData.confirmPassword) {
         newErrors.confirmPassword = 'Please confirm your password';
       } else if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
       }
     } else if (formData.password) {
-      
       if (formData.password.length < 8) {
         newErrors.password = 'Password must be at least 8 characters';
       } else if (formData.password.length > 100) {
@@ -206,29 +166,21 @@ const UserForm = () => {
       } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/.test(formData.password)) {
         newErrors.password = 'Password must contain uppercase, lowercase, and numbers';
       }
-
-      
       if (!formData.confirmPassword) {
         newErrors.confirmPassword = 'Please confirm your new password';
       } else if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
       }
     }
-
-    
     if (!formData.role) {
       newErrors.role = 'Role is required';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAlert(null);
-
     if (!validateForm()) {
       showError('Please fix the errors in the form before submitting');
       setAlert({
@@ -237,18 +189,13 @@ const UserForm = () => {
       });
       return;
     }
-
     setLoading(true);
-
     try {
       const token = localStorage.getItem('authToken');
       const url = isEditMode
         ? `${API_BASE_URL}/users/${id}`
         : `${API_BASE_URL}/users`;
-
       const method = isEditMode ? 'PUT' : 'POST';
-
-      
       const payload = {
         username: formData.username,
         email: formData.email,
@@ -257,11 +204,9 @@ const UserForm = () => {
         isActive: formData.isActive,
         truckNumber: formData.truckNumber || null,
       };
-
       if (!isEditMode || formData.password) {
         payload.password = formData.password;
       }
-
       const response = await fetch(url, {
         method,
         headers: {
@@ -270,11 +215,8 @@ const UserForm = () => {
         },
         body: JSON.stringify(payload),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
-        
         if (response.status === 409 || data.error?.includes('exists')) {
           setErrors({
             username: data.error?.includes('username') ? 'Username already exists' : '',
@@ -284,15 +226,12 @@ const UserForm = () => {
         }
         throw new Error(data.error || data.message || 'Failed to save user');
       }
-
       const successMessage = `User ${isEditMode ? 'updated' : 'created'} successfully!`;
       showSuccess(successMessage);
       setAlert({
         type: 'success',
         message: successMessage,
       });
-
-
       setTimeout(() => {
         navigate('/users');
       }, 1500);
@@ -308,12 +247,9 @@ const UserForm = () => {
       setLoading(false);
     }
   };
-
-  
   const handleCancel = () => {
     navigate('/users');
   };
-
   if (fetchLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -324,7 +260,6 @@ const UserForm = () => {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
@@ -339,7 +274,6 @@ const UserForm = () => {
               : 'Create a new user account with appropriate role and permissions'}
           </p>
         </div>
-
         {}
         {alert && (
           <div className="mb-6">
@@ -352,7 +286,6 @@ const UserForm = () => {
             </Alert>
           </div>
         )}
-
         {}
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6">
           {}
@@ -371,7 +304,6 @@ const UserForm = () => {
             helperText={isEditMode ? "Username cannot be changed" : "3+ characters, letters, numbers, and underscores only"}
             readOnly={isEditMode}
           />
-
           {}
           <Input
             label="Email"
@@ -387,7 +319,6 @@ const UserForm = () => {
             disabled={loading}
             helperText="Valid email address required"
           />
-
           {}
           <Input
             label="Full Name"
@@ -402,7 +333,6 @@ const UserForm = () => {
             icon={<User className="w-5 h-5" />}
             disabled={loading}
           />
-
           {}
           <div>
             <div className="relative">
@@ -429,7 +359,6 @@ const UserForm = () => {
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
-
             {}
             {!isEditMode && formData.password && (
               <div className="mt-2">
@@ -494,7 +423,6 @@ const UserForm = () => {
               </div>
             )}
           </div>
-
           {}
           <div>
             <div className="relative">
@@ -522,7 +450,6 @@ const UserForm = () => {
               </button>
             </div>
           </div>
-
           {}
           <Select
             label="Role"
@@ -540,7 +467,6 @@ const UserForm = () => {
             disabled={loading}
             helperText="Admin has full access, Employee has limited access"
           />
-
           {}
           <Input
             label="Truck Number"
@@ -555,7 +481,6 @@ const UserForm = () => {
             helperText="Unique truck/vehicle identifier for this employee (appears in Class column of invoices)"
             style={{ textTransform: 'uppercase' }}
           />
-
           {}
           <div className="flex items-center gap-3">
             <label className="relative inline-flex items-center cursor-pointer">
@@ -578,7 +503,6 @@ const UserForm = () => {
               </p>
             </div>
           </div>
-
           {}
           <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-gray-200">
             <Button
@@ -603,7 +527,6 @@ const UserForm = () => {
             </Button>
           </div>
         </form>
-
         {}
         {isEditMode && (
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -623,5 +546,4 @@ const UserForm = () => {
     </div>
   );
 };
-
 export default UserForm;

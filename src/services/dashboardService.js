@@ -2,16 +2,12 @@ import api from './api';
 import { handleApiError } from './errorHandler';
 
 
-
 const dashboardService = {
-  
   getDashboardData: async () => {
     try {
       console.log('[DashboardService] Starting API call to /reports/dashboard');
       console.log('[DashboardService] Base URL:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api');
-
       const response = await api.get('/reports/dashboard');
-
       console.log('[DashboardService] API call successful, response:', response);
       return response;
     } catch (error) {
@@ -28,8 +24,6 @@ const dashboardService = {
       });
     }
   },
-
-  
   getRecentActivity: async (limit = 20) => {
     try {
       const response = await api.get('/reports/recent-activity', {
@@ -42,8 +36,6 @@ const dashboardService = {
       });
     }
   },
-
-  
   getLowStockItems: async () => {
     try {
       const response = await api.get('/inventory', {
@@ -56,8 +48,6 @@ const dashboardService = {
       });
     }
   },
-
-  
   getStockSummary: async () => {
     try {
       const response = await api.get('/reports/stock-summary');
@@ -69,5 +59,4 @@ const dashboardService = {
     }
   },
 };
-
 export default dashboardService;

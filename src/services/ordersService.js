@@ -1,13 +1,6 @@
 import api from './api';
 
 
-
-
-
-
-
-
-
 export const getOrders = async (params = {}) => {
   try {
     const response = await api.get('/customerconnect/orders', { params });
@@ -17,10 +10,6 @@ export const getOrders = async (params = {}) => {
     throw error;
   }
 };
-
-
-
-
 export const getOrderByNumber = async (orderNumber) => {
   try {
     const response = await api.get(`/customerconnect/orders/${orderNumber}`);
@@ -30,10 +19,6 @@ export const getOrderByNumber = async (orderNumber) => {
     throw error;
   }
 };
-
-
-
-
 export const getOrderStats = async (params = {}) => {
   try {
     const response = await api.get('/customerconnect/stats', { params });
@@ -43,10 +28,6 @@ export const getOrderStats = async (params = {}) => {
     throw error;
   }
 };
-
-
-
-
 export const getOrderRange = async () => {
   try {
     const response = await api.get('/customerconnect/order-range');
@@ -56,10 +37,6 @@ export const getOrderRange = async () => {
     throw error;
   }
 };
-
-
-
-
 export const syncOrders = async (limit = 100, direction = 'new') => {
   try {
     const response = await api.post('/customerconnect/sync/orders',
@@ -75,10 +52,6 @@ export const syncOrders = async (limit = 100, direction = 'new') => {
     throw error;
   }
 };
-
-
-
-
 export const syncOrderDetails = async (orderNumber) => {
   try {
     const response = await api.post(`/customerconnect/sync/details/${orderNumber}`,
@@ -94,10 +67,6 @@ export const syncOrderDetails = async (orderNumber) => {
     throw error;
   }
 };
-
-
-
-
 export const syncAllOrderDetails = async (limit = 50) => {
   try {
     const response = await api.post('/customerconnect/sync/all-details',
@@ -113,10 +82,6 @@ export const syncAllOrderDetails = async (limit = 50) => {
     throw error;
   }
 };
-
-
-
-
 export const processStockMovements = async () => {
   try {
     const response = await api.post('/customerconnect/sync/stock',
@@ -132,10 +97,6 @@ export const processStockMovements = async () => {
     throw error;
   }
 };
-
-
-
-
 export const fullSync = async (options = {}) => {
   try {
     const response = await api.post('/customerconnect/sync/full',
@@ -151,10 +112,6 @@ export const fullSync = async (options = {}) => {
     throw error;
   }
 };
-
-
-
-
 export const deleteAllOrders = async () => {
   try {
     const response = await api.delete('/customerconnect/orders/all');
@@ -164,10 +121,6 @@ export const deleteAllOrders = async () => {
     throw error;
   }
 };
-
-
-
-
 export const deleteBulkOrdersByNumbers = async (orderNumbers) => {
   try {
     const response = await api.post('/customerconnect/orders/bulk-delete-by-numbers', {
@@ -179,7 +132,6 @@ export const deleteBulkOrdersByNumbers = async (orderNumbers) => {
     throw error;
   }
 };
-
 export default {
   getOrders,
   getOrderByNumber,

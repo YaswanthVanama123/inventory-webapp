@@ -29,32 +29,24 @@ const OrderDiscrepancyList = () => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [expandedRow, setExpandedRow] = useState(null);
-
-  
   const [statusFilter, setStatusFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [orderNumberFilter, setOrderNumberFilter] = useState('');
-
-  
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 50,
     total: 0,
     pages: 0
   });
-
-  
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedDiscrepancy, setSelectedDiscrepancy] = useState(null);
   const [actionNotes, setActionNotes] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
-
   useEffect(() => {
     fetchDiscrepancies();
     fetchStats();
   }, [statusFilter, typeFilter, orderNumberFilter, pagination.page]);
-
   const fetchDiscrepancies = async () => {
     try {
       setLoading(true);
@@ -62,13 +54,10 @@ const OrderDiscrepancyList = () => {
         page: pagination.page,
         limit: pagination.limit
       };
-
       if (statusFilter) params.status = statusFilter;
       if (typeFilter) params.discrepancyType = typeFilter;
       if (orderNumberFilter.trim()) params.orderNumber = orderNumberFilter.trim();
-
       const response = await orderDiscrepancyService.getOrderDiscrepancies(params);
-
       if (response.success) {
         setDiscrepancies(response.data.discrepancies);
         setPagination(response.data.pagination);
@@ -80,7 +69,6 @@ const OrderDiscrepancyList = () => {
       setLoading(false);
     }
   };
-
   const fetchStats = async () => {
     try {
       const response = await orderDiscrepancyService.getOrderDiscrepancyStats();
@@ -91,29 +79,24 @@ const OrderDiscrepancyList = () => {
       console.error('Fetch stats error:', error);
     }
   };
-
   const handleApprove = (discrepancy) => {
     setSelectedDiscrepancy(discrepancy);
     setActionNotes('');
     setShowApproveModal(true);
   };
-
   const handleReject = (discrepancy) => {
     setSelectedDiscrepancy(discrepancy);
     setActionNotes('');
     setShowRejectModal(true);
   };
-
   const confirmApprove = async () => {
     if (!selectedDiscrepancy) return;
-
     try {
       setActionLoading(true);
       const response = await orderDiscrepancyService.approveOrderDiscrepancy(
         selectedDiscrepancy._id,
         actionNotes
       );
-
       if (response.success) {
         showSuccess('Order discrepancy approved and stock adjusted');
         setShowApproveModal(false);
@@ -129,17 +112,14 @@ const OrderDiscrepancyList = () => {
       setActionLoading(false);
     }
   };
-
   const confirmReject = async () => {
     if (!selectedDiscrepancy) return;
-
     try {
       setActionLoading(true);
       const response = await orderDiscrepancyService.rejectOrderDiscrepancy(
         selectedDiscrepancy._id,
         actionNotes
       );
-
       if (response.success) {
         showSuccess('Order discrepancy rejected');
         setShowRejectModal(false);
@@ -155,16 +135,13 @@ const OrderDiscrepancyList = () => {
       setActionLoading(false);
     }
   };
-
   const getStatusBadge = (status) => {
     const config = {
       pending: { variant: 'warning', label: 'Pending', icon: ClockIcon },
       approved: { variant: 'success', label: 'Approved', icon: CheckCircleIcon },
       rejected: { variant: 'danger', label: 'Rejected', icon: XCircleIcon }
     };
-
     const { variant, label, icon: Icon } = config[status] || config.pending;
-
     return (
       <Badge variant={variant}>
         <Icon className="w-4 h-4 mr-1" />
@@ -172,19 +149,15 @@ const OrderDiscrepancyList = () => {
       </Badge>
     );
   };
-
   const getTypeBadge = (type) => {
     const config = {
       Shortage: { variant: 'warning', label: 'Shortage' },
       Overage: { variant: 'info', label: 'Overage' },
       Matched: { variant: 'success', label: 'Matched' }
     };
-
     const { variant, label } = config[type] || { variant: 'default', label: type };
-
     return <Badge variant={variant}>{label}</Badge>;
   };
-
   const formatDate = (date) => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleString('en-US', {
@@ -195,11 +168,9 @@ const OrderDiscrepancyList = () => {
       minute: '2-digit'
     });
   };
-
   if (loading && discrepancies.length === 0) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="space-y-5">
       {}
@@ -231,14 +202,12 @@ const OrderDiscrepancyList = () => {
           </Card>
         </div>
       )}
-
       {}
       <Card variant="elevated" padding="lg">
         <div className="flex items-center gap-2 mb-6">
           <FunnelIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           <h2 className="text-base font-semibold text-gray-900 dark:text-white">Filters</h2>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -257,7 +226,6 @@ const OrderDiscrepancyList = () => {
               <option value="rejected">Rejected</option>
             </Select>
           </div>
-
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
               Type
@@ -275,7 +243,6 @@ const OrderDiscrepancyList = () => {
               <option value="Matched">Matched</option>
             </Select>
           </div>
-
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
               Order Number
@@ -289,7 +256,6 @@ const OrderDiscrepancyList = () => {
               placeholder="Filter by order number"
             />
           </div>
-
           <div className="flex items-end">
             <Button
               variant="ghost"
@@ -306,7 +272,6 @@ const OrderDiscrepancyList = () => {
           </div>
         </div>
       </Card>
-
       {}
       <Card variant="elevated" padding="none">
         <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
@@ -314,7 +279,6 @@ const OrderDiscrepancyList = () => {
             Order Discrepancies ({pagination.total} records)
           </h2>
         </div>
-
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800">
@@ -380,7 +344,6 @@ const OrderDiscrepancyList = () => {
                           </div>
                         )}
                       </td>
-
                       <td className="px-6 py-4">
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
                           {discrepancy.itemName}
@@ -389,15 +352,12 @@ const OrderDiscrepancyList = () => {
                           {discrepancy.sku}
                         </div>
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-700 dark:text-gray-300">
                         {discrepancy.expectedQuantity}
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-gray-900 dark:text-white">
                         {discrepancy.receivedQuantity}
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <span className={`text-sm font-bold ${
                           discrepancy.discrepancyQuantity > 0
@@ -409,15 +369,12 @@ const OrderDiscrepancyList = () => {
                           {discrepancy.discrepancyQuantity > 0 ? '+' : ''}{discrepancy.discrepancyQuantity}
                         </span>
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getTypeBadge(discrepancy.discrepancyType)}
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getStatusBadge(discrepancy.status)}
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900 dark:text-white">
                           {discrepancy.reportedBy?.fullName || discrepancy.reportedBy?.username || 'N/A'}
@@ -426,7 +383,6 @@ const OrderDiscrepancyList = () => {
                           {formatDate(discrepancy.reportedAt)}
                         </div>
                       </td>
-
                       {isAdmin && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm" onClick={(e) => e.stopPropagation()}>
                           {discrepancy.status === 'pending' && (
@@ -450,7 +406,6 @@ const OrderDiscrepancyList = () => {
                         </td>
                       )}
                     </tr>
-
                     {}
                     {expandedRow === discrepancy._id && (
                       <tr>
@@ -462,7 +417,6 @@ const OrderDiscrepancyList = () => {
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{discrepancy.notes}</p>
                               </div>
                             )}
-
                             {discrepancy.resolvedBy && (
                               <div>
                                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Resolved By:</p>
@@ -473,7 +427,6 @@ const OrderDiscrepancyList = () => {
                                 </p>
                               </div>
                             )}
-
                             {discrepancy.resolutionNotes && (
                               <div>
                                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Resolution Notes:</p>
@@ -490,7 +443,6 @@ const OrderDiscrepancyList = () => {
             </tbody>
           </table>
         </div>
-
         {}
         {pagination.pages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
@@ -521,7 +473,6 @@ const OrderDiscrepancyList = () => {
           </div>
         )}
       </Card>
-
       {}
       <Modal
         isOpen={showApproveModal}
@@ -553,7 +504,6 @@ const OrderDiscrepancyList = () => {
               <br /><br />
               <strong>Stock Movement:</strong> {selectedDiscrepancy.discrepancyType === 'Shortage' ? 'OUT' : 'IN'} {Math.abs(selectedDiscrepancy.discrepancyQuantity)} units
             </Alert>
-
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Notes (Optional)
@@ -569,7 +519,6 @@ const OrderDiscrepancyList = () => {
           </>
         )}
       </Modal>
-
       {}
       <Modal
         isOpen={showRejectModal}
@@ -599,7 +548,6 @@ const OrderDiscrepancyList = () => {
             <Alert variant="danger" title="Rejection">
               This will reject the discrepancy for {selectedDiscrepancy.itemName}. No stock adjustments will be made.
             </Alert>
-
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Reason (Optional)
@@ -618,5 +566,4 @@ const OrderDiscrepancyList = () => {
     </div>
   );
 };
-
 export default OrderDiscrepancyList;

@@ -7,21 +7,15 @@ import Card from '../components/common/Card';
 
 const ErrorThrower = ({ shouldThrow, errorType = 'render' }) => {
   const [count, setCount] = useState(0);
-
-  
   if (shouldThrow && errorType === 'render') {
     throw new Error('Test render error: Component intentionally failed during render');
   }
-
-  
   const handleClick = () => {
     if (errorType === 'event') {
       throw new Error('Test event error: Button click handler failed');
     }
     setCount(count + 1);
   };
-
-  
   const handleAsyncError = async () => {
     if (errorType === 'async') {
       await new Promise((_, reject) => {
@@ -29,7 +23,6 @@ const ErrorThrower = ({ shouldThrow, errorType = 'render' }) => {
       });
     }
   };
-
   return (
     <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
       <p className="text-green-800 dark:text-green-300 mb-2">
@@ -46,20 +39,13 @@ const ErrorThrower = ({ shouldThrow, errorType = 'render' }) => {
     </div>
   );
 };
-
-
-
-
-
 const ErrorBoundaryDemo = () => {
   const [scenario, setScenario] = useState(null);
   const [key, setKey] = useState(0);
-
   const resetScenario = () => {
     setScenario(null);
     setKey(key + 1); 
   };
-
   const scenarios = [
     {
       id: 'render-error',
@@ -96,7 +82,6 @@ const ErrorBoundaryDemo = () => {
       ),
     },
   ];
-
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
@@ -108,7 +93,6 @@ const ErrorBoundaryDemo = () => {
             Test different error scenarios and see how ErrorBoundary handles them
           </p>
         </div>
-
         {}
         <Card className="mb-6 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
           <div className="flex items-start gap-3">
@@ -137,7 +121,6 @@ const ErrorBoundaryDemo = () => {
             </div>
           </div>
         </Card>
-
         {}
         <Card title="Select a Test Scenario" className="mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -161,7 +144,6 @@ const ErrorBoundaryDemo = () => {
             ))}
           </div>
         </Card>
-
         {}
         {scenario && (
           <Card title="Test Result" className="mb-6">
@@ -170,11 +152,9 @@ const ErrorBoundaryDemo = () => {
                 Reset Scenario
               </Button>
             </div>
-
             {}
             {scenarios.map((s) => {
               if (s.id !== scenario) return null;
-
               return (
                 <ErrorBoundary
                   key={`${s.id}-${key}`}
@@ -190,7 +170,6 @@ const ErrorBoundaryDemo = () => {
             })}
           </Card>
         )}
-
         {}
         <Card title="Working Component" className="mb-6">
           <p className="text-gray-600 dark:text-gray-400 mb-4">
@@ -200,7 +179,6 @@ const ErrorBoundaryDemo = () => {
             <ErrorThrower shouldThrow={false} errorType="none" />
           </ErrorBoundary>
         </Card>
-
         {}
         <Card title="Usage Examples">
           <div className="space-y-4">
@@ -214,7 +192,6 @@ const ErrorBoundaryDemo = () => {
 </ErrorBoundary>`}
               </pre>
             </div>
-
             <div>
               <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
                 With Custom Fallback
@@ -228,13 +205,11 @@ const ErrorBoundaryDemo = () => {
     onRetry={handleRetry}
   />
 );
-
 <ErrorBoundary fallback={fallback}>
   <YourComponent />
 </ErrorBoundary>`}
               </pre>
             </div>
-
             <div>
               <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
                 With Error Reporting
@@ -255,5 +230,4 @@ const ErrorBoundaryDemo = () => {
     </div>
   );
 };
-
 export default ErrorBoundaryDemo;

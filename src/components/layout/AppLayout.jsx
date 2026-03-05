@@ -12,9 +12,7 @@ const AppLayout = () => {
     { label: 'About', path: '/about' },
     { label: 'Contact', path: '/contact' }
   ];
-
   const isActiveRoute = (path) => location.pathname === path;
-
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {}
@@ -28,7 +26,6 @@ const AppLayout = () => {
               </div>
               <span className="text-xl font-bold text-gray-900">SEO Platform</span>
             </Link>
-
             {}
             <div className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => (
@@ -48,7 +45,6 @@ const AppLayout = () => {
                 </Link>
               ))}
             </div>
-
             {}
             <div className="hidden md:flex items-center gap-4">
               <Link
@@ -65,7 +61,6 @@ const AppLayout = () => {
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
-
             {}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -79,7 +74,6 @@ const AppLayout = () => {
               )}
             </button>
           </div>
-
           {}
           {mobileMenuOpen && (
             <div className="md:hidden border-t border-gray-200 py-4 space-y-2">
@@ -120,12 +114,10 @@ const AppLayout = () => {
           )}
         </nav>
       </header>
-
       {}
       <main className="flex-1">
         <Outlet />
       </main>
-
       {}
       <footer className="bg-gray-50 border-t border-gray-200 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -179,7 +171,6 @@ const AppLayout = () => {
                 </a>
               </div>
             </div>
-
             {}
             <div>
               <h3 className="text-sm font-semibold text-gray-900 mb-4">Product</h3>
@@ -206,7 +197,6 @@ const AppLayout = () => {
                 </li>
               </ul>
             </div>
-
             {}
             <div>
               <h3 className="text-sm font-semibold text-gray-900 mb-4">Company</h3>
@@ -233,7 +223,6 @@ const AppLayout = () => {
                 </li>
               </ul>
             </div>
-
             {}
             <div>
               <h3 className="text-sm font-semibold text-gray-900 mb-4">Legal</h3>
@@ -261,7 +250,6 @@ const AppLayout = () => {
               </ul>
             </div>
           </div>
-
           {}
           <div className="mt-12 pt-8 border-t border-gray-200">
             <p className="text-sm text-gray-600 text-center">
@@ -273,5 +261,4 @@ const AppLayout = () => {
     </div>
   );
 };
-
 export default AppLayout;

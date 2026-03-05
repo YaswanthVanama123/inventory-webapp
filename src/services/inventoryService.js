@@ -2,17 +2,11 @@ import api from './api';
 import { handleApiError } from './errorHandler';
 
 
-
 const inventoryService = {
-
   getAll: async (params = {}) => {
     try {
-
       const endpoint = params.usePOSPricing ? '/inventory/pos' : '/inventory';
-
-
       const { usePOSPricing, ...backendParams } = params;
-
       const response = await api.get(endpoint, { params: backendParams });
       return response;
     } catch (error) {
@@ -22,8 +16,6 @@ const inventoryService = {
       });
     }
   },
-
-  
   getAllForTruckCheckout: async () => {
     try {
       const response = await api.get('/inventory/truck-checkout');
@@ -35,8 +27,6 @@ const inventoryService = {
       });
     }
   },
-
-  
   getById: async (id) => {
     try {
       const response = await api.get(`/inventory/${id}`);
@@ -47,8 +37,6 @@ const inventoryService = {
       });
     }
   },
-
-  
   create: async (itemData) => {
     try {
       const response = await api.post('/inventory', itemData);
@@ -61,8 +49,6 @@ const inventoryService = {
       });
     }
   },
-
-  
   update: async (id, itemData) => {
     try {
       const response = await api.put(`/inventory/${id}`, itemData);
@@ -76,8 +62,6 @@ const inventoryService = {
       });
     }
   },
-
-  
   delete: async (id) => {
     try {
       const response = await api.delete(`/inventory/${id}`);
@@ -90,8 +74,6 @@ const inventoryService = {
       });
     }
   },
-
-  
   updateStock: async (id, stockData) => {
     try {
       const response = await api.patch(`/inventory/${id}/stock`, stockData);
@@ -104,8 +86,6 @@ const inventoryService = {
       });
     }
   },
-
-  
   getHistory: async (id, limit = 50) => {
     try {
       const response = await api.get(`/inventory/${id}/history`, {
@@ -118,8 +98,6 @@ const inventoryService = {
       });
     }
   },
-
-  
   getLowStock: async () => {
     try {
       const response = await api.get('/inventory/low-stock');
@@ -130,13 +108,9 @@ const inventoryService = {
       });
     }
   },
-
-
   uploadImages: async (id, images, primaryIndex = 0) => {
     try {
       const formData = new FormData();
-
-      
       if (images instanceof FileList) {
         Array.from(images).forEach((image) => {
           formData.append('images', image);
@@ -148,16 +122,12 @@ const inventoryService = {
       } else {
         formData.append('images', images);
       }
-
-      
       formData.append('primary', primaryIndex.toString());
-
       const response = await api.post(`/inventory/${id}/images`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-
       return response;
     } catch (error) {
       throw handleApiError(error, {
@@ -167,8 +137,6 @@ const inventoryService = {
       });
     }
   },
-
-  
   deleteImage: async (id, imageId) => {
     try {
       const response = await api.delete(`/inventory/${id}/images/${imageId}`);
@@ -179,8 +147,6 @@ const inventoryService = {
       });
     }
   },
-
-  
   setPrimaryImage: async (id, imageIndex) => {
     try {
       const response = await api.patch(`/inventory/${id}/images/primary`, {
@@ -193,8 +159,6 @@ const inventoryService = {
       });
     }
   },
-
-  
   generateInvoice: async (id, invoiceData) => {
     try {
       const response = await api.post(`/inventory/${id}/generate-invoice`, invoiceData);
@@ -208,5 +172,4 @@ const inventoryService = {
     }
   },
 };
-
 export default inventoryService;

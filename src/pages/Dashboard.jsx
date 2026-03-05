@@ -9,7 +9,6 @@ const Dashboard = () => {
         <h1 className="text-3xl font-bold text-slate-900 mb-2">Dashboard</h1>
         <p className="text-slate-600">Welcome to your inventory management dashboard</p>
       </div>
-
       {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {}
@@ -29,7 +28,6 @@ const Dashboard = () => {
             <span className="text-blue-100">+12% from last month</span>
           </div>
         </div>
-
         {}
         <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
@@ -47,7 +45,6 @@ const Dashboard = () => {
             <span className="text-amber-100">Needs attention</span>
           </div>
         </div>
-
         {}
         <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
@@ -65,7 +62,6 @@ const Dashboard = () => {
             <span className="text-green-100">Inventory worth</span>
           </div>
         </div>
-
         {}
         <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
@@ -84,7 +80,6 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-
       {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <h2 className="text-xl font-semibold text-slate-900 mb-4">Recent Activity</h2>
@@ -107,5 +102,4 @@ const Dashboard = () => {
     </div>
   );
 };
-
 export default Dashboard;

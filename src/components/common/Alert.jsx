@@ -19,9 +19,7 @@ const Alert = ({
       onDismiss();
     }
   };
-
   if (!isVisible) return null;
-
   const variants = {
     success: {
       bg: 'bg-green-50 dark:bg-green-900/20',
@@ -64,9 +62,7 @@ const Alert = ({
       ),
     },
   };
-
   const currentVariant = variants[variant];
-
   return (
     <div
       className={`rounded-lg border p-4 ${currentVariant.bg} ${currentVariant.border} ${className}`}
@@ -77,7 +73,6 @@ const Alert = ({
         <div className={`flex-shrink-0 ${currentVariant.text}`}>
           {icon || currentVariant.icon}
         </div>
-
         <div className="ml-3 flex-1">
           {title && (
             <h3 className={`text-sm font-semibold ${currentVariant.text} mb-1`}>
@@ -88,7 +83,6 @@ const Alert = ({
             {children}
           </div>
         </div>
-
         {dismissible && (
           <button
             onClick={handleDismiss}
@@ -104,7 +98,6 @@ const Alert = ({
     </div>
   );
 };
-
 Alert.propTypes = {
   children: PropTypes.node.isRequired,
   variant: PropTypes.oneOf(['success', 'warning', 'danger', 'info']),
@@ -114,5 +107,4 @@ Alert.propTypes = {
   icon: PropTypes.node,
   className: PropTypes.string,
 };
-
 export default Alert;

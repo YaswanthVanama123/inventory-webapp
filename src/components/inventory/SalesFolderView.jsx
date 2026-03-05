@@ -10,9 +10,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 
 
-
-
-
 const SalesFolderView = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
@@ -25,12 +22,9 @@ const SalesFolderView = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  
   useEffect(() => {
     fetchGroupedItems();
   }, []);
-
   const fetchGroupedItems = async () => {
     setLoading(true);
     try {
@@ -38,8 +32,6 @@ const SalesFolderView = () => {
       console.log('[SalesFolderView] Full API response:', response);
       console.log('[SalesFolderView] response.data:', response.data);
       console.log('[SalesFolderView] response.data.data:', response.data?.data);
-
-      
       const items = response.data?.data?.items || response.data?.items || [];
       console.log('[SalesFolderView] Parsed items:', items.length, 'items', items);
       setGroupedItems(items);
@@ -50,35 +42,23 @@ const SalesFolderView = () => {
       setLoading(false);
     }
   };
-
   const toggleItemFolder = async (sku) => {
     const isCurrentlyExpanded = expandedItems[sku];
-
-    
     setExpandedItems(prev => ({
       ...prev,
       [sku]: !prev[sku]
     }));
-
-    
     if (!isCurrentlyExpanded) {
       const item = groupedItems.find(i => i.sku === sku);
-
-      
       if (!item.invoices) {
         setLoadingInvoices(prev => ({ ...prev, [sku]: true }));
-
         try {
           const response = await api.get(`/routestar/items/${encodeURIComponent(item.name)}/invoices`);
           console.log('[SalesFolderView] Invoices response for item', item.name, ':', response);
           console.log('[SalesFolderView] response.data:', response.data);
           console.log('[SalesFolderView] response.data.data:', response.data?.data);
-
-          
           const invoices = response.data?.data?.entries || response.data?.entries || [];
           console.log('[SalesFolderView] Extracted invoices:', invoices.length, 'entries', invoices);
-
-          
           setGroupedItems(prev => {
             const updated = prev.map(item => {
               if (item.sku === sku) {
@@ -93,8 +73,6 @@ const SalesFolderView = () => {
         } catch (error) {
           console.error(`Error fetching invoices for item ${item.name}:`, error);
           showError('Failed to load invoice details');
-
-          
           setGroupedItems(prev => prev.map(item =>
             item.sku === sku
               ? { ...item, invoices: [] }
@@ -106,22 +84,14 @@ const SalesFolderView = () => {
       }
     }
   };
-
   const handleDownloadItemNames = () => {
-    
     const uniqueNames = groupedItems.map(item => {
-      
       let cleanName = item.name || '';
       cleanName = cleanName.replace(/[\t\r\n,]/g, ' ');
-      
       cleanName = cleanName.replace(/\s+/g, ' ').trim();
       return cleanName;
     });
-
-    
     const csvContent = uniqueNames.join('\n');
-
-    
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -132,14 +102,12 @@ const SalesFolderView = () => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
   };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount || 0);
   };
-
   const formatFullDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -152,7 +120,6 @@ const SalesFolderView = () => {
       return 'Invalid Date';
     }
   };
-
   const getStatusVariant = (status) => {
     const statusMap = {
       'Completed': 'success',
@@ -162,7 +129,6 @@ const SalesFolderView = () => {
     };
     return statusMap[status] || 'secondary';
   };
-
   const getInvoiceTypeVariant = (type) => {
     const typeMap = {
       'pending': 'warning',
@@ -170,11 +136,9 @@ const SalesFolderView = () => {
     };
     return typeMap[type] || 'secondary';
   };
-
   const getStockStatusVariant = (processed) => {
     return processed ? 'success' : 'warning';
   };
-
   const handleCheckboxChange = (sku) => {
     setSelectedItems(prev => {
       if (prev.includes(sku)) {
@@ -184,7 +148,6 @@ const SalesFolderView = () => {
       }
     });
   };
-
   const handleSelectAll = () => {
     if (selectedItems.length === filteredItems.length && filteredItems.length > 0) {
       setSelectedItems([]);
@@ -192,7 +155,6 @@ const SalesFolderView = () => {
       setSelectedItems(filteredItems.map(item => item.sku));
     }
   };
-
   const handleDeleteSelected = () => {
     if (selectedItems.length === 0) {
       showError('Please select items to delete');
@@ -200,22 +162,16 @@ const SalesFolderView = () => {
     }
     setDeleteModalOpen(true);
   };
-
   const confirmBulkDelete = async () => {
     if (selectedItems.length === 0) return;
-
     setDeleting(true);
     try {
-
       await api.post('/routestar/invoices/bulk-delete', {
         skus: selectedItems
       });
-
       showSuccess(`Successfully deleted ${selectedItems.length} item(s)`);
       setDeleteModalOpen(false);
       setSelectedItems([]);
-
-
       fetchGroupedItems();
     } catch (err) {
       console.error('Error deleting items:', err);
@@ -224,11 +180,8 @@ const SalesFolderView = () => {
       setDeleting(false);
     }
   };
-
-  
   const filteredItems = groupedItems.filter(item => {
     if (!searchTerm) return true;
-
     const search = searchTerm.toLowerCase();
     return (
       item.name?.toLowerCase().includes(search) ||
@@ -236,7 +189,6 @@ const SalesFolderView = () => {
       item.originalNames?.some(name => name.toLowerCase().includes(search))
     );
   });
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -244,7 +196,6 @@ const SalesFolderView = () => {
       </div>
     );
   }
-
   if (groupedItems.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-slate-200">
@@ -256,7 +207,6 @@ const SalesFolderView = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-3">
       {}
@@ -299,7 +249,6 @@ const SalesFolderView = () => {
           </p>
         )}
       </div>
-
       {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {}
@@ -319,7 +268,6 @@ const SalesFolderView = () => {
             </p>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -341,7 +289,6 @@ const SalesFolderView = () => {
             </p>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -363,7 +310,6 @@ const SalesFolderView = () => {
             </p>
           </div>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -386,7 +332,6 @@ const SalesFolderView = () => {
           </div>
         </div>
       </div>
-
       {}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
         <p className="text-sm text-blue-800 dark:text-blue-300 flex items-start gap-2">
@@ -396,7 +341,6 @@ const SalesFolderView = () => {
           <span>Items with multiple name variations are automatically merged and displayed with their canonical names</span>
         </p>
       </div>
-
       {}
       {groupedItems.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
@@ -415,7 +359,6 @@ const SalesFolderView = () => {
                     Select All ({selectedItems.length}/{filteredItems.length})
                   </span>
                 </label>
-
                 {selectedItems.length > 0 && (
                   <Button
                     variant="danger"
@@ -429,7 +372,6 @@ const SalesFolderView = () => {
                 )}
               </div>
             )}
-
             {}
             <Button
               variant="outline"
@@ -443,11 +385,9 @@ const SalesFolderView = () => {
           </div>
         </div>
       )}
-
       {filteredItems.map((group) => {
         const isExpanded = expandedItems[group.sku];
         const isSelected = selectedItems.includes(group.sku);
-
         return (
           <div
             key={group.sku}
@@ -471,7 +411,6 @@ const SalesFolderView = () => {
                   />
                 </div>
               )}
-
               {}
               <button
                 className="flex-shrink-0 p-1.5 hover:bg-emerald-200 rounded transition-colors"
@@ -486,7 +425,6 @@ const SalesFolderView = () => {
                   <ChevronRight className="w-5 h-5 text-emerald-600" />
                 )}
               </button>
-
               {}
               <div
                 className="flex-shrink-0 cursor-pointer"
@@ -496,7 +434,6 @@ const SalesFolderView = () => {
                   <ShoppingCart className="w-7 h-7 text-emerald-600" />
                 </div>
               </div>
-
               {}
               <div
                 className="flex-1 min-w-0 cursor-pointer"
@@ -527,7 +464,6 @@ const SalesFolderView = () => {
                   )}
                 </p>
               </div>
-
               {}
               <div className="lg:hidden w-full mt-3 grid grid-cols-3 gap-2">
                 <div className="bg-slate-50 rounded p-2 text-center">
@@ -543,7 +479,6 @@ const SalesFolderView = () => {
                   <p className="text-sm font-bold text-green-700">{formatCurrency(group.totalValue)}</p>
                 </div>
               </div>
-
               {}
               <div
                 className="hidden lg:flex items-center gap-6 mr-2 cursor-pointer"
@@ -569,7 +504,6 @@ const SalesFolderView = () => {
                 </div>
               </div>
             </div>
-
             {}
             {isExpanded && (
               <div className="border-t border-emerald-200 bg-emerald-50">
@@ -698,7 +632,6 @@ const SalesFolderView = () => {
           </div>
         );
       })}
-
       {}
       {filteredItems.length === 0 && groupedItems.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-slate-200">
@@ -715,7 +648,6 @@ const SalesFolderView = () => {
           </button>
         </div>
       )}
-
       {}
       <Modal
         isOpen={deleteModalOpen}
@@ -772,7 +704,6 @@ const SalesFolderView = () => {
               </div>
             </div>
           </div>
-
           <div className="space-y-2">
             <p className="text-sm text-gray-700 font-medium">
               You are about to delete {selectedItems.length} item(s):
@@ -797,5 +728,4 @@ const SalesFolderView = () => {
     </div>
   );
 };
-
 export default SalesFolderView;

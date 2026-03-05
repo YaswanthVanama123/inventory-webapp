@@ -3,9 +3,6 @@ import PropTypes from 'prop-types';
 import { MagnifyingGlassIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 
-
-
-
 const SearchableSelect = ({
   value,
   onChange,
@@ -24,8 +21,6 @@ const SearchableSelect = ({
   const [filteredOptions, setFilteredOptions] = useState(options);
   const containerRef = useRef(null);
   const searchInputRef = useRef(null);
-
-  
   useEffect(() => {
     if (!searchTerm) {
       setFilteredOptions(options);
@@ -38,8 +33,6 @@ const SearchableSelect = ({
       setFilteredOptions(filtered);
     }
   }, [searchTerm, options, getOptionLabel]);
-
-  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -47,18 +40,14 @@ const SearchableSelect = ({
         setSearchTerm('');
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
       searchInputRef.current.focus();
     }
   }, [isOpen]);
-
   const handleToggle = () => {
     if (!disabled) {
       setIsOpen(!isOpen);
@@ -67,30 +56,24 @@ const SearchableSelect = ({
       }
     }
   };
-
   const handleSelect = (option) => {
     const optionValue = getOptionValue ? getOptionValue(option) : option.value || option;
     onChange(optionValue);
     setIsOpen(false);
     setSearchTerm('');
   };
-
   const handleClear = (e) => {
     e.stopPropagation();
     onChange('');
     setSearchTerm('');
   };
-
-  
   const selectedOption = options.find(option => {
     const optionValue = getOptionValue ? getOptionValue(option) : option.value || option;
     return optionValue === value;
   });
-
   const selectedLabel = selectedOption
     ? (getOptionLabel ? getOptionLabel(selectedOption) : selectedOption.label || String(selectedOption))
     : '';
-
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       {}
@@ -124,7 +107,6 @@ const SearchableSelect = ({
           />
         </div>
       </button>
-
       {}
       {isOpen && (
         <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-80 overflow-hidden">
@@ -142,7 +124,6 @@ const SearchableSelect = ({
               />
             </div>
           </div>
-
           {}
           <div className="overflow-y-auto max-h-64">
             {filteredOptions.length === 0 ? (
@@ -154,7 +135,6 @@ const SearchableSelect = ({
                 const optionValue = getOptionValue ? getOptionValue(option) : option.value || option;
                 const optionLabel = getOptionLabel ? getOptionLabel(option) : option.label || String(option);
                 const isSelected = optionValue === value;
-
                 return (
                   <button
                     key={index}
@@ -178,7 +158,6 @@ const SearchableSelect = ({
     </div>
   );
 };
-
 SearchableSelect.propTypes = {
   value: PropTypes.any,
   onChange: PropTypes.func.isRequired,
@@ -192,5 +171,4 @@ SearchableSelect.propTypes = {
   getOptionValue: PropTypes.func,
   emptyMessage: PropTypes.string
 };
-
 export default SearchableSelect;

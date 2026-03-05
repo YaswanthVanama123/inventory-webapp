@@ -39,12 +39,10 @@ const PendingInvoices = () => {
   const [deleting, setDeleting] = useState(false);
   const [checkingRouteStar, setCheckingRouteStar] = useState(false);
   const [routeStarPendingCount, setRouteStarPendingCount] = useState(null);
-
   useEffect(() => {
     fetchInvoices();
     fetchInvoiceRange();
   }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, dateFrom, dateTo]);
-
   const fetchInvoiceRange = async () => {
     try {
       const response = await getInvoiceRange('pending');
@@ -55,39 +53,30 @@ const PendingInvoices = () => {
       console.error('Error fetching invoice range:', err);
     }
   };
-
   const fetchInvoices = async () => {
     setLoading(true);
-
     try {
       const params = {
         page: currentPage,
         limit: itemsPerPage,
         invoiceType: 'pending',
       };
-
       if (statusFilter) {
         params.status = statusFilter;
       }
-
       if (stockProcessedFilter !== '') {
         params.stockProcessed = stockProcessedFilter;
       }
-
       if (dateFrom) {
         params.startDate = dateFrom;
       }
-
       if (dateTo) {
         params.endDate = dateTo;
       }
-
       if (searchTerm) {
         params.customer = searchTerm;
       }
-
       const response = await getInvoices(params);
-
       if (response.success) {
         setInvoices(response.data.invoices || []);
         setTotalPages(response.data.pagination?.pages || 1);
@@ -102,16 +91,13 @@ const PendingInvoices = () => {
       setLoading(false);
     }
   };
-
   const handleSyncNew = async () => {
     if (!isAdmin) {
       showError('Only administrators can sync invoices');
       return;
     }
-
     const limit = syncLimit === 0 || syncLimit === '' ? 0 : parseInt(syncLimit);
     const isUnlimited = limit === 0;
-
     setSyncingNew(true);
     setSyncing(true);
     try {
@@ -133,16 +119,13 @@ const PendingInvoices = () => {
       setSyncing(false);
     }
   };
-
   const handleSyncOld = async () => {
     if (!isAdmin) {
       showError('Only administrators can sync invoices');
       return;
     }
-
     const limit = syncLimit === 0 || syncLimit === '' ? 0 : parseInt(syncLimit);
     const isUnlimited = limit === 0;
-
     setSyncingOld(true);
     setSyncing(true);
     try {
@@ -164,24 +147,20 @@ const PendingInvoices = () => {
       setSyncing(false);
     }
   };
-
   const handleSyncAll = async () => {
     if (!isAdmin) {
       showError('Only administrators can sync invoices');
       return;
     }
-
     setSyncingAll(true);
     setSyncing(true);
     try {
-      
       const response = await syncPendingInvoicesWithDetails(0, 'new');
       if (response.success) {
         const invoices = response.data.invoices || {};
         const details = response.data.details || {};
         const totalInvoices = (invoices.created || 0) + (invoices.updated || 0);
         const totalDetails = details.synced || 0;
-
         showSuccess(`Synced ${totalInvoices} invoices (${invoices.created || 0} created, ${invoices.updated || 0} updated) and ${totalDetails} details`);
         fetchInvoices();
         fetchInvoiceRange();
@@ -194,13 +173,11 @@ const PendingInvoices = () => {
       setSyncing(false);
     }
   };
-
   const handleSyncDetails = async () => {
     if (!isAdmin) {
       showError('Only administrators can sync invoice details');
       return;
     }
-
     setSyncingDetails(true);
     setSyncing(true);
     try {
@@ -217,13 +194,11 @@ const PendingInvoices = () => {
       setSyncing(false);
     }
   };
-
   const handleDeleteClick = async () => {
     if (!isAdmin) {
       showError('Only administrators can delete invoices');
       return;
     }
-
     setCheckingRouteStar(true);
     try {
       const response = await checkPendingInvoicesInRouteStar();
@@ -238,13 +213,11 @@ const PendingInvoices = () => {
       setCheckingRouteStar(false);
     }
   };
-
   const handleClearInvoices = async () => {
     if (!isAdmin) {
       showError('Only administrators can delete invoices');
       return;
     }
-
     setDeleting(true);
     try {
       const response = await deleteAllPendingInvoices();
@@ -262,32 +235,26 @@ const PendingInvoices = () => {
       setDeleting(false);
     }
   };
-
   const handleSearch = (value) => {
     setSearchTerm(value);
     setCurrentPage(1);
   };
-
   const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
     setCurrentPage(1);
   };
-
   const handleStockProcessedFilterChange = (e) => {
     setStockProcessedFilter(e.target.value);
     setCurrentPage(1);
   };
-
   const handleDateFromChange = (e) => {
     setDateFrom(e.target.value);
     setCurrentPage(1);
   };
-
   const handleDateToChange = (e) => {
     setDateTo(e.target.value);
     setCurrentPage(1);
   };
-
   const handleClearFilters = () => {
     setSearchTerm('');
     setStatusFilter('');
@@ -296,21 +263,17 @@ const PendingInvoices = () => {
     setDateTo('');
     setCurrentPage(1);
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
   const handlePageSizeChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
   };
-
   const handleViewInvoice = (invoiceNumber) => {
     navigate(`/invoices/routestar/${invoiceNumber}`);
   };
-
   const getStatusBadgeVariant = (status) => {
     const statusMap = {
       'Completed': 'success',
@@ -320,14 +283,12 @@ const PendingInvoices = () => {
     };
     return statusMap[status] || 'secondary';
   };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount || 0);
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -340,7 +301,6 @@ const PendingInvoices = () => {
       return 'Invalid Date';
     }
   };
-
   if (loading && invoices.length === 0) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -348,7 +308,6 @@ const PendingInvoices = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {}
@@ -510,7 +469,6 @@ const PendingInvoices = () => {
             </div>
           )}
         </div>
-
         {}
         {isAdmin && showSyncOptions && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
@@ -543,7 +501,6 @@ const PendingInvoices = () => {
                 <Button onClick={() => setSyncLimit(500)} variant="secondary" size="sm">500</Button>
               </div>
             </div>
-
             {}
             <div className="border-t border-blue-200 dark:border-blue-800 mt-4 pt-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -579,7 +536,6 @@ const PendingInvoices = () => {
             </div>
           </div>
         )}
-
         {}
         {showDeleteConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -599,12 +555,10 @@ const PendingInvoices = () => {
                   </p>
                 </div>
               </div>
-
               <div className="mb-6">
                 <p className="text-slate-700 dark:text-gray-300 mb-2">
                   Are you sure you want to delete all <strong>{totalItems} pending invoices</strong> from the database?
                 </p>
-
                 {routeStarPendingCount !== null && (
                   <div className={`${routeStarPendingCount > 0 ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'} border rounded-lg p-3 mt-3`}>
                     <p className={`text-sm ${routeStarPendingCount > 0 ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}`}>
@@ -617,14 +571,12 @@ const PendingInvoices = () => {
                     )}
                   </div>
                 )}
-
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mt-3">
                   <p className="text-sm text-yellow-800 dark:text-yellow-200">
                     <strong>Note:</strong> This will permanently delete all pending invoices from the database. You will need to sync again to restore them.
                   </p>
                 </div>
               </div>
-
               <div className="flex gap-3 justify-end">
                 <Button
                   onClick={() => {
@@ -661,7 +613,6 @@ const PendingInvoices = () => {
           </div>
         )}
       </div>
-
       {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -671,7 +622,6 @@ const PendingInvoices = () => {
             placeholder="Search by customer..."
             className="w-full"
           />
-
           <Select
             value={statusFilter}
             onChange={handleStatusFilterChange}
@@ -683,7 +633,6 @@ const PendingInvoices = () => {
             <option value="Closed">Closed</option>
             <option value="Cancelled">Cancelled</option>
           </Select>
-
           <Select
             value={stockProcessedFilter}
             onChange={handleStockProcessedFilterChange}
@@ -693,12 +642,10 @@ const PendingInvoices = () => {
             <option value="true">Stock Processed</option>
             <option value="false">Not Processed</option>
           </Select>
-
           <Button onClick={handleClearFilters} variant="secondary" className="w-full">
             Clear Filters
           </Button>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
@@ -724,7 +671,6 @@ const PendingInvoices = () => {
           </div>
         </div>
       </div>
-
       {}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
@@ -746,7 +692,6 @@ const PendingInvoices = () => {
           </p>
         </div>
       </div>
-
       {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         {invoices.length === 0 ? (
@@ -860,7 +805,6 @@ const PendingInvoices = () => {
                 </tbody>
               </table>
             </div>
-
             {}
             <div className="border-t border-slate-200 dark:border-gray-700">
               <Pagination
@@ -878,5 +822,4 @@ const PendingInvoices = () => {
     </div>
   );
 };
-
 export default PendingInvoices;

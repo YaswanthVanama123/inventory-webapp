@@ -5,19 +5,15 @@ import Sidebar, { MobileMenuButton } from './Sidebar';
 const MainLayout = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
   const handleCloseMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false);
   }, []);
-
   const handleToggleMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(prev => !prev);
   }, []);
-
   const handleToggleSidebar = useCallback((collapsed) => {
     setIsSidebarCollapsed(collapsed);
   }, []);
-
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-gray-900">
       {}
@@ -25,14 +21,12 @@ const MainLayout = ({ children }) => {
         onClick={handleToggleMobileMenu}
         isOpen={isMobileMenuOpen}
       />
-
       {}
       <Sidebar
         isOpen={isMobileMenuOpen}
         onClose={handleCloseMobileMenu}
         onToggleCollapse={handleToggleSidebar}
       />
-
       {}
       <div className={`transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
         <main className="pt-20 md:pt-0 p-4 md:p-6 lg:p-8">
@@ -42,5 +36,4 @@ const MainLayout = ({ children }) => {
     </div>
   );
 };
-
 export default MainLayout;

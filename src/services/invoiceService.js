@@ -2,9 +2,7 @@ import api from './api';
 import { handleApiError } from './errorHandler';
 
 
-
 const invoiceService = {
-  
   getAll: async (params = {}) => {
     try {
       const response = await api.get('/invoices', { params });
@@ -15,8 +13,6 @@ const invoiceService = {
       });
     }
   },
-
-  
   getById: async (id) => {
     try {
       const response = await api.get(`/invoices/${id}`);
@@ -27,8 +23,6 @@ const invoiceService = {
       });
     }
   },
-
-  
   getByNumber: async (number) => {
     try {
       const response = await api.get(`/invoices/number/${number}`);
@@ -39,8 +33,6 @@ const invoiceService = {
       });
     }
   },
-
-  
   create: async (invoiceData) => {
     try {
       const response = await api.post('/invoices', invoiceData);
@@ -53,8 +45,6 @@ const invoiceService = {
       });
     }
   },
-
-  
   update: async (id, invoiceData) => {
     try {
       const response = await api.put(`/invoices/${id}`, invoiceData);
@@ -66,8 +56,6 @@ const invoiceService = {
       });
     }
   },
-
-  
   delete: async (id) => {
     try {
       const response = await api.delete(`/invoices/${id}`);
@@ -79,16 +67,12 @@ const invoiceService = {
       });
     }
   },
-
-  
   getPDF: async (id, download = false) => {
     try {
       const response = await api.get(`/invoices/${id}/pdf`, {
         responseType: 'blob',
         params: { download },
       });
-
-      
       if (download) {
         const url = window.URL.createObjectURL(new Blob([response]));
         const link = document.createElement('a');
@@ -99,7 +83,6 @@ const invoiceService = {
         link.remove();
         window.URL.revokeObjectURL(url);
       }
-
       return response;
     } catch (error) {
       throw handleApiError(error, {
@@ -108,8 +91,6 @@ const invoiceService = {
       });
     }
   },
-
-  
   sendEmail: async (id, emailData = {}) => {
     try {
       const response = await api.post(`/invoices/${id}/send-email`, emailData);
@@ -122,8 +103,6 @@ const invoiceService = {
       });
     }
   },
-
-  
   getByType: async (type) => {
     try {
       const response = await api.get('/invoices', {
@@ -134,8 +113,6 @@ const invoiceService = {
       throw handleApiError(error);
     }
   },
-
-  
   getByDateRange: async (startDate, endDate) => {
     try {
       const response = await api.get('/invoices', {
@@ -146,8 +123,6 @@ const invoiceService = {
       throw handleApiError(error);
     }
   },
-
-  
   getRecent: async (limit = 10) => {
     try {
       const response = await api.get('/invoices', {
@@ -158,8 +133,6 @@ const invoiceService = {
       throw handleApiError(error);
     }
   },
-
-  
   preview: async (invoiceData) => {
     try {
       const response = await api.post('/invoices/preview', invoiceData);
@@ -172,5 +145,4 @@ const invoiceService = {
     }
   },
 };
-
 export default invoiceService;

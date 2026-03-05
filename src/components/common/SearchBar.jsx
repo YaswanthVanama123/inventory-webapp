@@ -27,15 +27,12 @@ const SearchBar = ({
       onChange({ target: { value: '' } });
     }
   };
-
   const sizes = {
     sm: 'px-3 py-1.5 text-sm',
     md: 'px-4 py-2 text-base',
     lg: 'px-5 py-3 text-lg',
   };
-
   const widthClass = fullWidth ? 'w-full' : 'w-full sm:w-96';
-
   return (
     <div className={`relative ${widthClass} ${className}`}>
       {}
@@ -77,7 +74,6 @@ const SearchBar = ({
           </svg>
         )}
       </div>
-
       {}
       <input
         type="text"
@@ -90,7 +86,6 @@ const SearchBar = ({
         aria-label="Search"
         {...props}
       />
-
       {}
       {value && (
         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -114,7 +109,6 @@ const SearchBar = ({
     </div>
   );
 };
-
 SearchBar.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
@@ -127,5 +121,4 @@ SearchBar.propTypes = {
   size: PropTypes.oneOf(['sm', 'md', 'lg']),
   className: PropTypes.string,
 };
-
 export default SearchBar;

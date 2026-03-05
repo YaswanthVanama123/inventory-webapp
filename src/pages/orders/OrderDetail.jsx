@@ -13,11 +13,9 @@ const OrderDetail = () => {
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     fetchOrderDetails();
   }, [orderNumber]);
-
   const fetchOrderDetails = async () => {
     setLoading(true);
     try {
@@ -32,7 +30,6 @@ const OrderDetail = () => {
       setLoading(false);
     }
   };
-
   const getStatusBadgeVariant = (status) => {
     const statusMap = {
       'Complete': 'success',
@@ -43,14 +40,12 @@ const OrderDetail = () => {
     };
     return statusMap[status] || 'secondary';
   };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount || 0);
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -65,7 +60,6 @@ const OrderDetail = () => {
       return 'Invalid Date';
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -73,7 +67,6 @@ const OrderDetail = () => {
       </div>
     );
   }
-
   if (!order) {
     return (
       <div className="text-center py-12">
@@ -89,7 +82,6 @@ const OrderDetail = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {}
@@ -125,7 +117,6 @@ const OrderDetail = () => {
           )}
         </div>
       </div>
-
       {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {}
@@ -162,7 +153,6 @@ const OrderDetail = () => {
             </div>
           </dl>
         </div>
-
         {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -194,7 +184,6 @@ const OrderDetail = () => {
           </dl>
         </div>
       </div>
-
       {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -233,7 +222,6 @@ const OrderDetail = () => {
           )}
         </div>
       </div>
-
       {}
       {order.items && order.items.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
@@ -308,7 +296,6 @@ const OrderDetail = () => {
           </div>
         </div>
       )}
-
       {}
       {order.notes && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
@@ -323,5 +310,4 @@ const OrderDetail = () => {
     </div>
   );
 };
-
 export default OrderDetail;

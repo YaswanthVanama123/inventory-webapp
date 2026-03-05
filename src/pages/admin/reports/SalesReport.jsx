@@ -34,8 +34,6 @@ import {
 
 
 const API_BASE_URL = 'http://localhost:5001/api';
-
-
 const Card = ({ children, className = '' }) => {
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
@@ -43,14 +41,11 @@ const Card = ({ children, className = '' }) => {
     </div>
   );
 };
-
-
 const SummaryCard = ({ title, value, change, changeType, icon: Icon, loading, prefix = '', suffix = '' }) => {
   const isPositive = changeType === 'positive';
   const ChangeIcon = isPositive ? TrendingUp : TrendingDown;
   const changeColor = isPositive ? 'text-green-600' : 'text-red-600';
   const changeBgColor = isPositive ? 'bg-green-50' : 'bg-red-50';
-
   if (loading) {
     return (
       <Card className="p-4 md:p-6 animate-pulse">
@@ -65,7 +60,6 @@ const SummaryCard = ({ title, value, change, changeType, icon: Icon, loading, pr
       </Card>
     );
   }
-
   return (
     <Card className="p-4 md:p-6 hover:shadow-md transition-shadow duration-200">
       <div className="flex items-start justify-between">
@@ -91,16 +85,12 @@ const SummaryCard = ({ title, value, change, changeType, icon: Icon, loading, pr
     </Card>
   );
 };
-
-
 const ChartSkeleton = () => (
   <div className="animate-pulse">
     <div className="h-4 bg-gray-200 rounded w-32 mb-4"></div>
     <div className="h-64 md:h-80 bg-gray-100 rounded"></div>
   </div>
 );
-
-
 const ErrorState = ({ message, onRetry }) => (
   <div className="text-center py-12">
     <AlertCircle className="w-12 h-12 md:w-16 md:h-16 text-red-500 mx-auto mb-4" />
@@ -115,8 +105,6 @@ const ErrorState = ({ message, onRetry }) => (
     </button>
   </div>
 );
-
-
 const CustomTooltip = ({ active, payload, label, prefix = '', suffix = '' }) => {
   if (active && payload && payload.length) {
     return (
@@ -132,8 +120,6 @@ const CustomTooltip = ({ active, payload, label, prefix = '', suffix = '' }) => 
   }
   return null;
 };
-
-
 const PaymentStatusBadge = ({ status }) => {
   const statusConfig = {
     paid: { color: 'bg-green-100 text-green-800', icon: CheckCircle, label: 'Paid' },
@@ -141,10 +127,8 @@ const PaymentStatusBadge = ({ status }) => {
     failed: { color: 'bg-red-100 text-red-800', icon: XCircle, label: 'Failed' },
     cancelled: { color: 'bg-gray-100 text-gray-800', icon: XCircle, label: 'Cancelled' },
   };
-
   const config = statusConfig[status?.toLowerCase()] || statusConfig.pending;
   const Icon = config.icon;
-
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
       <Icon className="w-3 h-3" />
@@ -152,14 +136,10 @@ const PaymentStatusBadge = ({ status }) => {
     </span>
   );
 };
-
-
 const SalesReport = () => {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  
   const [dateRange, setDateRange] = useState({
     startDate: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
@@ -167,12 +147,9 @@ const SalesReport = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [groupBy, setGroupBy] = useState('day');
   const [chartType, setChartType] = useState('line');
-
-  
   const fetchSalesReport = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const token = localStorage.getItem('authToken');
       const queryParams = new URLSearchParams({
@@ -181,36 +158,28 @@ const SalesReport = () => {
         category: selectedCategory,
         groupBy: groupBy,
       });
-
       const response = await fetch(`${API_BASE_URL}/reports/sales?${queryParams}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-
       if (!response.ok) {
         throw new Error(`Failed to fetch sales report: ${response.status}`);
       }
-
       const data = await response.json();
       setReportData(data);
     } catch (err) {
       console.error('Error fetching sales report:', err);
       setError(err.message || 'Failed to load sales report');
-
-      
       setReportData(getMockSalesData());
     } finally {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchSalesReport();
   }, [dateRange, selectedCategory, groupBy]);
-
-  
   const getMockSalesData = () => ({
     summary: {
       totalSales: 284500,
@@ -293,11 +262,8 @@ const SalesReport = () => {
     ],
     categories: ['All', 'Electronics', 'Clothing', 'Food & Beverage', 'Books', 'Other'],
   });
-
-  
   const handleExportCSV = () => {
     if (!reportData) return;
-
     const csvData = [
       ['Invoice ID', 'Customer', 'Date', 'Amount', 'Status', 'Items', 'Category'],
       ...reportData.recentInvoices.map(inv => [
@@ -310,7 +276,6 @@ const SalesReport = () => {
         inv.category,
       ]),
     ];
-
     const csvContent = csvData.map(row => row.join(',')).join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -322,11 +287,9 @@ const SalesReport = () => {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
   };
-
   const handleExportPDF = () => {
     alert('PDF export functionality would integrate with a PDF library like jsPDF or react-pdf');
   };
-
   const data = reportData || {};
   const summary = data.summary || {};
   const salesTrend = data.salesTrend || [];
@@ -334,7 +297,6 @@ const SalesReport = () => {
   const paymentStatus = data.paymentStatus || [];
   const recentInvoices = data.recentInvoices || [];
   const categories = data.categories || ['All'];
-
   return (
     <div className="space-y-4 md:space-y-6 p-4 md:p-6 bg-gray-50 min-h-screen">
       {}
@@ -375,7 +337,6 @@ const SalesReport = () => {
           </div>
         </div>
       </div>
-
       {}
       <Card className="p-4 md:p-6">
         <div className="flex items-center gap-2 mb-4">
@@ -408,7 +369,6 @@ const SalesReport = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
             />
           </div>
-
           {}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -427,7 +387,6 @@ const SalesReport = () => {
               ))}
             </select>
           </div>
-
           {}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -446,14 +405,12 @@ const SalesReport = () => {
           </div>
         </div>
       </Card>
-
       {}
       {error && !reportData && (
         <Card className="p-6">
           <ErrorState message={error} onRetry={fetchSalesReport} />
         </Card>
       )}
-
       {}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <SummaryCard
@@ -492,7 +449,6 @@ const SalesReport = () => {
           loading={loading}
         />
       </div>
-
       {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         {}
@@ -585,7 +541,6 @@ const SalesReport = () => {
             </>
           )}
         </Card>
-
         {}
         <Card className="p-4 md:p-6">
           {loading ? (
@@ -633,7 +588,6 @@ const SalesReport = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-
               {}
               <div className="grid grid-cols-2 gap-2 mt-4">
                 {categoryBreakdown.map((category, index) => (
@@ -650,7 +604,6 @@ const SalesReport = () => {
           )}
         </Card>
       </div>
-
       {}
       <Card className="p-4 md:p-6">
         <div className="mb-4">
@@ -660,7 +613,6 @@ const SalesReport = () => {
           </h2>
           <p className="text-xs md:text-sm text-gray-500">Invoice payment distribution</p>
         </div>
-
         {loading ? (
           <ChartSkeleton />
         ) : (
@@ -687,7 +639,6 @@ const SalesReport = () => {
           </div>
         )}
       </Card>
-
       {}
       <Card className="p-4 md:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
@@ -699,7 +650,6 @@ const SalesReport = () => {
             View All
           </button>
         </div>
-
         {loading ? (
           <div className="animate-pulse space-y-3">
             {[...Array(5)].map((_, i) => (
@@ -778,5 +728,4 @@ const SalesReport = () => {
     </div>
   );
 };
-
 export default SalesReport;

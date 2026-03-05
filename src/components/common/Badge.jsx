@@ -20,15 +20,12 @@ const Badge = ({
     info: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
     primary: 'bg-blue-600 text-white dark:bg-blue-500',
   };
-
   const sizes = {
     sm: 'px-2 py-0.5 text-xs',
     md: 'px-2.5 py-0.5 text-sm',
     lg: 'px-3 py-1 text-base',
   };
-
   const roundedStyles = rounded ? 'rounded-full' : 'rounded';
-
   const dotColors = {
     default: 'bg-gray-500',
     success: 'bg-green-500',
@@ -37,7 +34,6 @@ const Badge = ({
     info: 'bg-blue-500',
     primary: 'bg-white',
   };
-
   return (
     <span
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${roundedStyles} ${className}`}
@@ -50,7 +46,6 @@ const Badge = ({
     </span>
   );
 };
-
 Badge.propTypes = {
   children: PropTypes.node.isRequired,
   variant: PropTypes.oneOf(['default', 'success', 'warning', 'danger', 'info', 'primary']),
@@ -59,5 +54,4 @@ Badge.propTypes = {
   dot: PropTypes.bool,
   className: PropTypes.string,
 };
-
 export default Badge;

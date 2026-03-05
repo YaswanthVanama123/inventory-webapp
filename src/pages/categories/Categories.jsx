@@ -14,22 +14,17 @@ const Categories = () => {
 
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
-
-  
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add'); 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [form, setForm] = useState({ value: '', label: '' });
   const [modalLoading, setModalLoading] = useState(false);
-
   useEffect(() => {
     fetchCategories();
   }, []);
-
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      
       setCategories([]);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -39,42 +34,34 @@ const Categories = () => {
       setLoading(false);
     }
   };
-
   const handleAdd = () => {
     setForm({ value: '', label: '' });
     setModalMode('add');
     setSelectedCategory(null);
     setModalOpen(true);
   };
-
   const handleEdit = (category) => {
     setForm({ value: category.value, label: category.label });
     setModalMode('edit');
     setSelectedCategory(category);
     setModalOpen(true);
   };
-
   const handleSave = async () => {
     if (!form.value.trim() || !form.label.trim()) {
       showError('Category value and label are required');
       return;
     }
-
-    
     const normalizedValue = form.value.trim().toLowerCase();
     const isDuplicate = categories.some(cat => {
-      
       if (modalMode === 'edit' && selectedCategory && cat._id === selectedCategory._id) {
         return false;
       }
       return cat.value.toLowerCase() === normalizedValue;
     });
-
     if (isDuplicate) {
       showError('A category with this value already exists');
       return;
     }
-
     setModalLoading(true);
     try {
       if (modalMode === 'add') {
@@ -93,12 +80,10 @@ const Categories = () => {
       setModalLoading(false);
     }
   };
-
   const handleDelete = async (categoryId) => {
     if (!window.confirm('Are you sure you want to delete this category?')) {
       return;
     }
-
     try {
       await settingsService.deleteCategory(categoryId);
       showSuccess('Category deleted successfully');
@@ -108,12 +93,10 @@ const Categories = () => {
       showError(error.message || 'Failed to delete category');
     }
   };
-
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
-
   if (!isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -124,11 +107,9 @@ const Categories = () => {
       </div>
     );
   }
-
   if (loading) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto">
@@ -141,13 +122,11 @@ const Categories = () => {
             Manage product categories for your inventory
           </p>
         </div>
-
         <div className="mb-6">
           <Button onClick={handleAdd} variant="primary">
             + Add Category
           </Button>
         </div>
-
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
           {categories.length === 0 ? (
             <div className="text-center py-12">
@@ -209,7 +188,6 @@ const Categories = () => {
             </div>
           )}
         </div>
-
         <Modal
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
@@ -235,7 +213,6 @@ const Categories = () => {
               fullWidth
             />
           </div>
-
           <div className="mt-6 flex justify-end gap-3">
             <Button variant="ghost" onClick={() => setModalOpen(false)}>
               Cancel
@@ -254,5 +231,4 @@ const Categories = () => {
     </div>
   );
 };
-
 export default Categories;

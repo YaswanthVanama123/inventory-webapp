@@ -37,24 +37,20 @@ const TruckCheckoutList = () => {
   const [salesTracking, setSalesTracking] = useState([]);
   const [salesSummary, setSalesSummary] = useState({});
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 50, pages: 0 });
-
   const [employees, setEmployees] = useState([]);
   const [salesEmployees, setSalesEmployees] = useState([]);
   const [expandedEmployee, setExpandedEmployee] = useState(null);
   const [expandedSalesEmployee, setExpandedSalesEmployee] = useState(null);
   const [employeeCheckouts, setEmployeeCheckouts] = useState([]);
   const [employeeSalesTracking, setEmployeeSalesTracking] = useState([]);
-
   const [statusFilter, setStatusFilter] = useState('all');
   const [employeeFilter, setEmployeeFilter] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [checkoutToDelete, setCheckoutToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
-
   useEffect(() => {
     if (activeTab === 'checkouts') {
       if (checkoutsSubTab === 'all') {
@@ -70,23 +66,18 @@ const TruckCheckoutList = () => {
       }
     }
   }, [statusFilter, employeeFilter, pagination.page, startDate, endDate, activeTab, checkoutsSubTab, salesSubTab]);
-
   const loadCheckouts = async () => {
     try {
       setLoading(true);
-
       const params = {
         page: pagination.page,
         limit: pagination.limit
       };
-
       if (statusFilter !== 'all') params.status = statusFilter;
       if (employeeFilter.trim()) params.employeeName = employeeFilter.trim();
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
-
       const response = await truckCheckoutService.getCheckouts(params);
-
       setCheckouts(response.data.checkouts || []);
       setPagination(response.data.pagination || { total: 0, page: 1, limit: 50, pages: 0 });
     } catch (error) {
@@ -96,18 +87,14 @@ const TruckCheckoutList = () => {
       setLoading(false);
     }
   };
-
   const loadSalesTracking = async () => {
     try {
       setLoading(true);
-
       const params = {};
       if (employeeFilter.trim()) params.employeeName = employeeFilter.trim();
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
-
       const response = await truckCheckoutService.getSalesTracking(params);
-
       setSalesTracking(response.data.checkouts || []);
       setSalesSummary(response.data.summary || {});
     } catch (error) {
@@ -117,18 +104,14 @@ const TruckCheckoutList = () => {
       setLoading(false);
     }
   };
-
   const loadEmployees = async () => {
     try {
       setLoading(true);
-
       const params = {};
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
       if (searchTerm.trim()) params.search = searchTerm.trim();
-
       const response = await truckCheckoutService.getAllEmployeesWithStats(params);
-
       setEmployees(response.data || []);
     } catch (error) {
       console.error('Load employees error:', error);
@@ -137,18 +120,14 @@ const TruckCheckoutList = () => {
       setLoading(false);
     }
   };
-
   const loadSalesEmployees = async () => {
     try {
       setLoading(true);
-
       const params = {};
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
-
       const response = await truckCheckoutService.getSalesTracking(params);
       const allSalesTracking = response.data.checkouts || [];
-
       const employeeMap = new Map();
       allSalesTracking.forEach(item => {
         const key = `${item.employeeName}-${item.truckNumber || 'N/A'}`;
@@ -161,7 +140,6 @@ const TruckCheckoutList = () => {
         }
         employeeMap.get(key).items.push(item);
       });
-
       const groupedEmployees = Array.from(employeeMap.values()).map(emp => ({
         ...emp,
         totalCheckouts: emp.items.length,
@@ -169,7 +147,6 @@ const TruckCheckoutList = () => {
         shortageCount: emp.items.filter(i => i.status === 'Shortage').length,
         overageCount: emp.items.filter(i => i.status === 'Overage').length
       }));
-
       if (searchTerm.trim()) {
         const searchLower = searchTerm.toLowerCase();
         setSalesEmployees(groupedEmployees.filter(emp =>
@@ -186,22 +163,17 @@ const TruckCheckoutList = () => {
       setLoading(false);
     }
   };
-
   const loadEmployeeCheckouts = async (employeeName) => {
     try {
       setLoading(true);
-
       const params = {
         employeeName,
         page: 1,
         limit: 100
       };
-
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
-
       const response = await truckCheckoutService.getCheckouts(params);
-
       setEmployeeCheckouts(response.data.checkouts || []);
       setExpandedEmployee(employeeName);
     } catch (error) {
@@ -211,7 +183,6 @@ const TruckCheckoutList = () => {
       setLoading(false);
     }
   };
-
   const handleEmployeeExpand = (employeeName) => {
     if (expandedEmployee === employeeName) {
       setExpandedEmployee(null);
@@ -220,7 +191,6 @@ const TruckCheckoutList = () => {
       loadEmployeeCheckouts(employeeName);
     }
   };
-
   const handleSalesEmployeeExpand = (employeeName) => {
     if (expandedSalesEmployee === employeeName) {
       setExpandedSalesEmployee(null);
@@ -229,20 +199,15 @@ const TruckCheckoutList = () => {
       loadEmployeeSalesTracking(employeeName);
     }
   };
-
   const loadEmployeeSalesTracking = async (employeeName) => {
     try {
       setLoading(true);
-
       const params = {
         employeeName
       };
-
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
-
       const response = await truckCheckoutService.getSalesTracking(params);
-
       setEmployeeSalesTracking(response.data.checkouts || []);
       setExpandedSalesEmployee(employeeName);
     } catch (error) {
@@ -252,7 +217,6 @@ const TruckCheckoutList = () => {
       setLoading(false);
     }
   };
-
   const clearFilters = () => {
     setStatusFilter('all');
     setEmployeeFilter('');
@@ -261,16 +225,13 @@ const TruckCheckoutList = () => {
     setSearchTerm('');
     setPagination(prev => ({ ...prev, page: 1 }));
   };
-
   const getStatusBadge = (status) => {
     const config = {
       checked_out: { variant: 'warning', label: 'Checked Out', icon: ClockIcon },
       completed: { variant: 'success', label: 'Completed', icon: CheckCircleIcon },
       cancelled: { variant: 'danger', label: 'Cancelled', icon: XCircleIcon }
     };
-
     const { variant, label, icon: Icon } = config[status] || config.checked_out;
-
     return (
       <Badge variant={variant}>
         <Icon className="w-4 h-4 mr-1" />
@@ -278,7 +239,6 @@ const TruckCheckoutList = () => {
       </Badge>
     );
   };
-
   const formatDate = (date) => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleString('en-US', {
@@ -289,25 +249,20 @@ const TruckCheckoutList = () => {
       minute: '2-digit'
     });
   };
-
   const handleRowClick = (checkoutId) => {
     navigate(`/truck-checkouts/${checkoutId}`);
   };
-
   const handleEmployeeClick = (employeeName, e) => {
     e.stopPropagation();
     navigate(`/truck-checkouts/employee/${employeeName}`);
   };
-
   const handleDelete = async (checkoutId, e) => {
     e.stopPropagation();
     setCheckoutToDelete(checkoutId);
     setShowDeleteModal(true);
   };
-
   const confirmDelete = async () => {
     if (!checkoutToDelete) return;
-
     try {
       setDeleting(true);
       await truckCheckoutService.deleteCheckout(checkoutToDelete);
@@ -321,11 +276,9 @@ const TruckCheckoutList = () => {
       setDeleting(false);
     }
   };
-
   if (loading && checkouts.length === 0 && employees.length === 0 && salesTracking.length === 0 && salesEmployees.length === 0) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -350,7 +303,6 @@ const TruckCheckoutList = () => {
           New Checkout
         </Button>
       </div>
-
       {!isAdmin && (
         <div className="border-b border-gray-200 dark:border-gray-700">
           <div className="flex gap-1">
@@ -377,7 +329,6 @@ const TruckCheckoutList = () => {
           </div>
         </div>
       )}
-
       {isAdmin && (
         <div className="border-b border-gray-200 dark:border-gray-700">
           <div className="flex gap-1">
@@ -404,7 +355,6 @@ const TruckCheckoutList = () => {
           </div>
         </div>
       )}
-
       {activeTab === 'checkouts' && (
         <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           <div className="flex gap-1 px-4">
@@ -431,7 +381,6 @@ const TruckCheckoutList = () => {
           </div>
         </div>
       )}
-
       {activeTab === 'sales' && (
         <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           <div className="flex gap-1 px-4">
@@ -458,7 +407,6 @@ const TruckCheckoutList = () => {
           </div>
         </div>
       )}
-
       <Card>
         <div className="flex items-center gap-2 mb-4">
           <FunnelIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -466,7 +414,6 @@ const TruckCheckoutList = () => {
             Filters
           </h2>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {checkoutsSubTab === 'all' && activeTab === 'checkouts' && (
             <div>
@@ -487,7 +434,6 @@ const TruckCheckoutList = () => {
               </Select>
             </div>
           )}
-
           {(checkoutsSubTab === 'employees' && activeTab === 'checkouts') || (salesSubTab === 'employees' && activeTab === 'sales') ? (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -518,7 +464,6 @@ const TruckCheckoutList = () => {
               />
             </div>
           ) : null}
-
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Start Date
@@ -532,7 +477,6 @@ const TruckCheckoutList = () => {
               }}
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               End Date
@@ -546,7 +490,6 @@ const TruckCheckoutList = () => {
               }}
             />
           </div>
-
           <div className="flex items-end">
             <Button
               variant="ghost"
@@ -557,13 +500,11 @@ const TruckCheckoutList = () => {
           </div>
         </div>
       </Card>
-
       {activeTab === 'checkouts' && checkoutsSubTab === 'all' && (
         <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Checkouts ({pagination.total} records)
         </h2>
-
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800">
@@ -620,11 +561,9 @@ const TruckCheckoutList = () => {
                         )}
                       </div>
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       {checkout.truckNumber || '-'}
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm">
                         {checkout.itemName ? (
@@ -648,15 +587,12 @@ const TruckCheckoutList = () => {
                         )}
                       </div>
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       {formatDate(checkout.checkoutDate)}
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(checkout.status)}
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       {checkout.invoiceNumbers && checkout.invoiceNumbers.length > 0 ? (
                         <span className="font-medium">{checkout.invoiceNumbers.length} invoices</span>
@@ -664,7 +600,6 @@ const TruckCheckoutList = () => {
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <Button
                         variant="ghost"
@@ -681,7 +616,6 @@ const TruckCheckoutList = () => {
             </tbody>
           </table>
         </div>
-
         {pagination.pages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
@@ -736,7 +670,6 @@ const TruckCheckoutList = () => {
         )}
       </Card>
       )}
-
       {activeTab === 'checkouts' && checkoutsSubTab === 'employees' && (
         <Card>
           <div className="mb-4">
@@ -748,7 +681,6 @@ const TruckCheckoutList = () => {
               Click on an employee to view their checkouts
             </p>
           </div>
-
           <div className="space-y-2">
             {employees.length === 0 ? (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -790,7 +722,6 @@ const TruckCheckoutList = () => {
                       />
                     </div>
                   </button>
-
                   {expandedEmployee === employee.employeeName && (
                     <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                       {loading ? (
@@ -877,7 +808,6 @@ const TruckCheckoutList = () => {
           </div>
         </Card>
       )}
-
       {activeTab === 'sales' && salesSubTab === 'all' && (
         <Card>
           <div className="mb-4">
@@ -888,7 +818,6 @@ const TruckCheckoutList = () => {
               Track what was sold vs what was checked out
             </p>
           </div>
-
           {salesSummary && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
@@ -900,7 +829,6 @@ const TruckCheckoutList = () => {
                   <CheckCircleIcon className="w-8 h-8 text-green-600 dark:text-green-400" />
                 </div>
               </div>
-
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -910,7 +838,6 @@ const TruckCheckoutList = () => {
                   <ClockIcon className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
                 </div>
               </div>
-
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -922,7 +849,6 @@ const TruckCheckoutList = () => {
               </div>
             </div>
           )}
-
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-800">
@@ -1015,7 +941,6 @@ const TruckCheckoutList = () => {
           </div>
         </Card>
       )}
-
       {activeTab === 'sales' && salesSubTab === 'employees' && (
         <Card>
           <div className="mb-4">
@@ -1027,7 +952,6 @@ const TruckCheckoutList = () => {
               Click on an employee to view their sales tracking
             </p>
           </div>
-
           <div className="space-y-2">
             {salesEmployees.length === 0 ? (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -1071,7 +995,6 @@ const TruckCheckoutList = () => {
                       />
                     </div>
                   </button>
-
                   {expandedSalesEmployee === employee.employeeName && (
                     <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                       {loading ? (
@@ -1162,7 +1085,6 @@ const TruckCheckoutList = () => {
           </div>
         </Card>
       )}
-
       <Modal
         isOpen={showDeleteModal}
         onClose={() => !deleting && setShowDeleteModal(false)}
@@ -1193,5 +1115,4 @@ const TruckCheckoutList = () => {
     </div>
   );
 };
-
 export default TruckCheckoutList;

@@ -19,15 +19,11 @@ const InvoiceDetail = () => {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
   const [showPrintView, setShowPrintView] = useState(false);
-
-  
   const [showMarkAsPaidModal, setShowMarkAsPaidModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
-
   useEffect(() => {
     fetchInvoice();
   }, [id]);
-
   const fetchInvoice = async () => {
     try {
       setLoading(true);
@@ -41,7 +37,6 @@ const InvoiceDetail = () => {
       setLoading(false);
     }
   };
-
   const getStatusBadge = (status) => {
     const statusConfig = {
       draft: { variant: 'default', label: 'Draft' },
@@ -54,7 +49,6 @@ const InvoiceDetail = () => {
     const config = statusConfig[status?.toLowerCase()] || statusConfig.draft;
     return <Badge variant={config.variant} dot>{config.label}</Badge>;
   };
-
   const getPaymentStatusBadge = (paymentStatus) => {
     const statusConfig = {
       unpaid: { variant: 'warning', label: 'Unpaid' },
@@ -65,14 +59,12 @@ const InvoiceDetail = () => {
     const config = statusConfig[paymentStatus?.toLowerCase()] || statusConfig.unpaid;
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount || 0);
   };
-
   const formatDate = (date) => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleDateString('en-US', {
@@ -81,11 +73,9 @@ const InvoiceDetail = () => {
       day: 'numeric',
     });
   };
-
   const handleDownloadPDF = async () => {
     setActionLoading('download');
     try {
-
       const response = await api.get(`/invoices/${id}/pdf`, {
         responseType: 'blob',
       });
@@ -103,7 +93,6 @@ const InvoiceDetail = () => {
       setActionLoading(null);
     }
   };
-
   const handleSendEmail = async () => {
     setActionLoading('email');
     try {
@@ -117,11 +106,9 @@ const InvoiceDetail = () => {
       setActionLoading(null);
     }
   };
-
   const handleMarkAsPaid = () => {
     setShowMarkAsPaidModal(true);
   };
-
   const confirmMarkAsPaid = async () => {
     setActionLoading('paid');
     try {
@@ -138,11 +125,9 @@ const InvoiceDetail = () => {
       setActionLoading(null);
     }
   };
-
   const handleCancel = () => {
     setShowCancelModal(true);
   };
-
   const confirmCancel = async () => {
     setActionLoading('cancel');
     try {
@@ -159,11 +144,9 @@ const InvoiceDetail = () => {
       setActionLoading(null);
     }
   };
-
   const handlePrint = () => {
     window.print();
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -171,7 +154,6 @@ const InvoiceDetail = () => {
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -184,7 +166,6 @@ const InvoiceDetail = () => {
       </div>
     );
   }
-
   if (!invoice) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -197,7 +178,6 @@ const InvoiceDetail = () => {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {}
@@ -216,7 +196,6 @@ const InvoiceDetail = () => {
               <span className="hidden xs:inline">Back to Invoices</span>
               <span className="xs:hidden">Back</span>
             </Button>
-
             <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
               <Button
                 variant="outline"
@@ -229,7 +208,6 @@ const InvoiceDetail = () => {
                 </svg>
                 <span className="hidden sm:inline">Print</span>
               </Button>
-
               <Button
                 variant="outline"
                 size="sm"
@@ -242,7 +220,6 @@ const InvoiceDetail = () => {
                 </svg>
                 <span className="hidden sm:inline">Download PDF</span>
               </Button>
-
               <Button
                 variant="outline"
                 size="sm"
@@ -255,7 +232,6 @@ const InvoiceDetail = () => {
                 </svg>
                 <span className="hidden sm:inline">Send Email</span>
               </Button>
-
               {invoice.status?.toLowerCase() === 'draft' && (
                 <Button
                   variant="primary"
@@ -269,7 +245,6 @@ const InvoiceDetail = () => {
                   <span className="hidden sm:inline">Edit</span>
                 </Button>
               )}
-
               {invoice.paymentStatus?.toLowerCase() !== 'paid' && (
                 <Button
                   variant="primary"
@@ -284,7 +259,6 @@ const InvoiceDetail = () => {
                   <span className="hidden sm:inline">Mark as Paid</span>
                 </Button>
               )}
-
               {invoice.status?.toLowerCase() !== 'cancelled' && invoice.status?.toLowerCase() !== 'paid' && (
                 <Button
                   variant="danger"
@@ -303,7 +277,6 @@ const InvoiceDetail = () => {
           </div>
         </div>
       </div>
-
       {}
       <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-7xl">
         <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg print:shadow-none print:rounded-none">
@@ -323,7 +296,6 @@ const InvoiceDetail = () => {
                 {getPaymentStatusBadge(invoice.paymentStatus)}
               </div>
             </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
               <div>
                 <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
@@ -336,7 +308,6 @@ const InvoiceDetail = () => {
                   {invoice.from?.phone && <p className="text-xs">{invoice.from.phone}</p>}
                 </div>
               </div>
-
               <div>
                 <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
                   Invoice Details
@@ -360,7 +331,6 @@ const InvoiceDetail = () => {
               </div>
             </div>
           </div>
-
           {}
           <div className="border-b border-gray-200 dark:border-gray-700 p-3 sm:p-6">
             <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
@@ -387,7 +357,6 @@ const InvoiceDetail = () => {
               )}
             </div>
           </div>
-
           {}
           <div className="p-3 sm:p-6">
             <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
@@ -454,7 +423,6 @@ const InvoiceDetail = () => {
               </table>
             </div>
           </div>
-
           {}
           <div className="border-t border-gray-200 dark:border-gray-700 p-3 sm:p-6">
             <div className="flex justify-end">
@@ -463,7 +431,6 @@ const InvoiceDetail = () => {
                   <span>Subtotal:</span>
                   <span className="font-medium">{formatCurrency(invoice.subtotalAmount)}</span>
                 </div>
-
                 {(invoice.discount?.amount || invoice.discount) > 0 && (
                   <div className="flex justify-between text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                     <span>Discount:</span>
@@ -472,14 +439,12 @@ const InvoiceDetail = () => {
                     </span>
                   </div>
                 )}
-
                 {(invoice.taxAmount || invoice.tax) > 0 && (
                   <div className="flex justify-between text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                     <span>Tax {invoice.taxRate ? `(${invoice.taxRate}%)` : ''}:</span>
                     <span className="font-medium">{formatCurrency(invoice.taxAmount || invoice.tax)}</span>
                   </div>
                 )}
-
                 <div className="border-t-2 border-gray-300 dark:border-gray-600 pt-2 mt-2">
                   <div className="flex justify-between items-center">
                     <span className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
@@ -490,7 +455,6 @@ const InvoiceDetail = () => {
                     </span>
                   </div>
                 </div>
-
                 {invoice.amountPaid > 0 && (
                   <>
                     <div className="flex justify-between text-xs sm:text-sm text-gray-700 dark:text-gray-300">
@@ -512,7 +476,6 @@ const InvoiceDetail = () => {
               </div>
             </div>
           </div>
-
           {}
           {invoice.notes && (
             <div className="border-t border-gray-200 dark:border-gray-700 p-3 sm:p-6">
@@ -524,7 +487,6 @@ const InvoiceDetail = () => {
               </p>
             </div>
           )}
-
           {}
           {invoice.paymentHistory && invoice.paymentHistory.length > 0 && (
             <div className="border-t border-gray-200 dark:border-gray-700 p-3 sm:p-6 print:hidden">
@@ -564,7 +526,6 @@ const InvoiceDetail = () => {
               </div>
             </div>
           )}
-
           {}
           {invoice.qrCode && (
             <div className="border-t border-gray-200 dark:border-gray-700 p-6 sm:p-8 flex justify-center">
@@ -580,7 +541,6 @@ const InvoiceDetail = () => {
               </div>
             </div>
           )}
-
           {}
           <div className="border-t border-gray-200 dark:border-gray-700 p-6 sm:p-8 bg-gray-50 dark:bg-gray-900/50">
             <div className="text-center text-sm text-gray-600 dark:text-gray-400">
@@ -596,7 +556,6 @@ const InvoiceDetail = () => {
           </div>
         </div>
       </div>
-
       {}
       <Modal
         isOpen={showMarkAsPaidModal}
@@ -637,7 +596,6 @@ const InvoiceDetail = () => {
           </div>
         )}
       </Modal>
-
       {}
       <Modal
         isOpen={showCancelModal}
@@ -700,7 +658,6 @@ const InvoiceDetail = () => {
           )}
         </div>
       </Modal>
-
       {}
       <style jsx>{`
         @media print {
@@ -724,5 +681,4 @@ const InvoiceDetail = () => {
     </div>
   );
 };
-
 export default InvoiceDetail;

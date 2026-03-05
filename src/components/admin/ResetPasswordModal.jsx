@@ -13,21 +13,16 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
     newPassword: '',
     confirmPassword: '',
   });
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState(null);
-
-  
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     label: '',
     color: '',
   });
-
-  
   useEffect(() => {
     if (!isOpen) {
       setFormData({
@@ -41,28 +36,19 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
       setPasswordStrength({ score: 0, label: '', color: '' });
     }
   }, [isOpen]);
-
-  
   const calculatePasswordStrength = (password) => {
     if (!password) {
       return { score: 0, label: '', color: '' };
     }
-
     let score = 0;
-
-    
     if (password.length >= 8) score++;
     if (password.length >= 12) score++;
-
-    
     if (/[a-z]/.test(password)) score++;
     if (/[A-Z]/.test(password)) score++;
     if (/[0-9]/.test(password)) score++;
     if (/[^a-zA-Z0-9]/.test(password)) score++;
-
     let label = '';
     let color = '';
-
     if (score <= 2) {
       label = 'Weak';
       color = 'bg-red-500';
@@ -73,11 +59,8 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
       label = 'Strong';
       color = 'bg-green-500';
     }
-
     return { score, label, color };
   };
-
-  
   useEffect(() => {
     if (formData.newPassword) {
       const strength = calculatePasswordStrength(formData.newPassword);
@@ -86,31 +69,21 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
       setPasswordStrength({ score: 0, label: '', color: '' });
     }
   }, [formData.newPassword]);
-
-  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
-
-    
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
-
-    
     if (alert) {
       setAlert(null);
     }
   };
-
-  
   const validateForm = () => {
     const newErrors = {};
-
-    
     if (!formData.newPassword) {
       newErrors.newPassword = 'New password is required';
     } else if (formData.newPassword.length < 8) {
@@ -118,23 +91,17 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/.test(formData.newPassword)) {
       newErrors.newPassword = 'Password must contain uppercase, lowercase, and numbers';
     }
-
-    
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm the password';
     } else if (formData.newPassword !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAlert(null);
-
     if (!validateForm()) {
       setAlert({
         type: 'danger',
@@ -142,9 +109,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
       });
       return;
     }
-
     setLoading(true);
-
     try {
       const token = localStorage.getItem('authToken');
       const response = await fetch(`${API_BASE_URL}/users/${user.id}/reset-password`, {
@@ -157,19 +122,14 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
           newPassword: formData.newPassword,
         }),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.error || data.message || 'Failed to reset password');
       }
-
       setAlert({
         type: 'success',
         message: 'Password reset successfully!',
       });
-
-      
       setTimeout(() => {
         onClose(true); 
       }, 1500);
@@ -183,7 +143,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
       setLoading(false);
     }
   };
-
   const modalFooter = (
     <>
       <Button
@@ -205,7 +164,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
       </Button>
     </>
   );
-
   return (
     <Modal
       isOpen={isOpen}
@@ -225,7 +183,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
             {user?.email}
           </p>
         </div>
-
         {}
         {alert && (
           <Alert
@@ -236,7 +193,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
             {alert.message}
           </Alert>
         )}
-
         {}
         <div>
           <div className="relative">
@@ -263,7 +219,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
-
           {}
           {formData.newPassword && (
             <div className="mt-3">
@@ -328,7 +283,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
             </div>
           )}
         </div>
-
         {}
         <div className="relative">
           <Input
@@ -354,7 +308,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
             {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
         </div>
-
         {}
         {formData.confirmPassword && (
           <div className="flex items-center gap-2 text-sm">
@@ -371,7 +324,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
             )}
           </div>
         )}
-
         {}
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <div className="flex items-start gap-3">
@@ -389,7 +341,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
     </Modal>
   );
 };
-
 ResetPasswordModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
@@ -400,5 +351,4 @@ ResetPasswordModal.propTypes = {
     fullName: PropTypes.string,
   }),
 };
-
 export default ResetPasswordModal;

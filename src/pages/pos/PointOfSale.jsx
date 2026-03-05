@@ -25,7 +25,6 @@ const PointOfSale = () => {
   const { showSuccess, showError, showInfo } = useContext(ToastContext);
   const { user } = useAuth();
 
-  
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -33,13 +32,9 @@ const PointOfSale = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [viewMode, setViewMode] = useState('grid'); 
-
-  
   const [cart, setCart] = useState([]);
   const [savedCarts, setSavedCarts] = useState([]);
   const [showSavedCarts, setShowSavedCarts] = useState(false);
-
-  
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [processingCheckout, setProcessingCheckout] = useState(false);
   const [customerDetails, setCustomerDetails] = useState({
@@ -48,26 +43,18 @@ const PointOfSale = () => {
     phone: '',
     address: '',
   });
-
-  
   const [discount, setDiscount] = useState({ type: 'percentage', value: 0 });
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [notes, setNotes] = useState('');
-
-
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
-
-  
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productPurchases, setProductPurchases] = useState([]);
   const [loadingPurchases, setLoadingPurchases] = useState(false);
   const [purchaseAllocations, setPurchaseAllocations] = useState({});
   const [customPrice, setCustomPrice] = useState(0);
-
-
   const getImageUrl = (imagePath) => {
     if (!imagePath) return null; 
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
@@ -79,28 +66,20 @@ const PointOfSale = () => {
     }
     return imagePath;
   };
-
-  
   useEffect(() => {
     const saved = localStorage.getItem('savedCarts');
     if (saved) {
       setSavedCarts(JSON.parse(saved));
     }
   }, []);
-
-  
   useEffect(() => {
     fetchData();
   }, []);
-
   const fetchData = async () => {
     setLoading(true);
     try {
       const productsRes = await inventoryService.getAll({ limit: 1000, usePOSPricing: true });
-
       const productsData = productsRes?.data?.items || [];
-
-
       setProducts(productsData);
       setFilteredProducts(productsData);
       setCategories([]); 
@@ -111,11 +90,8 @@ const PointOfSale = () => {
       setLoading(false);
     }
   };
-
-  
   useEffect(() => {
     let filtered = products;
-
     if (searchTerm) {
       filtered = filtered.filter(
         (p) =>
@@ -123,27 +99,18 @@ const PointOfSale = () => {
           p.skuCode?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
     if (selectedCategory) {
       filtered = filtered.filter((p) => p.category === selectedCategory);
     }
-
     setFilteredProducts(filtered);
   }, [searchTerm, selectedCategory, products]);
-
-  
   const fetchProductPurchases = async (productId) => {
     setLoadingPurchases(true);
     try {
       const response = await api.get(`/inventory/${productId}/purchases`);
       const purchases = response.data?.data?.purchases || response.data?.purchases || [];
-
-      
       const availablePurchases = purchases.filter(p => (p.remainingQuantity ?? p.quantity) > 0);
-
       setProductPurchases(availablePurchases);
-
-      
       const initialAllocations = {};
       availablePurchases.forEach(purchase => {
         initialAllocations[purchase._id] = {
@@ -161,16 +128,12 @@ const PointOfSale = () => {
       setLoadingPurchases(false);
     }
   };
-
-  
   const openPurchaseModal = async (product) => {
     setSelectedProduct(product);
     setCustomPrice(product.sellingPrice || 0);
     setShowPurchaseModal(true);
     await fetchProductPurchases(product._id);
   };
-
-  
   const closePurchaseModal = () => {
     if (!loadingPurchases) {
       setShowPurchaseModal(false);
@@ -180,8 +143,6 @@ const PointOfSale = () => {
       setCustomPrice(0);
     }
   };
-
-  
   const togglePurchaseSelection = (purchaseId) => {
     setPurchaseAllocations(prev => ({
       ...prev,
@@ -192,12 +153,9 @@ const PointOfSale = () => {
       }
     }));
   };
-
-  
   const updateAllocationQuantity = (purchaseId, quantity) => {
     const allocation = purchaseAllocations[purchaseId];
     const validQuantity = Math.max(0, Math.min(quantity, allocation.maxQuantity));
-
     setPurchaseAllocations(prev => ({
       ...prev,
       [purchaseId]: {
@@ -207,22 +165,15 @@ const PointOfSale = () => {
       }
     }));
   };
-
-  
   const getTotalAllocatedQuantity = () => {
     return Object.values(purchaseAllocations).reduce((sum, alloc) => sum + (alloc.selected ? alloc.quantity : 0), 0);
   };
-
-  
   const addToCartWithAllocations = () => {
     const totalQty = getTotalAllocatedQuantity();
-
     if (totalQty === 0) {
       showError('Please select at least one purchase and specify quantity');
       return;
     }
-
-    
     const selectedAllocations = Object.entries(purchaseAllocations)
       .filter(([_, alloc]) => alloc.selected && alloc.quantity > 0)
       .map(([purchaseId, alloc]) => {
@@ -234,14 +185,9 @@ const PointOfSale = () => {
           supplier: purchase.supplier?.name || purchase.supplier
         };
       });
-
-    
     const existingItem = cart.find((item) => item._id === selectedProduct._id);
-
     if (existingItem) {
-      
       const mergedAllocations = [...(existingItem.purchaseAllocations || [])];
-
       selectedAllocations.forEach(newAlloc => {
         const existing = mergedAllocations.find(a => a.purchaseId === newAlloc.purchaseId);
         if (existing) {
@@ -250,14 +196,11 @@ const PointOfSale = () => {
           mergedAllocations.push(newAlloc);
         }
       });
-
       const newTotalQty = mergedAllocations.reduce((sum, a) => sum + a.quantity, 0);
-
       if (newTotalQty > selectedProduct.currentStock) {
         showError(`Only ${selectedProduct.currentStock} units available in stock`);
         return;
       }
-
       setCart(cart.map((item) =>
         item._id === selectedProduct._id
           ? { ...item, quantity: newTotalQty, sellingPrice: customPrice, purchaseAllocations: mergedAllocations }
@@ -280,39 +223,27 @@ const PointOfSale = () => {
       ]);
       showSuccess(`${selectedProduct.itemName} added to cart`);
     }
-
-    
     setShowPurchaseModal(false);
     setSelectedProduct(null);
     setProductPurchases([]);
     setPurchaseAllocations({});
     setCustomPrice(0);
   };
-
-
   const addToCart = useCallback((product) => {
-    
     openPurchaseModal(product);
   }, []);
-
-  
   const updateQuantity = useCallback((productId, newQuantity) => {
     const product = products.find((p) => p._id === productId);
-
     if (newQuantity <= 0) {
       removeFromCart(productId);
       return;
     }
-
     if (newQuantity > product.currentStock) {
       showError(`Only ${product.currentStock} units available in stock`);
       return;
     }
-
     setCart(cart.map((item) => (item._id === productId ? { ...item, quantity: newQuantity } : item)));
   }, [products, cart, showError]);
-
-  
   const removeFromCart = useCallback((productId) => {
     const item = cart.find(i => i._id === productId);
     setCart(cart.filter((item) => item._id !== productId));
@@ -320,8 +251,6 @@ const PointOfSale = () => {
       showInfo(`${item.itemName} removed from cart`);
     }
   }, [cart, showInfo]);
-
-  
   const clearCart = () => {
     setCart([]);
     setCustomerDetails({ name: '', email: '', phone: '', address: '' });
@@ -331,17 +260,13 @@ const PointOfSale = () => {
     setNotes('');
     showInfo('Cart cleared');
   };
-
-  
   const saveCart = () => {
     if (cart.length === 0) {
       showError('Cart is empty');
       return;
     }
-
     const cartName = prompt('Enter a name for this cart:');
     if (!cartName) return;
-
     const savedCart = {
       id: Date.now(),
       name: cartName,
@@ -351,14 +276,11 @@ const PointOfSale = () => {
       notes,
       savedAt: new Date().toISOString(),
     };
-
     const updated = [...savedCarts, savedCart];
     setSavedCarts(updated);
     localStorage.setItem('savedCarts', JSON.stringify(updated));
     showSuccess(`Cart saved as "${cartName}"`);
   };
-
-  
   const loadCart = (savedCart) => {
     setCart(savedCart.items);
     setCustomerDetails(savedCart.customer);
@@ -367,41 +289,31 @@ const PointOfSale = () => {
     setShowSavedCarts(false);
     showSuccess(`Cart "${savedCart.name}" loaded`);
   };
-
-  
   const deleteSavedCart = (cartId) => {
     const updated = savedCarts.filter(c => c.id !== cartId);
     setSavedCarts(updated);
     localStorage.setItem('savedCarts', JSON.stringify(updated));
     showInfo('Saved cart deleted');
   };
-
-  
   const applyCoupon = async () => {
     if (!couponCode.trim()) {
       showError('Please enter a coupon code');
       return;
     }
-
     setValidatingCoupon(true);
     try {
       const subtotal = cart.reduce((sum, item) => sum + item.sellingPrice * item.quantity, 0);
-
       const response = await api.post('/coupons/validate', {
         code: couponCode.toUpperCase(),
         subtotal,
       });
-
       if (response.data.valid) {
         const coupon = response.data.coupon;
         setAppliedCoupon(coupon);
-
-        
         setDiscount({
           type: 'fixed',
           value: coupon.discountAmount,
         });
-
         showSuccess(`Coupon "${coupon.code}" applied! You save $${coupon.discountAmount.toFixed(2)}`);
       }
     } catch (error) {
@@ -411,20 +323,15 @@ const PointOfSale = () => {
       setValidatingCoupon(false);
     }
   };
-
-  
   const removeCoupon = () => {
     setAppliedCoupon(null);
     setCouponCode('');
     setDiscount({ type: 'percentage', value: 0 });
     showInfo('Coupon removed');
   };
-
-  
   const calculateSubtotal = useMemo(() => {
     return cart.reduce((sum, item) => sum + item.sellingPrice * item.quantity, 0);
   }, [cart]);
-
   const calculateDiscount = useMemo(() => {
     const subtotal = calculateSubtotal;
     if (discount.type === 'fixed') {
@@ -433,14 +340,11 @@ const PointOfSale = () => {
       return (subtotal * discount.value) / 100;
     }
   }, [calculateSubtotal, discount]);
-
   const calculateTotal = useMemo(() => {
     const subtotal = calculateSubtotal;
     const discountAmount = calculateDiscount;
     return subtotal - discountAmount;
   }, [calculateSubtotal, calculateDiscount]);
-
-  
   const handleCheckout = () => {
     if (cart.length === 0) {
       showError('Cart is empty');
@@ -448,21 +352,16 @@ const PointOfSale = () => {
     }
     setShowCheckoutModal(true);
   };
-
-  
   const processSale = async () => {
     if (!customerDetails.name || !customerDetails.email) {
       showError('Customer name and email are required');
       return;
     }
-
     setProcessingCheckout(true);
-
     try {
       const subtotal = calculateSubtotal;
       const discountAmount = calculateDiscount;
       const total = calculateTotal;
-
       const invoiceData = {
         customer: {
           name: customerDetails.name,
@@ -503,29 +402,18 @@ const PointOfSale = () => {
         issueDate: new Date().toISOString(),
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       };
-
       const response = await api.post('/invoices', invoiceData);
-
-      
       if (appliedCoupon) {
         try {
           await api.post(`/coupons/${appliedCoupon._id}/use`);
         } catch (error) {
           console.error('Error updating coupon usage:', error);
-          
         }
       }
-
       showSuccess(`Sale submitted for approval! Invoice #${response.data.invoice.invoiceNumber} is pending`);
-
-      
       clearCart();
       setShowCheckoutModal(false);
-
-      
       fetchData();
-
-      
       navigate(`/invoices/${response.data.invoice._id}`);
     } catch (error) {
       console.error('Error processing sale:', error);
@@ -534,11 +422,9 @@ const PointOfSale = () => {
       setProcessingCheckout(false);
     }
   };
-
   if (loading) {
     return <LoadingSpinner />;
   }
-
   return (
     <div className="min-h-screen bg-slate-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-6 lg:px-8 py-8 max-w-[1800px]">
@@ -578,7 +464,6 @@ const PointOfSale = () => {
             </div>
           </div>
         </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-8">
           {}
           <div className="lg:col-span-7">
@@ -624,7 +509,6 @@ const PointOfSale = () => {
                     </button>
                   </div>
                 </div>
-
                 {}
                 {(searchTerm || selectedCategory) && (
                   <div className="flex items-center gap-3 flex-wrap bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-750 p-5 rounded-xl border-2 border-blue-200 dark:border-gray-700 shadow-sm">
@@ -662,7 +546,6 @@ const PointOfSale = () => {
                   </div>
                 )}
               </div>
-
               {}
               <div className={`max-h-[600px] overflow-y-auto ${
                 viewMode === 'grid'
@@ -777,7 +660,6 @@ const PointOfSale = () => {
               </div>
             </Card>
           </div>
-
           {}
           <div className="lg:col-span-3">
             <Card padding="lg" className="sticky top-4 shadow-sm border border-slate-200 dark:border-gray-700">
@@ -805,7 +687,6 @@ const PointOfSale = () => {
                   </div>
                 )}
               </div>
-
               {}
               <div className="space-y-2 mb-4 max-h-[350px] overflow-y-auto">
                 {cart.length > 0 ? (
@@ -877,7 +758,6 @@ const PointOfSale = () => {
                   </div>
                 )}
               </div>
-
               {}
               {cart.length > 0 && (
                 <>
@@ -904,7 +784,6 @@ const PointOfSale = () => {
                       </span>
                     </div>
                   </div>
-
                   <Button onClick={handleCheckout} className="w-full mt-3 bg-blue-600 hover:bg-blue-700" size="lg">
                     <Receipt className="w-5 h-5 mr-2" />
                     Checkout
@@ -914,7 +793,6 @@ const PointOfSale = () => {
             </Card>
           </div>
         </div>
-
         {}
         <Modal
           isOpen={showCheckoutModal}
@@ -973,14 +851,12 @@ const PointOfSale = () => {
                 />
               </div>
             </div>
-
             {}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
               <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                 <Tag className="w-5 h-5 text-blue-600" />
                 Coupon & Discount (Optional)
               </h3>
-
               {}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1025,7 +901,6 @@ const PointOfSale = () => {
                   </div>
                 )}
               </div>
-
               {}
               {!appliedCoupon && (
                 <>
@@ -1039,7 +914,6 @@ const PointOfSale = () => {
                       </span>
                     </div>
                   </div>
-
                   <div className="grid grid-cols-2 gap-4">
                     <Select
                       label="Type"
@@ -1063,7 +937,6 @@ const PointOfSale = () => {
                 </>
               )}
             </div>
-
             {}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
               <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
@@ -1081,7 +954,6 @@ const PointOfSale = () => {
                 <option value="other">Other</option>
               </Select>
             </div>
-
             {}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1095,7 +967,6 @@ const PointOfSale = () => {
                 rows={3}
               />
             </div>
-
             {}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
               <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
@@ -1126,7 +997,6 @@ const PointOfSale = () => {
                 </div>
               </div>
             </div>
-
             {}
             <div className="flex gap-4 pt-4 border-t border-slate-200 dark:border-gray-700">
               <Button
@@ -1148,7 +1018,6 @@ const PointOfSale = () => {
             </div>
           </div>
         </Modal>
-
         {}
         <Modal
           isOpen={showSavedCarts}
@@ -1195,7 +1064,6 @@ const PointOfSale = () => {
             )}
           </div>
         </Modal>
-
         {}
         <Modal
           isOpen={showPurchaseModal}
@@ -1221,7 +1089,6 @@ const PointOfSale = () => {
                   <p className="text-2xl font-bold text-blue-600">{getTotalAllocatedQuantity()}</p>
                 </div>
               </div>
-
               {}
               {loadingPurchases ? (
                 <div className="text-center py-8 bg-slate-50 rounded-lg">
@@ -1235,7 +1102,6 @@ const PointOfSale = () => {
                     <Layers className="w-4 h-4 text-blue-600 flex-shrink-0" />
                     <p className="text-xs text-blue-700">Check boxes to select purchase batches, then enter quantity. Mix multiple batches for FIFO management.</p>
                   </div>
-
                   {}
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {productPurchases.map((purchase, index) => {
@@ -1248,7 +1114,6 @@ const PointOfSale = () => {
                           year: '2-digit'
                         });
                       };
-
                       return (
                         <div
                           key={purchase._id}
@@ -1270,7 +1135,6 @@ const PointOfSale = () => {
                                 <Square className="w-5 h-5 text-slate-400" />
                               )}
                             </button>
-
                             {}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1.5">
@@ -1282,7 +1146,6 @@ const PointOfSale = () => {
                                   ${purchase.sellingPrice?.toFixed(2) || '0.00'}
                                 </span>
                               </div>
-
                               <div className="flex items-center gap-4 text-xs">
                                 <div>
                                   <span className="text-slate-500">Supplier:</span>
@@ -1304,7 +1167,6 @@ const PointOfSale = () => {
                                 </div>
                               </div>
                             </div>
-
                             {}
                             <div className="flex-shrink-0">
                               <div className="flex items-center gap-1 bg-white rounded-md border border-slate-300 p-1">
@@ -1338,7 +1200,6 @@ const PointOfSale = () => {
                               </p>
                             </div>
                           </div>
-
                           {}
                           {allocation.selected && (
                             <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-slate-200">
@@ -1373,7 +1234,6 @@ const PointOfSale = () => {
                       );
                     })}
                   </div>
-
                   {}
                   <div className="space-y-3">
                     {}
@@ -1400,7 +1260,6 @@ const PointOfSale = () => {
                         </p>
                       </div>
                     </div>
-
                     {}
                     <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
                       <div>
@@ -1441,5 +1300,4 @@ const PointOfSale = () => {
     </div>
   );
 };
-
 export default PointOfSale;

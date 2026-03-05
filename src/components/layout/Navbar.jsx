@@ -7,7 +7,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -17,77 +16,54 @@ const Navbar = () => {
     { id: 2, message: 'Report generated', unread: true },
     { id: 3, message: 'System update available', unread: false }
   ]);
-
-  
   const userMenuRef = useRef(null);
   const mobileMenuRef = useRef(null);
-
-  
   const unreadCount = notifications.filter(n => n.unread).length;
-
-  
   const getNavigationLinks = () => {
     const baseLinks = [
       { name: 'Dashboard', path: '/dashboard', roles: ['admin', 'employee'] }
     ];
-
     const adminLinks = [
       { name: 'Users', path: '/users', roles: ['admin'] },
       { name: 'Reports', path: '/reports', roles: ['admin', 'employee'] },
       { name: 'Analytics', path: '/analytics', roles: ['admin'] },
       { name: 'Settings', path: '/settings', roles: ['admin'] }
     ];
-
     const employeeLinks = [
       { name: 'My Tasks', path: '/tasks', roles: ['employee'] },
       { name: 'Reports', path: '/reports', roles: ['employee'] }
     ];
-
     if (isAdmin) {
       return [...baseLinks, ...adminLinks];
     } else if (isEmployee) {
       return [...baseLinks, ...employeeLinks];
     }
-
     return baseLinks;
   };
-
   const navigationLinks = getNavigationLinks();
-
-  
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setIsUserMenuOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
-
-  
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
-
-  
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -95,8 +71,6 @@ const Navbar = () => {
       setSearchQuery('');
     }
   };
-
-  
   const getInitials = (name) => {
     if (!name) return 'U';
     return name
@@ -106,7 +80,6 @@ const Navbar = () => {
       .toUpperCase()
       .slice(0, 2);
   };
-
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -128,7 +101,6 @@ const Navbar = () => {
               </span>
             </Link>
           </div>
-
           {}
           <div className="hidden md:flex items-center space-x-1">
             {navigationLinks.map((link) => (
@@ -145,7 +117,6 @@ const Navbar = () => {
               </Link>
             ))}
           </div>
-
           {}
           <div className="flex items-center space-x-4">
             {}
@@ -173,7 +144,6 @@ const Navbar = () => {
                 </svg>
               </div>
             </form>
-
             {}
             <div className="relative">
               <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors relative">
@@ -197,7 +167,6 @@ const Navbar = () => {
                 )}
               </button>
             </div>
-
             {}
             <div className="relative" ref={userMenuRef}>
               <button
@@ -231,7 +200,6 @@ const Navbar = () => {
                   />
                 </svg>
               </button>
-
               {}
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
@@ -315,7 +283,6 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-
             {}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -354,7 +321,6 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-
       {}
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-gray-200 bg-white">
@@ -384,7 +350,6 @@ const Navbar = () => {
                 </svg>
               </div>
             </form>
-
             {}
             {navigationLinks.map((link) => (
               <Link
@@ -405,5 +370,4 @@ const Navbar = () => {
     </nav>
   );
 };
-
 export default Navbar;

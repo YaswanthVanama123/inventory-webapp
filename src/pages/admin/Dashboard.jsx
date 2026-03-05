@@ -347,7 +347,7 @@ const Dashboard = () => {
   }, []);
 
   const data = dashboardData || {};
-  const stats = data.stats || {};
+  const stats = data.summary || data.stats || {}; // Support both summary and stats for backwards compatibility
   const salesTrend = data.salesTrend || [];
   const categoryDistribution = data.categoryDistribution || [];
   const recentActivities = data.recentActivities || [];
@@ -413,13 +413,21 @@ const Dashboard = () => {
             </span>
           )}
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6">
           <StatCard
-            title="Total Revenue"
+            title="Sales Revenue"
             value={formatCurrency(stats.totalRevenue)}
             change={`${stats.revenueChange > 0 ? '+' : ''}${stats.revenueChange}%`}
             changeType={stats.revenueChange >= 0 ? 'positive' : 'negative'}
             icon={DollarSign}
+            loading={loading}
+          />
+          <StatCard
+            title="Orders Cost"
+            value={formatCurrency(stats.totalPurchaseAmount)}
+            change={`${stats.purchaseCostChange > 0 ? '+' : ''}${stats.purchaseCostChange}%`}
+            changeType={stats.purchaseCostChange >= 0 ? 'negative' : 'positive'}
+            icon={ShoppingCart}
             loading={loading}
           />
           <StatCard
@@ -431,6 +439,14 @@ const Dashboard = () => {
             loading={loading}
           />
           <StatCard
+            title="Profit/Loss"
+            value={formatCurrency(stats.totalProfit)}
+            change={`${stats.profitMargin}% margin`}
+            changeType={stats.totalProfit >= 0 ? 'positive' : 'negative'}
+            icon={TrendingUp}
+            loading={loading}
+          />
+          <StatCard
             title="Low Stock Items"
             value={stats.lowStockItems?.toLocaleString() || '0'}
             change={`${stats.lowStockChange}%`}
@@ -439,11 +455,11 @@ const Dashboard = () => {
             loading={loading}
           />
           <StatCard
-            title="Profit Margin"
-            value={`${stats.profitMargin}%`}
-            change={`${stats.profitMarginChange > 0 ? '+' : ''}${stats.profitMarginChange}%`}
-            changeType={stats.profitMarginChange >= 0 ? 'positive' : 'negative'}
-            icon={TrendingUp}
+            title="Avg Order Value"
+            value={formatCurrency(stats.avgOrderValue)}
+            change={null}
+            changeType="positive"
+            icon={Activity}
             loading={loading}
           />
         </div>

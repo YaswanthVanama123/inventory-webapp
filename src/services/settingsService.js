@@ -34,6 +34,12 @@ export const updateSKUConfig = async (config) => {
   return response;
 };
 
+// Combined endpoint to get both cutoff date and threshold in one call
+export const getGeneralSettings = async () => {
+  const response = await api.get('/settings/general');
+  return response;
+};
+
 export const getStockCutoffDate = async () => {
   const response = await api.get('/settings/stock-cutoff-date');
   return response;
@@ -44,6 +50,16 @@ export const updateStockCutoffDate = async (cutoffDate) => {
   return response;
 };
 
+export const getLowStockThreshold = async () => {
+  const response = await api.get('/settings/low-stock-threshold');
+  return response;
+};
+
+export const updateLowStockThreshold = async (threshold) => {
+  const response = await api.put('/settings/low-stock-threshold', { threshold });
+  return response;
+};
+
 const settingsService = {
   getUnits,
   addUnit,
@@ -51,8 +67,11 @@ const settingsService = {
   deleteUnit,
   generateSKU,
   updateSKUConfig,
+  getGeneralSettings,
   getStockCutoffDate,
   updateStockCutoffDate,
+  getLowStockThreshold,
+  updateLowStockThreshold,
 };
 
 export default settingsService;

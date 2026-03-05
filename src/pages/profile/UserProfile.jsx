@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
+import { UserIcon, LockClosedIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 
 
 const UserProfile = () => {
@@ -195,9 +196,9 @@ const UserProfile = () => {
 
   
   const tabs = [
-    { id: 'profile', label: 'Profile Information', icon: '👤' },
-    { id: 'password', label: 'Change Password', icon: '🔒' },
-    { id: 'preferences', label: 'Preferences', icon: '⚙️' },
+    { id: 'profile', label: 'Profile Information', icon: UserIcon },
+    { id: 'password', label: 'Change Password', icon: LockClosedIcon },
+    { id: 'preferences', label: 'Preferences', icon: Cog6ToothIcon },
   ];
 
   return (
@@ -233,7 +234,7 @@ const UserProfile = () => {
                   }
                 `}
               >
-                <span className="text-lg">{tab.icon}</span>
+                <tab.icon className="w-5 h-5" />
                 <span>{tab.label}</span>
               </button>
             ))}

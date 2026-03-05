@@ -13,6 +13,8 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [stockCutoffDate, setStockCutoffDate] = useState('');
   const [stockCutoffLoading, setStockCutoffLoading] = useState(false);
+  const [lowStockThreshold, setLowStockThreshold] = useState('');
+  const [thresholdLoading, setThresholdLoading] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -21,12 +23,20 @@ const Settings = () => {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const cutoffRes = await settingsService.getStockCutoffDate();
-      const cutoffData = cutoffRes?.data?.stockCalculationCutoffDate || null;
+      // Use combined endpoint to fetch both settings in one call
+      const settingsRes = await settingsService.getGeneralSettings();
+
+      // Extract cutoff date
+      const cutoffData = settingsRes?.data?.stockCalculationCutoffDate || null;
       setStockCutoffDate(cutoffData ? new Date(cutoffData).toISOString().split('T')[0] : '');
+
+      // Extract low stock threshold
+      const thresholdData = settingsRes?.data?.lowStockThreshold || '';
+      setLowStockThreshold(thresholdData?.toString() || '');
     } catch (error) {
       console.error('Error fetching settings:', error);
       setStockCutoffDate('');
+      setLowStockThreshold('');
       showError(error.message || 'Failed to load settings. Please ensure the server is running.');
     } finally {
       setLoading(false);
@@ -49,6 +59,25 @@ const Settings = () => {
       showError(error.message || 'Failed to update cutoff date');
     } finally {
       setStockCutoffLoading(false);
+    }
+  };
+
+  const handleUpdateLowStockThreshold = async () => {
+    if (!lowStockThreshold || lowStockThreshold <= 0) {
+      showError('Please enter a valid threshold value greater than 0');
+      return;
+    }
+
+    setThresholdLoading(true);
+    try {
+      await settingsService.updateLowStockThreshold(parseInt(lowStockThreshold));
+      showSuccess('Low stock threshold updated successfully');
+      fetchSettings();
+    } catch (error) {
+      console.error('Error updating threshold:', error);
+      showError(error.message || 'Failed to update threshold');
+    } finally {
+      setThresholdLoading(false);
     }
   };
 
@@ -130,6 +159,58 @@ const Settings = () => {
             disabled={!stockCutoffDate || stockCutoffLoading}
           >
             Update Cutoff Date
+          </Button>
+        </div>
+      </div>
+
+      {/* Low Stock Threshold Setting */}
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-slate-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Low Stock Threshold</h3>
+        <p className="text-sm text-slate-600 dark:text-gray-400 mb-4">
+          Set the quantity threshold for RouteStar items. Items with quantities <strong>below</strong> this value will be marked as "Low Stock" on the dashboard.
+        </p>
+
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-4">
+          <div className="flex items-start gap-3">
+            <svg className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div className="text-sm text-amber-800 dark:text-amber-300">
+              <p className="font-medium mb-1">How this works:</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Items with quantity <strong>&lt; threshold</strong> will show as "Low Stock"</li>
+                <li>Low Stock count appears on the dashboard</li>
+                <li>Helps you identify items that need reordering</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-end gap-4">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
+              Threshold Quantity
+            </label>
+            <Input
+              type="number"
+              min="1"
+              value={lowStockThreshold}
+              onChange={(e) => setLowStockThreshold(e.target.value)}
+              placeholder="e.g., 10"
+              className="w-full"
+            />
+            {lowStockThreshold && (
+              <p className="mt-2 text-sm text-slate-500 dark:text-gray-400">
+                Items with quantity below <strong>{lowStockThreshold}</strong> will be marked as low stock
+              </p>
+            )}
+          </div>
+          <Button
+            onClick={handleUpdateLowStockThreshold}
+            loading={thresholdLoading}
+            disabled={!lowStockThreshold || lowStockThreshold <= 0 || thresholdLoading}
+          >
+            Update Threshold
           </Button>
         </div>
       </div>

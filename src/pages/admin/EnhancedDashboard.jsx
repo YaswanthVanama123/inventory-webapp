@@ -189,6 +189,9 @@ const EnhancedDashboard = () => {
             lowStockChange: `${summary.lowStockChange >= 0 ? '+' : ''}${summary.lowStockChange}%`,
             profitMargin: summary.profitMargin || 0,
             marginChange: `${summary.profitMarginChange >= 0 ? '+' : ''}${summary.profitMarginChange}%`,
+            totalPurchaseAmount: summary.totalPurchaseAmount || 0,
+            purchaseCostChange: `${summary.purchaseCostChange >= 0 ? '+' : ''}${summary.purchaseCostChange}%`,
+            totalProfit: summary.totalProfit || 0,
           },
 
           revenueTrend: salesTrend?.map(item => ({
@@ -260,6 +263,9 @@ const EnhancedDashboard = () => {
       lowStockChange: '+0%',
       profitMargin: 0,
       marginChange: '+0%',
+      totalPurchaseAmount: 0,
+      purchaseCostChange: '+0%',
+      totalProfit: 0,
     },
     revenueTrend: [],
     topProducts: [],
@@ -304,41 +310,61 @@ const EnhancedDashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <EnhancedStatCard
-          title="Total Revenue"
+          title="Sales Revenue"
           value={`$${data.kpis.totalRevenue.toLocaleString()}`}
           subtitle="This month"
           change={data.kpis.revenueChange}
-          changeType="positive"
+          changeType={data.kpis.revenueChange?.includes('+') ? 'positive' : 'negative'}
           icon={DollarSign}
           trend={revenueTrendMini}
           color="blue"
         />
         <EnhancedStatCard
-          title="Total Orders"
-          value={data.kpis.totalOrders.toLocaleString()}
-          subtitle={`Avg: $${data.kpis.avgOrderValue}`}
-          change={data.kpis.ordersChange}
-          changeType="positive"
+          title="Orders Cost"
+          value={`$${data.kpis.totalPurchaseAmount.toLocaleString()}`}
+          subtitle="Purchase orders"
+          change={data.kpis.purchaseCostChange}
+          changeType={data.kpis.purchaseCostChange?.includes('+') ? 'negative' : 'positive'}
           icon={ShoppingCart}
           trend={revenueTrendMini}
+          color="red"
+        />
+        <EnhancedStatCard
+          title="Total Orders"
+          value={data.kpis.totalOrders.toLocaleString()}
+          subtitle={`Avg: $${Math.round(data.kpis.avgOrderValue).toLocaleString()}`}
+          change={data.kpis.ordersChange}
+          changeType={data.kpis.ordersChange?.includes('+') ? 'positive' : 'negative'}
+          icon={FileText}
+          trend={revenueTrendMini}
           color="green"
+        />
+        <EnhancedStatCard
+          title="Profit/Loss"
+          value={`$${data.kpis.totalProfit.toLocaleString()}`}
+          subtitle={`${data.kpis.profitMargin}% margin`}
+          change={data.kpis.marginChange}
+          changeType={data.kpis.totalProfit >= 0 ? 'positive' : 'negative'}
+          icon={TrendingUp}
+          trend={revenueTrendMini}
+          color={data.kpis.totalProfit >= 0 ? 'teal' : 'red'}
         />
         <EnhancedStatCard
           title="Low Stock Items"
           value={data.kpis.lowStock}
           subtitle="Needs attention"
           change={data.kpis.lowStockChange}
-          changeType="positive"
+          changeType="negative"
           icon={AlertTriangle}
           color="amber"
         />
         <EnhancedStatCard
-          title="Profit Margin"
-          value={`${data.kpis.profitMargin}%`}
-          subtitle="Average margin"
-          change={data.kpis.marginChange}
+          title="Avg Order Value"
+          value={`$${Math.round(data.kpis.avgOrderValue).toLocaleString()}`}
+          subtitle="Per order"
+          change={data.kpis.avgOrderChange}
           changeType="positive"
           icon={Target}
           trend={revenueTrendMini}

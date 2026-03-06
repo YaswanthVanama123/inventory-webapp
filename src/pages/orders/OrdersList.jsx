@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
-import { getOrders, syncOrders, deleteAllOrders, deleteBulkOrdersByNumbers } from '../../services/ordersService';
+import { getOrders, syncOrders, deleteAllOrders, deleteBulkOrdersByNumbers, syncAllOrderDetails } from '../../services/ordersService';
 import purchaseOrderService from '../../services/purchaseOrderService';
 import orderDiscrepancyService from '../../services/orderDiscrepancyService';
 import SearchBar from '../../components/common/SearchBar';
@@ -25,6 +25,7 @@ const OrdersList = () => {
   const [syncing, setSyncing] = useState(false);
   const [syncingNew, setSyncingNew] = useState(false);
   const [syncingOld, setSyncingOld] = useState(false);
+  const [syncingAll, setSyncingAll] = useState(false);
   const [orderRange, setOrderRange] = useState({ highest: null, lowest: null, totalOrders: 0 });
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
@@ -49,6 +50,9 @@ const OrdersList = () => {
   const [verificationItems, setVerificationItems] = useState([]);
   const [verificationNotes, setVerificationNotes] = useState('');
   const [submittingVerification, setSubmittingVerification] = useState(false);
+  const [autoSyncEnabled, setAutoSyncEnabled] = useState(false);
+  const [autoSyncInterval, setAutoSyncInterval] = useState(30);
+  const [lastAutoSync, setLastAutoSync] = useState(null);
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -58,6 +62,26 @@ const OrdersList = () => {
   useEffect(() => {
     fetchOrders();
   }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, verifiedFilter, dateFrom, dateTo, debouncedSearchTerm]);
+  useEffect(() => {
+    if (!autoSyncEnabled) return;
+    const intervalMs = autoSyncInterval * 60 * 1000;
+    const autoSyncTimer = setInterval(async () => {
+      if (!syncing) {
+        try {
+          console.log('Running auto-sync for orders...');
+          const response = await syncOrders(0, 'new');
+          if (response.success && (response.data.created > 0 || response.data.updated > 0)) {
+            setLastAutoSync(new Date());
+            fetchOrders();
+            showSuccess(`Auto-sync: ${response.data.created} new, ${response.data.updated} updated orders`);
+          }
+        } catch (error) {
+          console.error('Auto-sync error:', error);
+        }
+      }
+    }, intervalMs);
+    return () => clearInterval(autoSyncTimer);
+  }, [autoSyncEnabled, autoSyncInterval, syncing]);
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -156,6 +180,43 @@ const OrdersList = () => {
       showError(err.message || 'Failed to sync old orders');
     } finally {
       setSyncingOld(false);
+      setSyncing(false);
+    }
+  };
+  const handleSyncAll = async () => {
+    if (!isAdmin) {
+      showError('Only administrators can sync orders');
+      return;
+    }
+    setSyncingAll(true);
+    setSyncing(true);
+    try {
+      // First sync new orders (this creates fetch history)
+      const ordersResponse = await syncOrders(0, 'new');
+      if (ordersResponse.success) {
+        const { created = 0, updated = 0, skipped = 0 } = ordersResponse.data;
+
+        // Then sync order details for all orders without details
+        let detailsSynced = 0;
+        try {
+          const detailsResponse = await syncAllOrderDetails(0);
+          if (detailsResponse.success) {
+            detailsSynced = detailsResponse.data.synced || 0;
+          }
+        } catch (detailsError) {
+          console.error('Error syncing details:', detailsError);
+        }
+
+        showSuccess(
+          `Full sync complete: ${created} new orders, ${updated} updated, ${detailsSynced} details synced`
+        );
+        fetchOrders();
+      }
+    } catch (err) {
+      console.error('Error syncing all orders:', err);
+      showError(err.message || 'Failed to sync all orders');
+    } finally {
+      setSyncingAll(false);
       setSyncing(false);
     }
   };
@@ -471,6 +532,32 @@ const OrdersList = () => {
                   Fetch older orders (lower than #{orderRange.lowest || '...'})
                 </div>
               </div>
+              <div className="relative group">
+                <Button
+                  onClick={handleSyncAll}
+                  disabled={syncing}
+                  variant="success"
+                  className="whitespace-nowrap"
+                  title="Fetch all orders and details"
+                >
+                  {syncingAll ? (
+                    <>
+                      <LoadingSpinner size="sm" className="mr-2" />
+                      Syncing All...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Sync All
+                    </>
+                  )}
+                </Button>
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                  Fetch all orders and their details (full sync)
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -535,6 +622,63 @@ const OrdersList = () => {
                 >
                   All
                 </Button>
+              </div>
+            </div>
+            {}
+            <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
+              <div className="flex flex-col gap-4">
+                <div>
+                  <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-400 mb-2">
+                    Automation Settings
+                  </h3>
+                  <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={autoSyncEnabled}
+                        onChange={(e) => {
+                          setAutoSyncEnabled(e.target.checked);
+                          if (e.target.checked) {
+                            showSuccess(`Auto-sync enabled: will run every ${autoSyncInterval} minutes`);
+                          } else {
+                            showSuccess('Auto-sync disabled');
+                          }
+                        }}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span className="text-sm font-medium text-slate-700 dark:text-gray-300">
+                        Enable Auto-Sync
+                      </span>
+                    </label>
+                    {autoSyncEnabled && (
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm text-slate-600 dark:text-gray-400">
+                          Every
+                        </label>
+                        <select
+                          value={autoSyncInterval}
+                          onChange={(e) => setAutoSyncInterval(parseInt(e.target.value))}
+                          className="px-3 py-1 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm"
+                        >
+                          <option value={5}>5 minutes</option>
+                          <option value={15}>15 minutes</option>
+                          <option value={30}>30 minutes</option>
+                          <option value={60}>1 hour</option>
+                          <option value={120}>2 hours</option>
+                          <option value={240}>4 hours</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                  {autoSyncEnabled && lastAutoSync && (
+                    <p className="text-xs text-slate-500 dark:text-gray-400 mt-2">
+                      Last auto-sync: {new Date(lastAutoSync).toLocaleTimeString()}
+                    </p>
+                  )}
+                  <p className="text-xs text-slate-500 dark:text-gray-500 mt-2">
+                    When enabled, automatically checks for new orders at the specified interval
+                  </p>
+                </div>
               </div>
             </div>
             {}

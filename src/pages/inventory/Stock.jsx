@@ -4,6 +4,7 @@ import stockService from '../../services/stockService';
 import discrepancyService from '../../services/discrepancyService';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
+import Badge from '../../components/common/Badge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { ArchiveBoxIcon, ShoppingCartIcon, ShoppingBagIcon, ArrowPathIcon, ArrowTrendingUpIcon, CurrencyDollarIcon, ChevronRightIcon, ChevronDownIcon, FolderIcon, DocumentTextIcon, TruckIcon, ExclamationTriangleIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { Package, CheckCircle2 } from 'lucide-react';
@@ -360,9 +361,16 @@ const Stock = () => {
                             <ChevronRightIcon className="w-4 h-4 mr-2 text-gray-500" />
                           )}
                           <FolderIcon className={`w-5 h-5 mr-3 ${activeTab === 'use' ? 'text-blue-500' : 'text-green-500'}`} />
-                          <span className="font-medium text-gray-900 dark:text-white">
-                            {item.categoryName}
-                          </span>
+                          <div className="flex flex-col">
+                            <span className="font-medium text-gray-900 dark:text-white">
+                              {item.categoryName}
+                            </span>
+                            {item.aliases && item.aliases.length > 0 && (
+                              <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                ({item.aliases.join(', ')})
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
                       {activeTab === 'use' ? (
@@ -619,7 +627,12 @@ const Stock = () => {
                                                 {sku.purchaseHistory.map((record, recordIndex) => (
                                                   <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                                                     <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
-                                                      {record.orderNumber}
+                                                      <div className="flex items-center gap-2">
+                                                        <span>{record.orderNumber}</span>
+                                                        {record.source === 'manual' && (
+                                                          <Badge variant="info" className="text-xs">MANUAL</Badge>
+                                                        )}
+                                                      </div>
                                                     </td>
                                                     <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
                                                       {record.orderDate ? new Date(record.orderDate).toLocaleDateString() : '-'}
@@ -698,7 +711,12 @@ const Stock = () => {
                                                     {sku.purchaseHistory.map((record, recordIndex) => (
                                                       <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                                                         <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
-                                                          {record.orderNumber}
+                                                          <div className="flex items-center gap-2">
+                                                            <span>{record.orderNumber}</span>
+                                                            {record.source === 'manual' && (
+                                                              <Badge variant="info" className="text-xs">MANUAL</Badge>
+                                                            )}
+                                                          </div>
                                                         </td>
                                                         <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
                                                           {record.orderDate ? new Date(record.orderDate).toLocaleDateString() : '-'}

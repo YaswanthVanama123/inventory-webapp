@@ -5,8 +5,9 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api',
   headers: {
     'Content-Type': 'application/json',
+    'Accept-Encoding': 'gzip, deflate, br'
   },
-  timeout: 15000,
+  timeout: 30000, // Increased to 30 seconds for optimized endpoints
 });
 const activeRequests = new Map();
 const RETRY_CONFIG = {

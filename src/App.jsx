@@ -24,11 +24,14 @@ const Stock = lazy(() => import('./pages/inventory/Stock'));
 const OrdersList = lazy(() => import('./pages/orders/OrdersList'));
 const OrderDetail = lazy(() => import('./pages/orders/OrderDetail'));
 const OrderVerification = lazy(() => import('./pages/orders/OrderVerification'));
+const ManualOrderForm = lazy(() => import('./pages/orders/ManualOrderForm'));
 const PendingInvoices = lazy(() => import('./pages/routestar/PendingInvoices'));
 const ClosedInvoices = lazy(() => import('./pages/routestar/ClosedInvoices'));
 const RouteStarInvoiceDetail = lazy(() => import('./pages/routestar/RouteStarInvoiceDetail'));
 const ModelCategoryMapping = lazy(() => import('./pages/routestar/ModelCategoryMapping'));
 const ItemNameAliasMapping = lazy(() => import('./pages/routestar/ItemNameAliasMapping'));
+const ManualPOItems = lazy(() => import('./pages/routestar/ManualPOItems'));
+const VendorManagement = lazy(() => import('./pages/vendors/VendorManagement'));
 const RouteStarItemsList = lazy(() => import('./pages/routestar/RouteStarItemsList'));
 const RouteStarSalesReport = lazy(() => import('./pages/routestar/SalesReport'));
 const ItemsInvoiceUsage = lazy(() => import('./pages/routestar/ItemsInvoiceUsage'));
@@ -168,6 +171,16 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute>
                         <OrdersList />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/orders/create"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <ManualOrderForm />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }
@@ -356,6 +369,28 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute requireAdmin>
                         <RouteStarItemsList />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                {}
+                <Route
+                  path="/manual-po-items"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <ManualPOItems />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                {}
+                <Route
+                  path="/vendors"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <VendorManagement />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

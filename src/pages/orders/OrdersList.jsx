@@ -32,6 +32,7 @@ const OrdersList = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [stockProcessedFilter, setStockProcessedFilter] = useState('');
   const [verifiedFilter, setVerifiedFilter] = useState('');
+  const [sourceFilter, setSourceFilter] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -61,7 +62,7 @@ const OrdersList = () => {
   }, [searchTerm]);
   useEffect(() => {
     fetchOrders();
-  }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, verifiedFilter, dateFrom, dateTo, debouncedSearchTerm]);
+  }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, verifiedFilter, sourceFilter, dateFrom, dateTo, debouncedSearchTerm]);
   useEffect(() => {
     if (!autoSyncEnabled) return;
     const intervalMs = autoSyncInterval * 60 * 1000;
@@ -97,6 +98,9 @@ const OrdersList = () => {
       }
       if (verifiedFilter !== '') {
         params.verified = verifiedFilter;
+      }
+      if (sourceFilter) {
+        params.source = sourceFilter;
       }
       if (dateFrom) {
         params.startDate = dateFrom;
@@ -262,6 +266,10 @@ const OrdersList = () => {
     setVerifiedFilter(e.target.value);
     setCurrentPage(1);
   };
+  const handleSourceFilterChange = (e) => {
+    setSourceFilter(e.target.value);
+    setCurrentPage(1);
+  };
   const handleDateFromChange = (e) => {
     setDateFrom(e.target.value);
     setCurrentPage(1);
@@ -275,6 +283,7 @@ const OrdersList = () => {
     setStatusFilter('');
     setStockProcessedFilter('');
     setVerifiedFilter('');
+    setSourceFilter('');
     setDateFrom('');
     setDateTo('');
     setCurrentPage(1);
@@ -468,6 +477,17 @@ const OrdersList = () => {
           </div>
           {isAdmin && (
             <div className="flex gap-2 items-center">
+              <Button
+                onClick={() => navigate('/orders/create')}
+                variant="success"
+                size="sm"
+                className="whitespace-nowrap"
+              >
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Create Order
+              </Button>
               <Button
                 onClick={() => setShowSyncOptions(!showSyncOptions)}
                 variant="secondary"
@@ -711,7 +731,7 @@ const OrdersList = () => {
       {}
       <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
         {}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           <div className="lg:col-span-2">
             <SearchBar
               value={searchTerm}
@@ -722,6 +742,15 @@ const OrdersList = () => {
               loading={loading && searchTerm !== debouncedSearchTerm}
             />
           </div>
+          <Select
+            value={sourceFilter}
+            onChange={handleSourceFilterChange}
+            className="w-full"
+          >
+            <option value="">All Sources</option>
+            <option value="customerconnect">Synced</option>
+            <option value="manual">Manual</option>
+          </Select>
           <Select
             value={statusFilter}
             onChange={handleStatusFilterChange}
@@ -918,8 +947,13 @@ const OrdersList = () => {
                           </td>
                         )}
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-slate-900 dark:text-white">
-                          #{order.orderNumber}
+                        <div className="flex items-center gap-2">
+                          <div className="text-sm font-medium text-slate-900 dark:text-white">
+                            #{order.orderNumber}
+                          </div>
+                          {order.source === 'manual' && (
+                            <Badge variant="info" className="text-xs">MANUAL</Badge>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4">

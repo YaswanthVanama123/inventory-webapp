@@ -48,9 +48,16 @@ const ManualOrderForm = () => {
         manualPOItemService.getActiveItems()
       ]);
 
-      setOrderNumber(orderNumData.data.orderNumber);
-      setVendors(vendorsData.vendors || []);
-      setManualPOItems(itemsData.items || []);
+      // Handle different API response formats
+      const orderNum = orderNumData.data?.orderNumber || orderNumData.orderNumber || '';
+      const vendorsList = Array.isArray(vendorsData.data) ? vendorsData.data : (vendorsData.data?.vendors || vendorsData.vendors || []);
+      const itemsList = Array.isArray(itemsData.data) ? itemsData.data : (itemsData.data?.items || itemsData.items || []);
+
+      setOrderNumber(orderNum);
+      setVendors(vendorsList);
+      setManualPOItems(itemsList);
+
+      console.log('Loaded data:', { orderNum, vendorsList, itemsList });
     } catch (error) {
       showError('Failed to load form data: ' + error.message);
       navigate('/orders');
@@ -86,8 +93,11 @@ const ManualOrderForm = () => {
 
       // Reload vendors and select the new one
       const vendorsData = await vendorService.getActiveVendors();
-      setVendors(vendorsData.vendors || []);
-      setSelectedVendor(response.data._id);
+      const vendorsList = Array.isArray(vendorsData.data) ? vendorsData.data : (vendorsData.data?.vendors || vendorsData.vendors || []);
+      setVendors(vendorsList);
+
+      const newVendorId = response.data?.data?._id || response.data?._id || response._id;
+      setSelectedVendor(newVendorId);
       setShowNewVendorForm(false);
       setNewVendor({ name: '', email: '', phone: '', address: '' });
     } catch (error) {
@@ -101,8 +111,8 @@ const ManualOrderForm = () => {
 
     // If SKU changed, auto-fill name
     if (field === 'sku') {
-      const item = manualPOItems.find(i => i._id === value);
-      if (item) {
+      const item = manualPOItems.find(i => i?._id === value);
+      if (item && item.name && item.sku) {
         newItems[index].name = item.name;
         newItems[index].sku = item.sku;
       }
@@ -162,17 +172,41 @@ const ManualOrderForm = () => {
     try {
       setSubmitting(true);
 
-      let vendorData;
+      let vendorData = null;
+
       if (showNewVendorForm) {
         // Create vendor first
         const vendorResponse = await vendorService.createVendor(newVendor);
-        const vendor = await vendorService.getVendorById(vendorResponse.data._id);
-        vendorData = vendor.data;
+        console.log('Create vendor response:', vendorResponse);
+
+        // Extract vendor ID from response (handle different API response formats)
+        const vendorId = vendorResponse.data?.data?._id || vendorResponse.data?._id || vendorResponse._id;
+
+        if (!vendorId) {
+          throw new Error('Failed to get vendor ID from response');
+        }
+
+        // Fetch the full vendor details
+        const vendorResult = await vendorService.getVendorById(vendorId);
+        console.log('Fetch vendor result:', vendorResult);
+
+        // Extract vendor data (handle different API response formats)
+        vendorData = vendorResult.data || vendorResult;
       } else {
         // Get selected vendor
-        const vendor = await vendorService.getVendorById(selectedVendor);
-        vendorData = vendor.data;
+        const vendorResult = await vendorService.getVendorById(selectedVendor);
+        console.log('Fetch vendor result:', vendorResult);
+
+        // Extract vendor data (handle different API response formats)
+        vendorData = vendorResult.data || vendorResult;
       }
+
+      // Ensure we have valid vendor data
+      if (!vendorData || !vendorData.name) {
+        throw new Error('Invalid vendor data received');
+      }
+
+      console.log('Final vendor data:', vendorData);
 
       // Prepare order data
       const orderData = {
@@ -192,10 +226,13 @@ const ManualOrderForm = () => {
         notes
       };
 
+      console.log('Submitting order data:', orderData);
+
       await manualOrderService.createManualOrder(orderData);
       showSuccess('Manual order created successfully and stock processed');
       navigate('/orders');
     } catch (error) {
+      console.error('Form submission error:', error);
       showError(error.message || 'Failed to create order');
     } finally {
       setSubmitting(false);
@@ -258,14 +295,14 @@ const ManualOrderForm = () => {
             {!showNewVendorForm ? (
               <SearchableSelect
                 options={[
-                  ...vendors,
+                  ...vendors.filter(v => v && v._id && v.name),
                   { _id: 'new', name: '+ Add New Vendor' }
                 ]}
                 value={selectedVendor}
                 onChange={handleVendorChange}
                 placeholder="Select vendor..."
-                getOptionLabel={(option) => option.name}
-                getOptionValue={(option) => option._id}
+                getOptionLabel={(option) => option?.name || 'Unknown'}
+                getOptionValue={(option) => option?._id || ''}
               />
             ) : (
               <div className="space-y-3 p-4 border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -372,12 +409,12 @@ const ManualOrderForm = () => {
                     Item *
                   </label>
                   <SearchableSelect
-                    options={manualPOItems}
-                    value={item.sku ? manualPOItems.find(i => i.sku === item.sku)?._id : ''}
+                    options={manualPOItems.filter(i => i && i._id && i.sku && i.name)}
+                    value={item.sku ? manualPOItems.find(i => i?.sku === item.sku)?._id : ''}
                     onChange={(value) => handleItemChange(index, 'sku', value)}
                     placeholder="Select item..."
-                    getOptionLabel={(option) => `${option.sku} - ${option.name}`}
-                    getOptionValue={(option) => option._id}
+                    getOptionLabel={(option) => option ? `${option.sku} - ${option.name}` : 'Unknown'}
+                    getOptionValue={(option) => option?._id || ''}
                   />
                 </div>
 

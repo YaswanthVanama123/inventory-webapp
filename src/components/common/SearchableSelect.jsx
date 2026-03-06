@@ -22,13 +22,24 @@ const SearchableSelect = ({
   const containerRef = useRef(null);
   const searchInputRef = useRef(null);
   useEffect(() => {
+    // Ensure options is always an array
+    const safeOptions = Array.isArray(options) ? options : [];
+
     if (!searchTerm) {
-      setFilteredOptions(options);
+      setFilteredOptions(safeOptions);
     } else {
       const searchLower = searchTerm.toLowerCase();
-      const filtered = options.filter(option => {
-        const label = getOptionLabel ? getOptionLabel(option) : option.label || String(option);
-        return label.toLowerCase().includes(searchLower);
+      const filtered = safeOptions.filter(option => {
+        // Safety check for undefined options
+        if (!option) return false;
+
+        try {
+          const label = getOptionLabel ? getOptionLabel(option) : option.label || String(option);
+          return label && label.toLowerCase().includes(searchLower);
+        } catch (error) {
+          console.error('Error filtering option:', option, error);
+          return false;
+        }
       });
       setFilteredOptions(filtered);
     }
@@ -67,13 +78,29 @@ const SearchableSelect = ({
     onChange('');
     setSearchTerm('');
   };
-  const selectedOption = options.find(option => {
-    const optionValue = getOptionValue ? getOptionValue(option) : option.value || option;
-    return optionValue === value;
-  });
-  const selectedLabel = selectedOption
-    ? (getOptionLabel ? getOptionLabel(selectedOption) : selectedOption.label || String(selectedOption))
-    : '';
+  const selectedOption = Array.isArray(options) && options.length > 0
+    ? options.find(option => {
+        if (!option) return false;
+        try {
+          const optionValue = getOptionValue ? getOptionValue(option) : option.value || option;
+          return optionValue === value;
+        } catch {
+          return false;
+        }
+      })
+    : null;
+
+  let selectedLabel = '';
+  if (selectedOption) {
+    try {
+      selectedLabel = getOptionLabel
+        ? getOptionLabel(selectedOption)
+        : (selectedOption.label || String(selectedOption) || '');
+    } catch (error) {
+      console.error('Error getting option label:', error);
+      selectedLabel = '';
+    }
+  }
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       {}
@@ -132,8 +159,17 @@ const SearchableSelect = ({
               </div>
             ) : (
               filteredOptions.map((option, index) => {
-                const optionValue = getOptionValue ? getOptionValue(option) : option.value || option;
-                const optionLabel = getOptionLabel ? getOptionLabel(option) : option.label || String(option);
+                if (!option) return null;
+
+                let optionValue, optionLabel;
+                try {
+                  optionValue = getOptionValue ? getOptionValue(option) : option.value || option;
+                  optionLabel = getOptionLabel ? getOptionLabel(option) : option.label || String(option);
+                } catch (error) {
+                  console.error('Error rendering option:', option, error);
+                  return null;
+                }
+
                 const isSelected = optionValue === value;
                 return (
                   <button

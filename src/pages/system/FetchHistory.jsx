@@ -241,7 +241,7 @@ const FetchHistory = () => {
         {/* Left Sidebar - Builds List */}
         <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
           {/* Search */}
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input

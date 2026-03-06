@@ -218,7 +218,7 @@ const RouteStarItemsList = () => {
         </div>
       </div>
       {}
-      <Card>
+      <Card className="sticky top-0 z-20">
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {}

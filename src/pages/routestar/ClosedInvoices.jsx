@@ -607,7 +607,7 @@ const ClosedInvoices = () => {
         )}
       </div>
       {}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
+      <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <SearchBar
             value={searchTerm}
@@ -850,7 +850,7 @@ const ClosedInvoices = () => {
               </table>
             </div>
             {}
-            <div className="border-t border-slate-200 dark:border-gray-700">
+            <div className="border-t border-slate-200 dark:border-gray-700 p-4">
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}

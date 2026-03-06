@@ -261,7 +261,7 @@ const InvoiceList = () => {
         </div>
       </div>
       {}
-      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
+      <div className="sticky top-0 z-20 bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="space-y-4">
           {}
           <div className="w-full">

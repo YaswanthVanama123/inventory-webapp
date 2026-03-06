@@ -388,7 +388,7 @@ const OrdersList = () => {
     );
   }
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 sm:px-6 pb-6">
       {}
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -565,7 +565,7 @@ const OrdersList = () => {
         )}
       </div>
       {}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
+      <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
         {}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="lg:col-span-2">
@@ -853,7 +853,7 @@ const OrdersList = () => {
               </table>
             </div>
             {}
-            <div className="border-t border-slate-200 dark:border-gray-700">
+            <div className="border-t border-slate-200 dark:border-gray-700 p-4">
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}

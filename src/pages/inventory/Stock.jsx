@@ -118,7 +118,7 @@ const Stock = () => {
         </Button>
       </div>
       {}
-      <Card>
+      <Card className="sticky top-0 z-20">
         <div className="flex border-b border-gray-200 dark:border-gray-700">
           <button
             onClick={() => {

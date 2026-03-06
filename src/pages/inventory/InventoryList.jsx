@@ -467,7 +467,7 @@ const InventoryList = () => {
         </div>
       </div>
       {}
-      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
+      <div className="sticky top-0 z-20 bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="space-y-4">
           {}
           {activeTab === 'purchases' && (
@@ -581,7 +581,7 @@ const InventoryList = () => {
         </div>
       </div>
       {}
-      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
+      <div className="sticky top-0 z-20 bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="flex items-center gap-3 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-1.5 max-w-2xl border border-slate-200 dark:border-gray-700">
           <button
             onClick={() => setActiveTab('purchases')}

@@ -33,6 +33,8 @@ const ItemNameAliasMapping = lazy(() => import('./pages/routestar/ItemNameAliasM
 const ManualPOItems = lazy(() => import('./pages/routestar/ManualPOItems'));
 const VendorManagement = lazy(() => import('./pages/vendors/VendorManagement'));
 const RouteStarItemsList = lazy(() => import('./pages/routestar/RouteStarItemsList'));
+const RouteStarCustomersList = lazy(() => import('./pages/routestar/RouteStarCustomersList'));
+const RouteStarCustomerDetail = lazy(() => import('./pages/routestar/RouteStarCustomerDetail'));
 const RouteStarSalesReport = lazy(() => import('./pages/routestar/SalesReport'));
 const ItemsInvoiceUsage = lazy(() => import('./pages/routestar/ItemsInvoiceUsage'));
 const PointOfSale = lazy(() => import('./pages/pos/PointOfSale'));
@@ -370,6 +372,26 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute requireAdmin>
                         <RouteStarItemsList />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/routestar/customers"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <RouteStarCustomersList />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/routestar/customers/:customerId"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <RouteStarCustomerDetail />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

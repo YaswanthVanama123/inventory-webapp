@@ -234,6 +234,11 @@ const adminMenuItems = [
     icon: PackageIcon
   },
   {
+    label: 'RouteStar Customers',
+    path: '/routestar/customers',
+    icon: UsersIcon
+  },
+  {
     label: 'Manual PO Items',
     path: '/manual-po-items',
     icon: TagIcon
@@ -354,6 +359,11 @@ const employeeMenuItems = [
     label: 'RouteStar Items',
     path: '/routestar/items',
     icon: PackageIcon
+  },
+  {
+    label: 'RouteStar Customers',
+    path: '/routestar/customers',
+    icon: UsersIcon
   },
   {
     label: 'Sales Report',

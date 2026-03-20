@@ -270,6 +270,7 @@ const adminMenuItems = [
       { label: 'Overview', path: '/reports', icon: ChartIcon },
       { label: 'Sales Report', path: '/reports/sales', icon: ChartIcon },
       { label: 'Low Stock', path: '/reports/low-stock', icon: WarningIcon },
+      { label: 'Customer Export', path: '/reports/customer-export', icon: ChartIcon },
     ]
   },
   {

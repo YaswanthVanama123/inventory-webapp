@@ -50,6 +50,7 @@ const SalesReport = lazy(() => import('./pages/reports/SalesReport'));
 const ToastDemo = lazy(() => import('./pages/ToastDemo'));
 const ErrorBoundaryDemo = lazy(() => import('./pages/ErrorBoundaryDemo'));
 const LowStockReport = lazy(() => import('./pages/reports/LowStockReport'));
+const CustomerExport = lazy(() => import('./pages/reports/CustomerExport'));
 const UserProfile = lazy(() => import('./pages/profile/UserProfile'));
 const Settings = lazy(() => import('./pages/settings/Settings'));
 const Trash = lazy(() => import('./pages/trash/Trash'));
@@ -486,6 +487,16 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute requireAdmin>
                         <LowStockReport />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/reports/customer-export"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <CustomerExport />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

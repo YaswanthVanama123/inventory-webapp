@@ -24,7 +24,9 @@ const RouteStarInvoiceDetail = () => {
     try {
       const response = await getInvoiceByNumber(invoiceNumber);
       if (response.success) {
-        setInvoice(response.data);
+        // Handle double-nested response structure
+        const invoiceData = response.data?.data || response.data;
+        setInvoice(invoiceData);
       }
     } catch (err) {
       console.error('Error fetching invoice:', err);
@@ -191,6 +193,26 @@ const RouteStarInvoiceDetail = () => {
                   {invoice.customer?.name || 'N/A'}
                 </p>
               </div>
+              {invoice.customer?.email && (
+                <div>
+                  <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                    Email
+                  </label>
+                  <p className="text-base text-slate-900 dark:text-white mt-1">
+                    {invoice.customer.email}
+                  </p>
+                </div>
+              )}
+              {invoice.customer?.phone && (
+                <div>
+                  <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                    Phone
+                  </label>
+                  <p className="text-base text-slate-900 dark:text-white mt-1">
+                    {invoice.customer.phone}
+                  </p>
+                </div>
+              )}
               {invoice.customer?.address && (
                 <div>
                   <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
@@ -204,12 +226,22 @@ const RouteStarInvoiceDetail = () => {
             </div>
           </div>
           {}
-          {(invoice.assignedTo || invoice.signedBy || invoice.serviceNotes || invoice.invoiceMemo) && (
+          {(invoice.assignedTo || invoice.signedBy || invoice.serviceNotes || invoice.invoiceMemo || invoice.enteredBy || invoice.customerGrouping) && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
                 Additional Information
               </h2>
               <div className="space-y-3">
+                {invoice.enteredBy && (
+                  <div>
+                    <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                      Entered By
+                    </label>
+                    <p className="text-base text-slate-900 dark:text-white mt-1">
+                      {invoice.enteredBy}
+                    </p>
+                  </div>
+                )}
                 {invoice.assignedTo && (
                   <div>
                     <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
@@ -227,6 +259,16 @@ const RouteStarInvoiceDetail = () => {
                     </label>
                     <p className="text-base text-slate-900 dark:text-white mt-1">
                       {invoice.signedBy}
+                    </p>
+                  </div>
+                )}
+                {invoice.customerGrouping && (
+                  <div>
+                    <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                      Customer Grouping
+                    </label>
+                    <p className="text-base text-slate-900 dark:text-white mt-1">
+                      {invoice.customerGrouping}
                     </p>
                   </div>
                 )}
@@ -278,6 +320,26 @@ const RouteStarInvoiceDetail = () => {
                   {invoice.invoiceType}
                 </p>
               </div>
+              {invoice.stop !== undefined && invoice.stop !== null && (
+                <div>
+                  <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                    Stop Number
+                  </label>
+                  <p className="text-base text-slate-900 dark:text-white mt-1">
+                    {invoice.stop}
+                  </p>
+                </div>
+              )}
+              {invoice.dateCompleted && (
+                <div>
+                  <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                    Date Completed
+                  </label>
+                  <p className="text-base text-slate-900 dark:text-white mt-1">
+                    {formatDate(invoice.dateCompleted)}
+                  </p>
+                </div>
+              )}
               {invoice.salesTaxRate && (
                 <div>
                   <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
@@ -290,6 +352,47 @@ const RouteStarInvoiceDetail = () => {
               )}
             </div>
           </div>
+
+          {/* Time & Duration */}
+          {(invoice.arrivalTime || invoice.departureTime || invoice.elapsedTime) && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+                Time & Duration
+              </h2>
+              <div className="space-y-3">
+                {invoice.arrivalTime && (
+                  <div>
+                    <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                      Arrival Time
+                    </label>
+                    <p className="text-base text-slate-900 dark:text-white mt-1">
+                      {invoice.arrivalTime}
+                    </p>
+                  </div>
+                )}
+                {invoice.departureTime && (
+                  <div>
+                    <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                      Departure Time
+                    </label>
+                    <p className="text-base text-slate-900 dark:text-white mt-1">
+                      {invoice.departureTime}
+                    </p>
+                  </div>
+                )}
+                {invoice.elapsedTime && (
+                  <div>
+                    <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                      Elapsed Time
+                    </label>
+                    <p className="text-base text-slate-900 dark:text-white mt-1">
+                      {invoice.elapsedTime}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -318,6 +421,82 @@ const RouteStarInvoiceDetail = () => {
               </div>
             </div>
           </div>
+
+          {/* Payment Information */}
+          {(invoice.payment || invoice.paymentMethod) && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+                Payment Information
+              </h2>
+              <div className="space-y-3">
+                {invoice.paymentMethod && (
+                  <div>
+                    <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                      Payment Method
+                    </label>
+                    <p className="text-base text-slate-900 dark:text-white mt-1">
+                      {invoice.paymentMethod}
+                    </p>
+                  </div>
+                )}
+                {invoice.payment && (
+                  <div>
+                    <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                      Payment
+                    </label>
+                    <p className="text-base text-slate-900 dark:text-white mt-1">
+                      {invoice.payment}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Posting Information */}
+          {(invoice.postedBy || invoice.postedTimestamp || invoice.isPosted) && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+                Posting Information
+              </h2>
+              <div className="space-y-3">
+                {invoice.isPosted !== undefined && (
+                  <div>
+                    <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                      Posted Status
+                    </label>
+                    <p className="text-base text-slate-900 dark:text-white mt-1">
+                      {invoice.isPosted ? (
+                        <Badge variant="success" size="sm">Posted</Badge>
+                      ) : (
+                        <Badge variant="secondary" size="sm">Not Posted</Badge>
+                      )}
+                    </p>
+                  </div>
+                )}
+                {invoice.postedBy && (
+                  <div>
+                    <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                      Posted By
+                    </label>
+                    <p className="text-base text-slate-900 dark:text-white mt-1">
+                      {invoice.postedBy}
+                    </p>
+                  </div>
+                )}
+                {invoice.postedTimestamp && (
+                  <div>
+                    <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
+                      Posted Timestamp
+                    </label>
+                    <p className="text-base text-slate-900 dark:text-white mt-1">
+                      {formatDate(invoice.postedTimestamp)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
       {}

@@ -35,6 +35,8 @@ const VendorManagement = lazy(() => import('./pages/vendors/VendorManagement'));
 const RouteStarItemsList = lazy(() => import('./pages/routestar/RouteStarItemsList'));
 const RouteStarCustomersList = lazy(() => import('./pages/routestar/RouteStarCustomersList'));
 const RouteStarCustomerDetail = lazy(() => import('./pages/routestar/RouteStarCustomerDetail'));
+const RouteStarClosedInvoiceCustomers = lazy(() => import('./pages/routestar/RouteStarClosedInvoiceCustomers'));
+const GoAuditsLocations = lazy(() => import('./pages/goaudits/GoAuditsLocations'));
 const RouteStarSalesReport = lazy(() => import('./pages/routestar/SalesReport'));
 const ItemsInvoiceUsage = lazy(() => import('./pages/routestar/ItemsInvoiceUsage'));
 const PointOfSale = lazy(() => import('./pages/pos/PointOfSale'));
@@ -392,6 +394,26 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute requireAdmin>
                         <RouteStarCustomerDetail />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/routestar/closed-invoice-customers"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <RouteStarClosedInvoiceCustomers />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/goaudits/locations"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <GoAuditsLocations />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

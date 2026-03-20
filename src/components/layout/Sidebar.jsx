@@ -239,6 +239,16 @@ const adminMenuItems = [
     icon: UsersIcon
   },
   {
+    label: 'Closed Invoice Customers',
+    path: '/routestar/closed-invoice-customers',
+    icon: UsersIcon
+  },
+  {
+    label: 'GoAudits Locations',
+    path: '/goaudits/locations',
+    icon: BuildingIcon
+  },
+  {
     label: 'Manual PO Items',
     path: '/manual-po-items',
     icon: TagIcon

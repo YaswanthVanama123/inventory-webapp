@@ -29,6 +29,14 @@ const routeStarCustomerService = {
   syncCustomerDetails: async (params = {}) => {
     const response = await api.post('/routestar-customers/sync-details', {}, { params });
     return response.data;
+  },
+
+  getCustomersFromClosedInvoices: async (startDate, endDate) => {
+    const params = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    const response = await api.get('/routestar-customers/from-closed-invoices', { params });
+    return response.data;
   }
 };
 

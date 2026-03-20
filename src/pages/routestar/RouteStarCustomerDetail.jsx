@@ -225,6 +225,35 @@ const RouteStarCustomerDetail = () => {
                     </div>
                   )}
                 </address>
+                {(customer.latitude || customer.longitude) && (
+                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="text-sm space-y-2">
+                      {customer.latitude && (
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-gray-500 dark:text-gray-400">Latitude:</span>
+                          <span className="text-gray-900 dark:text-white font-mono">{customer.latitude}</span>
+                        </div>
+                      )}
+                      {customer.longitude && (
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-gray-500 dark:text-gray-400">Longitude:</span>
+                          <span className="text-gray-900 dark:text-white font-mono">{customer.longitude}</span>
+                        </div>
+                      )}
+                      {customer.latitude && customer.longitude && (
+                        <a
+                          href={`https://www.google.com/maps?q=${customer.latitude},${customer.longitude}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium mt-2"
+                        >
+                          <MapPinIcon className="h-4 w-4" />
+                          View on Google Maps
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </Card>
 

@@ -24,11 +24,13 @@
     @apply font-sans text-base text-dark-800 bg-light;
     min-height: 100vh;
     scroll-behavior: smooth;
+    max-width: 100vw; /* Prevent body from exceeding viewport width */
   }
 
   html, body, #root {
     width: 100%;
     height: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
   }
 
   /* Heading styles */
@@ -438,6 +440,27 @@
 
   .mobile-scroll-inner {
     @apply inline-block min-w-full align-middle px-4 sm:px-0;
+  }
+
+  /* Responsive table wrapper */
+  .table-responsive {
+    @apply overflow-x-auto;
+  }
+
+  .table-responsive table {
+    @apply min-w-full;
+  }
+
+  /* Ensure tables don't break layout on mobile */
+  table {
+    @apply max-w-full;
+  }
+
+  /* Word break for long text in table cells */
+  td {
+    @apply break-words;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   /* Prevent text selection */

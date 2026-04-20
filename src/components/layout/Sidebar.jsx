@@ -171,113 +171,132 @@ const ShieldCheckIcon = () => (
   </svg>
 );
 const adminMenuItems = [
+  // === CORE OPERATIONS ===
   {
     label: 'Dashboard',
     path: '/dashboard',
-    icon: DashboardIcon
+    icon: DashboardIcon,
+    section: 'Core'
+  },
+
+  // === INVENTORY MANAGEMENT ===
+  {
+    label: 'Stock',
+    path: '/stock',
+    icon: PackageIcon,
+    section: 'Inventory'
   },
   {
-    label: 'Inventory',
+    label: 'Inventory Items',
     path: '/inventory',
     icon: InventoryIcon,
+    section: 'Inventory',
     submenu: [
       { label: 'View All', path: '/inventory', icon: ListIcon },
       { label: 'Add New Item', path: '/inventory/new', icon: AddIcon },
     ]
   },
   {
-    label: 'Stock',
-    path: '/stock',
-    icon: PackageIcon
-  },
-  {
     label: 'Discrepancies',
     path: '/discrepancies',
-    icon: AlertTriangleIcon
+    icon: AlertTriangleIcon,
+    section: 'Inventory'
   },
-  {
-    label: 'Truck Checkouts',
-    path: '/truck-checkouts',
-    icon: TruckIcon,
-    submenu: [
-      { label: 'View All', path: '/truck-checkouts', icon: ListIcon },
-      { label: 'New Checkout', path: '/truck-checkouts/new', icon: AddIcon },
-    ]
-  },
+
+  // === DAILY OPERATIONS ===
   {
     label: 'Orders',
     path: '/orders',
-    icon: ClipboardListIcon,
+    icon: ShoppingCartIcon,
+    section: 'Operations',
     submenu: [
       { label: 'View All', path: '/orders', icon: ListIcon },
       { label: 'Create Order', path: '/orders/create', icon: AddIcon },
     ]
   },
   {
+    label: 'Truck Checkouts',
+    path: '/truck-checkouts',
+    icon: TruckIcon,
+    section: 'Operations',
+    submenu: [
+      { label: 'View All', path: '/truck-checkouts', icon: ListIcon },
+      { label: 'New Checkout', path: '/truck-checkouts/new', icon: AddIcon },
+    ]
+  },
+  {
     label: 'Invoices',
     path: '/invoices',
     icon: InvoicesIcon,
+    section: 'Operations',
     submenu: [
       { label: 'View All', path: '/invoices', icon: ListIcon },
       { label: 'Create New', path: '/invoices/new', icon: AddIcon },
-      { label: 'Pending (RouteStar)', path: '/invoices/routestar/pending', icon: ListIcon },
-      { label: 'Closed (RouteStar)', path: '/invoices/routestar/closed', icon: ListIcon },
+      { label: 'Pending (RouteStar)', path: '/invoices/routestar/pending', icon: ClockHistoryIcon },
+      { label: 'Closed (RouteStar)', path: '/invoices/routestar/closed', icon: CheckCircleIcon },
     ]
+  },
+
+  // === ROUTESTAR INTEGRATION ===
+  {
+    label: 'RouteStar Items',
+    path: '/routestar/items',
+    icon: CubeIcon,
+    section: 'RouteStar'
   },
   {
     label: 'Model Mapping',
     path: '/routestar/model-mapping',
-    icon: LinkIcon
+    icon: LinkIcon,
+    section: 'RouteStar'
   },
   {
     label: 'Item Alias Mapping',
     path: '/routestar/item-alias-mapping',
-    icon: LinkIcon
+    icon: LinkIcon,
+    section: 'RouteStar'
   },
+
+  // === MASTER DATA ===
   {
-    label: 'RouteStar Items',
-    path: '/routestar/items',
-    icon: PackageIcon
-  },
-  {
-    label: 'RouteStar Customers',
-    path: '/routestar/customers',
-    icon: UsersIcon
-  },
-  {
-    label: 'Closed Invoice Customers',
-    path: '/routestar/closed-invoice-customers',
-    icon: UsersIcon
-  },
-  {
-    label: 'GoAudits Locations',
-    path: '/goaudits/locations',
-    icon: BuildingIcon
+    label: 'Vendors',
+    path: '/vendors',
+    icon: BuildingIcon,
+    section: 'Master Data'
   },
   {
     label: 'Manual PO Items',
     path: '/manual-po-items',
-    icon: TagIcon
+    icon: TagIcon,
+    section: 'Master Data'
   },
-  {
-    label: 'Vendors',
-    path: '/vendors',
-    icon: BuildingIcon
-  },
+
+  // === REPORTS & ANALYTICS ===
   {
     label: 'Sales Report',
     path: '/routestar/sales-report',
-    icon: ChartIcon
+    icon: ChartIcon,
+    section: 'Reports'
   },
   {
     label: 'Items Invoice Usage',
     path: '/routestar/items-invoice-usage',
-    icon: FolderIcon
+    icon: FolderIcon,
+    section: 'Reports'
   },
+  {
+    label: 'Employee Activities',
+    path: '/activities',
+    icon: ActivityIcon,
+    section: 'Reports'
+  },
+
+  // === SYSTEM & ADMIN ===
   {
     label: 'Users',
     path: '/users',
     icon: UsersIcon,
+    section: 'Administration',
     submenu: [
       { label: 'View All', path: '/users', icon: ListIcon },
       { label: 'Add New User', path: '/users/new', icon: AddIcon },
@@ -286,125 +305,129 @@ const adminMenuItems = [
   {
     label: 'Screen Permissions',
     path: '/admin/screen-permissions',
-    icon: ShieldCheckIcon
-  },
-  {
-    label: 'Reports',
-    path: '/reports',
-    icon: ReportsIcon,
-    submenu: [
-      { label: 'Overview', path: '/reports', icon: ChartIcon },
-      { label: 'Sales Report', path: '/reports/sales', icon: ChartIcon },
-      { label: 'Low Stock', path: '/reports/low-stock', icon: WarningIcon },
-      { label: 'Customer Export', path: '/reports/customer-export', icon: ChartIcon },
-    ]
-  },
-  {
-    label: 'Employee Activities',
-    path: '/activities',
-    icon: ActivityIcon
-  },
-  {
-    label: 'Fetch History',
-    path: '/system/fetch-history',
-    icon: ClockHistoryIcon
+    icon: ShieldCheckIcon,
+    section: 'Administration'
   },
   {
     label: 'Settings',
     path: '/settings',
-    icon: SettingsIcon
+    icon: SettingsIcon,
+    section: 'Administration'
   },
+  {
+    label: 'Fetch History',
+    path: '/system/fetch-history',
+    icon: ClockHistoryIcon,
+    section: 'Administration'
+  },
+
+  // === PERSONAL ===
   {
     label: 'Profile',
     path: '/profile',
-    icon: ProfileIcon
+    icon: ProfileIcon,
+    section: 'Personal'
   },
 ];
+
 const employeeMenuItems = [
+  // === CORE ===
   {
     label: 'Dashboard',
     path: '/dashboard',
-    icon: DashboardIcon
+    icon: DashboardIcon,
+    section: 'Core'
+  },
+
+  // === STOCK & INVENTORY ===
+  {
+    label: 'Stock',
+    path: '/stock',
+    icon: PackageIcon,
+    section: 'Inventory'
   },
   {
-    label: 'My Work',
-    path: '/my-work',
-    icon: TruckIcon
-  },
-  {
-    label: 'Inventory',
+    label: 'Inventory Items',
     path: '/inventory',
     icon: InventoryIcon,
+    section: 'Inventory',
     submenu: [
       { label: 'View All', path: '/inventory', icon: ListIcon },
     ]
   },
   {
-    label: 'Stock',
-    path: '/stock',
-    icon: PackageIcon
-  },
-  {
     label: 'Discrepancies',
     path: '/discrepancies',
-    icon: AlertTriangleIcon
+    icon: AlertTriangleIcon,
+    section: 'Inventory'
+  },
+
+  // === MY DAILY WORK ===
+  {
+    label: 'Orders',
+    path: '/orders',
+    icon: ClipboardListIcon,
+    section: 'Daily Work',
+    submenu: [
+      { label: 'View All', path: '/orders', icon: ListIcon },
+    ]
   },
   {
     label: 'Truck Checkouts',
     path: '/truck-checkouts',
     icon: TruckIcon,
+    section: 'Daily Work',
     submenu: [
       { label: 'View All', path: '/truck-checkouts', icon: ListIcon },
       { label: 'New Checkout', path: '/truck-checkouts/new', icon: AddIcon },
     ]
   },
   {
-    label: 'Orders',
-    path: '/orders',
-    icon: ClipboardListIcon,
-    submenu: [
-      { label: 'View All', path: '/orders', icon: ListIcon },
-    ]
-  },
-  {
     label: 'Invoices',
     path: '/invoices',
     icon: InvoicesIcon,
+    section: 'Daily Work',
     submenu: [
       { label: 'View All', path: '/invoices', icon: ListIcon },
-      { label: 'Pending (RouteStar)', path: '/invoices/routestar/pending', icon: ListIcon },
-      { label: 'Closed (RouteStar)', path: '/invoices/routestar/closed', icon: ListIcon },
+      { label: 'Pending (RouteStar)', path: '/invoices/routestar/pending', icon: ClockHistoryIcon },
+      { label: 'Closed (RouteStar)', path: '/invoices/routestar/closed', icon: CheckCircleIcon },
     ]
   },
+
+  // === ROUTESTAR DATA ===
   {
     label: 'RouteStar Items',
     path: '/routestar/items',
-    icon: PackageIcon
+    icon: CubeIcon,
+    section: 'RouteStar'
   },
-  {
-    label: 'RouteStar Customers',
-    path: '/routestar/customers',
-    icon: UsersIcon
-  },
+
+  // === REPORTS ===
   {
     label: 'Sales Report',
     path: '/routestar/sales-report',
-    icon: ChartIcon
+    icon: ChartIcon,
+    section: 'Reports'
   },
   {
     label: 'Items Invoice Usage',
     path: '/routestar/items-invoice-usage',
-    icon: FolderIcon
+    icon: FolderIcon,
+    section: 'Reports'
   },
   {
     label: 'Fetch History',
     path: '/system/fetch-history',
-    icon: ClockHistoryIcon
+    icon: ClockHistoryIcon,
+    section: 'Reports'
   },
+
+  // === PERSONAL ===
   {
     label: 'Profile',
     path: '/profile',
-    icon: ProfileIcon
+    icon: ProfileIcon,
+    section: 'Personal'
   },
 ];
 const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
@@ -591,7 +614,7 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
         {}
         <nav className="flex-1 overflow-y-auto py-4 px-2">
           <ul className="space-y-1">
-            {menuItems.map((item) => {
+            {menuItems.map((item, index) => {
               const Icon = item.icon;
               const hasSubmenu = item.submenu && item.submenu.length > 0;
               const isExpanded = expandedMenus[item.label];
@@ -607,8 +630,33 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
               } else {
                 isActive = currentPathOnly === item.path;
               }
+
+              // Section header logic
+              const previousSection = index > 0 ? menuItems[index - 1].section : null;
+              const showSectionHeader = !isCollapsed && !isMobile && item.section !== previousSection;
+
+              const sectionLabels = {
+                'Core': 'CORE',
+                'Inventory': 'INVENTORY MANAGEMENT',
+                'Operations': 'DAILY OPERATIONS',
+                'RouteStar': 'ROUTESTAR INTEGRATION',
+                'Master Data': 'MASTER DATA',
+                'Reports': 'REPORTS & ANALYTICS',
+                'Administration': 'SYSTEM & ADMIN',
+                'Personal': 'PERSONAL',
+                'Daily Work': 'MY DAILY WORK'
+              };
+
               return (
-                <li key={item.label + '-' + item.path}>
+                <React.Fragment key={item.label + '-' + item.path}>
+                  {showSectionHeader && (
+                    <li className="px-3 pt-4 pb-2 mt-2">
+                      <div className="text-xs font-semibold text-slate-400 dark:text-gray-500 uppercase tracking-wider">
+                        {sectionLabels[item.section] || item.section}
+                      </div>
+                    </li>
+                  )}
+                  <li>
                   {}
                   {hasSubmenu ? (
                     <div>
@@ -702,6 +750,7 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
                     </NavLink>
                   )}
                 </li>
+                </React.Fragment>
               );
             })}
           </ul>

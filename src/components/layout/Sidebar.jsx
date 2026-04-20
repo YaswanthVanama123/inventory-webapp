@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
+import { useUserScreens } from '../../hooks/useUserScreens';
 
 
 const DashboardIcon = () => (
@@ -164,6 +165,11 @@ const BuildingIcon = () => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
   </svg>
 );
+const ShieldCheckIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+  </svg>
+);
 const adminMenuItems = [
   {
     label: 'Dashboard',
@@ -276,6 +282,11 @@ const adminMenuItems = [
       { label: 'View All', path: '/users', icon: ListIcon },
       { label: 'Add New User', path: '/users/new', icon: AddIcon },
     ]
+  },
+  {
+    label: 'Screen Permissions',
+    path: '/admin/screen-permissions',
+    icon: ShieldCheckIcon
   },
   {
     label: 'Reports',
@@ -398,6 +409,7 @@ const employeeMenuItems = [
 ];
 const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
   const { user, isAdmin, logout } = useContext(AuthContext);
+  const { hasAccessToScreen, hasAccessToAnySubScreen, loading: permissionsLoading } = useUserScreens();
   const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -451,7 +463,36 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
       onClose();
     }
   }, [location.pathname, isMobile, onClose]);
-  const menuItems = isAdmin ? adminMenuItems : employeeMenuItems;
+
+  // Filter menu items based on user permissions
+  const filterMenuItems = (items) => {
+    if (isAdmin) return items; // Admins see everything
+
+    return items
+      .map(item => ({ ...item })) // Clone to avoid mutation
+      .filter(item => {
+        // Check if user has access to the main path
+        const hasMainAccess = hasAccessToScreen(item.path);
+
+        // If it has submenu, check if user has access to any submenu item
+        if (item.submenu && item.submenu.length > 0) {
+          const hasSubAccess = hasAccessToAnySubScreen(item.submenu);
+
+          if (hasSubAccess) {
+            // Filter submenu items as well (create new filtered array)
+            item.submenu = item.submenu.filter(subItem => hasAccessToScreen(subItem.path));
+            return true;
+          }
+          return false;
+        }
+
+        return hasMainAccess;
+      });
+  };
+
+  const baseMenuItems = isAdmin ? adminMenuItems : employeeMenuItems;
+  const menuItems = filterMenuItems(baseMenuItems);
+
   const handleToggleCollapse = () => {
     if (!isMobile) {
       const newCollapsedState = !isCollapsed;

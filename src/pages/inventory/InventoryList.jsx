@@ -64,6 +64,8 @@ const InventoryList = () => {
   const [expandedSales, setExpandedSales] = useState({});
   const [sales, setSales] = useState({});
   const [loadingSales, setLoadingSales] = useState({});
+  const [folderViewFilteredCount, setFolderViewFilteredCount] = useState(0);
+  const [folderViewTotalCount, setFolderViewTotalCount] = useState(0);
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -90,7 +92,33 @@ const InventoryList = () => {
     } else if (activeTab === 'purchases' && viewMode === 'folder') {
       setLoading(false);
     }
-  }, [debouncedSearchTerm, selectedCategory, statusFilter, sortBy, sortOrder, currentPage, itemsPerPage, activeTab, viewMode]);
+  }, [selectedCategory, statusFilter, sortBy, sortOrder, currentPage, itemsPerPage, activeTab, viewMode]);
+
+  // Frontend search filter
+  const getFilteredItems = () => {
+    if (!searchTerm || !items || items.length === 0) {
+      return items;
+    }
+
+    const search = searchTerm.toLowerCase().trim();
+
+    return items.filter(item => {
+      if (activeTab === 'purchases') {
+        // For purchases: search by model number (skuCode) or item name
+        const matchesModelNumber = item.skuCode?.toLowerCase().includes(search);
+        const matchesItemName = item.name?.toLowerCase().includes(search);
+        return matchesModelNumber || matchesItemName;
+      } else {
+        // For sells: search by RouteStar item name
+        const matchesRouteStarName = item.routeStarItemName?.toLowerCase().includes(search) ||
+                                      item.name?.toLowerCase().includes(search);
+        return matchesRouteStarName;
+      }
+    });
+  };
+
+  const filteredItems = getFilteredItems();
+
   useEffect(() => {
     setError(null);
   }, [activeTab]);
@@ -107,9 +135,7 @@ const InventoryList = () => {
         sortBy,
         sortOrder,
       };
-      if (debouncedSearchTerm) {
-        params.search = debouncedSearchTerm;
-      }
+      // Removed search from API params - now filtering on frontend
       if (selectedCategory) {
         params.category = selectedCategory;
       }
@@ -239,6 +265,10 @@ const InventoryList = () => {
       fetchPurchasesForItem(selectedItemForPurchase._id);
       fetchInventoryItems();
     }
+  };
+  const handleFolderViewFilteredCountChange = (filteredCount, totalCount) => {
+    setFolderViewFilteredCount(filteredCount);
+    setFolderViewTotalCount(totalCount);
   };
   const handleDeletePurchase = (purchase, itemId) => {
     setPurchaseToDelete({ purchase, itemId });
@@ -449,7 +479,14 @@ const InventoryList = () => {
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Inventory</h1>
             <p className="text-slate-600 mt-1">
-              {totalItems} {totalItems === 1 ? 'item' : 'items'} in stock
+              {searchTerm
+                ? viewMode === 'folder'
+                  ? `${folderViewFilteredCount} of ${folderViewTotalCount} items matching search`
+                  : `${filteredItems.length} of ${totalItems} items matching search`
+                : viewMode === 'folder'
+                  ? `${folderViewTotalCount} ${folderViewTotalCount === 1 ? 'item' : 'items'} in stock`
+                  : `${totalItems} ${totalItems === 1 ? 'item' : 'items'} in stock`
+              }
             </p>
           </div>
           {isAdmin && (
@@ -463,120 +500,6 @@ const InventoryList = () => {
               </svg>
               Add New Item
             </Button>
-          )}
-        </div>
-      </div>
-      {}
-      <div className="sticky top-0 z-20 bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
-        <div className="space-y-4">
-          {}
-          {activeTab === 'purchases' && (
-            <>
-              {}
-              <div className="w-full">
-                <SearchBar
-                  value={searchTerm}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  placeholder="Search by item name, SKU, or category..."
-                  fullWidth
-                  loading={loading && searchTerm !== debouncedSearchTerm}
-                />
-              </div>
-              {}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                {}
-                <Select
-                  name="category"
-                  value={selectedCategory}
-                  onChange={handleCategoryChange}
-                  options={categoryOptions}
-                  placeholder="All Categories"
-                  fullWidth
-                />
-                {}
-                <Select
-                  name="status"
-                  value={statusFilter}
-                  onChange={handleStatusFilterChange}
-                  options={statusOptions}
-                  placeholder="All Items"
-                  fullWidth
-                />
-                {}
-                <Select
-                  name="sort"
-                  value={`${sortBy}-${sortOrder}`}
-                  onChange={handleSortChange}
-                  options={sortOptions}
-                  placeholder="Sort by..."
-                  fullWidth
-                />
-                {}
-                <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1">
-                  <button
-                    onClick={() => setViewMode('table')}
-                    className={`flex-1 px-3 py-1.5 rounded font-medium transition-all duration-200 ${
-                      viewMode === 'table'
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                    aria-label="Table view"
-                    title="Table View"
-                  >
-                    <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => setViewMode('card')}
-                    className={`flex-1 px-3 py-1.5 rounded font-medium transition-all duration-200 ${
-                      viewMode === 'card'
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                    aria-label="Card view"
-                    title="Card View"
-                  >
-                    <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => setViewMode('folder')}
-                    className={`flex-1 px-3 py-1.5 rounded font-medium transition-all duration-200 ${
-                      viewMode === 'folder'
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                    aria-label="Folder view"
-                    title="Folder View"
-                  >
-                    <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                    </svg>
-                  </button>
-                </div>
-                {}
-                {(searchTerm || selectedCategory || statusFilter) && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSearchTerm('');
-                      setSelectedCategory('');
-                      setStatusFilter('');
-                      setCurrentPage(1);
-                    }}
-                    className="whitespace-nowrap"
-                  >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Clear Filters
-                  </Button>
-                )}
-              </div>
-            </>
           )}
         </div>
       </div>
@@ -609,6 +532,19 @@ const InventoryList = () => {
           </button>
         </div>
       </div>
+      {/* Search Bar */}
+      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
+        <SearchBar
+          value={searchTerm}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder={
+            activeTab === 'purchases'
+              ? "Search by model number or item name..."
+              : "Search by RouteStar item name..."
+          }
+          fullWidth
+        />
+      </div>
       {}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -630,12 +566,14 @@ const InventoryList = () => {
               isAdmin={isAdmin}
               onDeleteItem={handleDelete}
               getImageUrl={getImageUrl}
+              searchTerm={searchTerm}
+              onFilteredCountChange={handleFolderViewFilteredCountChange}
             />
           ) : loading ? (
             <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
               <LoadingSpinner size="lg" text="Loading inventory..." className="mx-auto" />
             </div>
-          ) : items.length === 0 ? (
+          ) : filteredItems.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm border border-slate-200">
               <EmptyState
                 icon={
@@ -684,7 +622,7 @@ const InventoryList = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-slate-200">
-                    {items.map((item) => (
+                    {filteredItems.map((item) => (
                       <React.Fragment key={item._id}>
                         <tr className="hover:bg-slate-50 transition-colors">
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -963,7 +901,7 @@ const InventoryList = () => {
           {}
           {viewMode === 'card' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              {items.map((item) => (
+              {filteredItems.map((item) => (
                 <div
                   key={item._id}
                   className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow duration-200"

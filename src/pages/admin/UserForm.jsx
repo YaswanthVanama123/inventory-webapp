@@ -2,12 +2,12 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { User, Mail, Lock, Eye, EyeOff, Shield, CheckCircle, AlertCircle } from 'lucide-react';
 import { ToastContext } from '../../contexts/ToastContext';
+import userService from '../../services/userService';
+import screenPermissionService from '../../services/screenPermissionService';
 import Input from '../../components/common/Input';
 import Select from '../../components/common/Select';
 import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
-
-const API_BASE_URL = 'http://localhost:5001/api';
 
 const UserForm = () => {
   const navigate = useNavigate();
@@ -35,26 +35,66 @@ const UserForm = () => {
     label: '',
     color: '',
   });
+  const [allScreens, setAllScreens] = useState([]);
+  const [defaultScreens, setDefaultScreens] = useState([]);
+  const [selectedScreenIds, setSelectedScreenIds] = useState([]);
+  const [loadingScreens, setLoadingScreens] = useState(false);
   useEffect(() => {
+    fetchScreens();
     if (isEditMode) {
       fetchUser();
+      fetchUserPermissions();
     }
   }, [id, isEditMode]);
+
+  // Fetch permissions when role changes to employee for new users
+  useEffect(() => {
+    if (!isEditMode && formData.role === 'employee' && allScreens.length === 0) {
+      fetchScreens();
+    }
+  }, [formData.role, isEditMode]);
+
+  const fetchScreens = async () => {
+    try {
+      const [screensResponse, defaultResponse] = await Promise.all([
+        screenPermissionService.getAllScreens(),
+        screenPermissionService.getDefaultScreens()
+      ]);
+
+      if (screensResponse.success) {
+        setAllScreens(screensResponse.data || []);
+      }
+
+      if (defaultResponse.success) {
+        setDefaultScreens(defaultResponse.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching screens:', err);
+    }
+  };
+
+  const fetchUserPermissions = async () => {
+    if (!id) return;
+
+    setLoadingScreens(true);
+    try {
+      const response = await screenPermissionService.getUserSpecificPermissions(id);
+      if (response.success) {
+        // Get the IDs of screens this user has access to (beyond defaults)
+        const screenIds = response.data.map(screen => screen._id);
+        setSelectedScreenIds(screenIds);
+      }
+    } catch (err) {
+      console.error('Error fetching user permissions:', err);
+    } finally {
+      setLoadingScreens(false);
+    }
+  };
   const fetchUser = async () => {
     setFetchLoading(true);
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(`${API_BASE_URL}/users/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch user');
-      }
-      const data = await response.json();
-      const user = data.data.user;  
+      const response = await userService.getById(id);
+      const user = response.data.user;
       setFormData({
         username: user.username || '',
         email: user.email || '',
@@ -101,17 +141,23 @@ const UserForm = () => {
     return { score, label, color };
   };
   useEffect(() => {
-    if (!isEditMode && formData.password) {
+    if (formData.password) {
       const strength = calculatePasswordStrength(formData.password);
       setPasswordStrength(strength);
     }
-  }, [formData.password, isEditMode]);
+  }, [formData.password]);
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
+
+    // Reset screen permissions if role is changed to admin
+    if (name === 'role' && value === 'admin') {
+      setSelectedScreenIds([]);
+    }
+
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -178,6 +224,17 @@ const UserForm = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  const handleScreenToggle = (screenId) => {
+    setSelectedScreenIds(prev => {
+      if (prev.includes(screenId)) {
+        return prev.filter(id => id !== screenId);
+      } else {
+        return [...prev, screenId];
+      }
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAlert(null);
@@ -191,11 +248,6 @@ const UserForm = () => {
     }
     setLoading(true);
     try {
-      const token = localStorage.getItem('authToken');
-      const url = isEditMode
-        ? `${API_BASE_URL}/users/${id}`
-        : `${API_BASE_URL}/users`;
-      const method = isEditMode ? 'PUT' : 'POST';
       const payload = {
         username: formData.username,
         email: formData.email,
@@ -207,25 +259,22 @@ const UserForm = () => {
       if (!isEditMode || formData.password) {
         payload.password = formData.password;
       }
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        if (response.status === 409 || data.error?.includes('exists')) {
-          setErrors({
-            username: data.error?.includes('username') ? 'Username already exists' : '',
-            email: data.error?.includes('email') ? 'Email already exists' : '',
-          });
-          throw new Error(data.error || 'User already exists');
+
+      const response = isEditMode
+        ? await userService.update(id, payload)
+        : await userService.create(payload);
+
+      // Save screen permissions for employees
+      if (formData.role === 'employee') {
+        try {
+          const userId = isEditMode ? id : response.data.user._id;
+          await screenPermissionService.updateUserPermissions(userId, selectedScreenIds);
+        } catch (permErr) {
+          console.error('Error saving screen permissions:', permErr);
+          showError('User saved but screen permissions update failed');
         }
-        throw new Error(data.error || data.message || 'Failed to save user');
       }
+
       const successMessage = `User ${isEditMode ? 'updated' : 'created'} successfully!`;
       showSuccess(successMessage);
       setAlert({
@@ -335,6 +384,21 @@ const UserForm = () => {
           />
           {}
           <div>
+            {isEditMode && (
+              <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <div>
+                    <h4 className="text-sm font-semibold text-blue-900">Admin Password Reset</h4>
+                    <p className="text-sm text-blue-700 mt-1">
+                      As an admin, you can reset this employee's password. Enter a new password below, or leave blank to keep the current password.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="relative">
               <Input
                 label="Password"
@@ -348,7 +412,7 @@ const UserForm = () => {
                 fullWidth
                 icon={<Lock className="w-5 h-5" />}
                 disabled={loading}
-                helperText={isEditMode ? "Leave blank to keep current password" : "Minimum 8 characters with uppercase, lowercase, and numbers"}
+                helperText={isEditMode ? "Leave blank to keep current password - As admin, you can reset without knowing the current password" : "Minimum 8 characters with uppercase, lowercase, and numbers"}
               />
               <button
                 type="button"
@@ -360,7 +424,7 @@ const UserForm = () => {
               </button>
             </div>
             {}
-            {!isEditMode && formData.password && (
+            {formData.password && (
               <div className="mt-2">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-gray-600">Password Strength:</span>
@@ -481,7 +545,77 @@ const UserForm = () => {
             helperText="Unique truck/vehicle identifier for this employee (appears in Class column of invoices)"
             style={{ textTransform: 'uppercase' }}
           />
-          {}
+          {/* Screen Permissions - Only show for employees */}
+          {formData.role === 'employee' && (
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <div className="flex items-center gap-2 mb-3">
+                <Shield className="w-5 h-5 text-indigo-600" />
+                <h3 className="text-sm font-semibold text-gray-900">Screen Permissions</h3>
+              </div>
+              <p className="text-xs text-gray-600 mb-4">
+                Select additional screens this employee can access. Default screens are automatically included for all employees.
+              </p>
+
+              {loadingScreens ? (
+                <div className="text-center py-4 text-sm text-gray-500">Loading screens...</div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Default Screens (Read-only) */}
+                  {defaultScreens.length > 0 && (
+                    <div>
+                      <h4 className="text-xs font-medium text-gray-700 mb-2 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        Default Screens (Always Included)
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {defaultScreens.map(screen => (
+                          <div
+                            key={screen._id}
+                            className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded text-xs text-gray-700"
+                          >
+                            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                            <span>{screen.displayName}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Additional Screens (Selectable) */}
+                  {allScreens.filter(screen => !screen.isDefault).length > 0 && (
+                    <div>
+                      <h4 className="text-xs font-medium text-gray-700 mb-2">Additional Screens (Optional)</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {allScreens
+                          .filter(screen => !screen.isDefault)
+                          .sort((a, b) => a.displayName.localeCompare(b.displayName))
+                          .map(screen => (
+                            <label
+                              key={screen._id}
+                              className={`flex items-center gap-2 px-3 py-2 border rounded cursor-pointer transition-colors ${
+                                selectedScreenIds.includes(screen._id)
+                                  ? 'bg-indigo-50 border-indigo-300 text-indigo-900'
+                                  : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedScreenIds.includes(screen._id)}
+                                onChange={() => handleScreenToggle(screen._id)}
+                                className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                                disabled={loading}
+                              />
+                              <span className="text-xs">{screen.displayName}</span>
+                            </label>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+          {/* Active Status Toggle */}
           <div className="flex items-center gap-3">
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -529,14 +663,14 @@ const UserForm = () => {
         </form>
         {}
         {isEditMode && (
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
+              <Shield className="w-5 h-5 text-green-600 mt-0.5" />
               <div>
-                <h3 className="text-sm font-semibold text-blue-900">Security Note</h3>
-                <p className="text-sm text-blue-700 mt-1">
-                  To reset this user's password, use the Reset Password feature from the users list page.
-                  Only enter a new password here if you want to update it directly.
+                <h3 className="text-sm font-semibold text-green-900">Admin Password Reset Enabled</h3>
+                <p className="text-sm text-green-700 mt-1">
+                  You can reset this employee's password without knowing their current password.
+                  Simply enter a new password above and click "Update User". The employee can use the new password immediately after the update.
                 </p>
               </div>
             </div>

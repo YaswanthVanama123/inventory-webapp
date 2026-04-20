@@ -67,6 +67,7 @@ const TruckCheckoutShop = lazy(() => import('./pages/truck-checkout/TruckCheckou
 const TruckCheckoutDetail = lazy(() => import('./pages/truck-checkout/TruckCheckoutDetail'));
 const EmployeeCheckouts = lazy(() => import('./pages/truck-checkout/EmployeeCheckouts'));
 const DiscrepancyPage = lazy(() => import('./pages/admin/DiscrepancyPage'));
+const ScreenPermissionsManagement = lazy(() => import('./pages/admin/ScreenPermissionsManagement'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
   const { isAuthenticated, isAdmin, loading } = React.useContext(AuthContext);
@@ -500,6 +501,17 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute requireAdmin>
                         <UserForm />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                {/* Screen Permissions Management */}
+                <Route
+                  path="/admin/screen-permissions"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <ScreenPermissionsManagement />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

@@ -514,7 +514,9 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
   };
 
   const baseMenuItems = isAdmin ? adminMenuItems : employeeMenuItems;
-  const menuItems = filterMenuItems(baseMenuItems);
+  // TEMPORARILY COMMENTED OUT FOR CLIENT PRESENTATION - Permission filtering disabled
+  // const menuItems = filterMenuItems(baseMenuItems);
+  const menuItems = baseMenuItems; // Show all menu items without permission checks
 
   const handleToggleCollapse = () => {
     if (!isMobile) {

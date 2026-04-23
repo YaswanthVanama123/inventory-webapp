@@ -21,11 +21,20 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
   const [deleting, setDeleting] = useState(false);
   useEffect(() => {
     fetchGroupedItems();
-  }, []);
+  }, [searchTerm]); 
+
   const fetchGroupedItems = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/customerconnect/items/grouped');
+      const params = {
+        limit: 1000 
+      };
+
+      if (searchTerm) {
+        params.search = searchTerm;
+      }
+
+      const response = await api.get('/customerconnect/items/grouped', { params });
       console.log('[FolderView] Full API response:', response);
       console.log('[FolderView] response.data:', response.data);
       console.log('[FolderView] response.data.data:', response.data?.data);
@@ -170,7 +179,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
     }
   };
 
-  // Filter items based on search term
   const getFilteredItems = () => {
     if (!searchTerm || !groupedItems || groupedItems.length === 0) {
       return groupedItems;
@@ -186,7 +194,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
 
   const filteredItems = getFilteredItems();
 
-  // Notify parent component about filtered count changes
   useEffect(() => {
     if (onFilteredCountChange) {
       onFilteredCountChange(filteredItems.length, groupedItems.length);
@@ -482,7 +489,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
           </div>
         );
       })}
-      {/* Empty state when search returns no results */}
       {filteredItems.length === 0 && groupedItems.length > 0 && searchTerm && (
         <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-slate-200">
           <Package className="w-16 h-16 mx-auto text-slate-300 mb-4" />

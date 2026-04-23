@@ -532,16 +532,11 @@ const InventoryList = () => {
           </button>
         </div>
       </div>
-      {/* Search Bar */}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <SearchBar
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
-          placeholder={
-            activeTab === 'purchases'
-              ? "Search by model number or item name..."
-              : "Search by RouteStar item name..."
-          }
+          placeholder="Search by name, SKU, or variation..."
           fullWidth
         />
       </div>
@@ -566,7 +561,7 @@ const InventoryList = () => {
               isAdmin={isAdmin}
               onDeleteItem={handleDelete}
               getImageUrl={getImageUrl}
-              searchTerm={searchTerm}
+              searchTerm={debouncedSearchTerm}
               onFilteredCountChange={handleFolderViewFilteredCountChange}
             />
           ) : loading ? (
@@ -1183,7 +1178,7 @@ const InventoryList = () => {
           )}
         </>
       ) : activeTab === 'sells' ? (
-        <SalesFolderView />
+        <SalesFolderView searchTerm={debouncedSearchTerm} />
       ) : null}
       {}
       <Modal

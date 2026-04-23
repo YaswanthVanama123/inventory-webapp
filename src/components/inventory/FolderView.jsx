@@ -179,20 +179,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
     }
   };
 
-  const getFilteredItems = () => {
-    if (!searchTerm || !groupedItems || groupedItems.length === 0) {
-      return groupedItems;
-    }
-
-    const search = searchTerm.toLowerCase().trim();
-    return groupedItems.filter(item => {
-      const matchesModelNumber = item.sku?.toLowerCase().includes(search);
-      const matchesItemName = item.name?.toLowerCase().includes(search);
-      return matchesModelNumber || matchesItemName;
-    });
-  };
-
-  const filteredItems = getFilteredItems();
+  const filteredItems = groupedItems;
 
   useEffect(() => {
     if (onFilteredCountChange) {

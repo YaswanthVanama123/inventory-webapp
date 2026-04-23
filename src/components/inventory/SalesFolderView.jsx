@@ -10,7 +10,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 
 
-const SalesFolderView = () => {
+const SalesFolderView = ({ searchTerm = '' }) => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
   const { showSuccess, showError } = useContext(ToastContext);
@@ -21,14 +21,23 @@ const SalesFolderView = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(() => {
     fetchGroupedItems();
-  }, []);
+  }, [searchTerm]);
+
   const fetchGroupedItems = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/routestar/items/grouped');
+      const params = {
+        limit: 1000
+      };
+
+      if (searchTerm) {
+        params.search = searchTerm;
+      }
+
+      const response = await api.get('/routestar/items/grouped', { params });
       console.log('[SalesFolderView] Full API response:', response);
       console.log('[SalesFolderView] response.data:', response.data);
       console.log('[SalesFolderView] response.data.data:', response.data?.data);
@@ -180,15 +189,9 @@ const SalesFolderView = () => {
       setDeleting(false);
     }
   };
-  const filteredItems = groupedItems.filter(item => {
-    if (!searchTerm) return true;
-    const search = searchTerm.toLowerCase();
-    return (
-      item.name?.toLowerCase().includes(search) ||
-      item.sku?.toLowerCase().includes(search) ||
-      item.originalNames?.some(name => name.toLowerCase().includes(search))
-    );
-  });
+
+  const filteredItems = groupedItems;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -209,46 +212,6 @@ const SalesFolderView = () => {
   }
   return (
     <div className="space-y-3">
-      {}
-      <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
-        <div className="relative">
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by name, SKU, or variation..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-          />
-          <svg
-            className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          )}
-        </div>
-        {searchTerm && (
-          <p className="text-sm text-slate-500 mt-2">
-            Found {filteredItems.length} of {groupedItems.length} items
-          </p>
-        )}
-      </div>
       {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {}
@@ -633,19 +596,13 @@ const SalesFolderView = () => {
         );
       })}
       {}
-      {filteredItems.length === 0 && groupedItems.length > 0 && (
+      {filteredItems.length === 0 && searchTerm && (
         <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-slate-200">
           <ShoppingCart className="w-16 h-16 mx-auto text-slate-300 mb-4" />
           <p className="text-slate-900 font-semibold text-lg mb-2">No items found</p>
           <p className="text-sm text-slate-500">
-            No items match your search "{searchTerm}". Try a different search term.
+            No items match "{searchTerm}". Try a different search term.
           </p>
-          <button
-            onClick={() => setSearchTerm('')}
-            className="mt-4 text-emerald-600 hover:text-emerald-700 font-medium text-sm"
-          >
-            Clear search
-          </button>
         </div>
       )}
       {}

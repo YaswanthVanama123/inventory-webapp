@@ -6,12 +6,14 @@ import Button from '../common/Button';
 import LoadingSpinner from '../common/LoadingSpinner';
 import Modal from '../common/Modal';
 import { ToastContext } from '../../contexts/ToastContext';
+import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 
 
 const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = '', onFilteredCountChange }) => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useContext(ToastContext);
+  const { user } = useAuth();
   const [expandedItems, setExpandedItems] = useState({});
   const [groupedItems, setGroupedItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,6 +21,9 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
   const [selectedItems, setSelectedItems] = useState([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [verifyingItems, setVerifyingItems] = useState({});
+  const [verifyModalOpen, setVerifyModalOpen] = useState(false);
+  const [itemToVerify, setItemToVerify] = useState(null);
   useEffect(() => {
     fetchGroupedItems();
   }, [searchTerm]); 
@@ -176,6 +181,54 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
       showError(err.message || 'Failed to delete items');
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleVerifyItem = (order, itemIndex, sku) => {
+    setItemToVerify({ order, itemIndex, sku });
+    setVerifyModalOpen(true);
+  };
+
+  const confirmVerifyItem = async () => {
+    if (!itemToVerify) return;
+
+    const { order, itemIndex, sku } = itemToVerify;
+    const verifyKey = `${order.orderNumber}-${itemIndex}`;
+
+    try {
+      setVerifyingItems(prev => ({ ...prev, [verifyKey]: true }));
+
+      await api.post(
+        `/customerconnect/orders/${order.orderNumber}/items/${itemIndex}/verify`,
+        {
+          userId: user?.id || user?._id,
+          sku: sku
+        }
+      );
+
+      showSuccess('Item verified successfully');
+
+      const updatedOrders = await api.get(`/customerconnect/items/${encodeURIComponent(sku)}/orders`);
+      const orders = updatedOrders.data?.data?.entries || updatedOrders.data?.entries || [];
+
+      setGroupedItems(prev => prev.map(item => {
+        if (item.sku === sku) {
+          return { ...item, orders };
+        }
+        return item;
+      }));
+
+      setVerifyModalOpen(false);
+      setItemToVerify(null);
+    } catch (error) {
+      console.error('Error verifying item:', error);
+      showError(error.response?.data?.message || 'Failed to verify item');
+    } finally {
+      setVerifyingItems(prev => {
+        const newState = { ...prev };
+        delete newState[verifyKey];
+        return newState;
+      });
     }
   };
 
@@ -392,11 +445,22 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                           <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                             Stock
                           </th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                            Verification
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 bg-white">
                         {group.orders.map((order, index) => {
                           const stockStatus = getStockStatus(order.stockProcessed);
+                          const isItemVerified = order.itemVerified === true;
+                          console.log(`[FolderView] Order ${order.orderNumber} - index ${index}:`, {
+                            itemVerified: order.itemVerified,
+                            isItemVerified: isItemVerified,
+                            itemVerifiedAt: order.itemVerifiedAt,
+                            stockProcessed: order.stockProcessed,
+                            fullOrder: order
+                          });
                           return (
                             <tr
                               key={`${order.orderNumber}-${index}`}
@@ -443,6 +507,31 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                                   {stockStatus.label}
                                 </Badge>
                               </td>
+                              <td className="px-6 py-4">
+                                {isItemVerified ? (
+                                  <div className="flex flex-col gap-1">
+                                    <Badge variant="success" size="sm">Verified</Badge>
+                                    <span className="text-xs text-slate-500">
+                                      {formatFullDate(order.itemVerifiedAt)}
+                                    </span>
+                                    {order.itemVerifiedBy && (
+                                      <span className="text-xs text-slate-500">
+                                        by {order.itemVerifiedBy.username || order.itemVerifiedBy.name || 'N/A'}
+                                      </span>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <Button
+                                    variant="primary"
+                                    size="sm"
+                                    onClick={() => handleVerifyItem(order, index, group.sku)}
+                                    disabled={verifyingItems[`${order.orderNumber}-${index}`]}
+                                    className="whitespace-nowrap"
+                                  >
+                                    {verifyingItems[`${order.orderNumber}-${index}`] ? 'Verifying...' : 'Verify Item Arrival'}
+                                  </Button>
+                                )}
+                              </td>
                             </tr>
                           );
                         })}
@@ -465,7 +554,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                               {formatCurrency(group.totalValue)}
                             </span>
                           </td>
-                          <td colSpan="2"></td>
+                          <td colSpan="3"></td>
                         </tr>
                       </tfoot>
                     </table>
@@ -561,6 +650,107 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
             </div>
           </div>
         </div>
+      </Modal>
+
+      {/* Verification Confirmation Modal */}
+      <Modal
+        isOpen={verifyModalOpen}
+        onClose={() => {
+          if (!verifyingItems[`${itemToVerify?.order?.orderNumber}-${itemToVerify?.itemIndex}`]) {
+            setVerifyModalOpen(false);
+            setItemToVerify(null);
+          }
+        }}
+        title="Verify Item Arrival"
+        size="md"
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setVerifyModalOpen(false);
+                setItemToVerify(null);
+              }}
+              disabled={verifyingItems[`${itemToVerify?.order?.orderNumber}-${itemToVerify?.itemIndex}`]}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={confirmVerifyItem}
+              loading={verifyingItems[`${itemToVerify?.order?.orderNumber}-${itemToVerify?.itemIndex}`]}
+              disabled={verifyingItems[`${itemToVerify?.order?.orderNumber}-${itemToVerify?.itemIndex}`]}
+            >
+              Confirm Verification
+            </Button>
+          </>
+        }
+      >
+        {itemToVerify && (
+          <div className="space-y-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <svg
+                  className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div>
+                  <p className="text-sm font-medium text-blue-800">Confirm Item Arrival</p>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Please verify that this item has been received and is in good condition.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-gray-900">Item Details:</h4>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-gray-600">SKU:</span>
+                  <span className="text-sm font-semibold text-gray-900">{itemToVerify.sku}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-gray-600">Item Name:</span>
+                  <span className="text-sm font-semibold text-gray-900">{itemToVerify.order.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-gray-600">Order Number:</span>
+                  <span className="text-sm font-semibold text-gray-900">#{itemToVerify.order.orderNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-gray-600">Vendor:</span>
+                  <span className="text-sm font-semibold text-gray-900">{itemToVerify.order.vendor || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-gray-600">Quantity:</span>
+                  <span className="text-sm font-semibold text-gray-900">{itemToVerify.order.qty}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-gray-600">Unit Price:</span>
+                  <span className="text-sm font-semibold text-gray-900">{formatCurrency(itemToVerify.order.unitPrice)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-gray-600">Line Total:</span>
+                  <span className="text-sm font-semibold text-green-600">{formatCurrency(itemToVerify.order.lineTotal)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-gray-600">Order Date:</span>
+                  <span className="text-sm font-semibold text-gray-900">{formatFullDate(itemToVerify.order.orderDate)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

@@ -249,6 +249,9 @@ const OrderDetail = () => {
                   <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-gray-300 uppercase tracking-wider">
                     Total
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-gray-300 uppercase tracking-wider">
+                    Item Status
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-gray-700">
@@ -279,12 +282,26 @@ const OrderDetail = () => {
                         {formatCurrency(item.lineTotal || (item.qty || 0) * (item.unitPrice || 0))}
                       </div>
                     </td>
+                    <td className="px-6 py-4">
+                      {item.itemVerified === true ? (
+                        <div className="flex flex-col gap-1">
+                          <Badge variant="success" size="sm">Verified</Badge>
+                          {item.itemVerifiedAt && (
+                            <span className="text-xs text-slate-500 dark:text-gray-400">
+                              {formatDate(item.itemVerifiedAt)}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <Badge variant="warning" size="sm">Not Verified</Badge>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
               <tfoot className="bg-slate-50 dark:bg-gray-700">
                 <tr>
-                  <td colSpan="4" className="px-6 py-4 text-right text-sm font-semibold text-slate-900 dark:text-white">
+                  <td colSpan="5" className="px-6 py-4 text-right text-sm font-semibold text-slate-900 dark:text-white">
                     Total:
                   </td>
                   <td className="px-6 py-4 text-right text-lg font-bold text-slate-900 dark:text-white">

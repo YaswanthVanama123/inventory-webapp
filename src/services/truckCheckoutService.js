@@ -12,6 +12,16 @@ const truckCheckoutService = {
     const response = await api.get(`/truck-checkouts/stock/${encodeURIComponent(itemName)}`);
     return response;
   },
+  getTruckInventory: async (truckNumber, itemName, employeeName = null) => {
+    const params = {};
+    if (employeeName) {
+      params.employeeName = employeeName;
+    }
+    const response = await api.get(`/truck-checkouts/truck-inventory/${encodeURIComponent(truckNumber)}/${encodeURIComponent(itemName)}`, {
+      params
+    });
+    return response;
+  },
   createCheckoutNew: async (checkoutData) => {
     const response = await api.post('/truck-checkouts/create-new', checkoutData);
     return response;

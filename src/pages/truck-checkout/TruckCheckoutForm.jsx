@@ -32,6 +32,13 @@ const TruckCheckoutForm = () => {
   const [showDiscrepancyModal, setShowDiscrepancyModal] = useState(false);
   const [discrepancyInfo, setDiscrepancyInfo] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Truck inventory validation states
+  const [actualTruckInventory, setActualTruckInventory] = useState('');
+  const [truckInventory, setTruckInventory] = useState(null);
+  const [loadingTruckInventory, setLoadingTruckInventory] = useState(false);
+  const [showTruckDiscrepancyModal, setShowTruckDiscrepancyModal] = useState(false);
+  const [truckDiscrepancyInfo, setTruckDiscrepancyInfo] = useState(null);
   useEffect(() => {
     if (!showItemPicker) {
       setSearchQuery(''); 
@@ -63,12 +70,33 @@ const TruckCheckoutForm = () => {
       [name]: value
     }));
   };
-  const handleItemSelect = (item) => {
+  const handleItemSelect = async (item) => {
     setSelectedItem(item);
     setShowItemPicker(false);
     setValidationError('');
     setQuantityTaking('');
     setRemainingQuantity('');
+    setActualTruckInventory('');
+    setTruckInventory(null);
+
+    // Fetch truck inventory when item is selected
+    if (user?.truckNumber) {
+      try {
+        setLoadingTruckInventory(true);
+        const response = await truckCheckoutService.getTruckInventory(
+          user.truckNumber,
+          item.itemName,
+          user.fullName
+        );
+        setTruckInventory(response.data);
+        console.log('[TruckCheckout] Current truck inventory:', response.data.currentTruckInventory);
+      } catch (error) {
+        console.error('[TruckCheckout] Failed to get truck inventory:', error);
+        setTruckInventory(null);
+      } finally {
+        setLoadingTruckInventory(false);
+      }
+    }
   };
   const handleQuantityTakingChange = (e) => {
     setQuantityTaking(e.target.value);
@@ -80,14 +108,16 @@ const TruckCheckoutForm = () => {
   };
   const validateStockMath = () => {
     if (!selectedItem || !quantityTaking || !remainingQuantity) {
-      return true; 
+      return true;
     }
     const taking = parseFloat(quantityTaking);
     const remaining = parseFloat(remainingQuantity);
     const currentStock = selectedItem.currentStock || 0;
     const expectedRemaining = currentStock - taking;
     if (Math.abs(remaining - expectedRemaining) > 0.001) {
-      const error = `Math Error: Current stock (${currentStock}) - Taking (${taking}) should equal ${expectedRemaining.toFixed(2)}, but you entered ${remaining}`;
+      const difference = remaining - expectedRemaining;
+      const discrepancyType = difference > 0 ? 'Overage' : 'Shortage';
+      const error = `${discrepancyType} Detected: Expected remaining is ${expectedRemaining.toFixed(2)}, but you entered ${remaining}. Difference: ${Math.abs(difference).toFixed(2)} (${discrepancyType})`;
       setValidationError(error);
       return false;
     }
@@ -134,9 +164,41 @@ const TruckCheckoutForm = () => {
       setShowDiscrepancyModal(true);
       return;
     }
-    await submitCheckout(false);
+
+    // Validate truck inventory if provided
+    if (actualTruckInventory && actualTruckInventory.trim() !== '') {
+      const actualTruck = parseFloat(actualTruckInventory);
+
+      if (isNaN(actualTruck) || actualTruck < 0) {
+        showError('Please enter a valid truck inventory quantity');
+        return;
+      }
+
+      if (truckInventory) {
+        // Expected truck inventory AFTER this checkout = current + taking
+        const expectedTruckAfterCheckout = truckInventory.currentTruckInventory + taking;
+        const truckDifference = actualTruck - expectedTruckAfterCheckout;
+
+        // Use tolerance for floating-point comparison (allow 0.01 difference for rounding)
+        if (Math.abs(truckDifference) > 0.01) {
+          setTruckDiscrepancyInfo({
+            itemName: selectedItem.itemName,
+            currentTruckInventory: truckInventory.currentTruckInventory,
+            quantityTaking: taking,
+            expectedTruckInventory: expectedTruckAfterCheckout,
+            actualTruckInventory: actualTruck,
+            truckDiscrepancyDifference: truckDifference,
+            truckDiscrepancyType: truckDifference > 0 ? 'Overage' : 'Shortage',
+          });
+          setShowTruckDiscrepancyModal(true);
+          return;
+        }
+      }
+    }
+
+    await submitCheckout(false, false);
   };
-  const submitCheckout = async (acceptDiscrepancy) => {
+  const submitCheckout = async (acceptDiscrepancy, acceptTruckDiscrepancy) => {
     try {
       setSubmitting(true);
       const checkoutData = {
@@ -145,9 +207,13 @@ const TruckCheckoutForm = () => {
         itemName: selectedItem.itemName,
         quantityTaking: parseFloat(quantityTaking),
         remainingQuantity: parseFloat(remainingQuantity),
+        actualTruckInventory: actualTruckInventory && actualTruckInventory.trim() !== ''
+          ? parseFloat(actualTruckInventory)
+          : undefined,
         notes: formData.notes.trim(),
         checkoutDate: formData.checkoutDate ? new Date(formData.checkoutDate).toISOString() : new Date().toISOString(),
         acceptDiscrepancy,
+        acceptTruckDiscrepancy,
       };
       console.log('[TruckCheckout] Submitting:', checkoutData);
       const response = await truckCheckoutService.createCheckoutNew(checkoutData);
@@ -165,10 +231,28 @@ const TruckCheckoutForm = () => {
         setShowDiscrepancyModal(true);
         return;
       }
+
+      // Handle truck inventory discrepancy confirmation
+      if (!response.success && response.requiresTruckConfirmation) {
+        const truckValidation = response.truckInventoryValidation;
+        setTruckDiscrepancyInfo({
+          itemName: selectedItem.itemName,
+          currentTruckInventory: truckValidation.currentTruckInventoryBeforeCheckout,
+          quantityTaking: parseFloat(quantityTaking),
+          expectedTruckInventory: truckValidation.expectedTruckInventory,
+          actualTruckInventory: truckValidation.actualTruckInventory,
+          truckDiscrepancyDifference: truckValidation.truckDiscrepancyDifference,
+          truckDiscrepancyType: truckValidation.truckDiscrepancyType,
+        });
+        setShowTruckDiscrepancyModal(true);
+        return;
+      }
+
       if (response.success) {
         setShowDiscrepancyModal(false);
+        setShowTruckDiscrepancyModal(false);
         showSuccess(
-          response.discrepancy
+          response.discrepancy || response.truckDiscrepancy
             ? 'Checkout created with discrepancy adjustment'
             : 'Checkout created successfully'
         );
@@ -304,10 +388,60 @@ const TruckCheckoutForm = () => {
               </div>
             </div>
           )}
+
+          {/* Current Truck Inventory Display */}
+          {selectedItem && truckInventory && (
+            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-bold text-blue-700 dark:text-blue-300">
+                  Current Truck Inventory
+                </span>
+                {loadingTruckInventory && (
+                  <span className="text-xs text-blue-600 dark:text-blue-400">Loading...</span>
+                )}
+              </div>
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-3">
+                {truckInventory.currentTruckInventory} units
+              </div>
+              <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                <div>Total Checked Out: {truckInventory.totalCheckedOut}</div>
+                <div>Total Sold: {truckInventory.totalSold}</div>
+                {truckInventory.discrepancyAdjustment !== 0 && (
+                  <div className="text-yellow-600 dark:text-yellow-400">
+                    Discrepancy Adjustments: {truckInventory.discrepancyAdjustment > 0 ? '+' : ''}
+                    {truckInventory.discrepancyAdjustment}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Actual Truck Inventory Input */}
+          {selectedItem && truckInventory && (
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Actual Quantity on Truck (Physical Count)
+              </label>
+              <Input
+                type="number"
+                step="0.01"
+                value={actualTruckInventory}
+                onChange={(e) => setActualTruckInventory(e.target.value)}
+                placeholder="How many do you actually have on truck?"
+              />
+              {quantityTaking && (
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  Expected after checkout: {truckInventory.currentTruckInventory} + {parseFloat(quantityTaking) || 0} ={' '}
+                  {truckInventory.currentTruckInventory + (parseFloat(quantityTaking) || 0)}
+                </p>
+              )}
+            </div>
+          )}
+
           {validationError && (
-            <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
-              <ExclamationTriangleIcon className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700 dark:text-red-300">{validationError}</p>
+            <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg flex items-start gap-3">
+              <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-yellow-700 dark:text-yellow-300">{validationError}</p>
             </div>
           )}
         </Card>
@@ -408,14 +542,14 @@ const TruckCheckoutForm = () => {
         size="md"
       >
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
-            <ExclamationTriangleIcon className="w-8 h-8 text-red-600 dark:text-red-400 flex-shrink-0" />
+          <div className="flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+            <ExclamationTriangleIcon className="w-8 h-8 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
             <div>
-              <h3 className="font-semibold text-red-900 dark:text-red-100">
-                Math Validation Failed
+              <h3 className="font-semibold text-yellow-900 dark:text-yellow-100">
+                Stock Count Difference
               </h3>
-              <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                The remaining quantity you entered doesn't match the system calculation.
+              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                There's a difference between expected and entered warehouse count.
               </p>
             </div>
           </div>
@@ -486,7 +620,101 @@ const TruckCheckoutForm = () => {
               variant="danger"
               loading={submitting}
               disabled={submitting}
-              onClick={() => submitCheckout(true)}
+              onClick={() => submitCheckout(true, false)}
+            >
+              Accept & Create Checkout
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Truck Discrepancy Modal */}
+      <Modal
+        isOpen={showTruckDiscrepancyModal}
+        onClose={() => !submitting && setShowTruckDiscrepancyModal(false)}
+        title="Truck Inventory Discrepancy"
+        size="md"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+            <ExclamationTriangleIcon className="w-8 h-8 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+            <div>
+              <h3 className="font-semibold text-yellow-900 dark:text-yellow-100">
+                Truck Inventory Mismatch
+              </h3>
+              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                The truck inventory you entered doesn't match the system calculation.
+              </p>
+            </div>
+          </div>
+          {truckDiscrepancyInfo && (
+            <div className="space-y-3">
+              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Item:</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  {truckDiscrepancyInfo.itemName}
+                </span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Current Truck Inventory:</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  {truckDiscrepancyInfo.currentTruckInventory}
+                </span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Adding to Truck:</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  {truckDiscrepancyInfo.quantityTaking}
+                </span>
+              </div>
+              <div className="flex justify-between py-2 border-b-2 border-gray-300 dark:border-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Expected Truck Inventory:</span>
+                <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                  {truckDiscrepancyInfo.expectedTruckInventory}
+                </span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-sm text-gray-600 dark:text-gray-400">You Entered:</span>
+                <span className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
+                  {truckDiscrepancyInfo.actualTruckInventory}
+                </span>
+              </div>
+              <div className="flex justify-between py-2">
+                <span className="text-sm font-medium text-gray-900 dark:text-white">Difference:</span>
+                <span
+                  className={`text-sm font-bold ${
+                    truckDiscrepancyInfo.truckDiscrepancyDifference > 0
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-red-600 dark:text-red-400'
+                  }`}
+                >
+                  {truckDiscrepancyInfo.truckDiscrepancyDifference > 0 ? '+' : ''}
+                  {truckDiscrepancyInfo.truckDiscrepancyDifference} ({truckDiscrepancyInfo.truckDiscrepancyType})
+                </span>
+              </div>
+              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  ⚠️ Accepting this will create an approved <strong>truck discrepancy</strong> record.
+                  This is different from stock discrepancy and tracks your truck inventory separately.
+                </p>
+              </div>
+            </div>
+          )}
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setShowTruckDiscrepancyModal(false)}
+              disabled={submitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              loading={submitting}
+              disabled={submitting}
+              onClick={() => submitCheckout(false, true)}
             >
               Accept & Create Checkout
             </Button>

@@ -388,7 +388,8 @@ const TruckCheckoutForm = () => {
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
                     Stock: {item.currentStock || 0} • Purchased: {item.totalPurchased || 0} • Sold:{' '}
-                    {item.totalSold || 0}
+                    {item.totalSold || 0} • Checked Out: {item.totalCheckedOut || 0} • Discrepancies:{' '}
+                    {item.totalDiscrepancies || 0}
                   </div>
                 </div>
                 {selectedItem?.itemName === item.itemName && (

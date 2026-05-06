@@ -6,6 +6,7 @@ import { getInvoiceByNumber, syncInvoiceDetails } from '../../services/routestar
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { formatDate } from '../../utils/dateUtils';
 
 const RouteStarInvoiceDetail = () => {
   const { invoiceNumber } = useParams();
@@ -68,18 +69,6 @@ const RouteStarInvoiceDetail = () => {
       style: 'currency',
       currency: 'USD',
     }).format(amount || 0);
-  };
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    } catch {
-      return 'Invalid Date';
-    }
   };
   const handleBack = () => {
     if (invoice?.invoiceType === 'closed') {

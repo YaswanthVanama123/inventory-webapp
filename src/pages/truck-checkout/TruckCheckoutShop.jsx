@@ -549,10 +549,10 @@ const TruckCheckoutShop = () => {
                   placeholder="Optional"
                 />
                 <Input
-                  label="Truck Number"
+                  label="Route Name"
                   value={employeeInfo.truckNumber}
                   onChange={(e) => setEmployeeInfo({ ...employeeInfo, truckNumber: e.target.value })}
-                  placeholder="Enter truck number"
+                  placeholder="Enter route name"
                 />
               </div>
               <Textarea

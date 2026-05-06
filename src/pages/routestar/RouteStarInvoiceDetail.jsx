@@ -277,7 +277,7 @@ const RouteStarInvoiceDetail = () => {
                     <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
                       Service Notes
                     </label>
-                    <p className="text-base text-slate-900 dark:text-white mt-1">
+                    <p className="text-base text-slate-900 dark:text-white mt-1 whitespace-pre-wrap break-words">
                       {invoice.serviceNotes}
                     </p>
                   </div>
@@ -287,7 +287,7 @@ const RouteStarInvoiceDetail = () => {
                     <label className="text-sm font-medium text-slate-600 dark:text-gray-400">
                       Invoice Memo
                     </label>
-                    <p className="text-base text-slate-900 dark:text-white mt-1">
+                    <p className="text-base text-slate-900 dark:text-white mt-1 whitespace-pre-wrap break-words">
                       {invoice.invoiceMemo}
                     </p>
                   </div>

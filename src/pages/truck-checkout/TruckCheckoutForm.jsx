@@ -131,7 +131,7 @@ const TruckCheckoutForm = () => {
       return;
     }
     if (!user.truckNumber?.trim()) {
-      showError('Truck number is required. Please update your profile.');
+      showError('Route name is required. Please update your profile.');
       return;
     }
     if (!selectedItem) {
@@ -298,7 +298,7 @@ const TruckCheckoutForm = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Truck Number <span className="text-red-500">*</span>
+                Route Name <span className="text-red-500">*</span>
               </label>
               <Input
                 name="truckNumber"

@@ -24,6 +24,8 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
   const [verifyingItems, setVerifyingItems] = useState({});
   const [verifyModalOpen, setVerifyModalOpen] = useState(false);
   const [itemToVerify, setItemToVerify] = useState(null);
+  const [receivedQuantity, setReceivedQuantity] = useState('');
+  const [notes, setNotes] = useState('');
   useEffect(() => {
     fetchGroupedItems();
   }, [searchTerm]); 
@@ -184,8 +186,22 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
     }
   };
 
-  const handleVerifyItem = (order, itemIndex, sku) => {
-    setItemToVerify({ order, itemIndex, sku });
+  const handleVerifyItem = (order, sku) => {
+    console.log('[FolderView] handleVerifyItem called with order:', order);
+    console.log('[FolderView] order.qty:', order.qty);
+    console.log('[FolderView] order.receivedQuantity:', order.receivedQuantity);
+    console.log('[FolderView] order.verificationHistory:', order.verificationHistory);
+    console.log('[FolderView] order.itemIndex:', order.itemIndex);
+
+    const expectedQty = order.qty || 0;
+    const previouslyReceived = order.receivedQuantity || 0;
+    const remainingQty = Math.max(0, expectedQty - previouslyReceived);
+
+    console.log('[FolderView] Calculated - expectedQty:', expectedQty, 'previouslyReceived:', previouslyReceived, 'remainingQty:', remainingQty);
+
+    setItemToVerify({ order, itemIndex: order.itemIndex, sku });
+    setReceivedQuantity(remainingQty.toString());
+    setNotes('');
     setVerifyModalOpen(true);
   };
 
@@ -195,24 +211,56 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
     const { order, itemIndex, sku } = itemToVerify;
     const verifyKey = `${order.orderNumber}-${itemIndex}`;
 
+    const receivedQty = parseFloat(receivedQuantity);
+    if (isNaN(receivedQty) || receivedQty <= 0) {
+      showError('Please enter a valid received quantity greater than 0');
+      return;
+    }
+
     try {
       setVerifyingItems(prev => ({ ...prev, [verifyKey]: true }));
 
-      await api.post(
+      console.log('[FolderView] Sending verification request:', {
+        orderNumber: order.orderNumber,
+        itemIndex: itemIndex,
+        sku: sku,
+        receivedQty: receivedQty
+      });
+
+      const response = await api.post(
         `/customerconnect/orders/${order.orderNumber}/items/${itemIndex}/verify`,
         {
           userId: user?.id || user?._id,
-          sku: sku
+          sku: sku,
+          receivedQty: receivedQty,
+          notes: notes.trim()
         }
       );
 
-      showSuccess('Item verified successfully');
+      const message = response.data?.message || 'Item verified successfully';
+      showSuccess(message);
 
+      console.log('[FolderView] Verification successful, refetching from database...');
+
+      // Fetch fresh data from database
       const updatedOrders = await api.get(`/customerconnect/items/${encodeURIComponent(sku)}/orders`);
       const orders = updatedOrders.data?.data?.entries || updatedOrders.data?.entries || [];
 
+      console.log('[FolderView] Refetched orders from DB:', orders);
+      if (orders.length > 0) {
+        console.log('[FolderView] First order data:', {
+          orderNumber: orders[0].orderNumber,
+          qty: orders[0].qty,
+          receivedQuantity: orders[0].receivedQuantity,
+          remainingQuantity: orders[0].remainingQuantity,
+          verificationHistory: orders[0].verificationHistory
+        });
+      }
+
+      // Update state with fresh database data
       setGroupedItems(prev => prev.map(item => {
         if (item.sku === sku) {
+          console.log('[FolderView] Updating SKU', sku, 'with fresh data from DB');
           return { ...item, orders };
         }
         return item;
@@ -220,6 +268,8 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
 
       setVerifyModalOpen(false);
       setItemToVerify(null);
+      setReceivedQuantity('');
+      setNotes('');
     } catch (error) {
       console.error('Error verifying item:', error);
       showError(error.response?.data?.message || 'Failed to verify item');
@@ -520,15 +570,33 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                                       </span>
                                     )}
                                   </div>
+                                ) : (order.receivedQuantity && order.receivedQuantity > 0) ? (
+                                  <div className="flex flex-col gap-2">
+                                    <Badge variant="warning" size="sm">Partial ({order.receivedQuantity}/{order.qty})</Badge>
+                                    {order.verificationHistory && order.verificationHistory.length > 0 && (
+                                      <span className="text-xs text-blue-600">
+                                        {order.verificationHistory.length} receipt(s)
+                                      </span>
+                                    )}
+                                    <Button
+                                      variant="primary"
+                                      size="sm"
+                                      onClick={() => handleVerifyItem(order, group.sku)}
+                                      disabled={verifyingItems[`${order.orderNumber}-${order.itemIndex}`]}
+                                      className="whitespace-nowrap"
+                                    >
+                                      {verifyingItems[`${order.orderNumber}-${order.itemIndex}`] ? 'Verifying...' : 'Verify Remaining'}
+                                    </Button>
+                                  </div>
                                 ) : (
                                   <Button
                                     variant="primary"
                                     size="sm"
-                                    onClick={() => handleVerifyItem(order, index, group.sku)}
-                                    disabled={verifyingItems[`${order.orderNumber}-${index}`]}
+                                    onClick={() => handleVerifyItem(order, group.sku)}
+                                    disabled={verifyingItems[`${order.orderNumber}-${order.itemIndex}`]}
                                     className="whitespace-nowrap"
                                   >
-                                    {verifyingItems[`${order.orderNumber}-${index}`] ? 'Verifying...' : 'Verify Item Arrival'}
+                                    {verifyingItems[`${order.orderNumber}-${order.itemIndex}`] ? 'Verifying...' : 'Verify Item Arrival'}
                                   </Button>
                                 )}
                               </td>
@@ -659,6 +727,8 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
           if (!verifyingItems[`${itemToVerify?.order?.orderNumber}-${itemToVerify?.itemIndex}`]) {
             setVerifyModalOpen(false);
             setItemToVerify(null);
+            setReceivedQuantity('');
+            setNotes('');
           }
         }}
         title="Verify Item Arrival"
@@ -670,6 +740,8 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
               onClick={() => {
                 setVerifyModalOpen(false);
                 setItemToVerify(null);
+                setReceivedQuantity('');
+                setNotes('');
               }}
               disabled={verifyingItems[`${itemToVerify?.order?.orderNumber}-${itemToVerify?.itemIndex}`]}
             >
@@ -686,71 +758,199 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
           </>
         }
       >
-        {itemToVerify && (
-          <div className="space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <svg
-                  className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <div>
-                  <p className="text-sm font-medium text-blue-800">Confirm Item Arrival</p>
-                  <p className="text-sm text-blue-700 mt-1">
-                    Please verify that this item has been received and is in good condition.
+        {itemToVerify && (() => {
+          const expectedQty = itemToVerify.order.qty || 0;
+          const previouslyReceived = itemToVerify.order.receivedQuantity || 0;
+          const receivingNow = parseFloat(receivedQuantity) || 0;
+          const remainingAfter = Math.max(0, expectedQty - previouslyReceived - receivingNow);
+          const verificationHistory = itemToVerify.order.verificationHistory || [];
+
+          console.log('[FolderView Modal] Rendering modal with data:', {
+            expectedQty,
+            previouslyReceived,
+            receivingNow,
+            remainingAfter,
+            verificationHistoryLength: verificationHistory.length,
+            verificationHistory,
+            fullOrder: itemToVerify.order
+          });
+
+          return (
+            <div className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <svg
+                    className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-medium text-blue-800">Confirm Item Arrival</p>
+                    <p className="text-sm text-blue-700 mt-1">
+                      Enter the quantity received for this shipment.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-gray-900">Item Details:</h4>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium text-gray-600">SKU:</span>
+                    <span className="text-sm font-semibold text-gray-900">{itemToVerify.sku}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium text-gray-600">Item Name:</span>
+                    <span className="text-sm font-semibold text-gray-900">{itemToVerify.order.name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium text-gray-600">Order Number:</span>
+                    <span className="text-sm font-semibold text-gray-900">#{itemToVerify.order.orderNumber}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium text-gray-600">Vendor:</span>
+                    <span className="text-sm font-semibold text-gray-900">{itemToVerify.order.vendor || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium text-gray-600">Unit Price:</span>
+                    <span className="text-sm font-semibold text-gray-900">{formatCurrency(itemToVerify.order.unitPrice)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium text-gray-600">Line Total:</span>
+                    <span className="text-sm font-semibold text-green-600">{formatCurrency(itemToVerify.order.lineTotal)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium text-gray-600">Order Date:</span>
+                    <span className="text-sm font-semibold text-gray-900">{formatFullDate(itemToVerify.order.orderDate)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Verification History */}
+              {verificationHistory.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-semibold text-gray-900">Previous Receipts:</h4>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase">#</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Date</th>
+                          <th className="px-3 py-2 text-right text-xs font-semibold text-gray-600 uppercase">Qty Received</th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Notes</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {verificationHistory.map((history, idx) => (
+                          <tr key={idx} className="hover:bg-gray-50">
+                            <td className="px-3 py-2 text-sm text-gray-900">{idx + 1}</td>
+                            <td className="px-3 py-2 text-sm text-gray-700">
+                              {history.verifiedAt ? formatFullDate(history.verifiedAt) : 'N/A'}
+                            </td>
+                            <td className="px-3 py-2 text-sm font-bold text-blue-600 text-right">
+                              {history.receivedQty || 0}
+                            </td>
+                            <td className="px-3 py-2 text-sm text-gray-600">
+                              {history.notes || '-'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot className="bg-gray-100">
+                        <tr>
+                          <td colSpan="2" className="px-3 py-2 text-sm font-semibold text-gray-700 text-right">
+                            Total Received:
+                          </td>
+                          <td className="px-3 py-2 text-sm font-bold text-blue-600 text-right">
+                            {previouslyReceived}
+                          </td>
+                          <td></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Quantity Information */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-gray-900">Quantity Information:</h4>
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-700">Ordered Quantity:</span>
+                    <span className="text-lg font-bold text-gray-900">{expectedQty}</span>
+                  </div>
+
+                  {previouslyReceived > 0 && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-700">Previously Received:</span>
+                      <span className="text-lg font-bold text-blue-600">{previouslyReceived}</span>
+                    </div>
+                  )}
+
+                  <div className="pt-2 border-t border-blue-300">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How many did you receive now? *
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max={expectedQty - previouslyReceived}
+                      step="1"
+                      value={receivedQuantity}
+                      onChange={(e) => setReceivedQuantity(e.target.value)}
+                      className="w-full px-4 py-2 text-lg font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Enter quantity received"
+                      required
+                    />
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2 border-t border-blue-300">
+                    <span className="text-sm font-medium text-gray-700">Remaining After This:</span>
+                    <span className={`text-lg font-bold ${
+                      remainingAfter === 0
+                        ? 'text-green-600'
+                        : 'text-orange-600'
+                    }`}>
+                      {remainingAfter}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Notes (Optional)
+                </label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Add any notes about this receipt..."
+                />
+              </div>
+
+              {remainingAfter > 0 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <p className="text-sm text-yellow-800">
+                    <strong>Note:</strong> This is a partial receipt. You'll need to verify again when the remaining {remainingAfter} unit(s) arrive.
                   </p>
                 </div>
-              </div>
+              )}
             </div>
-
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-gray-900">Item Details:</h4>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">SKU:</span>
-                  <span className="text-sm font-semibold text-gray-900">{itemToVerify.sku}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Item Name:</span>
-                  <span className="text-sm font-semibold text-gray-900">{itemToVerify.order.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Order Number:</span>
-                  <span className="text-sm font-semibold text-gray-900">#{itemToVerify.order.orderNumber}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Vendor:</span>
-                  <span className="text-sm font-semibold text-gray-900">{itemToVerify.order.vendor || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Quantity:</span>
-                  <span className="text-sm font-semibold text-gray-900">{itemToVerify.order.qty}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Unit Price:</span>
-                  <span className="text-sm font-semibold text-gray-900">{formatCurrency(itemToVerify.order.unitPrice)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Line Total:</span>
-                  <span className="text-sm font-semibold text-green-600">{formatCurrency(itemToVerify.order.lineTotal)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Order Date:</span>
-                  <span className="text-sm font-semibold text-gray-900">{formatFullDate(itemToVerify.order.orderDate)}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+          );
+        })()}
       </Modal>
     </div>
   );

@@ -32,9 +32,13 @@ const OrderVerification = () => {
     fetchOrder();
   }, [orderId]);
   useEffect(() => {
-    const discrepancies = items.some(item =>
-      parseFloat(item.receivedQuantity || 0) !== item.qty
-    );
+    const discrepancies = items.some(item => {
+      const receivingNow = parseFloat(item.receivingNow || 0);
+      const previouslyReceived = item.receivedQuantity || 0;
+      const expected = item.qty;
+      const totalAfterThis = previouslyReceived + receivingNow;
+      return totalAfterThis !== expected;
+    });
     setHasDiscrepancies(discrepancies);
   }, [items]);
   const fetchOrder = async () => {
@@ -45,7 +49,7 @@ const OrderVerification = () => {
         setOrder(response.data);
         setItems(response.data.items.map(item => ({
           ...item,
-          receivedQuantity: item.qty, 
+          receivingNow: Math.max(0, (item.qty || 0) - (item.receivedQuantity || 0)),
           itemName: item.name
         })));
       }
@@ -58,7 +62,7 @@ const OrderVerification = () => {
   };
   const handleQuantityChange = (index, value) => {
     const newItems = [...items];
-    newItems[index].receivedQuantity = value;
+    newItems[index].receivingNow = value;
     setItems(newItems);
   };
   const handleAllGood = async () => {
@@ -86,7 +90,7 @@ const OrderVerification = () => {
         sku: item.sku,
         itemName: item.itemName || item.name,
         expectedQuantity: item.qty,
-        receivedQuantity: parseFloat(item.receivedQuantity) || 0,
+        receivedQuantity: parseFloat(item.receivingNow) || 0,
         notes: item.notes || ''
       }));
       const response = await orderDiscrepancyService.verifyOrder(orderId, {
@@ -95,13 +99,19 @@ const OrderVerification = () => {
         notes: notes.trim()
       });
       if (response.success) {
-        const discrepancyCount = response.data.discrepancies?.length || 0;
-        showSuccess(`Order verified with ${discrepancyCount} discrepancy(ies) recorded`);
-        navigate('/discrepancies');
+        const { partiallyVerifiedItems = [], fullyReceived = false } = response.data;
+
+        if (fullyReceived) {
+          showSuccess('Order fully received and verified!');
+          navigate('/orders');
+        } else {
+          showSuccess(`Partial receipt recorded - ${partiallyVerifiedItems.length} item(s) still pending`);
+          navigate('/orders');
+        }
       }
     } catch (error) {
       console.error('Submit discrepancies error:', error);
-      showError(error.response?.data?.message || 'Failed to submit discrepancies');
+      showError(error.response?.data?.message || 'Failed to submit verification');
     } finally {
       setSubmitting(false);
     }
@@ -188,13 +198,16 @@ const OrderVerification = () => {
                   Item
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  Expected Qty
+                  Ordered Qty
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  Received Qty *
+                  Previously Received
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  Difference
+                  Receiving Now *
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                  Remaining After
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                   Status
@@ -203,12 +216,15 @@ const OrderVerification = () => {
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
               {items.map((item, index) => {
-                const received = parseFloat(item.receivedQuantity) || 0;
+                const receivingNow = parseFloat(item.receivingNow) || 0;
+                const previouslyReceived = item.receivedQuantity || 0;
                 const expected = item.qty;
-                const difference = received - expected;
-                const hasDiscrepancy = difference !== 0;
+                const totalAfterThis = previouslyReceived + receivingNow;
+                const remaining = Math.max(0, expected - totalAfterThis);
+                const isFullyReceived = totalAfterThis >= expected;
+                const hasDiscrepancy = totalAfterThis !== expected;
                 return (
-                  <tr key={index} className={hasDiscrepancy ? 'bg-yellow-50 dark:bg-yellow-900/10' : ''}>
+                  <tr key={index} className={hasDiscrepancy && !isFullyReceived ? 'bg-yellow-50 dark:bg-yellow-900/10' : ''}>
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
                         {item.name}
@@ -216,42 +232,50 @@ const OrderVerification = () => {
                       <div className="text-xs text-gray-500 dark:text-gray-400">
                         {item.sku}
                       </div>
+                      {item.verificationHistory && item.verificationHistory.length > 0 && (
+                        <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                          {item.verificationHistory.length} previous receipt(s)
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-gray-900 dark:text-white">
+                      {expected}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-700 dark:text-gray-300">
-                      {expected}
+                      {previouslyReceived > 0 ? (
+                        <span className="font-medium text-blue-600 dark:text-blue-400">{previouslyReceived}</span>
+                      ) : (
+                        <span className="text-gray-400">0</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <Input
                         type="number"
-                        value={item.receivedQuantity}
+                        value={item.receivingNow}
                         onChange={(e) => handleQuantityChange(index, e.target.value)}
                         min="0"
+                        max={remaining}
                         step="1"
                         className="w-24 text-right"
                         required
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
-                      {hasDiscrepancy && (
-                        <span className={`text-sm font-bold ${
-                          difference > 0
-                            ? 'text-blue-600 dark:text-blue-400'
-                            : 'text-orange-600 dark:text-orange-400'
-                        }`}>
-                          {difference > 0 ? '+' : ''}{difference}
-                        </span>
-                      )}
-                      {!hasDiscrepancy && (
-                        <span className="text-sm text-green-600 dark:text-green-400">-</span>
-                      )}
+                      <span className={`text-sm font-bold ${
+                        remaining === 0
+                          ? 'text-green-600 dark:text-green-400'
+                          : 'text-orange-600 dark:text-orange-400'
+                      }`}>
+                        {remaining}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {hasDiscrepancy ? (
-                        <Badge variant={difference > 0 ? 'info' : 'warning'}>
-                          {difference > 0 ? 'Overage' : 'Shortage'}
-                        </Badge>
+                      {isFullyReceived ? (
+                        <Badge variant="success">Complete</Badge>
+                      ) : previouslyReceived > 0 ? (
+                        <Badge variant="warning">Partial</Badge>
                       ) : (
-                        <Badge variant="success">Matched</Badge>
+                        <Badge variant="info">Pending</Badge>
                       )}
                     </td>
                   </tr>

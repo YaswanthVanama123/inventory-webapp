@@ -423,10 +423,36 @@ const EmployeeActivities = () => {
                       </span>
                     </div>
                     {activity.details && (
-                      <div className="text-sm text-gray-600 dark:text-gray-400 overflow-x-auto">
-                        <pre className="whitespace-pre-wrap break-words font-mono text-xs bg-gray-100 dark:bg-gray-900 p-2 rounded">
-                          {JSON.stringify(activity.details, null, 2)}
-                        </pre>
+                      <div className="mt-3 space-y-1">
+                        {Object.entries(activity.details).map(([key, value]) => {
+                          // Skip null, undefined, or empty values
+                          if (value === null || value === undefined || value === '') return null;
+
+                          // Format the key to be more readable
+                          const formattedKey = key
+                            .replace(/([A-Z])/g, ' $1')
+                            .replace(/^./, str => str.toUpperCase())
+                            .trim();
+
+                          // Format the value
+                          let formattedValue = value;
+                          if (typeof value === 'object') {
+                            formattedValue = JSON.stringify(value);
+                          } else if (typeof value === 'boolean') {
+                            formattedValue = value ? 'Yes' : 'No';
+                          }
+
+                          return (
+                            <div key={key} className="flex items-start text-sm">
+                              <span className="font-medium text-gray-700 dark:text-gray-300 min-w-32">
+                                {formattedKey}:
+                              </span>
+                              <span className="text-gray-600 dark:text-gray-400 ml-2">
+                                {formattedValue}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>

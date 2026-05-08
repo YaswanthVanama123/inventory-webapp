@@ -5,8 +5,7 @@ import Modal from '../common/Modal';
 import Input from '../common/Input';
 import Button from '../common/Button';
 import Alert from '../common/Alert';
-
-const API_BASE_URL = 'http://localhost:5001/api';
+import api from '../../services/api';
 
 const ResetPasswordModal = ({ isOpen, onClose, user }) => {
   const [formData, setFormData] = useState({
@@ -102,6 +101,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAlert(null);
+
     if (!validateForm()) {
       setAlert({
         type: 'danger',
@@ -109,29 +109,26 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
       });
       return;
     }
+
     setLoading(true);
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(`${API_BASE_URL}/users/${user.id}/reset-password`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          newPassword: formData.newPassword,
-        }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || data.message || 'Failed to reset password');
+      const userId = user._id || user.id; // Handle both _id and id
+
+      if (!userId) {
+        throw new Error('User ID is missing');
       }
+
+      const response = await api.put(`/users/${userId}/reset-password`, {
+        newPassword: formData.newPassword,
+      });
+
       setAlert({
         type: 'success',
         message: 'Password reset successfully!',
       });
+
       setTimeout(() => {
-        onClose(true); 
+        onClose(true);
       }, 1500);
     } catch (err) {
       console.error('Error resetting password:', err);

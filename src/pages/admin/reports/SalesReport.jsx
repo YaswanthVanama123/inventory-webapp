@@ -31,9 +31,9 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import api from '../../../services/api';
 
 
-const API_BASE_URL = 'http://localhost:5001/api';
 const Card = ({ children, className = '' }) => {
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
@@ -151,23 +151,13 @@ const SalesReport = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('authToken');
       const queryParams = new URLSearchParams({
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,
         category: selectedCategory,
         groupBy: groupBy,
       });
-      const response = await fetch(`${API_BASE_URL}/reports/sales?${queryParams}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`Failed to fetch sales report: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await api.get(`/reports/sales?${queryParams}`);
       setReportData(data);
     } catch (err) {
       console.error('Error fetching sales report:', err);

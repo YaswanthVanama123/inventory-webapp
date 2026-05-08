@@ -23,9 +23,9 @@ import {
   Award,
   Clock,
 } from 'lucide-react';
+import api from '../../services/api';
 
 
-const API_BASE_URL = 'http://localhost:5001/api';
 const Card = ({ children, className = '' }) => {
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
@@ -235,17 +235,7 @@ const Reports = () => {
   const fetchQuickStats = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(`${API_BASE_URL}/reports/stats`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch stats');
-      }
-      const data = await response.json();
+      const data = await api.get('/reports/stats');
       setQuickStats(data);
     } catch (err) {
       console.error('Error fetching stats:', err);
@@ -256,21 +246,11 @@ const Reports = () => {
   };
   const fetchRecentReports = async () => {
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(`${API_BASE_URL}/reports/recent`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch recent reports');
-      }
-      const data = await response.json();
+      const data = await api.get('/reports/recent');
       setRecentReports(data);
     } catch (err) {
       console.error('Error fetching recent reports:', err);
-      setRecentReports(getMockRecentReports());
+      setRecentReports([]);
     }
   };
   useEffect(() => {
@@ -400,7 +380,8 @@ const Reports = () => {
     console.log(`Exporting ${reportId} as CSV`);
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`${API_BASE_URL}/reports/${reportId}/export/csv`, {
+      const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+      const response = await fetch(`${baseURL}/reports/${reportId}/export/csv`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -426,7 +407,8 @@ const Reports = () => {
     console.log(`Exporting ${reportId} as PDF`);
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`${API_BASE_URL}/reports/${reportId}/export/pdf`, {
+      const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+      const response = await fetch(`${baseURL}/reports/${reportId}/export/pdf`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

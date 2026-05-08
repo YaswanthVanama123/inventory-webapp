@@ -26,12 +26,29 @@ export const useUserScreens = () => {
   };
 
   const hasAccessToScreen = (path) => {
-    // Check if user has access to this path
-    return userScreens.some(screen => screen.path === path);
+    if (!path) return false;
+
+    // Normalize paths for comparison (remove query params and trailing slashes)
+    const normalizedPath = path.split('?')[0].replace(/\/$/, '');
+
+    return userScreens.some(screen => {
+      const screenPath = screen.path.split('?')[0].replace(/\/$/, '');
+
+      // Exact match
+      if (screenPath === normalizedPath) return true;
+
+      // Child route match (e.g., /inventory/:id matches /inventory)
+      if (normalizedPath.startsWith(screenPath + '/') && screenPath !== '') {
+        return true;
+      }
+
+      return false;
+    });
   };
 
   const hasAccessToAnySubScreen = (submenu) => {
     // Check if user has access to any screen in the submenu
+    if (!submenu || submenu.length === 0) return false;
     return submenu.some(item => hasAccessToScreen(item.path));
   };
 

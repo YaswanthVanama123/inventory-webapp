@@ -7,6 +7,30 @@ const screenPermissionService = {
     return response;
   },
 
+  // Get a single screen by ID
+  getScreenById: async (screenId) => {
+    const response = await api.get(`/screen-permissions/screens/${screenId}`);
+    return response;
+  },
+
+  // Create a new screen
+  createScreen: async (screenData) => {
+    const response = await api.post('/screen-permissions/screens', screenData);
+    return response;
+  },
+
+  // Update a screen
+  updateScreen: async (screenId, screenData) => {
+    const response = await api.put(`/screen-permissions/screens/${screenId}`, screenData);
+    return response;
+  },
+
+  // Delete a screen
+  deleteScreen: async (screenId) => {
+    const response = await api.delete(`/screen-permissions/screens/${screenId}`);
+    return response;
+  },
+
   // Get default screens
   getDefaultScreens: async () => {
     const response = await api.get('/screen-permissions/screens/default');

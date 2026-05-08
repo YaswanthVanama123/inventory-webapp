@@ -309,6 +309,12 @@ const adminMenuItems = [
     section: 'Administration'
   },
   {
+    label: 'Screen Management',
+    path: '/admin/screens',
+    icon: ClipboardListIcon,
+    section: 'Administration'
+  },
+  {
     label: 'Settings',
     path: '/settings',
     icon: SettingsIcon,
@@ -514,9 +520,7 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
   };
 
   const baseMenuItems = isAdmin ? adminMenuItems : employeeMenuItems;
-  // TEMPORARILY COMMENTED OUT FOR CLIENT PRESENTATION - Permission filtering disabled
-  // const menuItems = filterMenuItems(baseMenuItems);
-  const menuItems = baseMenuItems; // Show all menu items without permission checks
+  const menuItems = filterMenuItems(baseMenuItems);
 
   const handleToggleCollapse = () => {
     if (!isMobile) {

@@ -49,6 +49,7 @@ const InvoiceDetail = lazy(() => import('./pages/invoices/InvoiceDetail'));
 const Approvals = lazy(() => import('./pages/approvals/Approvals'));
 const UserList = lazy(() => import('./pages/admin/UserList'));
 const UserForm = lazy(() => import('./pages/admin/UserForm'));
+const ScreenManagement = lazy(() => import('./pages/admin/ScreenManagement'));
 const Reports = lazy(() => import('./pages/reports/Reports'));
 const SalesReport = lazy(() => import('./pages/reports/SalesReport'));
 const ToastDemo = lazy(() => import('./pages/ToastDemo'));
@@ -290,7 +291,7 @@ function App() {
                   path="/invoices"
                   element={
                     <ErrorBoundary>
-                      <ProtectedRoute requireAdmin>
+                      <ProtectedRoute>
                         <InvoiceList />
                       </ProtectedRoute>
                     </ErrorBoundary>
@@ -320,7 +321,7 @@ function App() {
                   path="/invoices/routestar/pending"
                   element={
                     <ErrorBoundary>
-                      <ProtectedRoute requireAdmin>
+                      <ProtectedRoute>
                         <PendingInvoices />
                       </ProtectedRoute>
                     </ErrorBoundary>
@@ -330,7 +331,7 @@ function App() {
                   path="/invoices/routestar/closed"
                   element={
                     <ErrorBoundary>
-                      <ProtectedRoute requireAdmin>
+                      <ProtectedRoute>
                         <ClosedInvoices />
                       </ProtectedRoute>
                     </ErrorBoundary>
@@ -373,7 +374,7 @@ function App() {
                   path="/routestar/items"
                   element={
                     <ErrorBoundary>
-                      <ProtectedRoute requireAdmin>
+                      <ProtectedRoute>
                         <RouteStarItemsList />
                       </ProtectedRoute>
                     </ErrorBoundary>
@@ -446,7 +447,7 @@ function App() {
                   path="/routestar/sales-report"
                   element={
                     <ErrorBoundary>
-                      <ProtectedRoute requireAdmin>
+                      <ProtectedRoute>
                         <RouteStarSalesReport />
                       </ProtectedRoute>
                     </ErrorBoundary>
@@ -512,6 +513,17 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute requireAdmin>
                         <ScreenPermissionsManagement />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                {/* Screen Management */}
+                <Route
+                  path="/admin/screens"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <ScreenManagement />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

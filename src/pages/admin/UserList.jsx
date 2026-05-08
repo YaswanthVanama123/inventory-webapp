@@ -12,6 +12,7 @@ import Modal from '../../components/common/Modal';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import ResetPasswordModal from '../../components/admin/ResetPasswordModal';
+import ScreenPermissionsModal from '../../components/admin/ScreenPermissionsModal';
 
 const UserList = () => {
   const navigate = useNavigate();
@@ -24,8 +25,9 @@ const UserList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [viewMode, setViewMode] = useState('table'); 
+  const [viewMode, setViewMode] = useState('table');
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+  const [showScreenPermissionsModal, setShowScreenPermissionsModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showToggleStatusModal, setShowToggleStatusModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -105,7 +107,18 @@ const UserList = () => {
     setShowResetPasswordModal(false);
     setSelectedUser(null);
     if (success) {
-      fetchUsers(); 
+      fetchUsers();
+    }
+  };
+  const handleScreenPermissions = (user) => {
+    setSelectedUser(user);
+    setShowScreenPermissionsModal(true);
+  };
+  const handleScreenPermissionsClose = (success) => {
+    setShowScreenPermissionsModal(false);
+    setSelectedUser(null);
+    if (success) {
+      showSuccess('Screen permissions updated successfully');
     }
   };
   const handleDeleteUser = (user) => {
@@ -459,6 +472,15 @@ const UserList = () => {
                             <Button
                               variant="ghost"
                               size="sm"
+                              onClick={() => handleScreenPermissions(user)}
+                              className="text-purple-600 hover:text-purple-800"
+                              title="Manage Screen Permissions"
+                            >
+                              Permissions
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={() => handleToggleStatus(user)}
                               className={
                                 user.isActive
@@ -552,6 +574,15 @@ const UserList = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleScreenPermissions(user)}
+                          fullWidth
+                          className="border-purple-300 text-purple-700 hover:bg-purple-50"
+                        >
+                          Permissions
+                        </Button>
+                        <Button
                           variant={user.isActive ? 'danger' : 'outline'}
                           size="sm"
                           onClick={() => handleToggleStatus(user)}
@@ -559,9 +590,11 @@ const UserList = () => {
                         >
                           {user.isActive ? 'Deactivate' : 'Activate'}
                         </Button>
+                      </div>
+                      <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleDeleteUser(user)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-red-200"
+                          className="w-full p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-red-200 flex items-center justify-center gap-2"
                           aria-label="Delete"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -572,6 +605,7 @@ const UserList = () => {
                               d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                             />
                           </svg>
+                          Delete
                         </button>
                       </div>
                     </div>
@@ -600,6 +634,12 @@ const UserList = () => {
       <ResetPasswordModal
         isOpen={showResetPasswordModal}
         onClose={handleResetPasswordClose}
+        user={selectedUser}
+      />
+      {}
+      <ScreenPermissionsModal
+        isOpen={showScreenPermissionsModal}
+        onClose={handleScreenPermissionsClose}
         user={selectedUser}
       />
       {}

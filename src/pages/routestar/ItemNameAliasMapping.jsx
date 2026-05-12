@@ -113,10 +113,46 @@ const ItemNameAliasMapping = () => {
   const handleModalChange = (field, value) => {
     setModalData(prev => ({ ...prev, [field]: value }));
   };
+  const [aliasSuggestions, setAliasSuggestions] = useState([]);
+  const [activeAliasIndex, setActiveAliasIndex] = useState(null);
+
   const handleAliasChange = (index, value) => {
     const newAliases = [...modalData.aliases];
     newAliases[index] = value;
     setModalData(prev => ({ ...prev, aliases: newAliases }));
+
+    // Show suggestions for unmapped items matching the typed text
+    if (value.trim().length > 0) {
+      const searchLower = value.toLowerCase();
+      const currentAliasesLower = newAliases
+        .filter((_, i) => i !== index)
+        .map(a => a.toLowerCase());
+
+      const suggestions = uniqueItems.filter(item => {
+        // Show unmapped items, or items mapped to the current mapping being edited
+        const isAvailable = !item.isMapped ||
+          (editingMapping && item.canonicalName === editingMapping.canonicalName);
+        // Don't suggest items already in the aliases list
+        const notAlreadyAdded = !currentAliasesLower.includes(item.itemName.toLowerCase());
+        // Match search text
+        const matchesSearch = item.itemName.toLowerCase().includes(searchLower);
+        return isAvailable && notAlreadyAdded && matchesSearch;
+      }).slice(0, 10);
+
+      setAliasSuggestions(suggestions);
+      setActiveAliasIndex(index);
+    } else {
+      setAliasSuggestions([]);
+      setActiveAliasIndex(null);
+    }
+  };
+
+  const selectAliasSuggestion = (index, itemName) => {
+    const newAliases = [...modalData.aliases];
+    newAliases[index] = itemName;
+    setModalData(prev => ({ ...prev, aliases: newAliases }));
+    setAliasSuggestions([]);
+    setActiveAliasIndex(null);
   };
   const addAliasField = () => {
     setModalData(prev => ({
@@ -711,21 +747,58 @@ const ItemNameAliasMapping = () => {
               Aliases <span className="text-red-500">*</span>
             </label>
             {modalData.aliases.map((alias, index) => (
-              <div key={index} className="flex gap-2 mb-2">
-                <Input
-                  type="text"
-                  placeholder={`e.g., jrt-2ply, jrt 2pLy`}
-                  value={alias}
-                  onChange={(e) => handleAliasChange(index, e.target.value)}
-                  className="flex-1"
-                />
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => removeAliasField(index)}
-                  icon={<XMarkIcon className="w-4 h-4" />}
-                  disabled={modalData.aliases.length === 1}
-                />
+              <div key={index} className="relative mb-2">
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder={`e.g., jrt-2ply, jrt 2pLy`}
+                    value={alias}
+                    onChange={(e) => handleAliasChange(index, e.target.value)}
+                    onFocus={() => {
+                      if (alias.trim().length > 0) {
+                        handleAliasChange(index, alias);
+                      }
+                    }}
+                    onBlur={() => {
+                      // Delay to allow click on suggestion
+                      setTimeout(() => {
+                        if (activeAliasIndex === index) {
+                          setAliasSuggestions([]);
+                          setActiveAliasIndex(null);
+                        }
+                      }, 200);
+                    }}
+                    className="flex-1"
+                  />
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => removeAliasField(index)}
+                    icon={<XMarkIcon className="w-4 h-4" />}
+                    disabled={modalData.aliases.length === 1}
+                  />
+                </div>
+                {/* Autocomplete suggestions dropdown */}
+                {activeAliasIndex === index && aliasSuggestions.length > 0 && (
+                  <div className="absolute z-50 left-0 right-12 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                    {aliasSuggestions.map((item, sIdx) => (
+                      <button
+                        key={sIdx}
+                        type="button"
+                        className="w-full px-3 py-2 text-left hover:bg-blue-50 dark:hover:bg-blue-900/20 flex items-center justify-between border-b border-gray-100 dark:border-gray-700 last:border-0"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => selectAliasSuggestion(index, item.itemName)}
+                      >
+                        <span className="text-sm font-mono text-gray-900 dark:text-white">
+                          {item.itemName}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {item.itemParent || ''}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
             <Button
@@ -737,7 +810,7 @@ const ItemNameAliasMapping = () => {
               Add Another Alias
             </Button>
             <p className="text-xs text-gray-500 mt-2">
-              All these variations will be mapped to the canonical name
+              All these variations will be mapped to the canonical name. Type to see suggestions from unmapped items.
             </p>
           </div>
           {}

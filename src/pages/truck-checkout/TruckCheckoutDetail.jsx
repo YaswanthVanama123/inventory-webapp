@@ -21,7 +21,11 @@ import {
   CubeIcon,
   ExclamationTriangleIcon,
   XMarkIcon,
-  TrashIcon
+  TrashIcon,
+  UserIcon,
+  CalendarIcon,
+  HashtagIcon,
+  MapPinIcon
 } from '@heroicons/react/24/outline';
 
 const TruckCheckoutDetail = () => {
@@ -304,7 +308,7 @@ const TruckCheckoutDetail = () => {
   };
   const getStatusBadge = (status) => {
     const config = {
-      checked_out: { variant: 'warning', label: 'Checked Out', icon: ClockIcon },
+      checked_out: { variant: 'info', label: 'Checked Out', icon: ClockIcon },
       completed: { variant: 'success', label: 'Completed', icon: CheckCircleIcon },
       cancelled: { variant: 'danger', label: 'Cancelled', icon: XCircleIcon }
     };
@@ -345,379 +349,337 @@ const TruckCheckoutDetail = () => {
   const canTally = checkout.status === 'completed' && checkout.invoiceNumbers && checkout.invoiceNumbers.length > 0;
   const canProcessStock = hasTally && !checkout.stockProcessed;
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      {}
-      <div className="flex items-center justify-between">
-        <div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/truck-checkouts')}
-            className="mb-3"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Checkouts
-          </Button>
+    <div className="space-y-5 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <button
+          onClick={() => navigate('/truck-checkouts')}
+          className="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1 mb-4"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Checkouts
+        </button>
+        <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <TruckIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+            <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+              <TruckIcon className="w-6 h-6 text-blue-600" />
+            </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Checkout Details
+              <h1 className="text-xl font-bold text-slate-900">
+                {checkout.employeeName}
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
-                {checkout.employeeName} - {formatDate(checkout.checkoutDate)}
+              <p className="text-sm text-slate-500 mt-0.5 flex items-center gap-2">
+                <span>Truck: {checkout.truckNumber || 'N/A'}</span>
+                <span className="text-slate-300">|</span>
+                <span>{formatDate(checkout.checkoutDate)}</span>
               </p>
             </div>
           </div>
+          {getStatusBadge(checkout.status)}
         </div>
-        {getStatusBadge(checkout.status)}
       </div>
-      {}
+
+      {/* Actions Bar */}
       {checkout.status === 'checked_out' && (
-        <Card>
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
           <div className="flex items-center gap-3 flex-wrap">
-            <Button
-              variant="primary"
+            <button
               onClick={() => setShowCompleteModal(true)}
-              loading={actionLoading === 'complete'}
+              disabled={actionLoading === 'complete'}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
             >
-              <DocumentTextIcon className="w-5 h-5 mr-2" />
+              <DocumentTextIcon className="w-4 h-4" />
               Add Invoices & Complete
-            </Button>
-            <Button
-              variant="danger"
+            </button>
+            <button
               onClick={() => setShowCancelModal(true)}
-              loading={actionLoading === 'cancel'}
+              disabled={actionLoading === 'cancel'}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 text-sm font-medium rounded-lg border border-red-200 transition-colors disabled:opacity-50"
             >
-              <XCircleIcon className="w-5 h-5 mr-2" />
+              <XCircleIcon className="w-4 h-4" />
               Cancel Checkout
-            </Button>
-            <Button
-              variant="ghost"
+            </button>
+            <button
               onClick={handleDelete}
-              loading={actionLoading === 'delete'}
-              className="ml-auto"
+              disabled={actionLoading === 'delete'}
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 text-sm font-medium rounded-lg transition-colors ml-auto disabled:opacity-50"
             >
-              <TrashIcon className="w-5 h-5 mr-2" />
-              Delete Checkout
-            </Button>
+              <TrashIcon className="w-4 h-4" />
+              Delete
+            </button>
           </div>
-        </Card>
+        </div>
       )}
       {checkout.status === 'completed' && (
-        <Card>
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
           <div className="flex items-center gap-3 flex-wrap">
             {!checkout.stockProcessed && checkout.invoiceNumbers && checkout.invoiceNumbers.length > 0 && (
-              <Button
-                variant="secondary"
+              <button
                 onClick={handleAddMoreInvoices}
-                loading={actionLoading === 'update-invoices'}
+                disabled={actionLoading === 'update-invoices'}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
               >
-                <DocumentTextIcon className="w-5 h-5 mr-2" />
+                <DocumentTextIcon className="w-4 h-4" />
                 Add More Invoices
-              </Button>
+              </button>
             )}
             {canTally && (
-              <Button
-                variant="primary"
+              <button
                 onClick={handleTally}
-                loading={actionLoading === 'tally'}
+                disabled={actionLoading === 'tally'}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
               >
-                <CalculatorIcon className="w-5 h-5 mr-2" />
+                <CalculatorIcon className="w-4 h-4" />
                 {hasTally ? 'Re-Tally' : 'Fetch & Tally Invoices'}
-              </Button>
+              </button>
             )}
             {canProcessStock && (
-              <Button
-                variant="success"
+              <button
                 onClick={handleProcessStock}
-                loading={actionLoading === 'stock'}
+                disabled={actionLoading === 'stock'}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
               >
-                <CubeIcon className="w-5 h-5 mr-2" />
+                <CubeIcon className="w-4 h-4" />
                 Process Stock Movements
-              </Button>
+              </button>
             )}
             {checkout.stockProcessed && (
-              <Badge variant="success" size="lg">
-                <CheckCircleIcon className="w-5 h-5 mr-2" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-full border border-green-200">
+                <CheckCircleIcon className="w-4 h-4" />
                 Stock Processed
-              </Badge>
+              </span>
             )}
-            <Button
-              variant="ghost"
+            <button
               onClick={handleDelete}
-              loading={actionLoading === 'delete'}
-              className="ml-auto"
+              disabled={actionLoading === 'delete'}
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 text-sm font-medium rounded-lg transition-colors ml-auto disabled:opacity-50"
             >
-              <TrashIcon className="w-5 h-5 mr-2" />
-              Delete Checkout
-            </Button>
+              <TrashIcon className="w-4 h-4" />
+              Delete
+            </button>
           </div>
           {canProcessStock && (
-            <Alert variant="info" title="Stock Processing" className="mt-4">
-              This will adjust stock levels by adding back sold items (to compensate for double-decrease during checkout and invoice sync) and tracking used items separately.
-            </Alert>
+            <p className="text-xs text-slate-500 mt-3 pl-1">
+              Stock processing will adjust levels by adding back sold items and tracking used items separately.
+            </p>
           )}
-        </Card>
+        </div>
       )}
       {checkout.status === 'cancelled' && (
-        <Card>
-          <div className="flex items-center gap-3 flex-wrap">
-            <Button
-              variant="ghost"
-              onClick={handleDelete}
-              loading={actionLoading === 'delete'}
-            >
-              <TrashIcon className="w-5 h-5 mr-2" />
-              Delete Checkout
-            </Button>
-          </div>
-        </Card>
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <button
+            onClick={handleDelete}
+            disabled={actionLoading === 'delete'}
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+          >
+            <TrashIcon className="w-4 h-4" />
+            Delete Checkout
+          </button>
+        </div>
       )}
-      {}
-      <Card>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Employee Information
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Employee Name</p>
-            <p className="font-semibold text-gray-900 dark:text-white">{checkout.employeeName}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Employee ID</p>
-            <p className="font-semibold text-gray-900 dark:text-white">{checkout.employeeId || '-'}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Route Name</p>
-            <p className="font-semibold text-gray-900 dark:text-white">{checkout.truckNumber || '-'}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Checkout Date</p>
-            <p className="font-semibold text-gray-900 dark:text-white">{formatDate(checkout.checkoutDate)}</p>
-          </div>
-          {checkout.completedDate && (
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Completed Date</p>
-              <p className="font-semibold text-gray-900 dark:text-white">{formatDate(checkout.completedDate)}</p>
+
+      {/* Info Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Employee & Checkout Info */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
+            <UserIcon className="w-4 h-4 text-slate-500" />
+            Employee & Checkout Info
+          </h3>
+          <dl className="space-y-3">
+            <div className="flex justify-between items-center">
+              <dt className="text-xs text-slate-500">Employee</dt>
+              <dd className="text-sm font-semibold text-slate-900">{checkout.employeeName}</dd>
+            </div>
+            <div className="flex justify-between items-center">
+              <dt className="text-xs text-slate-500">Employee ID</dt>
+              <dd className="text-sm text-slate-900">{checkout.employeeId || '-'}</dd>
+            </div>
+            <div className="flex justify-between items-center">
+              <dt className="text-xs text-slate-500">Route/Truck</dt>
+              <dd className="text-sm font-medium text-slate-900">{checkout.truckNumber || '-'}</dd>
+            </div>
+            <div className="flex justify-between items-center">
+              <dt className="text-xs text-slate-500">Checkout Date</dt>
+              <dd className="text-sm text-slate-900">{formatDate(checkout.checkoutDate)}</dd>
+            </div>
+            {checkout.completedDate && (
+              <div className="flex justify-between items-center">
+                <dt className="text-xs text-slate-500">Completed</dt>
+                <dd className="text-sm text-slate-900">{formatDate(checkout.completedDate)}</dd>
+              </div>
+            )}
+          </dl>
+          {checkout.notes && (
+            <div className="mt-4 pt-3 border-t border-slate-100">
+              <dt className="text-xs text-slate-500 mb-1">Notes</dt>
+              <dd className="text-sm text-slate-700 bg-slate-50 rounded-lg px-3 py-2">
+                {checkout.notes}
+              </dd>
             </div>
           )}
         </div>
-        {checkout.notes && (
-          <div className="mt-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Notes</p>
-            <p className="text-gray-900 dark:text-white mt-1">{checkout.notes}</p>
-          </div>
-        )}
-      </Card>
-      {}
-      <Card>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Items Taken ({checkout.itemName ? '1' : checkout.itemsTaken?.length || 0})
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  Item Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  SKU
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  Quantity
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  Notes
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-              {}
-              {checkout.itemName ? (
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                    {checkout.itemName}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                    -
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900 dark:text-white">
-                    {checkout.quantityTaking}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                    {checkout.notes || '-'}
-                  </td>
-                </tr>
-              ) : (
-                checkout.itemsTaken?.map((item, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                      {item.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                      {item.sku || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900 dark:text-white">
-                      {item.quantity}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {item.notes || '-'}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-            <tfoot className="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <td colSpan="2" className="px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white">
-                  Total
-                </td>
-                <td className="px-6 py-3 text-sm font-bold text-right text-gray-900 dark:text-white">
-                  {checkout.itemName ? checkout.quantityTaking : checkout.itemsTaken?.reduce((sum, item) => sum + item.quantity, 0) || 0}
-                </td>
-                <td></td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      </Card>
-      {}
-      {checkout.invoiceNumbers && checkout.invoiceNumbers.length > 0 && (
-        <Card>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Invoice Information
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        {/* Invoices */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
+            <DocumentTextIcon className="w-4 h-4 text-slate-500" />
+            Invoices
+          </h3>
+          {checkout.invoiceNumbers && checkout.invoiceNumbers.length > 0 ? (
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Invoice Numbers</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-slate-500">{checkout.invoiceNumbers.length} invoice(s)</span>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                  checkout.invoiceType === 'closed'
+                    ? 'bg-green-50 text-green-700'
+                    : 'bg-amber-50 text-amber-700'
+                }`}>
+                  {checkout.invoiceType || 'closed'}
+                </span>
+              </div>
+              <div className="space-y-1.5">
                 {checkout.invoiceNumbers.map((invNum, index) => (
-                  <Badge key={index} variant="info">
+                  <div key={index} className="text-sm text-slate-700 bg-slate-50 rounded-lg px-3 py-2 font-mono">
                     {invNum}
-                  </Badge>
+                  </div>
                 ))}
               </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Invoice Type</p>
-              <Badge variant={checkout.invoiceType === 'closed' ? 'success' : 'warning'}>
-                {checkout.invoiceType}
-              </Badge>
+          ) : (
+            <div className="text-center py-8">
+              <DocumentTextIcon className="w-10 h-10 text-slate-200 mx-auto mb-2" />
+              <p className="text-sm text-slate-400">No invoices yet</p>
             </div>
-          </div>
-        </Card>
-      )}
-      {}
+          )}
+        </div>
+      </div>
+
+      {/* Items Taken */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+        <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+            <CubeIcon className="w-4 h-4 text-slate-500" />
+            Items Taken ({checkout.itemName ? '1' : checkout.itemsTaken?.length || 0})
+          </h3>
+          <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
+            Total Qty: {checkout.itemName ? checkout.quantityTaking : checkout.itemsTaken?.reduce((sum, item) => sum + item.quantity, 0) || 0}
+          </span>
+        </div>
+        <div className="divide-y divide-slate-100">
+          {checkout.itemName ? (
+            <div className="px-5 py-3.5 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-900">{checkout.itemName}</p>
+                {checkout.notes && <p className="text-xs text-slate-500 mt-0.5">{checkout.notes}</p>}
+              </div>
+              <span className="text-sm font-bold text-slate-900 bg-slate-100 px-3 py-1 rounded-lg">
+                x{checkout.quantityTaking}
+              </span>
+            </div>
+          ) : (
+            checkout.itemsTaken?.map((item, index) => (
+              <div key={index} className="px-5 py-3.5 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-900">{item.name}</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    {item.sku && <span className="text-xs text-slate-500">SKU: {item.sku}</span>}
+                    {item.notes && <span className="text-xs text-slate-400">• {item.notes}</span>}
+                  </div>
+                </div>
+                <span className="text-sm font-bold text-slate-900 bg-slate-100 px-3 py-1 rounded-lg">
+                  x{item.quantity}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+      {/* Tally Results */}
       {hasTally && (
-        <Card>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <CalculatorIcon className="w-6 h-6" />
-            Tally Results
-          </h2>
-          {}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-              <p className="text-sm text-blue-600 dark:text-blue-400">Total Items Taken</p>
-              <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+          <div className="px-5 py-4 border-b border-slate-200">
+            <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+              <CalculatorIcon className="w-4 h-4 text-slate-500" />
+              Tally Results
+            </h3>
+          </div>
+          {/* Summary Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-5">
+            <div className="bg-blue-50 rounded-lg p-3 text-center">
+              <p className="text-xs font-medium text-blue-600 uppercase tracking-wide">Taken</p>
+              <p className="text-xl font-bold text-blue-700 mt-1">
                 {checkout.tallyResults.discrepancies?.reduce((sum, item) => sum + item.quantityTaken, 0) || 0}
               </p>
             </div>
-            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-              <p className="text-sm text-green-600 dark:text-green-400">Items Sold</p>
-              <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+            <div className="bg-green-50 rounded-lg p-3 text-center">
+              <p className="text-xs font-medium text-green-600 uppercase tracking-wide">Sold</p>
+              <p className="text-xl font-bold text-green-700 mt-1">
                 {checkout.tallyResults.discrepancies?.reduce((sum, item) => sum + item.quantitySold, 0) || 0}
               </p>
-              <p className="text-xs text-green-600 dark:text-green-400 mt-1">From invoices</p>
             </div>
-            <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
-              <p className="text-sm text-orange-600 dark:text-orange-400">Items Used</p>
-              <p className="text-2xl font-bold text-orange-700 dark:text-orange-300">
+            <div className="bg-orange-50 rounded-lg p-3 text-center">
+              <p className="text-xs font-medium text-orange-600 uppercase tracking-wide">Used</p>
+              <p className="text-xl font-bold text-orange-700 mt-1">
                 {(checkout.tallyResults.discrepancies?.reduce((sum, item) => sum + item.quantityTaken, 0) || 0) -
                  (checkout.tallyResults.discrepancies?.reduce((sum, item) => sum + item.quantitySold, 0) || 0)}
               </p>
-              <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">For service/installation</p>
             </div>
-            <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
-              <p className="text-sm text-purple-600 dark:text-purple-400">Discrepancies</p>
-              <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+            <div className="bg-purple-50 rounded-lg p-3 text-center">
+              <p className="text-xs font-medium text-purple-600 uppercase tracking-wide">Issues</p>
+              <p className="text-xl font-bold text-purple-700 mt-1">
                 {checkout.tallyResults.discrepancies?.filter(d => d.status !== 'matched').length || 0}
               </p>
             </div>
           </div>
-          {}
+          {/* Item Comparison */}
           {checkout.tallyResults.discrepancies && checkout.tallyResults.discrepancies.length > 0 && (
-            <>
-              <h3 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+            <div className="border-t border-slate-200">
+              <div className="px-5 py-3 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                 Item Comparison
-              </h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-gray-50 dark:bg-gray-800">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                        Item
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                        Taken
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                        Sold
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                        Used
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                    {checkout.tallyResults.discrepancies.map((item, index) => (
-                      <tr key={index} className={item.status !== 'matched' ? 'bg-yellow-50 dark:bg-yellow-900/10' : ''}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                          {item.name}
-                          {item.sku && <span className="text-xs text-gray-500 ml-2">({item.sku})</span>}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600 dark:text-gray-400">
-                          {item.quantityTaken}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-green-600 dark:text-green-400 font-semibold">
-                          {item.quantitySold}
-                        </td>
-                        <td className={`px-6 py-4 whitespace-nowrap text-sm text-right font-semibold ${
-                          item.difference === 0 ? 'text-gray-600 dark:text-gray-400' :
-                          item.difference > 0 ? 'text-orange-600 dark:text-orange-400' :
-                          'text-red-600 dark:text-red-400'
-                        }`}>
-                          {item.difference > 0 ? item.difference : 0}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {item.status === 'matched' && <Badge variant="success">Matched</Badge>}
-                          {item.status === 'excess' && (
-                            <Badge variant="warning">
-                              <ExclamationTriangleIcon className="w-4 h-4 mr-1" />
-                              Has Returns
-                            </Badge>
-                          )}
-                          {item.status === 'shortage' && (
-                            <Badge variant="danger">
-                              <ExclamationTriangleIcon className="w-4 h-4 mr-1" />
-                              Shortage
-                            </Badge>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
-            </>
+              <div className="divide-y divide-slate-100">
+                {checkout.tallyResults.discrepancies.map((item, index) => (
+                  <div key={index} className={`px-5 py-3 flex items-center justify-between ${item.status !== 'matched' ? 'bg-amber-50/50' : ''}`}>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-slate-900 truncate">{item.name}</p>
+                      {item.sku && <p className="text-xs text-slate-500">{item.sku}</p>}
+                    </div>
+                    <div className="flex items-center gap-6 text-sm">
+                      <div className="text-center w-12">
+                        <div className="text-xs text-slate-500">Taken</div>
+                        <div className="font-medium">{item.quantityTaken}</div>
+                      </div>
+                      <div className="text-center w-12">
+                        <div className="text-xs text-slate-500">Sold</div>
+                        <div className="font-medium text-green-600">{item.quantitySold}</div>
+                      </div>
+                      <div className="text-center w-12">
+                        <div className="text-xs text-slate-500">Used</div>
+                        <div className={`font-medium ${item.difference > 0 ? 'text-orange-600' : 'text-slate-600'}`}>
+                          {item.difference > 0 ? item.difference : 0}
+                        </div>
+                      </div>
+                      <div className="w-24 text-right">
+                        {item.status === 'matched' && (
+                          <span className="inline-flex items-center text-xs font-medium text-green-700 bg-green-50 px-2 py-1 rounded-full">Matched</span>
+                        )}
+                        {item.status === 'excess' && (
+                          <span className="inline-flex items-center text-xs font-medium text-amber-700 bg-amber-50 px-2 py-1 rounded-full">Returns</span>
+                        )}
+                        {item.status === 'shortage' && (
+                          <span className="inline-flex items-center text-xs font-medium text-red-700 bg-red-50 px-2 py-1 rounded-full">Shortage</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
-        </Card>
+        </div>
       )}
       {}
       <Modal
@@ -868,7 +830,7 @@ const TruckCheckoutDetail = () => {
                           <td className="px-4 py-3 text-center">
                             <Badge variant={
                               item.status === 'matched' ? 'success' :
-                              item.status === 'excess' ? 'info' : 'warning'
+                              item.status === 'excess' ? 'info' : 'danger'
                             }>
                               {item.status === 'matched' ? 'Matched' :
                                item.status === 'excess' ? 'Excess (Returns)' : 'Shortage'}
@@ -1108,7 +1070,7 @@ const TruckCheckoutDetail = () => {
                           <td className="px-4 py-3 text-center">
                             <Badge variant={
                               item.status === 'matched' ? 'success' :
-                              item.status === 'excess' ? 'info' : 'warning'
+                              item.status === 'excess' ? 'info' : 'danger'
                             }>
                               {item.status === 'matched' ? 'Matched' :
                                item.status === 'excess' ? 'Excess (Returns)' : 'Shortage'}

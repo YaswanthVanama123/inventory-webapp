@@ -45,7 +45,7 @@ const EmployeeCheckouts = () => {
   };
   const getStatusBadge = (status) => {
     const config = {
-      checked_out: { variant: 'warning', label: 'Checked Out', icon: ClockIcon },
+      checked_out: { variant: 'info', label: 'Checked Out', icon: ClockIcon },
       completed: { variant: 'success', label: 'Completed', icon: CheckCircleIcon },
       cancelled: { variant: 'danger', label: 'Cancelled', icon: XCircleIcon }
     };

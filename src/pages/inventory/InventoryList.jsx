@@ -311,7 +311,7 @@ const InventoryList = () => {
     const variants = {
       'Electronics': 'info',
       'Clothing': 'success',
-      'Food': 'warning',
+      'Food': 'info',
       'Books': 'primary',
       'Furniture': 'default',
     };
@@ -770,7 +770,7 @@ const InventoryList = () => {
                                           {isAdmin && (
                                             <td className="px-4 py-3 text-center">
                                               {purchase.deletionStatus === 'pending' ? (
-                                                <div className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs">
+                                                <div className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
                                                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                   </svg>
@@ -849,7 +849,7 @@ const InventoryList = () => {
                                               <td className="px-4 py-3 text-sm text-slate-700">{invoice.customer?.name || 'Walk-in'}</td>
                                               <td className="px-4 py-3 text-sm font-semibold text-green-700">${invoice.totalAmount?.toFixed(2) || '0.00'}</td>
                                               <td className="px-4 py-3 text-sm">
-                                                <Badge variant={invoice.status === 'paid' ? 'success' : invoice.status === 'pending' ? 'warning' : 'default'}>
+                                                <Badge variant={invoice.status === 'paid' ? 'success' : invoice.status === 'pending' ? 'info' : 'default'}>
                                                   {invoice.status || 'N/A'}
                                                 </Badge>
                                               </td>

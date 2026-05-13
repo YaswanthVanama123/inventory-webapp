@@ -123,7 +123,7 @@ const CustomTooltip = ({ active, payload, label, prefix = '', suffix = '' }) => 
 const PaymentStatusBadge = ({ status }) => {
   const statusConfig = {
     paid: { color: 'bg-green-100 text-green-800', icon: CheckCircle, label: 'Paid' },
-    pending: { color: 'bg-yellow-100 text-yellow-800', icon: Clock, label: 'Pending' },
+    pending: { color: 'bg-blue-100 text-blue-800', icon: Clock, label: 'Pending' },
     failed: { color: 'bg-red-100 text-red-800', icon: XCircle, label: 'Failed' },
     cancelled: { color: 'bg-gray-100 text-gray-800', icon: XCircle, label: 'Cancelled' },
   };

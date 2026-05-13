@@ -137,15 +137,15 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
     if (stockProcessed) {
       return { label: 'Processed', variant: 'success' };
     } else {
-      return { label: 'Pending', variant: 'warning' };
+      return { label: 'Pending', variant: 'info' };
     }
   };
   const getOrderStatusVariant = (status) => {
     const statusMap = {
       'Complete': 'success',
       'Shipped': 'info',
-      'Processing': 'warning',
-      'Pending': 'warning',
+      'Processing': 'info',
+      'Pending': 'info',
       'Cancelled': 'danger',
       'Denied': 'danger'
     };
@@ -572,7 +572,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                                   </div>
                                 ) : (order.receivedQuantity && order.receivedQuantity > 0) ? (
                                   <div className="flex flex-col gap-2">
-                                    <Badge variant="warning" size="sm">Partial ({order.receivedQuantity}/{order.qty})</Badge>
+                                    <Badge variant="info" size="sm">Partial ({order.receivedQuantity}/{order.qty})</Badge>
                                     {order.verificationHistory && order.verificationHistory.length > 0 && (
                                       <span className="text-xs text-blue-600">
                                         {order.verificationHistory.length} receipt(s)

@@ -399,7 +399,7 @@ const RouteStarItemsList = () => {
                       {item.isMapped ? (
                         <Badge variant="success">Mapped</Badge>
                       ) : (
-                        <Badge variant="warning">Unmapped</Badge>
+                        <Badge variant="info">Unmapped</Badge>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

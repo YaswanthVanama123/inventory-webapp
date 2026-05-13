@@ -128,7 +128,7 @@ const Approvals = () => {
               </p>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
-              <Badge variant="warning" className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm lg:text-base">
+              <Badge variant="info" className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm lg:text-base">
                 <Clock className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 {activeTab === 'invoices' ? pendingInvoices.length : pendingPurchaseDeletions.length} Pending
               </Badge>
@@ -154,7 +154,7 @@ const Approvals = () => {
                   <span className="hidden xs:inline">Invoice Approvals</span>
                   <span className="xs:hidden">Invoices</span>
                   {pendingInvoices.length > 0 && (
-                    <Badge variant="warning" className="ml-1 text-xs">
+                    <Badge variant="info" className="ml-1 text-xs">
                       {pendingInvoices.length}
                     </Badge>
                   )}
@@ -175,7 +175,7 @@ const Approvals = () => {
                   <span className="hidden xs:inline">Purchase Deletions</span>
                   <span className="xs:hidden">Deletions</span>
                   {pendingPurchaseDeletions.length > 0 && (
-                    <Badge variant="warning" className="ml-1 text-xs">
+                    <Badge variant="info" className="ml-1 text-xs">
                       {pendingPurchaseDeletions.length}
                     </Badge>
                   )}
@@ -214,7 +214,7 @@ const Approvals = () => {
                               <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white break-words">
                                 Invoice #{invoice.invoiceNumber}
                               </h3>
-                              <Badge variant="warning" className="shadow-md text-xs sm:text-sm">
+                              <Badge variant="info" className="shadow-md text-xs sm:text-sm">
                                 <Clock className="w-3 h-3 mr-1" />
                                 <span className="hidden xs:inline">Pending Approval</span>
                                 <span className="xs:hidden">Pending</span>

@@ -33,7 +33,7 @@ const OrderDetail = () => {
   const getStatusBadgeVariant = (status) => {
     const statusMap = {
       'Complete': 'success',
-      'Processing': 'warning',
+      'Processing': 'info',
       'Shipped': 'info',
       'Cancelled': 'danger',
       'Pending': 'secondary',
@@ -197,7 +197,7 @@ const OrderDetail = () => {
             {order.stockProcessed ? (
               <Badge variant="success">Yes</Badge>
             ) : (
-              <Badge variant="warning">No</Badge>
+              <Badge variant="info">No</Badge>
             )}
           </div>
           {order.stockProcessedAt && (
@@ -293,7 +293,7 @@ const OrderDetail = () => {
                           )}
                         </div>
                       ) : (
-                        <Badge variant="warning" size="sm">Not Verified</Badge>
+                        <Badge variant="info" size="sm">Not Verified</Badge>
                       )}
                     </td>
                   </tr>

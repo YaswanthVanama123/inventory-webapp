@@ -315,7 +315,7 @@ const ItemsInvoiceUsage = () => {
                                           variant={
                                             invoice.status === 'Completed' || invoice.status === 'Closed'
                                               ? 'success'
-                                              : 'warning'
+                                              : 'info'
                                           }
                                         >
                                           {invoice.status}

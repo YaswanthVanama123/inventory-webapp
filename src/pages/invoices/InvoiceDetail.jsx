@@ -40,7 +40,7 @@ const InvoiceDetail = () => {
   const getStatusBadge = (status) => {
     const statusConfig = {
       draft: { variant: 'default', label: 'Draft' },
-      pending: { variant: 'warning', label: 'Pending' },
+      pending: { variant: 'info', label: 'Pending' },
       sent: { variant: 'info', label: 'Sent' },
       paid: { variant: 'success', label: 'Paid' },
       overdue: { variant: 'danger', label: 'Overdue' },
@@ -51,7 +51,7 @@ const InvoiceDetail = () => {
   };
   const getPaymentStatusBadge = (paymentStatus) => {
     const statusConfig = {
-      unpaid: { variant: 'warning', label: 'Unpaid' },
+      unpaid: { variant: 'info', label: 'Unpaid' },
       partial: { variant: 'info', label: 'Partially Paid' },
       paid: { variant: 'success', label: 'Paid' },
       refunded: { variant: 'default', label: 'Refunded' },

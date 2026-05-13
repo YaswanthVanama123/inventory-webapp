@@ -224,7 +224,7 @@ const OrderVerification = () => {
                 const isFullyReceived = totalAfterThis >= expected;
                 const hasDiscrepancy = totalAfterThis !== expected;
                 return (
-                  <tr key={index} className={hasDiscrepancy && !isFullyReceived ? 'bg-yellow-50 dark:bg-yellow-900/10' : ''}>
+                  <tr key={index} className={hasDiscrepancy && !isFullyReceived ? 'bg-blue-50 dark:bg-blue-900/10' : ''}>
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
                         {item.name}
@@ -273,7 +273,7 @@ const OrderVerification = () => {
                       {isFullyReceived ? (
                         <Badge variant="success">Complete</Badge>
                       ) : previouslyReceived > 0 ? (
-                        <Badge variant="warning">Partial</Badge>
+                        <Badge variant="info">Partial</Badge>
                       ) : (
                         <Badge variant="info">Pending</Badge>
                       )}

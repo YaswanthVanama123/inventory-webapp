@@ -277,7 +277,7 @@ const PendingInvoices = () => {
   const getStatusBadgeVariant = (status) => {
     const statusMap = {
       'Completed': 'success',
-      'Pending': 'warning',
+      'Pending': 'info',
       'Closed': 'info',
       'Cancelled': 'danger',
     };
@@ -571,8 +571,8 @@ const PendingInvoices = () => {
                     )}
                   </div>
                 )}
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mt-3">
-                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mt-3">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
                     <strong>Note:</strong> This will permanently delete all pending invoices from the database. You will need to sync again to restore them.
                   </p>
                 </div>
@@ -687,7 +687,7 @@ const PendingInvoices = () => {
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <p className="text-sm text-slate-600 dark:text-gray-400">Pending Processing</p>
-          <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
             {invoices.filter(i => !i.stockProcessed).length}
           </p>
         </div>
@@ -786,7 +786,7 @@ const PendingInvoices = () => {
                             Processed
                           </Badge>
                         ) : (
-                          <Badge variant="warning">Pending</Badge>
+                          <Badge variant="info">Pending</Badge>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

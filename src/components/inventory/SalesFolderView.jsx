@@ -133,20 +133,20 @@ const SalesFolderView = ({ searchTerm = '' }) => {
     const statusMap = {
       'Completed': 'success',
       'Closed': 'success',
-      'Pending': 'warning',
+      'Pending': 'info',
       'Cancelled': 'danger'
     };
     return statusMap[status] || 'secondary';
   };
   const getInvoiceTypeVariant = (type) => {
     const typeMap = {
-      'pending': 'warning',
+      'pending': 'info',
       'closed': 'success'
     };
     return typeMap[type] || 'secondary';
   };
   const getStockStatusVariant = (processed) => {
-    return processed ? 'success' : 'warning';
+    return processed ? 'success' : 'info';
   };
   const handleCheckboxChange = (sku) => {
     setSelectedItems(prev => {

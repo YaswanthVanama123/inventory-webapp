@@ -21,7 +21,12 @@ import {
   TrashIcon,
   UserGroupIcon,
   MagnifyingGlassIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  ChevronDownIcon,
+  CalendarIcon,
+  DocumentTextIcon,
+  UserIcon,
+  CubeIcon
 } from '@heroicons/react/24/outline';
 
 const TruckCheckoutList = () => {
@@ -48,6 +53,7 @@ const TruckCheckoutList = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedCheckout, setExpandedCheckout] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [checkoutToDelete, setCheckoutToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
@@ -227,7 +233,7 @@ const TruckCheckoutList = () => {
   };
   const getStatusBadge = (status) => {
     const config = {
-      checked_out: { variant: 'warning', label: 'Checked Out', icon: ClockIcon },
+      checked_out: { variant: 'info', label: 'Checked Out', icon: ClockIcon },
       completed: { variant: 'success', label: 'Completed', icon: CheckCircleIcon },
       cancelled: { variant: 'danger', label: 'Cancelled', icon: XCircleIcon }
     };
@@ -501,174 +507,238 @@ const TruckCheckoutList = () => {
         </div>
       </Card>
       {activeTab === 'checkouts' && checkoutsSubTab === 'all' && (
-        <Card>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-          Checkouts ({pagination.total} records)
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Employee
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Truck
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Items
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Checkout Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Invoices
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-              {checkouts.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                    No checkouts found
-                  </td>
-                </tr>
-              ) : (
-                checkouts.map((checkout) => (
-                  <tr
-                    key={checkout._id}
-                    onClick={() => handleRowClick(checkout._id)}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <button
-                          onClick={(e) => handleEmployeeClick(checkout.employeeName, e)}
-                          className="font-semibold text-blue-600 dark:text-blue-400 hover:underline"
-                        >
-                          {checkout.employeeName}
-                        </button>
-                        {checkout.employeeId && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            ID: {checkout.employeeId}
-                          </p>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                      {checkout.truckNumber || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm">
-                        {checkout.itemName ? (
-                          <>
-                            <p className="font-medium text-gray-900 dark:text-white">
-                              {checkout.itemName}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                              Qty: {checkout.quantityTaking || 0}
-                            </p>
-                          </>
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+          <div className="px-6 py-4 border-b border-slate-200">
+            <h2 className="text-lg font-semibold text-slate-900">
+              Checkouts ({pagination.total} records)
+            </h2>
+          </div>
+
+          <div className="divide-y divide-slate-100">
+            {checkouts.length === 0 ? (
+              <div className="p-12 text-center">
+                <TruckIcon className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-slate-700 mb-2">No Checkouts Found</h3>
+                <p className="text-slate-500">Checkouts will appear here when items are checked out</p>
+              </div>
+            ) : (
+              checkouts.map((checkout) => {
+                const isExpanded = expandedCheckout === checkout._id;
+                const itemDisplay = checkout.itemName
+                  ? { name: checkout.itemName, qty: checkout.quantityTaking || 0 }
+                  : { name: `${checkout.itemsTaken?.length || 0} items`, qty: checkout.itemsTaken?.reduce((sum, item) => sum + item.quantity, 0) || 0 };
+                return (
+                  <div key={checkout._id}>
+                    {/* Row Header - Clickable */}
+                    <div
+                      onClick={() => setExpandedCheckout(isExpanded ? null : checkout._id)}
+                      className={`flex items-center gap-4 px-6 py-4 cursor-pointer transition-colors ${
+                        isExpanded ? 'bg-blue-50/50' : 'hover:bg-slate-50'
+                      }`}
+                    >
+                      {/* Expand Icon */}
+                      <div className="text-slate-400">
+                        {isExpanded ? (
+                          <ChevronDownIcon className="w-5 h-5 text-blue-600" />
                         ) : (
-                          <>
-                            <p className="font-medium text-gray-900 dark:text-white">
-                              {checkout.itemsTaken?.length || 0} items
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                              Total qty: {checkout.itemsTaken?.reduce((sum, item) => sum + item.quantity, 0) || 0}
-                            </p>
-                          </>
+                          <ChevronRightIcon className="w-5 h-5" />
                         )}
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                      {formatDate(checkout.checkoutDate)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+
+                      {/* Item & Employee Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-slate-900 truncate">
+                            {itemDisplay.name}
+                          </span>
+                          <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                            Qty: {itemDisplay.qty}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 mt-1">
+                          <span className="text-xs font-medium text-blue-600">
+                            {checkout.employeeName}
+                          </span>
+                          <span className="text-xs text-slate-400">
+                            Truck: {checkout.truckNumber || '-'}
+                          </span>
+                          <span className="text-xs text-slate-400">
+                            {formatDate(checkout.checkoutDate)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Status Badge */}
                       {getStatusBadge(checkout.status)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                      {checkout.invoiceNumbers && checkout.invoiceNumbers.length > 0 ? (
-                        <span className="font-medium">{checkout.invoiceNumbers.length} invoices</span>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => handleDelete(checkout._id, e)}
-                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                      >
-                        <TrashIcon className="w-4 h-4" />
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-        {pagination.pages > 1 && (
-          <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-700 dark:text-gray-300">
+
+                      {/* Delete Button */}
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={(e) => handleDelete(checkout._id, e)}
+                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete"
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Expanded Detail Panel */}
+                    {isExpanded && (
+                      <div className="px-6 pb-5 bg-blue-50/30 border-t border-slate-100">
+                        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {/* Employee & Truck Details */}
+                          <div className="bg-white rounded-lg border border-slate-200 p-4">
+                            <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                              <UserIcon className="w-4 h-4 text-slate-500" />
+                              Employee & Truck
+                            </h4>
+                            <dl className="space-y-2.5">
+                              <div className="flex justify-between">
+                                <dt className="text-xs text-slate-500">Employee</dt>
+                                <dd className="text-sm font-medium text-blue-600">
+                                  <button
+                                    onClick={(e) => handleEmployeeClick(checkout.employeeName, e)}
+                                    className="hover:underline"
+                                  >
+                                    {checkout.employeeName}
+                                  </button>
+                                </dd>
+                              </div>
+                              {checkout.employeeId && (
+                                <div className="flex justify-between">
+                                  <dt className="text-xs text-slate-500">Employee ID</dt>
+                                  <dd className="text-sm text-slate-900">{checkout.employeeId}</dd>
+                                </div>
+                              )}
+                              <div className="flex justify-between">
+                                <dt className="text-xs text-slate-500">Truck</dt>
+                                <dd className="text-sm font-medium text-slate-900">{checkout.truckNumber || 'N/A'}</dd>
+                              </div>
+                              <div className="flex justify-between">
+                                <dt className="text-xs text-slate-500">Status</dt>
+                                <dd>{getStatusBadge(checkout.status)}</dd>
+                              </div>
+                            </dl>
+                          </div>
+
+                          {/* Items Detail */}
+                          <div className="bg-white rounded-lg border border-slate-200 p-4">
+                            <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                              <CubeIcon className="w-4 h-4 text-slate-500" />
+                              Items
+                            </h4>
+                            {checkout.itemName ? (
+                              <dl className="space-y-2.5">
+                                <div className="flex justify-between">
+                                  <dt className="text-xs text-slate-500">Item</dt>
+                                  <dd className="text-sm font-medium text-slate-900 text-right max-w-[180px] truncate">{checkout.itemName}</dd>
+                                </div>
+                                <div className="flex justify-between">
+                                  <dt className="text-xs text-slate-500">Quantity</dt>
+                                  <dd className="text-sm font-bold text-slate-900">{checkout.quantityTaking || 0}</dd>
+                                </div>
+                                {checkout.itemSku && (
+                                  <div className="flex justify-between">
+                                    <dt className="text-xs text-slate-500">SKU</dt>
+                                    <dd className="text-sm text-slate-900">{checkout.itemSku}</dd>
+                                  </div>
+                                )}
+                              </dl>
+                            ) : checkout.itemsTaken && checkout.itemsTaken.length > 0 ? (
+                              <div className="space-y-2">
+                                {checkout.itemsTaken.slice(0, 5).map((item, idx) => (
+                                  <div key={idx} className="flex justify-between items-center py-1 border-b border-slate-50 last:border-0">
+                                    <span className="text-sm text-slate-700 truncate max-w-[140px]">{item.itemName || item.name}</span>
+                                    <span className="text-sm font-semibold text-slate-900">x{item.quantity}</span>
+                                  </div>
+                                ))}
+                                {checkout.itemsTaken.length > 5 && (
+                                  <p className="text-xs text-slate-500 pt-1">+{checkout.itemsTaken.length - 5} more items</p>
+                                )}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-slate-400 italic">No items</p>
+                            )}
+                          </div>
+
+                          {/* Timing & Invoices */}
+                          <div className="bg-white rounded-lg border border-slate-200 p-4">
+                            <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                              <CalendarIcon className="w-4 h-4 text-slate-500" />
+                              Timing & Invoices
+                            </h4>
+                            <dl className="space-y-2.5">
+                              <div className="flex justify-between">
+                                <dt className="text-xs text-slate-500">Checkout Date</dt>
+                                <dd className="text-sm text-slate-900">{formatDate(checkout.checkoutDate)}</dd>
+                              </div>
+                              {checkout.completedDate && (
+                                <div className="flex justify-between">
+                                  <dt className="text-xs text-slate-500">Completed</dt>
+                                  <dd className="text-sm text-slate-900">{formatDate(checkout.completedDate)}</dd>
+                                </div>
+                              )}
+                              <div className="pt-2 border-t border-slate-100">
+                                <dt className="text-xs text-slate-500 mb-2">Invoices</dt>
+                                {checkout.invoiceNumbers && checkout.invoiceNumbers.length > 0 ? (
+                                  <div className="space-y-1">
+                                    {checkout.invoiceNumbers.map((inv, idx) => (
+                                      <dd key={idx} className="text-sm text-slate-900 bg-slate-50 rounded px-2 py-1">
+                                        {inv}
+                                      </dd>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <dd className="text-sm text-slate-400 italic">No invoices</dd>
+                                )}
+                              </div>
+                            </dl>
+                          </div>
+                        </div>
+                        {/* View Full Detail Link */}
+                        <div className="mt-4 text-center">
+                          <button
+                            onClick={() => handleRowClick(checkout._id)}
+                            className="text-sm text-blue-600 hover:text-blue-800 font-medium hover:underline"
+                          >
+                            View Full Details →
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Pagination */}
+          {pagination.pages > 1 && (
+            <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+              <div className="text-sm text-slate-600">
                 Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
-                {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} records
+                {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
               </div>
               <div className="flex gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
+                <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                   disabled={pagination.page === 1}
+                  className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Previous
-                </Button>
-                <div className="flex gap-1">
-                  {[...Array(pagination.pages)].map((_, i) => {
-                    const page = i + 1;
-                    if (
-                      page === 1 ||
-                      page === pagination.pages ||
-                      (page >= pagination.page - 1 && page <= pagination.page + 1)
-                    ) {
-                      return (
-                        <Button
-                          key={page}
-                          variant={page === pagination.page ? 'primary' : 'secondary'}
-                          size="sm"
-                          onClick={() => setPagination(prev => ({ ...prev, page }))}
-                        >
-                          {page}
-                        </Button>
-                      );
-                    } else if (page === pagination.page - 2 || page === pagination.page + 2) {
-                      return <span key={page} className="px-2 py-1">...</span>;
-                    }
-                    return null;
-                  })}
-                </div>
-                <Button
-                  variant="secondary"
-                  size="sm"
+                </button>
+                <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                   disabled={pagination.page === pagination.pages}
+                  className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
-                </Button>
+                </button>
               </div>
             </div>
-          </div>
-        )}
-      </Card>
+          )}
+        </div>
       )}
       {activeTab === 'checkouts' && checkoutsSubTab === 'employees' && (
         <Card>
@@ -829,13 +899,13 @@ const TruckCheckoutList = () => {
                   <CheckCircleIcon className="w-8 h-8 text-green-600 dark:text-green-400" />
                 </div>
               </div>
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">Shortage</p>
-                    <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">{salesSummary.shortage || 0}</p>
+                    <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Shortage</p>
+                    <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{salesSummary.shortage || 0}</p>
                   </div>
-                  <ClockIcon className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
+                  <ClockIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
@@ -918,7 +988,7 @@ const TruckCheckoutList = () => {
                           </Badge>
                         )}
                         {item.status === 'Shortage' && (
-                          <Badge variant="warning">
+                          <Badge variant="info">
                             <ClockIcon className="w-4 h-4 mr-1" />
                             Shortage
                           </Badge>
@@ -984,7 +1054,7 @@ const TruckCheckoutList = () => {
                         </p>
                         <div className="flex gap-2 text-xs mt-1">
                           <span className="text-green-600 dark:text-green-400">{employee.goodCount} good</span>
-                          <span className="text-yellow-600 dark:text-yellow-400">{employee.shortageCount} shortage</span>
+                          <span className="text-blue-600 dark:text-blue-400">{employee.shortageCount} shortage</span>
                           <span className="text-red-600 dark:text-red-400">{employee.overageCount} overage</span>
                         </div>
                       </div>
@@ -1056,7 +1126,7 @@ const TruckCheckoutList = () => {
                                       </Badge>
                                     )}
                                     {item.status === 'Shortage' && (
-                                      <Badge variant="warning">
+                                      <Badge variant="info">
                                         <ClockIcon className="w-4 h-4 mr-1" />
                                         Shortage
                                       </Badge>

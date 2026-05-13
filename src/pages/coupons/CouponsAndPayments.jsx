@@ -357,7 +357,7 @@ const CouponsAndPayments = () => {
                         ) : expired ? (
                           <Badge variant="danger">Expired</Badge>
                         ) : usedUp ? (
-                          <Badge variant="warning">Used Up</Badge>
+                          <Badge variant="info">Used Up</Badge>
                         ) : (
                           <Badge variant="default">Inactive</Badge>
                         )}

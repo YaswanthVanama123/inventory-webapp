@@ -58,7 +58,7 @@ const RouteStarInvoiceDetail = () => {
   const getStatusBadgeVariant = (status) => {
     const statusMap = {
       'Completed': 'success',
-      'Pending': 'warning',
+      'Pending': 'info',
       'Closed': 'info',
       'Cancelled': 'danger',
     };
@@ -623,7 +623,7 @@ const RouteStarInvoiceDetail = () => {
               {invoice.stockProcessed ? (
                 <Badge variant="success" size="sm">Processed</Badge>
               ) : (
-                <Badge variant="warning" size="sm">Not Processed</Badge>
+                <Badge variant="info" size="sm">Not Processed</Badge>
               )}
             </p>
           </div>

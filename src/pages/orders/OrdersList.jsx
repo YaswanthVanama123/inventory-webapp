@@ -302,7 +302,7 @@ const OrdersList = () => {
   const getStatusBadgeVariant = (status) => {
     const statusMap = {
       'Complete': 'success',
-      'Processing': 'warning',
+      'Processing': 'info',
       'Shipped': 'info',
       'Cancelled': 'danger',
       'Pending': 'secondary',
@@ -841,7 +841,7 @@ const OrdersList = () => {
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <p className="text-sm text-slate-600 dark:text-gray-400">Pending</p>
-          <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
             {orders.filter(o => !o.stockProcessed).length}
           </p>
         </div>
@@ -998,7 +998,7 @@ const OrdersList = () => {
                             Processed
                           </Badge>
                         ) : (
-                          <Badge variant="warning">
+                          <Badge variant="info">
                             Pending
                           </Badge>
                         )}
@@ -1284,7 +1284,7 @@ const OrdersList = () => {
                       return (
                         <tr
                           key={index}
-                          className={isPartial ? 'bg-blue-50 dark:bg-blue-900/10' : !isFullyReceived && receivingNow < (expected - previouslyReceived) ? 'bg-yellow-50 dark:bg-yellow-900/10' : ''}
+                          className={isPartial ? 'bg-blue-50 dark:bg-blue-900/10' : !isFullyReceived && receivingNow < (expected - previouslyReceived) ? 'bg-blue-50 dark:bg-blue-900/10' : ''}
                         >
                           <td className="px-4 py-3">
                             <div className="text-sm font-medium text-gray-900 dark:text-white">
@@ -1333,9 +1333,9 @@ const OrdersList = () => {
                             {isFullyReceived ? (
                               <Badge variant="success">Complete</Badge>
                             ) : previouslyReceived > 0 ? (
-                              <Badge variant="warning">Partial</Badge>
+                              <Badge variant="info">Partial</Badge>
                             ) : receivingNow < expected ? (
-                              <Badge variant="warning">Shortage</Badge>
+                              <Badge variant="info">Shortage</Badge>
                             ) : (
                               <Badge variant="success">Matched</Badge>
                             )}
@@ -1362,8 +1362,8 @@ const OrdersList = () => {
             </div>
             {}
             {hasDiscrepancies && (
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
-                <p className="text-xs text-yellow-800 dark:text-yellow-200">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                <p className="text-xs text-blue-800 dark:text-blue-200">
                   <strong>Note:</strong> Some items will not be fully received after this verification. The remaining quantities will be tracked for future receipts.
                 </p>
               </div>

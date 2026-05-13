@@ -230,7 +230,6 @@ const adminMenuItems = [
     icon: InvoicesIcon,
     section: 'Operations',
     submenu: [
-      { label: 'View All', path: '/invoices', icon: ListIcon },
       { label: 'Create New', path: '/invoices/new', icon: AddIcon },
       { label: 'Pending (RouteStar)', path: '/invoices/routestar/pending', icon: ClockHistoryIcon },
       { label: 'Closed (RouteStar)', path: '/invoices/routestar/closed', icon: CheckCircleIcon },
@@ -394,7 +393,6 @@ const employeeMenuItems = [
     icon: InvoicesIcon,
     section: 'Daily Work',
     submenu: [
-      { label: 'View All', path: '/invoices', icon: ListIcon },
       { label: 'Pending (RouteStar)', path: '/invoices/routestar/pending', icon: ClockHistoryIcon },
       { label: 'Closed (RouteStar)', path: '/invoices/routestar/closed', icon: CheckCircleIcon },
     ]

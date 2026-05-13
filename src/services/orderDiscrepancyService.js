@@ -29,6 +29,10 @@ const orderDiscrepancyService = {
   getOrderDiscrepancyStats: async () => {
     const response = await api.get('/order-discrepancies/stats');
     return response;
+  },
+  deleteOrderDiscrepancy: async (id) => {
+    const response = await api.delete(`/order-discrepancies/${id}`);
+    return response;
   }
 };
 export default orderDiscrepancyService;

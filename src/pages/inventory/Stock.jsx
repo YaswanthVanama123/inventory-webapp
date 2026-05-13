@@ -1208,15 +1208,16 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
   }, [prefilledItem?.categoryName, prefilledItem?.itemName]);
 
   useEffect(() => {
-    if (formData.systemQuantity && formData.actualQuantity) {
+    if (formData.actualQuantity !== undefined && formData.systemQuantity !== undefined) {
       const diff = formData.actualQuantity - formData.systemQuantity;
-      if (diff > 0 && !formData.discrepancyType) {
-        setFormData(prev => ({ ...prev, discrepancyType: 'Overage' }));
-      } else if (diff < 0 && !formData.discrepancyType) {
-        setFormData(prev => ({ ...prev, discrepancyType: 'Shortage' }));
+      let newType = '';
+      if (diff > 0) newType = 'Overage';
+      else if (diff < 0) newType = 'Shortage';
+      if (newType !== formData.discrepancyType) {
+        setFormData(prev => ({ ...prev, discrepancyType: newType }));
       }
     }
-  }, [formData.systemQuantity, formData.actualQuantity, formData.discrepancyType]);
+  }, [formData.systemQuantity, formData.actualQuantity]);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -1288,30 +1289,39 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 ) : (
                   <div className="border border-gray-200 dark:border-gray-700 rounded-lg max-h-64 overflow-y-auto">
                     {categoryItems.map((item, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => handleCategoryItemSelect(item)}
-                        className={`w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0 ${
-                          formData.itemName === (item.itemName || item.categoryName) ? 'bg-blue-50 dark:bg-blue-900/30' : ''
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          {item.isCategory && (
+                      item.isCategory ? (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => handleCategoryItemSelect(item)}
+                          className={`w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0 ${
+                            formData.itemName === (item.itemName || item.categoryName) ? 'bg-blue-50 dark:bg-blue-900/30' : ''
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
                             <span className="px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 rounded">
                               Category Level
                             </span>
-                          )}
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900 dark:text-white">
-                              {item.itemName || item.categoryName}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {item.sku && `SKU: ${item.sku} • `}Current Stock: {item.currentStock || item.stockRemaining || 0}
+                            <div className="flex-1">
+                              <div className="font-medium text-gray-900 dark:text-white">
+                                {item.itemName || item.categoryName}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                Current Stock: {item.currentStock || item.stockRemaining || 0}
+                              </div>
                             </div>
                           </div>
+                        </button>
+                      ) : (
+                        <div
+                          key={index}
+                          className="w-full px-4 py-2 border-b border-gray-100 dark:border-gray-700 last:border-0 pl-8"
+                        >
+                          <div className="text-sm text-gray-700 dark:text-gray-300">
+                            {item.itemName || item.categoryName}
+                          </div>
                         </div>
-                      </button>
+                      )
                     ))}
                   </div>
                 )}
@@ -1456,18 +1466,13 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Discrepancy Type *
                 </label>
-                <select
-                  value={formData.discrepancyType}
-                  onChange={(e) => setFormData({ ...formData, discrepancyType: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  required
-                >
-                  <option value="">Select type...</option>
-                  <option value="Overage">Overage (More than expected)</option>
-                  <option value="Shortage">Shortage (Less than expected)</option>
-                  <option value="Damage">Damage</option>
-                  <option value="Missing">Missing</option>
-                </select>
+                <input
+                  type="text"
+                  value={formData.discrepancyType ? `${formData.discrepancyType} (${formData.discrepancyType === 'Overage' ? 'More than expected' : 'Less than expected'})` : ''}
+                  disabled
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-600 dark:text-white cursor-not-allowed"
+                  placeholder="Auto-detected from difference"
+                />
               </div>
               {}
               <div>

@@ -23,6 +23,7 @@ const Reports = () => {
   useEffect(() => {
     fetchDashboardData();
   }, [dateRange]);
+
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -34,6 +35,7 @@ const Reports = () => {
       setLoading(false);
     }
   };
+
   const handleQuickDateRange = (days) => {
     const end = new Date();
     const start = subDays(end, days);
@@ -42,6 +44,7 @@ const Reports = () => {
       endDate: format(end, 'yyyy-MM-dd'),
     });
   };
+
   const handleThisMonth = () => {
     const now = new Date();
     setDateRange({
@@ -49,36 +52,17 @@ const Reports = () => {
       endDate: format(endOfMonth(now), 'yyyy-MM-dd'),
     });
   };
-  const reportCards = [
-    {
-      title: 'Sales Report',
-      description: 'View detailed sales analytics and trends',
-      icon: TrendingUp,
-      color: 'from-blue-500 to-blue-600',
-      path: '/reports/sales',
-      stats: dashboardData?.summary?.totalSales
-        ? `$${Number(dashboardData.summary.totalSales).toLocaleString()}`
-        : 'Loading...',
-    },
-    {
-      title: 'Low Stock Report',
-      description: 'View items that need restocking',
-      icon: AlertTriangle,
-      color: 'from-red-500 to-red-600',
-      path: '/reports/low-stock',
-      stats: dashboardData?.lowStock?.count
-        ? `${dashboardData.lowStock.count} items`
-        : 'Loading...',
-    },
-  ];
-  const getPreviewChartData = () => {
-    if (!dashboardData?.recentSales) return [];
-    return dashboardData.recentSales.slice(0, 7).map(item => ({
-      date: format(new Date(item.date), 'MMM dd'),
-      sales: item.sales || 0,
+
+  const getChartData = () => {
+    if (!dashboardData?.salesTrend || dashboardData.salesTrend.length === 0) return [];
+    return dashboardData.salesTrend.map(item => ({
+      date: item.month,
+      sales: item.revenue || 0,
       orders: item.orders || 0,
+      profit: item.profit || 0,
     }));
   };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -86,9 +70,29 @@ const Reports = () => {
       </div>
     );
   }
-  const chartData = getPreviewChartData();
+
+  const chartData = getChartData();
   const summary = dashboardData?.summary || {};
-  const lowStock = dashboardData?.lowStock || {};
+
+  const reportCards = [
+    {
+      title: 'Sales Report',
+      description: 'View detailed sales analytics and trends',
+      icon: TrendingUp,
+      color: 'from-blue-500 to-blue-600',
+      path: '/reports/sales',
+      stats: `$${Number(summary.totalRevenue || 0).toLocaleString()}`,
+    },
+    {
+      title: 'Low Stock Report',
+      description: 'View items that need restocking',
+      icon: AlertTriangle,
+      color: 'from-red-500 to-red-600',
+      path: '/reports/low-stock',
+      stats: `${summary.lowStockCount || 0} items`,
+    },
+  ];
+
   return (
     <div className="space-y-6">
       {}
@@ -146,10 +150,10 @@ const Reports = () => {
             <DollarSign className="w-6 h-6 text-white" />
           </div>
           <p className="text-3xl font-bold text-white">
-            ${Number(summary.totalSales || 0).toLocaleString()}
+            ${Number(summary.totalRevenue || 0).toLocaleString()}
           </p>
           <p className="text-sm text-white mt-2">
-            {Number(summary.salesChange || 0) >= 0 ? '+' : ''}{Number(summary.salesChange || 0).toFixed(1)}% from last period
+            {Number(summary.revenueChange || 0) >= 0 ? '+' : ''}{Number(summary.revenueChange || 0).toFixed(1)}% from last period
           </p>
         </div>
         <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg shadow-sm p-6 text-white">
@@ -173,7 +177,7 @@ const Reports = () => {
             {Number(summary.totalOrders || 0).toLocaleString()}
           </p>
           <p className="text-sm text-white mt-2">
-            Avg: ${Number(summary.averageOrderValue || 0).toFixed(2)}
+            Avg: ${Number(summary.avgOrderValue || 0).toFixed(2)}
           </p>
         </div>
         <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg shadow-sm p-6 text-white">
@@ -182,10 +186,10 @@ const Reports = () => {
             <Package className="w-6 h-6 text-white" />
           </div>
           <p className="text-3xl font-bold text-white">
-            {lowStock.count || 0}
+            {summary.lowStockCount || 0}
           </p>
           <p className="text-sm text-white mt-2">
-            {lowStock.critical || 0} critical priority
+            {summary.reorderCount || 0} need reorder
           </p>
         </div>
       </div>
@@ -194,7 +198,7 @@ const Reports = () => {
         {}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-900">Sales Trend (7 Days)</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Sales Trend</h2>
             <button
               onClick={() => navigate('/reports/sales')}
               className="text-sm text-blue-600 hover:text-blue-700 font-medium"
@@ -219,6 +223,7 @@ const Reports = () => {
                       border: '1px solid #e2e8f0',
                       borderRadius: '8px'
                     }}
+                    formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Revenue']}
                   />
                   <Line
                     type="monotone"
@@ -226,6 +231,15 @@ const Reports = () => {
                     stroke="#3b82f6"
                     strokeWidth={2}
                     dot={{ fill: '#3b82f6', r: 4 }}
+                    name="Revenue"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="profit"
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    dot={{ fill: '#10b981', r: 4 }}
+                    name="Profit"
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -239,7 +253,7 @@ const Reports = () => {
         {}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-900">Orders Overview (7 Days)</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Orders Overview</h2>
             <button
               onClick={() => navigate('/reports/sales')}
               className="text-sm text-blue-600 hover:text-blue-700 font-medium"
@@ -265,7 +279,7 @@ const Reports = () => {
                       borderRadius: '8px'
                     }}
                   />
-                  <Bar dataKey="orders" fill="#6366f1" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="orders" fill="#6366f1" radius={[8, 8, 0, 0]} name="Orders" />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -276,6 +290,36 @@ const Reports = () => {
           </div>
         </div>
       </div>
+      {}
+      {dashboardData?.topSellingItemsDetailed?.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">Top Selling Items</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200">
+              <thead>
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Item</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">SKU</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Revenue</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Qty Sold</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Orders</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {dashboardData.topSellingItemsDetailed.map((item, idx) => (
+                  <tr key={idx} className="hover:bg-slate-50">
+                    <td className="px-4 py-3 text-sm font-medium text-slate-900">{item.itemName}</td>
+                    <td className="px-4 py-3 text-sm text-slate-600">{item.skuCode}</td>
+                    <td className="px-4 py-3 text-sm text-right text-emerald-600 font-semibold">${Number(item.value || 0).toLocaleString()}</td>
+                    <td className="px-4 py-3 text-sm text-right text-slate-700">{item.quantity}</td>
+                    <td className="px-4 py-3 text-sm text-right text-slate-700">{item.orderCount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
       {}
       <div>
         <h2 className="text-xl font-semibold text-slate-900 mb-4">Detailed Reports</h2>
@@ -308,7 +352,7 @@ const Reports = () => {
         </div>
       </div>
       {}
-      {lowStock.count > 0 && (
+      {summary.lowStockCount > 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
           <div className="flex items-start gap-4">
             <div className="flex-shrink-0">
@@ -321,8 +365,8 @@ const Reports = () => {
                 Low Stock Alert
               </h3>
               <p className="text-amber-700 mb-3">
-                You have {lowStock.count} items with low stock levels.
-                {lowStock.critical > 0 && ` ${lowStock.critical} items are at critical level.`}
+                You have {summary.lowStockCount} items with low stock levels.
+                {summary.reorderCount > 0 && ` ${summary.reorderCount} items need reordering.`}
               </p>
               <button
                 onClick={() => navigate('/reports/low-stock')}

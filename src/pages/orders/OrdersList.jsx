@@ -745,8 +745,8 @@ const OrdersList = () => {
               value={searchTerm}
               onChange={handleSearch}
               onClear={handleSearchClear}
-              placeholder="Search by vendor..."
-              className="w-full"
+              placeholder="Search by vendor or order number..."
+              fullWidth
               loading={loading && searchTerm !== debouncedSearchTerm}
             />
           </div>

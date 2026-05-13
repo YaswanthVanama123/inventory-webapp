@@ -42,7 +42,7 @@ const PendingInvoices = () => {
   useEffect(() => {
     fetchInvoices();
     fetchInvoiceRange();
-  }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, dateFrom, dateTo]);
+  }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, dateFrom, dateTo, searchTerm]);
   const fetchInvoiceRange = async () => {
     try {
       const response = await getInvoiceRange('pending');
@@ -235,8 +235,8 @@ const PendingInvoices = () => {
       setDeleting(false);
     }
   };
-  const handleSearch = (value) => {
-    setSearchTerm(value);
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
   const handleStatusFilterChange = (e) => {
@@ -620,7 +620,7 @@ const PendingInvoices = () => {
             value={searchTerm}
             onChange={handleSearch}
             placeholder="Search by customer..."
-            className="w-full"
+            fullWidth
           />
           <Select
             value={statusFilter}

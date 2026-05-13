@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
 import { getOrders, syncOrders, deleteAllOrders, deleteBulkOrdersByNumbers, syncAllOrderDetails } from '../../services/ordersService';
@@ -17,6 +17,7 @@ import Input from '../../components/common/Input';
 
 const OrdersList = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { isAdmin } = useAuth();
   const { showSuccess, showError } = useContext(ToastContext);
 
@@ -35,7 +36,7 @@ const OrdersList = () => {
   const [sourceFilter, setSourceFilter] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page')) || 1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(20);
@@ -290,6 +291,15 @@ const OrdersList = () => {
   };
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    setSearchParams(prev => {
+      const params = new URLSearchParams(prev);
+      if (page === 1) {
+        params.delete('page');
+      } else {
+        params.set('page', page.toString());
+      }
+      return params;
+    });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const handlePageSizeChange = (newSize) => {

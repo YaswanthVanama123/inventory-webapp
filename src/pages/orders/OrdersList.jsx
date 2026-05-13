@@ -378,7 +378,8 @@ const OrdersList = () => {
         setVerifyingOrder(orderData);
         setVerificationItems(orderData.items.map(item => ({
           ...item,
-          receivedQuantity: item.qty,
+          previouslyReceived: item.receivedQuantity || 0,
+          receivingNow: Math.max(0, (item.qty || 0) - (item.receivedQuantity || 0)),
           itemName: item.name
         })));
         setVerificationNotes('');
@@ -391,12 +392,15 @@ const OrdersList = () => {
   };
   const handleQuantityChange = (index, value) => {
     const newItems = [...verificationItems];
-    newItems[index].receivedQuantity = value;
+    newItems[index].receivingNow = value;
     setVerificationItems(newItems);
   };
-  const hasDiscrepancies = verificationItems.some(
-    item => parseFloat(item.receivedQuantity || 0) !== item.qty
-  );
+  const hasDiscrepancies = verificationItems.some(item => {
+    const receivingNow = parseFloat(item.receivingNow || 0);
+    const previouslyReceived = item.previouslyReceived || 0;
+    const totalAfterThis = previouslyReceived + receivingNow;
+    return totalAfterThis !== item.qty;
+  });
   const handleVerifyAllGood = async () => {
     try {
       setSubmittingVerification(true);
@@ -405,7 +409,7 @@ const OrdersList = () => {
         notes: verificationNotes.trim() || 'All items received as expected'
       });
       if (response.success) {
-        showSuccess('Order verified successfully - all items correct');
+        showSuccess('Order verified successfully - all items received');
         setShowVerifyModal(false);
         setVerifyingOrder(null);
         setVerificationItems([]);
@@ -426,7 +430,7 @@ const OrdersList = () => {
         sku: item.sku,
         itemName: item.itemName || item.name,
         expectedQuantity: item.qty,
-        receivedQuantity: parseFloat(item.receivedQuantity) || 0,
+        receivedQuantity: parseFloat(item.receivingNow) || 0,
         notes: item.notes || ''
       }));
       const response = await orderDiscrepancyService.verifyOrder(verifyingOrder._id, {
@@ -435,8 +439,12 @@ const OrdersList = () => {
         notes: verificationNotes.trim()
       });
       if (response.success) {
-        const discrepancyCount = response.data.discrepancies?.length || 0;
-        showSuccess(`Order verified with ${discrepancyCount} discrepancy(ies) recorded`);
+        const { partiallyVerifiedItems = [], fullyReceived = false } = response.data;
+        if (fullyReceived) {
+          showSuccess('Order fully received and verified');
+        } else {
+          showSuccess(`Partial receipt recorded - ${partiallyVerifiedItems.length} item(s) still pending`);
+        }
         setShowVerifyModal(false);
         setVerifyingOrder(null);
         setVerificationItems([]);
@@ -1010,7 +1018,9 @@ const OrdersList = () => {
                               }}
                               className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 font-medium"
                             >
-                              Verify Order
+                              {order.items?.some(i => (i.receivedQuantity || 0) > 0 && (i.receivedQuantity || 0) < i.qty)
+                                ? 'Verify Remaining'
+                                : 'Verify Order'}
                             </button>
                           )}
                           <button
@@ -1233,7 +1243,7 @@ const OrdersList = () => {
             {}
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
               <p className="text-xs text-gray-700 dark:text-gray-300">
-                <strong>Instructions:</strong> Enter the actual quantity received for each item. If all items match exactly, click "All Good". Otherwise, the differences will be recorded as discrepancies for admin approval.
+                <strong>Instructions:</strong> Enter the quantity being received now for each item. Previously received quantities are shown. If all remaining items are being received, click "All Good". Otherwise, adjust quantities and submit.
               </p>
             </div>
             {}
@@ -1249,10 +1259,13 @@ const OrdersList = () => {
                         Expected
                       </th>
                       <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                        Received
+                        Previously Received
                       </th>
                       <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                        Difference
+                        Receiving Now
+                      </th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                        Remaining
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                         Status
@@ -1261,14 +1274,17 @@ const OrdersList = () => {
                   </thead>
                   <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                     {verificationItems.map((item, index) => {
-                      const received = parseFloat(item.receivedQuantity) || 0;
+                      const receivingNow = parseFloat(item.receivingNow) || 0;
+                      const previouslyReceived = item.previouslyReceived || 0;
                       const expected = item.qty;
-                      const difference = received - expected;
-                      const hasDiscrepancy = difference !== 0;
+                      const totalAfterThis = previouslyReceived + receivingNow;
+                      const remaining = Math.max(0, expected - totalAfterThis);
+                      const isFullyReceived = totalAfterThis >= expected;
+                      const isPartial = previouslyReceived > 0 && !isFullyReceived;
                       return (
                         <tr
                           key={index}
-                          className={hasDiscrepancy ? 'bg-yellow-50 dark:bg-yellow-900/10' : ''}
+                          className={isPartial ? 'bg-blue-50 dark:bg-blue-900/10' : !isFullyReceived && receivingNow < (expected - previouslyReceived) ? 'bg-yellow-50 dark:bg-yellow-900/10' : ''}
                         >
                           <td className="px-4 py-3">
                             <div className="text-sm font-medium text-gray-900 dark:text-white">
@@ -1277,14 +1293,26 @@ const OrdersList = () => {
                             <div className="text-xs text-gray-500 dark:text-gray-400">
                               {item.sku}
                             </div>
+                            {item.verificationHistory && item.verificationHistory.length > 0 && (
+                              <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                                {item.verificationHistory.length} previous receipt(s)
+                              </div>
+                            )}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-right text-sm text-gray-700 dark:text-gray-300">
+                          <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-semibold text-gray-900 dark:text-white">
                             {expected}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-right text-sm">
+                            {previouslyReceived > 0 ? (
+                              <span className="font-medium text-blue-600 dark:text-blue-400">{previouslyReceived}</span>
+                            ) : (
+                              <span className="text-gray-400">0</span>
+                            )}
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap text-right">
                             <Input
                               type="number"
-                              value={item.receivedQuantity}
+                              value={item.receivingNow}
                               onChange={(e) => handleQuantityChange(index, e.target.value)}
                               min="0"
                               step="1"
@@ -1293,28 +1321,21 @@ const OrdersList = () => {
                             />
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap text-right">
-                            {hasDiscrepancy ? (
-                              <span
-                                className={`text-sm font-bold ${
-                                  difference > 0
-                                    ? 'text-blue-600 dark:text-blue-400'
-                                    : 'text-orange-600 dark:text-orange-400'
-                                }`}
-                              >
-                                {difference > 0 ? '+' : ''}
-                                {difference}
-                              </span>
-                            ) : (
-                              <span className="text-sm text-green-600 dark:text-green-400">
-                                -
-                              </span>
-                            )}
+                            <span className={`text-sm font-bold ${
+                              remaining === 0
+                                ? 'text-green-600 dark:text-green-400'
+                                : 'text-orange-600 dark:text-orange-400'
+                            }`}>
+                              {remaining}
+                            </span>
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap">
-                            {hasDiscrepancy ? (
-                              <Badge variant={difference > 0 ? 'info' : 'warning'}>
-                                {difference > 0 ? 'Overage' : 'Shortage'}
-                              </Badge>
+                            {isFullyReceived ? (
+                              <Badge variant="success">Complete</Badge>
+                            ) : previouslyReceived > 0 ? (
+                              <Badge variant="warning">Partial</Badge>
+                            ) : receivingNow < expected ? (
+                              <Badge variant="warning">Shortage</Badge>
                             ) : (
                               <Badge variant="success">Matched</Badge>
                             )}
@@ -1343,7 +1364,7 @@ const OrdersList = () => {
             {hasDiscrepancies && (
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
                 <p className="text-xs text-yellow-800 dark:text-yellow-200">
-                  <strong>Discrepancies Detected:</strong> Some items have quantity differences. These will be recorded as discrepancies and sent to admin for approval.
+                  <strong>Note:</strong> Some items will not be fully received after this verification. The remaining quantities will be tracked for future receipts.
                 </p>
               </div>
             )}
@@ -1366,7 +1387,7 @@ const OrdersList = () => {
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  All Good - Everything Matches
+                  All Good - Everything Received
                 </Button>
               ) : (
                 <Button
@@ -1378,7 +1399,7 @@ const OrdersList = () => {
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
-                  Submit with Discrepancies
+                  Submit Partial Receipt
                 </Button>
               )}
             </div>

@@ -25,12 +25,13 @@ const RouteStarItemsList = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [filterForUse, setFilterForUse] = useState(false);
   const [filterForSell, setFilterForSell] = useState(false);
+  const [filterMapped, setFilterMapped] = useState('all');
   useEffect(() => {
     const timer = setTimeout(() => {
       loadData();
-    }, searchText ? 500 : 0); 
+    }, searchText ? 500 : 0);
     return () => clearTimeout(timer);
-  }, [pagination.page, selectedParent, selectedType, selectedCategory, filterForUse, filterForSell, searchText]);
+  }, [pagination.page, selectedParent, selectedType, selectedCategory, filterForUse, filterForSell, filterMapped, searchText]);
   const loadData = async () => {
     try {
       setLoading(true);
@@ -42,7 +43,8 @@ const RouteStarItemsList = () => {
         type: selectedType !== 'all' ? selectedType : undefined,
         itemCategory: selectedCategory !== 'all' ? selectedCategory : undefined,
         forUse: filterForUse ? 'true' : undefined,
-        forSell: filterForSell ? 'true' : undefined
+        forSell: filterForSell ? 'true' : undefined,
+        mapped: filterMapped !== 'all' ? filterMapped : undefined
       };
       const data = await routeStarItemsService.getItemsWithStats(params);
       console.log('Combined page data:', data);
@@ -292,7 +294,7 @@ const RouteStarItemsList = () => {
             </Button>
           </div>
           {}
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-center">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -311,6 +313,15 @@ const RouteStarItemsList = () => {
               />
               <span className="text-sm text-gray-700 dark:text-gray-300">Show only "For Sell"</span>
             </label>
+            <Select
+              value={filterMapped}
+              onChange={(e) => { setFilterMapped(e.target.value); setPagination(p => ({...p, page: 1})); }}
+              className="w-40"
+            >
+              <option value="all">All Status</option>
+              <option value="mapped">Mapped</option>
+              <option value="unmapped">Unmapped</option>
+            </Select>
           </div>
         </div>
       </Card>

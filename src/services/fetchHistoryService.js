@@ -20,7 +20,7 @@ const fetchHistoryService = {
     return response.data || response; 
   },
   async getHistory(params = {}) {
-    const { source, status, fetchType, limit = 50, page = 1, days = 10 } = params;
+    const { source, status, fetchType, limit = 50, page = 1, days = 15 } = params;
     const queryParams = new URLSearchParams();
     if (source) queryParams.append('source', source);
     if (status) queryParams.append('status', status);
@@ -36,7 +36,7 @@ const fetchHistoryService = {
     const response = await api.get(`/fetch-history/active${queryParams}`);
     return response; 
   },
-  async getStatistics(source = null, days = 10) {
+  async getStatistics(source = null, days = 15) {
     const queryParams = new URLSearchParams();
     if (source) queryParams.append('source', source);
     queryParams.append('days', days);
@@ -51,7 +51,7 @@ const fetchHistoryService = {
     const response = await api.post(`/fetch-history/${id}/cancel`);
     return response; 
   },
-  async cleanupOldRecords(days = 10) {
+  async cleanupOldRecords(days = 15) {
     const response = await api.delete(`/fetch-history/cleanup?days=${days}`);
     return response; 
   }

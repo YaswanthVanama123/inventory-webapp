@@ -26,7 +26,7 @@ const FetchHistory = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [sourceFilter, setSourceFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [daysFilter, setDaysFilter] = useState('7');
+  const [daysFilter, setDaysFilter] = useState('15');
   useEffect(() => {
     loadData();
     const interval = setInterval(loadData, 30000);
@@ -228,6 +228,7 @@ const FetchHistory = () => {
                 >
                   <option value="1">Last 24 hours</option>
                   <option value="7">Last 7 days</option>
+                  <option value="15">Last 15 days</option>
                   <option value="30">Last 30 days</option>
                   <option value="all">All Time</option>
                 </select>

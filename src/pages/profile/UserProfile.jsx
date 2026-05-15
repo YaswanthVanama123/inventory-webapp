@@ -59,7 +59,7 @@ const UserProfile = () => {
       color = 'bg-red-500';
     } else if (score <= 4) {
       label = 'Medium';
-      color = 'bg-yellow-500';
+      color = 'bg-blue-500';
     } else {
       label = 'Strong';
       color = 'bg-green-500';
@@ -289,7 +289,7 @@ const UserProfile = () => {
                       <span className="text-slate-600">Password Strength:</span>
                       <span className={`font-medium ${
                         passwordStrength.score <= 2 ? 'text-red-600' :
-                        passwordStrength.score <= 4 ? 'text-yellow-600' :
+                        passwordStrength.score <= 4 ? 'text-blue-600' :
                         'text-green-600'
                       }`}>
                         {passwordStrength.label}

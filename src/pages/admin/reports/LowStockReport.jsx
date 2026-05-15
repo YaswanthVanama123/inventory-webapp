@@ -35,10 +35,10 @@ const PRIORITY_COLORS = {
     dot: 'bg-orange-500',
   },
   Low: {
-    bg: 'bg-yellow-100',
-    text: 'text-yellow-800',
-    border: 'border-yellow-200',
-    dot: 'bg-yellow-500',
+    bg: 'bg-blue-100',
+    text: 'text-blue-800',
+    border: 'border-blue-200',
+    dot: 'bg-blue-500',
   },
 };
 const Card = ({ children, className = '' }) => {
@@ -422,7 +422,7 @@ const LowStockReport = () => {
           title="Low Priority"
           value={summary.lowPriority || 0}
           icon={TrendingDown}
-          iconColor="bg-yellow-600"
+          iconColor="bg-blue-600"
         />
         <StatCard
           title="Total Reorder Cost"

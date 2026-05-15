@@ -55,12 +55,12 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
             You don't have permission to access this page.
           </p>
           {userRole && requiredRoles.length > 0 && (
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mt-4">
-              <p className="text-sm text-yellow-800 dark:text-yellow-200">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
                 <span className="font-semibold">Your role:</span>{' '}
                 <span className="capitalize">{userRole}</span>
               </p>
-              <p className="text-sm text-yellow-800 dark:text-yellow-200 mt-1">
+              <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">
                 <span className="font-semibold">Required role{requiredRoles.length > 1 ? 's' : ''}:</span>{' '}
                 <span className="capitalize">
                   {requiredRoles.join(', ')}

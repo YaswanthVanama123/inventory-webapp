@@ -942,8 +942,8 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
               </div>
 
               {remainingAfter > 0 && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                  <p className="text-sm text-yellow-800">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm text-blue-800">
                     <strong>Note:</strong> This is a partial receipt. You'll need to verify again when the remaining {remainingAfter} unit(s) arrive.
                   </p>
                 </div>

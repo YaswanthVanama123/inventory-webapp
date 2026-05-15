@@ -46,9 +46,9 @@ const Toast = ({ message, type = 'info', onClose }) => {
         };
       case 'warning':
         return {
-          bg: 'bg-yellow-50 border-yellow-200',
-          text: 'text-yellow-800',
-          icon: 'text-yellow-500',
+          bg: 'bg-blue-50 border-blue-200',
+          text: 'text-blue-800',
+          icon: 'text-blue-500',
           iconPath: (
             <path
               strokeLinecap="round"
@@ -113,7 +113,7 @@ const Toast = ({ message, type = 'info', onClose }) => {
         className={`
           flex-shrink-0 ${styles.icon}
           hover:opacity-70 transition-opacity
-          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${type === 'success' ? 'green' : type === 'error' ? 'red' : type === 'warning' ? 'yellow' : 'blue'}-500
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${type === 'success' ? 'green' : type === 'error' ? 'red' : 'blue'}-500
           rounded
         `}
         aria-label="Close notification"

@@ -1013,7 +1013,7 @@ const InventoryList = () => {
                                         </div>
                                         {isAdmin && (
                                           purchase.deletionStatus === 'pending' ? (
-                                            <div className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs flex-shrink-0">
+                                            <div className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs flex-shrink-0">
                                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                               </svg>
@@ -1317,10 +1317,10 @@ const InventoryList = () => {
       >
         {purchaseToDelete && (
           <div className="space-y-4">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <svg
-                  className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5"
+                  className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1333,8 +1333,8 @@ const InventoryList = () => {
                   />
                 </svg>
                 <div>
-                  <p className="text-sm font-medium text-yellow-800">Deletion Request</p>
-                  <p className="text-sm text-yellow-700 mt-1">
+                  <p className="text-sm font-medium text-blue-800">Deletion Request</p>
+                  <p className="text-sm text-blue-700 mt-1">
                     This will submit a request to delete the purchase entry. The deletion requires approval.
                   </p>
                 </div>

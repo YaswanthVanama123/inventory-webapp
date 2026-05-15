@@ -37,7 +37,6 @@ const TruckCheckoutForm = () => {
   const [actualTruckInventory, setActualTruckInventory] = useState('');
   const [truckInventory, setTruckInventory] = useState(null);
   const [loadingTruckInventory, setLoadingTruckInventory] = useState(false);
-  const [showTruckDiscrepancyModal, setShowTruckDiscrepancyModal] = useState(false);
   const [truckDiscrepancyInfo, setTruckDiscrepancyInfo] = useState(null);
   useEffect(() => {
     if (!showItemPicker) {
@@ -148,11 +147,14 @@ const TruckCheckoutForm = () => {
       showError('Please enter remaining quantity');
       return;
     }
+
+    // Detect stock discrepancy
+    let stockDisc = null;
     if (!validateStockMath()) {
       const currentStock = selectedItem.currentStock || 0;
       const expectedRemaining = currentStock - taking;
       const difference = remaining - expectedRemaining;
-      setDiscrepancyInfo({
+      stockDisc = {
         itemName: selectedItem.itemName,
         currentStock,
         taking,
@@ -160,28 +162,22 @@ const TruckCheckoutForm = () => {
         userEnteredRemaining: remaining,
         difference: difference.toFixed(2),
         discrepancyType: difference > 0 ? 'Overage' : 'Shortage',
-      });
-      setShowDiscrepancyModal(true);
-      return;
+      };
     }
 
-    // Validate truck inventory if provided
+    // Detect truck inventory discrepancy
+    let truckDisc = null;
     if (actualTruckInventory && actualTruckInventory.trim() !== '') {
       const actualTruck = parseFloat(actualTruckInventory);
-
       if (isNaN(actualTruck) || actualTruck < 0) {
         showError('Please enter a valid truck inventory quantity');
         return;
       }
-
       if (truckInventory) {
-        // Expected truck inventory AFTER this checkout = current + taking
         const expectedTruckAfterCheckout = truckInventory.currentTruckInventory + taking;
         const truckDifference = actualTruck - expectedTruckAfterCheckout;
-
-        // Use tolerance for floating-point comparison (allow 0.01 difference for rounding)
         if (Math.abs(truckDifference) > 0.01) {
-          setTruckDiscrepancyInfo({
+          truckDisc = {
             itemName: selectedItem.itemName,
             currentTruckInventory: truckInventory.currentTruckInventory,
             quantityTaking: taking,
@@ -189,11 +185,17 @@ const TruckCheckoutForm = () => {
             actualTruckInventory: actualTruck,
             truckDiscrepancyDifference: truckDifference,
             truckDiscrepancyType: truckDifference > 0 ? 'Overage' : 'Shortage',
-          });
-          setShowTruckDiscrepancyModal(true);
-          return;
+          };
         }
       }
+    }
+
+    // Show combined modal if either discrepancy exists
+    if (stockDisc || truckDisc) {
+      setDiscrepancyInfo(stockDisc);
+      setTruckDiscrepancyInfo(truckDisc);
+      setShowDiscrepancyModal(true);
+      return;
     }
 
     await submitCheckout(false, false);
@@ -217,40 +219,38 @@ const TruckCheckoutForm = () => {
       };
       console.log('[TruckCheckout] Submitting:', checkoutData);
       const response = await truckCheckoutService.createCheckoutNew(checkoutData);
-      if (!response.success && response.requiresConfirmation) {
-        const validation = response.validation;
-        setDiscrepancyInfo({
-          itemName: selectedItem.itemName,
-          currentStock: validation.currentStock,
-          taking: validation.quantityTaking,
-          expectedRemaining: validation.systemCalculatedRemaining,
-          userEnteredRemaining: validation.userRemainingQuantity,
-          difference: validation.discrepancyDifference,
-          discrepancyType: validation.discrepancyType,
-        });
-        setShowDiscrepancyModal(true);
-        return;
-      }
 
-      // Handle truck inventory discrepancy confirmation
-      if (!response.success && response.requiresTruckConfirmation) {
-        const truckValidation = response.truckInventoryValidation;
-        setTruckDiscrepancyInfo({
-          itemName: selectedItem.itemName,
-          currentTruckInventory: truckValidation.currentTruckInventoryBeforeCheckout,
-          quantityTaking: parseFloat(quantityTaking),
-          expectedTruckInventory: truckValidation.expectedTruckInventory,
-          actualTruckInventory: truckValidation.actualTruckInventory,
-          truckDiscrepancyDifference: truckValidation.truckDiscrepancyDifference,
-          truckDiscrepancyType: truckValidation.truckDiscrepancyType,
-        });
-        setShowTruckDiscrepancyModal(true);
+      if (!response.success && (response.requiresConfirmation || response.requiresTruckConfirmation)) {
+        if (response.requiresConfirmation) {
+          const validation = response.validation;
+          setDiscrepancyInfo({
+            itemName: selectedItem.itemName,
+            currentStock: validation.currentStock,
+            taking: validation.quantityTaking,
+            expectedRemaining: validation.systemCalculatedRemaining,
+            userEnteredRemaining: validation.userRemainingQuantity,
+            difference: validation.discrepancyDifference,
+            discrepancyType: validation.discrepancyType,
+          });
+        }
+        if (response.requiresTruckConfirmation) {
+          const truckValidation = response.truckInventoryValidation;
+          setTruckDiscrepancyInfo({
+            itemName: selectedItem.itemName,
+            currentTruckInventory: truckValidation.currentTruckInventoryBeforeCheckout,
+            quantityTaking: parseFloat(quantityTaking),
+            expectedTruckInventory: truckValidation.expectedTruckInventory,
+            actualTruckInventory: truckValidation.actualTruckInventory,
+            truckDiscrepancyDifference: truckValidation.truckDiscrepancyDifference,
+            truckDiscrepancyType: truckValidation.truckDiscrepancyType,
+          });
+        }
+        setShowDiscrepancyModal(true);
         return;
       }
 
       if (response.success) {
         setShowDiscrepancyModal(false);
-        setShowTruckDiscrepancyModal(false);
         showSuccess(
           response.discrepancy || response.truckDiscrepancy
             ? 'Checkout created with discrepancy adjustment'
@@ -407,7 +407,7 @@ const TruckCheckoutForm = () => {
                 <div>Total Checked Out: {truckInventory.totalCheckedOut}</div>
                 <div>Total Sold: {truckInventory.totalSold}</div>
                 {truckInventory.discrepancyAdjustment !== 0 && (
-                  <div className="text-yellow-600 dark:text-yellow-400">
+                  <div className="text-blue-600 dark:text-blue-400">
                     Discrepancy Adjustments: {truckInventory.discrepancyAdjustment > 0 ? '+' : ''}
                     {truckInventory.discrepancyAdjustment}
                   </div>
@@ -439,9 +439,9 @@ const TruckCheckoutForm = () => {
           )}
 
           {validationError && (
-            <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg flex items-start gap-3">
-              <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-yellow-700 dark:text-yellow-300">{validationError}</p>
+            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg flex items-start gap-3">
+              <ExclamationTriangleIcon className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-blue-700 dark:text-blue-300">{validationError}</p>
             </div>
           )}
         </Card>
@@ -538,173 +538,91 @@ const TruckCheckoutForm = () => {
       <Modal
         isOpen={showDiscrepancyModal}
         onClose={() => !submitting && setShowDiscrepancyModal(false)}
-        title="Stock Discrepancy Detected"
-        size="md"
+        title="Discrepancy Detected"
+        size="lg"
       >
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-            <ExclamationTriangleIcon className="w-8 h-8 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
-            <div>
-              <h3 className="font-semibold text-yellow-900 dark:text-yellow-100">
-                Stock Count Difference
-              </h3>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                There's a difference between expected and entered warehouse count.
-              </p>
-            </div>
-          </div>
           {discrepancyInfo && (
             <div className="space-y-3">
-              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Item:</span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {discrepancyInfo.itemName}
-                </span>
+              <div className="flex items-center gap-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <ExclamationTriangleIcon className="w-6 h-6 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                <h3 className="font-semibold text-orange-900 dark:text-orange-100">
+                  Stock Remaining Discrepancy
+                </h3>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Current Stock:</span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {discrepancyInfo.currentStock}
-                </span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Taking:</span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {discrepancyInfo.taking}
-                </span>
-              </div>
-              <div className="flex justify-between py-2 border-b-2 border-gray-300 dark:border-gray-600">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Expected Remaining:</span>
-                <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                  {discrepancyInfo.expectedRemaining}
-                </span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
-                <span className="text-sm text-gray-600 dark:text-gray-400">You Entered:</span>
-                <span className="text-sm font-bold text-red-600 dark:text-red-400">
-                  {discrepancyInfo.userEnteredRemaining}
-                </span>
-              </div>
-              <div className="flex justify-between py-2">
-                <span className="text-sm font-medium text-gray-900 dark:text-white">Difference:</span>
-                <span
-                  className={`text-sm font-bold ${
-                    parseFloat(discrepancyInfo.difference) > 0
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-red-600 dark:text-red-400'
-                  }`}
-                >
-                  {parseFloat(discrepancyInfo.difference) > 0 ? '+' : ''}
-                  {discrepancyInfo.difference} ({discrepancyInfo.discrepancyType})
-                </span>
-              </div>
-              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                  ⚠️ Accepting this will automatically create an <strong>Approved</strong> discrepancy
-                  and adjust stock accordingly.
-                </p>
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-2">
+                <div className="flex justify-between py-1">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Current Stock:</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{discrepancyInfo.currentStock}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Taking:</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{discrepancyInfo.taking}</span>
+                </div>
+                <div className="flex justify-between py-1 border-t border-gray-200 dark:border-gray-600 pt-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Expected Remaining:</span>
+                  <span className="text-sm font-bold text-blue-600 dark:text-blue-400">{discrepancyInfo.expectedRemaining}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">You Entered:</span>
+                  <span className="text-sm font-bold text-red-600 dark:text-red-400">{discrepancyInfo.userEnteredRemaining}</span>
+                </div>
+                <div className="flex justify-between py-1 border-t border-gray-200 dark:border-gray-600 pt-2">
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">Difference:</span>
+                  <span className={`text-sm font-bold ${parseFloat(discrepancyInfo.difference) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {parseFloat(discrepancyInfo.difference) > 0 ? '+' : ''}{discrepancyInfo.difference} ({discrepancyInfo.discrepancyType})
+                  </span>
+                </div>
               </div>
             </div>
           )}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setShowDiscrepancyModal(false)}
-              disabled={submitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="danger"
-              loading={submitting}
-              disabled={submitting}
-              onClick={() => submitCheckout(true, false)}
-            >
-              Accept & Create Checkout
-            </Button>
-          </div>
-        </div>
-      </Modal>
 
-      {/* Truck Discrepancy Modal */}
-      <Modal
-        isOpen={showTruckDiscrepancyModal}
-        onClose={() => !submitting && setShowTruckDiscrepancyModal(false)}
-        title="Truck Inventory Discrepancy"
-        size="md"
-      >
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-            <ExclamationTriangleIcon className="w-8 h-8 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
-            <div>
-              <h3 className="font-semibold text-yellow-900 dark:text-yellow-100">
-                Truck Inventory Mismatch
-              </h3>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                The truck inventory you entered doesn't match the system calculation.
-              </p>
-            </div>
-          </div>
           {truckDiscrepancyInfo && (
             <div className="space-y-3">
-              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Item:</span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {truckDiscrepancyInfo.itemName}
-                </span>
+              <div className="flex items-center gap-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <ExclamationTriangleIcon className="w-6 h-6 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                <h3 className="font-semibold text-orange-900 dark:text-orange-100">
+                  Truck Inventory Discrepancy
+                </h3>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Current Truck Inventory:</span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {truckDiscrepancyInfo.currentTruckInventory}
-                </span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Adding to Truck:</span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {truckDiscrepancyInfo.quantityTaking}
-                </span>
-              </div>
-              <div className="flex justify-between py-2 border-b-2 border-gray-300 dark:border-gray-600">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Expected Truck Inventory:</span>
-                <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                  {truckDiscrepancyInfo.expectedTruckInventory}
-                </span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
-                <span className="text-sm text-gray-600 dark:text-gray-400">You Entered:</span>
-                <span className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
-                  {truckDiscrepancyInfo.actualTruckInventory}
-                </span>
-              </div>
-              <div className="flex justify-between py-2">
-                <span className="text-sm font-medium text-gray-900 dark:text-white">Difference:</span>
-                <span
-                  className={`text-sm font-bold ${
-                    truckDiscrepancyInfo.truckDiscrepancyDifference > 0
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-red-600 dark:text-red-400'
-                  }`}
-                >
-                  {truckDiscrepancyInfo.truckDiscrepancyDifference > 0 ? '+' : ''}
-                  {truckDiscrepancyInfo.truckDiscrepancyDifference} ({truckDiscrepancyInfo.truckDiscrepancyType})
-                </span>
-              </div>
-              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                  ⚠️ Accepting this will create an approved <strong>truck discrepancy</strong> record.
-                  This is different from stock discrepancy and tracks your truck inventory separately.
-                </p>
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-2">
+                <div className="flex justify-between py-1">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Current Truck Inventory:</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{truckDiscrepancyInfo.currentTruckInventory}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Adding to Truck:</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{truckDiscrepancyInfo.quantityTaking}</span>
+                </div>
+                <div className="flex justify-between py-1 border-t border-gray-200 dark:border-gray-600 pt-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Expected Truck Inventory:</span>
+                  <span className="text-sm font-bold text-blue-600 dark:text-blue-400">{truckDiscrepancyInfo.expectedTruckInventory}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">You Entered:</span>
+                  <span className="text-sm font-bold text-red-600 dark:text-red-400">{truckDiscrepancyInfo.actualTruckInventory}</span>
+                </div>
+                <div className="flex justify-between py-1 border-t border-gray-200 dark:border-gray-600 pt-2">
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">Difference:</span>
+                  <span className={`text-sm font-bold ${truckDiscrepancyInfo.truckDiscrepancyDifference > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {truckDiscrepancyInfo.truckDiscrepancyDifference > 0 ? '+' : ''}{truckDiscrepancyInfo.truckDiscrepancyDifference} ({truckDiscrepancyInfo.truckDiscrepancyType})
+                  </span>
+                </div>
               </div>
             </div>
           )}
+
+          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              Accepting will create approved discrepancy record(s) and adjust accordingly.
+            </p>
+          </div>
+
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <Button
               type="button"
               variant="ghost"
-              onClick={() => setShowTruckDiscrepancyModal(false)}
+              onClick={() => { setShowDiscrepancyModal(false); setDiscrepancyInfo(null); setTruckDiscrepancyInfo(null); }}
               disabled={submitting}
             >
               Cancel
@@ -714,7 +632,7 @@ const TruckCheckoutForm = () => {
               variant="danger"
               loading={submitting}
               disabled={submitting}
-              onClick={() => submitCheckout(false, true)}
+              onClick={() => submitCheckout(!!discrepancyInfo, !!truckDiscrepancyInfo)}
             >
               Accept & Create Checkout
             </Button>

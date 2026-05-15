@@ -129,13 +129,13 @@ const StockReconciliationView = () => {
               <TrendingUp className="w-8 h-8 text-green-400" />
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4 border border-yellow-200">
+          <div className="bg-white rounded-lg shadow-sm p-4 border border-blue-200">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-slate-500 uppercase font-medium mb-1">Out of Stock</p>
-                <p className="text-2xl font-bold text-yellow-600">{summary.outOfStock}</p>
+                <p className="text-2xl font-bold text-blue-600">{summary.outOfStock}</p>
               </div>
-              <TrendingDown className="w-8 h-8 text-yellow-400" />
+              <TrendingDown className="w-8 h-8 text-blue-400" />
             </div>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4 border border-red-200">
@@ -178,8 +178,8 @@ const StockReconciliationView = () => {
               onClick={() => setFilter('out_of_stock')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filter === 'out_of_stock'
-                  ? 'bg-yellow-600 text-white'
-                  : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
               }`}
             >
               Out of Stock ({summary?.outOfStock || 0})
@@ -274,7 +274,7 @@ const StockReconciliationView = () => {
                   <td className="px-6 py-4 text-right">
                     <span className={`text-base font-bold ${
                       item.stock.current < 0 ? 'text-red-600' :
-                      item.stock.current === 0 ? 'text-yellow-600' :
+                      item.stock.current === 0 ? 'text-blue-600' :
                       'text-green-600'
                     }`}>
                       {item.stock.current}

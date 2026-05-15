@@ -66,7 +66,7 @@ export const calculatePasswordStrength = (password) => {
     color = 'bg-red-500';
   } else if (score <= 4) {
     label = 'Medium';
-    color = 'bg-yellow-500';
+    color = 'bg-blue-500';
   } else {
     label = 'Strong';
     color = 'bg-green-500';

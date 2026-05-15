@@ -52,9 +52,9 @@ const LowStockReport = () => {
         label: 'High'
       },
       medium: {
-        bg: 'bg-yellow-100',
-        text: 'text-yellow-800',
-        border: 'border-yellow-200',
+        bg: 'bg-blue-100',
+        text: 'text-blue-800',
+        border: 'border-blue-200',
         label: 'Medium'
       },
       low: {
@@ -208,12 +208,12 @@ const LowStockReport = () => {
           </div>
           <p className="text-3xl font-bold text-orange-700">{stats.high}</p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-yellow-200 bg-yellow-50">
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-blue-200 bg-blue-50">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-yellow-600">Medium Priority</p>
-            <AlertTriangle className="w-5 h-5 text-yellow-500" />
+            <p className="text-sm text-blue-600">Medium Priority</p>
+            <AlertTriangle className="w-5 h-5 text-blue-500" />
           </div>
-          <p className="text-3xl font-bold text-yellow-700">{stats.medium}</p>
+          <p className="text-3xl font-bold text-blue-700">{stats.medium}</p>
         </div>
       </div>
       {}
@@ -289,7 +289,7 @@ const LowStockReport = () => {
                             className={`h-2 rounded-full ${
                               priority === 'critical' ? 'bg-red-500' :
                               priority === 'high' ? 'bg-orange-500' :
-                              priority === 'medium' ? 'bg-yellow-500' :
+                              priority === 'medium' ? 'bg-blue-500' :
                               'bg-blue-500'
                             }`}
                             style={{
@@ -373,7 +373,7 @@ const LowStockReport = () => {
                     className={`h-2 rounded-full ${
                       priority === 'critical' ? 'bg-red-500' :
                       priority === 'high' ? 'bg-orange-500' :
-                      priority === 'medium' ? 'bg-yellow-500' :
+                      priority === 'medium' ? 'bg-blue-500' :
                       'bg-blue-500'
                     }`}
                     style={{

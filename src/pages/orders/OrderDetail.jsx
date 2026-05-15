@@ -292,6 +292,13 @@ const OrderDetail = () => {
                             </span>
                           )}
                         </div>
+                      ) : item.receivedQuantity > 0 ? (
+                        <div className="flex flex-col gap-1">
+                          <Badge variant="primary" size="sm">Partially Verified</Badge>
+                          <span className="text-xs text-slate-500 dark:text-gray-400">
+                            {item.receivedQuantity} of {item.qty} received
+                          </span>
+                        </div>
                       ) : (
                         <Badge variant="info" size="sm">Not Verified</Badge>
                       )}

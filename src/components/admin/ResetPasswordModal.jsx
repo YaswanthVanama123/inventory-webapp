@@ -53,7 +53,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
       color = 'bg-red-500';
     } else if (score <= 4) {
       label = 'Medium';
-      color = 'bg-yellow-500';
+      color = 'bg-blue-500';
     } else {
       label = 'Strong';
       color = 'bg-green-500';
@@ -223,7 +223,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
                 <span className="text-xs text-gray-600">Password Strength:</span>
                 <span className={`text-xs font-medium ${
                   passwordStrength.label === 'Weak' ? 'text-red-600' :
-                  passwordStrength.label === 'Medium' ? 'text-yellow-600' :
+                  passwordStrength.label === 'Medium' ? 'text-blue-600' :
                   'text-green-600'
                 }`}>
                   {passwordStrength.label}
@@ -322,12 +322,12 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
           </div>
         )}
         {}
-        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+            <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
             <div>
-              <h4 className="text-sm font-semibold text-yellow-900">Security Notice</h4>
-              <p className="text-xs text-yellow-700 mt-1">
+              <h4 className="text-sm font-semibold text-blue-900">Security Notice</h4>
+              <p className="text-xs text-blue-700 mt-1">
                 The user will be required to log in with the new password. Make sure to communicate
                 the new password securely.
               </p>

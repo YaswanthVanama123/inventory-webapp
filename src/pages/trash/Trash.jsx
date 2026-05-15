@@ -192,14 +192,14 @@ const Trash = () => {
           </div>
         )}
         {}
-        <Card padding="lg" className="mt-8 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+        <Card padding="lg" className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
           <div className="flex gap-3">
-            <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-semibold text-yellow-900 dark:text-yellow-200 mb-1">
+              <h4 className="font-semibold text-blue-900 dark:text-blue-200 mb-1">
                 Important Notice
               </h4>
-              <p className="text-sm text-yellow-800 dark:text-yellow-300">
+              <p className="text-sm text-blue-800 dark:text-blue-300">
                 Items in trash are kept for 30 days before being permanently deleted.
                 Once permanently deleted, items cannot be recovered.
               </p>

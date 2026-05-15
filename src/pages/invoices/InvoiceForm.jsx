@@ -571,7 +571,7 @@ const InvoiceForm = () => {
                               item.currentQuantity > 10
                                 ? 'text-green-600 dark:text-green-400'
                                 : item.currentQuantity > 0
-                                ? 'text-yellow-600 dark:text-yellow-400'
+                                ? 'text-blue-600 dark:text-blue-400'
                                 : 'text-red-600 dark:text-red-400'
                             }`}>
                               Stock: {item.currentQuantity}

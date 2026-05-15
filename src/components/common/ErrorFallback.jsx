@@ -71,7 +71,7 @@ const ErrorFallback = ({
     ),
     warning: (
       <svg
-        className={`${sizeStyles[size].iconCircle} text-yellow-600 dark:text-yellow-500`}
+        className={`${sizeStyles[size].iconCircle} text-blue-600 dark:text-blue-500`}
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"

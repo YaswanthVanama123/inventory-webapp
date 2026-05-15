@@ -133,7 +133,7 @@ const UserForm = () => {
       color = 'bg-red-500';
     } else if (score <= 4) {
       label = 'Medium';
-      color = 'bg-yellow-500';
+      color = 'bg-blue-500';
     } else {
       label = 'Strong';
       color = 'bg-green-500';
@@ -430,7 +430,7 @@ const UserForm = () => {
                   <span className="text-xs text-gray-600">Password Strength:</span>
                   <span className={`text-xs font-medium ${
                     passwordStrength.label === 'Weak' ? 'text-red-600' :
-                    passwordStrength.label === 'Medium' ? 'text-yellow-600' :
+                    passwordStrength.label === 'Medium' ? 'text-blue-600' :
                     'text-green-600'
                   }`}>
                     {passwordStrength.label}

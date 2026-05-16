@@ -24,6 +24,8 @@ const Stock = () => {
   const [expandedSkuPurchases, setExpandedSkuPurchases] = useState(new Set());
   const [categorySkuData, setCategorySkuData] = useState({});
   const [categoryDiscrepancies, setCategoryDiscrepancies] = useState({});
+  const [categorySalesHistory, setCategorySalesHistory] = useState({});
+  const [categoryCheckoutHistory, setCategoryCheckoutHistory] = useState({});
   const [loadingCategories, setLoadingCategories] = useState(new Set());
   const [showDiscrepancyModal, setShowDiscrepancyModal] = useState(false);
   const [prefilledItem, setPrefilledItem] = useState(null);
@@ -70,18 +72,27 @@ const Stock = () => {
           const newLoadingCategories = new Set(loadingCategories);
           newLoadingCategories.add(categoryName);
           setLoadingCategories(newLoadingCategories);
-          const response = activeTab === 'use'
-            ? await stockService.getCategorySKUs(categoryName)
-            : await stockService.getCategorySales(categoryName);
+          const response = await stockService.getCategorySales(categoryName);
           setCategorySkuData(prev => ({
             ...prev,
             [categoryName]: response.skus || []
           }));
-          // Store category-level discrepancies separately
           if (response.categoryDiscrepancies) {
             setCategoryDiscrepancies(prev => ({
               ...prev,
               [categoryName]: response.categoryDiscrepancies || []
+            }));
+          }
+          if (response.categorySalesHistory) {
+            setCategorySalesHistory(prev => ({
+              ...prev,
+              [categoryName]: response.categorySalesHistory || []
+            }));
+          }
+          if (response.categoryCheckoutHistory) {
+            setCategoryCheckoutHistory(prev => ({
+              ...prev,
+              [categoryName]: response.categoryCheckoutHistory || []
             }));
           }
           newLoadingCategories.delete(categoryName);
@@ -181,6 +192,8 @@ const Stock = () => {
               setExpandedSKUs(new Set());
               setCategorySkuData({});
               setCategoryDiscrepancies({});
+              setCategorySalesHistory({});
+              setCategoryCheckoutHistory({});
             }}
             className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
               activeTab === 'use'
@@ -189,7 +202,7 @@ const Stock = () => {
             }`}
           >
             <ShoppingCartIcon className="w-5 h-5" />
-            Use Stock (Purchases)
+            Use Stock
           </button>
           <button
             onClick={() => {
@@ -198,6 +211,8 @@ const Stock = () => {
               setExpandedSKUs(new Set());
               setCategorySkuData({});
               setCategoryDiscrepancies({});
+              setCategorySalesHistory({});
+              setCategoryCheckoutHistory({});
             }}
             className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
               activeTab === 'sell'
@@ -211,133 +226,75 @@ const Stock = () => {
         </div>
       </Card>
       {}
-      <div className={`grid grid-cols-1 ${activeTab === 'sell' ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-6`}>
-        {activeTab === 'use' ? (
-          <>
-            {}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Categories</p>
-                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-500">{currentData.totals.categoryCount || 0}</p>
-                </div>
-                <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-                  <FolderIcon className="w-6 h-6 text-blue-600 dark:text-blue-500" />
-                </div>
-              </div>
-              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Distinct categories
-                </p>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Purchased</p>
+              <p className="text-3xl font-bold text-blue-600 dark:text-blue-500">{currentData.totals.totalPurchased || 0}</p>
             </div>
-            {}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Quantity</p>
-                  <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-500">{currentData.totals.totalQuantity || 0}</p>
-                </div>
-                <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center">
-                  <ArrowTrendingUpIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-500" />
-                </div>
-              </div>
-              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Units purchased
-                </p>
-              </div>
+            <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+              <ShoppingCartIcon className="w-6 h-6 text-blue-600 dark:text-blue-500" />
             </div>
-            {}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Value</p>
-                  <p className="text-3xl font-bold text-purple-600 dark:text-purple-500">${(currentData.totals.totalValue || 0).toFixed(2)}</p>
-                </div>
-                <div className="w-12 h-12 bg-purple-50 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
-                  <CurrencyDollarIcon className="w-6 h-6 text-purple-600 dark:text-purple-500" />
-                </div>
-              </div>
-              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Purchase value
-                </p>
-              </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Units ordered
+            </p>
+          </div>
+        </div>
+        {}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Sold</p>
+              <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-500">{currentData.totals.totalSold || 0}</p>
             </div>
-          </>
-        ) : (
-          <>
-            {}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Purchased</p>
-                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-500">{currentData.totals.totalPurchased || 0}</p>
-                </div>
-                <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-                  <ShoppingCartIcon className="w-6 h-6 text-blue-600 dark:text-blue-500" />
-                </div>
-              </div>
-              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Units ordered
-                </p>
-              </div>
+            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg flex items-center justify-center">
+              <ShoppingBagIcon className="w-6 h-6 text-emerald-600 dark:text-emerald-500" />
             </div>
-            {}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Sold</p>
-                  <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-500">{currentData.totals.totalSold || 0}</p>
-                </div>
-                <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg flex items-center justify-center">
-                  <ShoppingBagIcon className="w-6 h-6 text-emerald-600 dark:text-emerald-500" />
-                </div>
-              </div>
-              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Units sold
-                </p>
-              </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Units sold
+            </p>
+          </div>
+        </div>
+        {}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Checked Out</p>
+              <p className="text-3xl font-bold text-orange-600 dark:text-orange-500">{currentData.totals.totalCheckedOut || 0}</p>
             </div>
-            {}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Checked Out</p>
-                  <p className="text-3xl font-bold text-orange-600 dark:text-orange-500">{currentData.totals.totalCheckedOut || 0}</p>
-                </div>
-                <div className="w-12 h-12 bg-orange-50 dark:bg-orange-900/20 rounded-lg flex items-center justify-center">
-                  <TruckIcon className="w-6 h-6 text-orange-600 dark:text-orange-500" />
-                </div>
-              </div>
-              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Units on trucks
-                </p>
-              </div>
+            <div className="w-12 h-12 bg-orange-50 dark:bg-orange-900/20 rounded-lg flex items-center justify-center">
+              <TruckIcon className="w-6 h-6 text-orange-600 dark:text-orange-500" />
             </div>
-            {}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Stock Remaining</p>
-                  <p className="text-3xl font-bold text-purple-600 dark:text-purple-500">{currentData.totals.stockRemaining || 0}</p>
-                </div>
-                <div className="w-12 h-12 bg-purple-50 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
-                  <ArchiveBoxIcon className="w-6 h-6 text-purple-600 dark:text-purple-500" />
-                </div>
-              </div>
-              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Available stock
-                </p>
-              </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Units on trucks
+            </p>
+          </div>
+        </div>
+        {}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Stock Remaining</p>
+              <p className="text-3xl font-bold text-purple-600 dark:text-purple-500">{currentData.totals.stockRemaining || 0}</p>
             </div>
-          </>
-        )}
+            <div className="w-12 h-12 bg-purple-50 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
+              <ArchiveBoxIcon className="w-6 h-6 text-purple-600 dark:text-purple-500" />
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Available stock
+            </p>
+          </div>
+        </div>
       </div>
       {}
       <Card>
@@ -361,43 +318,27 @@ const Stock = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Category Name
                   </th>
-                  {activeTab === 'use' ? (
-                    <>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Total Quantity
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Item Count
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Total Value
-                      </th>
-                    </>
-                  ) : (
-                    <>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Purchased
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Sold
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Checked Out
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Stock Remaining
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Discrepancies
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Orders / Invoices
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Total Value
-                      </th>
-                    </>
-                  )}
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Purchased
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Sold
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Checked Out
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Stock Remaining
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Discrepancies
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Orders / Invoices
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Total Value
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
@@ -428,70 +369,48 @@ const Stock = () => {
                           </div>
                         </div>
                       </td>
-                      {activeTab === 'use' ? (
-                        <>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <span className="text-lg font-bold text-gray-900 dark:text-white">
-                              {item.totalQuantity}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                              {item.itemCount}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right">
-                            <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                              ${item.totalValue.toFixed(2)}
-                            </span>
-                          </td>
-                        </>
-                      ) : (
-                        <>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                              {item.totalPurchased || 0}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                              {item.totalSold || 0}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
-                              {item.totalCheckedOut || 0}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
-                              {item.stockRemaining || 0}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <span className="text-lg font-bold text-red-600 dark:text-red-400">
-                              {item.totalDiscrepancyDifference !== undefined ? item.totalDiscrepancyDifference : item.totalDiscrepancies || 0}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                              {item.itemCount || 0} / {item.invoiceCount || 0}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right">
-                            <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                              ${(item.totalPurchaseValue || 0).toFixed(2)}
-                            </span>
-                          </td>
-                        </>
-                      )}
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                          {item.totalPurchased || 0}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                          {item.totalSold || 0}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                          {item.totalCheckedOut || 0}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                          {item.stockRemaining || 0}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <span className="text-lg font-bold text-red-600 dark:text-red-400">
+                          {item.totalDiscrepancyDifference !== undefined ? item.totalDiscrepancyDifference : item.totalDiscrepancies || 0}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                          {item.itemCount || 0} / {item.invoiceCount || 0}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                          ${(item.totalPurchaseValue || 0).toFixed(2)}
+                        </span>
+                      </td>
                     </tr>
                     {/* Expanded Category Content */}
                     {expandedCategories.has(item.categoryName) && (
                       <>
                         {loadingCategories.has(item.categoryName) ? (
                           <tr>
-                            <td colSpan={activeTab === 'use' ? '4' : '8'} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            <td colSpan="8" className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                               <div className="flex items-center justify-center">
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500 mr-2"></div>
                                 Loading SKUs...
@@ -500,9 +419,8 @@ const Stock = () => {
                           </tr>
                         ) : categorySkuData[item.categoryName] && categorySkuData[item.categoryName].length > 0 ? (
                           <>
-                            {/* Category-Level History Folders (only for Sell Stock) */}
-                            {activeTab === 'sell' && (
-                              <>
+                            {/* Category-Level History Folders */}
+                            <>
                                 {/* Sales History Folder */}
                                 <tr
                                   className="bg-green-50 dark:bg-green-900/10 hover:bg-green-100 dark:hover:bg-green-900/20 cursor-pointer"
@@ -517,7 +435,7 @@ const Stock = () => {
                                       )}
                                       <ShoppingBagIcon className="w-4 h-4 mr-2 text-green-600 dark:text-green-400" />
                                       <span className="font-medium text-gray-900 dark:text-white text-sm">
-                                        Sales History ({categorySkuData[item.categoryName].reduce((sum, sku) => sum + (sku.salesHistory || []).length, 0)} invoices)
+                                        Sales History ({(categorySalesHistory[item.categoryName] || []).length} invoices)
                                       </span>
                                     </div>
                                   </td>
@@ -555,7 +473,7 @@ const Stock = () => {
                                               </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                              {categorySkuData[item.categoryName].flatMap(sku => sku.salesHistory || []).map((record, recordIndex) => (
+                                              {(categorySalesHistory[item.categoryName] || []).map((record, recordIndex) => (
                                                 <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                                                   <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
                                                     {record.invoiceNumber}
@@ -610,7 +528,7 @@ const Stock = () => {
                                       )}
                                       <TruckIcon className="w-4 h-4 mr-2 text-orange-600 dark:text-orange-400" />
                                       <span className="font-medium text-gray-900 dark:text-white text-sm">
-                                        Checkout History ({categorySkuData[item.categoryName].reduce((sum, sku) => sum + (sku.checkoutHistory || []).length, 0)} checkouts)
+                                        Checkout History ({(categoryCheckoutHistory[item.categoryName] || []).length} checkouts)
                                       </span>
                                     </div>
                                   </td>
@@ -642,7 +560,7 @@ const Stock = () => {
                                               </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                              {categorySkuData[item.categoryName].flatMap(sku => sku.checkoutHistory || []).map((record, recordIndex) => (
+                                              {(categoryCheckoutHistory[item.categoryName] || []).map((record, recordIndex) => (
                                                 <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                                                   <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
                                                     {record.employeeName || '-'}
@@ -800,7 +718,6 @@ const Stock = () => {
                                   </tr>
                                 )}
                               </>
-                            )}
 
                             {/* SKU Items */}
                             {categorySkuData[item.categoryName].map((sku) => (
@@ -827,63 +744,41 @@ const Stock = () => {
                                     </div>
                                   </div>
                                 </td>
-                                {activeTab === 'use' ? (
-                                  <>
-                                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                                        {sku.totalQuantity}
-                                      </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                                      <span className="text-xs text-gray-600 dark:text-gray-400">
-                                        {(sku.purchaseHistory || []).length} orders
-                                      </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                                        ${sku.totalValue.toFixed(2)}
-                                      </span>
-                                    </td>
-                                  </>
-                                ) : (
-                                  <>
-                                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                                      <span className="text-xs text-gray-400 dark:text-gray-600">
-                                        -
-                                      </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                                      <span className="text-xs text-gray-400 dark:text-gray-600">
-                                        -
-                                      </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                                      <span className="text-xs text-gray-400 dark:text-gray-600">
-                                        -
-                                      </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                                      <span className="text-xs text-gray-400 dark:text-gray-600">
-                                        -
-                                      </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                                      <span className="text-xs text-gray-400 dark:text-gray-600">
-                                        -
-                                      </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                                      <span className="text-xs text-gray-400 dark:text-gray-600">
-                                        -
-                                      </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                                      <span className="text-xs text-gray-400 dark:text-gray-600">
-                                        -
-                                      </span>
-                                    </td>
-                                  </>
-                                )}
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                  <span className="text-xs text-gray-400 dark:text-gray-600">
+                                    -
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                  <span className="text-xs text-gray-400 dark:text-gray-600">
+                                    -
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                  <span className="text-xs text-gray-400 dark:text-gray-600">
+                                    -
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                  <span className="text-xs text-gray-400 dark:text-gray-600">
+                                    -
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                  <span className="text-xs text-gray-400 dark:text-gray-600">
+                                    -
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                  <span className="text-xs text-gray-400 dark:text-gray-600">
+                                    -
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-right">
+                                  <span className="text-xs text-gray-400 dark:text-gray-600">
+                                    -
+                                  </span>
+                                </td>
                               </tr>
                               {/* SKU Expanded Content */}
                               {expandedSKUs.has(sku.sku) && (
@@ -896,7 +791,7 @@ const Stock = () => {
                                       toggleSkuPurchases(sku.sku);
                                     }}
                                   >
-                                    <td colSpan={activeTab === 'use' ? '4' : '8'} className="px-6 py-3">
+                                    <td colSpan="8" className="px-6 py-3">
                                       <div className="flex items-center pl-16">
                                         {expandedSkuPurchases.has(sku.sku) ? (
                                           <ChevronDownIcon className="w-4 h-4 mr-2 text-gray-500" />
@@ -914,7 +809,7 @@ const Stock = () => {
                                   {/* Purchase History Table */}
                                   {expandedSkuPurchases.has(sku.sku) && sku.purchaseHistory && sku.purchaseHistory.length > 0 && (
                                     <tr>
-                                      <td colSpan={activeTab === 'use' ? '4' : '8'} className="px-0 py-0">
+                                      <td colSpan="8" className="px-0 py-0">
                                         <div className="bg-white dark:bg-gray-900 border-l-4 border-blue-300 dark:border-blue-700 ml-20">
                                           <div className="overflow-x-auto">
                                             <table className="min-w-full">
@@ -996,7 +891,7 @@ const Stock = () => {
                           </>
                         ) : (
                           <tr>
-                            <td colSpan={activeTab === 'use' ? '4' : '8'} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                            <td colSpan="8" className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
                               No SKUs mapped to this category
                             </td>
                           </tr>
@@ -1011,43 +906,27 @@ const Stock = () => {
                   <td className="px-6 py-4 text-right text-sm text-gray-900 dark:text-white uppercase">
                     Total:
                   </td>
-                  {activeTab === 'use' ? (
-                    <>
-                      <td className="px-6 py-4 text-center text-lg text-gray-900 dark:text-white">
-                        {currentData.totals.totalQuantity || 0}
-                      </td>
-                      <td className="px-6 py-4 text-center text-sm text-gray-900 dark:text-white">
-                        {currentData.items.reduce((sum, item) => sum + (item.itemCount || 0), 0)}
-                      </td>
-                      <td className="px-6 py-4 text-right text-lg text-gray-900 dark:text-white">
-                        ${(currentData.totals.totalValue || 0).toFixed(2)}
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td className="px-6 py-4 text-center text-lg text-blue-600 dark:text-blue-400">
-                        {currentData.totals.totalPurchased || 0}
-                      </td>
-                      <td className="px-6 py-4 text-center text-lg text-green-600 dark:text-green-400">
-                        {currentData.totals.totalSold || 0}
-                      </td>
-                      <td className="px-6 py-4 text-center text-lg text-orange-600 dark:text-orange-400">
-                        {currentData.totals.totalCheckedOut || 0}
-                      </td>
-                      <td className="px-6 py-4 text-center text-lg text-purple-600 dark:text-purple-400">
-                        {currentData.totals.stockRemaining || 0}
-                      </td>
-                      <td className="px-6 py-4 text-center text-lg text-red-600 dark:text-red-400">
-                        {currentData.totals.totalDiscrepancyDifference !== undefined ? currentData.totals.totalDiscrepancyDifference : currentData.totals.totalDiscrepancies || 0}
-                      </td>
-                      <td className="px-6 py-4 text-center text-sm text-gray-900 dark:text-white">
-                        {currentData.items.reduce((sum, item) => sum + (item.itemCount || 0), 0)} / {currentData.items.reduce((sum, item) => sum + (item.invoiceCount || 0), 0)}
-                      </td>
-                      <td className="px-6 py-4 text-right text-lg text-gray-900 dark:text-white">
-                        ${(currentData.totals.totalPurchaseValue || 0).toFixed(2)}
-                      </td>
-                    </>
-                  )}
+                  <td className="px-6 py-4 text-center text-lg text-blue-600 dark:text-blue-400">
+                    {currentData.totals.totalPurchased || 0}
+                  </td>
+                  <td className="px-6 py-4 text-center text-lg text-green-600 dark:text-green-400">
+                    {currentData.totals.totalSold || 0}
+                  </td>
+                  <td className="px-6 py-4 text-center text-lg text-orange-600 dark:text-orange-400">
+                    {currentData.totals.totalCheckedOut || 0}
+                  </td>
+                  <td className="px-6 py-4 text-center text-lg text-purple-600 dark:text-purple-400">
+                    {currentData.totals.stockRemaining || 0}
+                  </td>
+                  <td className="px-6 py-4 text-center text-lg text-red-600 dark:text-red-400">
+                    {currentData.totals.totalDiscrepancyDifference !== undefined ? currentData.totals.totalDiscrepancyDifference : currentData.totals.totalDiscrepancies || 0}
+                  </td>
+                  <td className="px-6 py-4 text-center text-sm text-gray-900 dark:text-white">
+                    {currentData.items.reduce((sum, item) => sum + (item.itemCount || 0), 0)} / {currentData.items.reduce((sum, item) => sum + (item.invoiceCount || 0), 0)}
+                  </td>
+                  <td className="px-6 py-4 text-right text-lg text-gray-900 dark:text-white">
+                    ${(currentData.totals.totalPurchaseValue || 0).toFixed(2)}
+                  </td>
                 </tr>
               </tfoot>
             </table>
@@ -1061,10 +940,10 @@ const Stock = () => {
           <div className="text-sm text-blue-800 dark:text-blue-300">
             <p className="font-semibold mb-1">About Stock Categories:</p>
             <ul className="list-disc list-inside space-y-1">
-              <li><strong>Use Stock:</strong> Items for internal use - shows purchase history from orders for tracking purposes</li>
-              <li><strong>Sell Stock:</strong> Resale inventory - shows both purchase history (orders) AND sales history (invoices) to track inventory flow</li>
-              <li><strong>Folder Structure:</strong> Click on a category to view mapped SKUs, then click on a SKU to view detailed history</li>
-              <li><strong>Inventory Tracking:</strong> For Sell Stock, you can see Total Purchased, Total Sold, and Remaining Stock for each SKU</li>
+              <li><strong>Use Stock:</strong> Items for internal use - shows full inventory tracking including purchases, sales, checkouts, and discrepancies</li>
+              <li><strong>Sell Stock:</strong> Resale inventory - shows full inventory tracking including purchases, sales, checkouts, and discrepancies</li>
+              <li><strong>Folder Structure:</strong> Click on a category to view Sales History, Checkout History, Discrepancy History, and mapped SKUs</li>
+              <li><strong>Inventory Tracking:</strong> Both tabs show Total Purchased, Total Sold, Total Checked Out, and Stock Remaining for each category</li>
             </ul>
           </div>
         </div>
@@ -1078,7 +957,6 @@ const Stock = () => {
           }}
           onSuccess={() => {
             setShowDiscrepancyModal(false);
-            // Clear the cached category data to force reload
             if (prefilledItem?.categoryName) {
               setCategorySkuData(prev => {
                 const updated = { ...prev };
@@ -1086,6 +964,16 @@ const Stock = () => {
                 return updated;
               });
               setCategoryDiscrepancies(prev => {
+                const updated = { ...prev };
+                delete updated[prefilledItem.categoryName];
+                return updated;
+              });
+              setCategorySalesHistory(prev => {
+                const updated = { ...prev };
+                delete updated[prefilledItem.categoryName];
+                return updated;
+              });
+              setCategoryCheckoutHistory(prev => {
                 const updated = { ...prev };
                 delete updated[prefilledItem.categoryName];
                 return updated;

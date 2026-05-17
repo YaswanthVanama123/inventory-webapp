@@ -74,7 +74,7 @@ const PendingInvoices = () => {
         params.endDate = dateTo;
       }
       if (searchTerm) {
-        params.customer = searchTerm;
+        params.search = searchTerm;
       }
       const response = await getInvoices(params);
       if (response.success) {
@@ -619,7 +619,7 @@ const PendingInvoices = () => {
           <SearchBar
             value={searchTerm}
             onChange={handleSearch}
-            placeholder="Search by customer..."
+            placeholder="Search by customer or invoice #..."
             fullWidth
           />
           <Select

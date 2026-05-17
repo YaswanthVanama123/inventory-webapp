@@ -74,6 +74,9 @@ const ClosedInvoices = () => {
       if (dateTo) {
         params.endDate = dateTo;
       }
+      if (dateFrom || dateTo) {
+        params.dateField = 'dateCompleted';
+      }
       if (searchTerm) {
         params.search = searchTerm;
       }
@@ -756,6 +759,9 @@ const ClosedInvoices = () => {
                       Date
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-gray-300 uppercase tracking-wider">
+                      Date Completed
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-gray-300 uppercase tracking-wider">
                       Total
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-gray-300 uppercase tracking-wider">
@@ -808,6 +814,11 @@ const ClosedInvoices = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-slate-900 dark:text-white">
                           {formatDate(invoice.invoiceDate)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-slate-900 dark:text-white">
+                          {invoice.dateCompleted ? formatDate(invoice.dateCompleted) : '-'}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

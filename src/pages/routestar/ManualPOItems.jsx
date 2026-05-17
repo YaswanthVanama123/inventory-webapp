@@ -8,7 +8,7 @@ import Modal from '../../components/common/Modal';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import Badge from '../../components/common/Badge';
-import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, PencilIcon, CheckCircleIcon, NoSymbolIcon } from '@heroicons/react/24/outline';
 
 const ManualPOItems = () => {
   const { showSuccess, showError } = useContext(ToastContext);
@@ -183,17 +183,19 @@ const ManualPOItems = () => {
     }
   };
 
-  const handleDelete = async (sku) => {
-    if (!window.confirm(`Are you sure you want to delete SKU: ${sku}?`)) {
+  const handleToggleActive = async (item) => {
+    const newStatus = !item.isActive;
+    const action = newStatus ? 'activate' : 'deactivate';
+    if (!window.confirm(`Are you sure you want to ${action} SKU: ${item.sku}?${newStatus ? '' : '\n\nInactive items cannot be added to new orders, but existing orders remain unchanged.'}`)) {
       return;
     }
 
     try {
-      await manualPOItemService.deleteItem(sku);
-      showSuccess('Manual PO item deleted successfully');
+      await manualPOItemService.updateItem(item.sku, { isActive: newStatus });
+      showSuccess(`Manual PO item ${newStatus ? 'activated' : 'deactivated'} successfully`);
       loadData();
     } catch (error) {
-      showError('Failed to delete item: ' + error.message);
+      showError(`Failed to ${action} item: ` + error.message);
     }
   };
 
@@ -350,14 +352,23 @@ const ManualPOItems = () => {
                         <button
                           onClick={() => handleOpenModal(item)}
                           className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                          title="Edit"
                         >
                           <PencilIcon className="w-5 h-5" />
                         </button>
                         <button
-                          onClick={() => handleDelete(item.sku)}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                          onClick={() => handleToggleActive(item)}
+                          className={item.isActive
+                            ? "text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
+                            : "text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                          }
+                          title={item.isActive ? "Deactivate (block new orders)" : "Activate"}
                         >
-                          <TrashIcon className="w-5 h-5" />
+                          {item.isActive ? (
+                            <NoSymbolIcon className="w-5 h-5" />
+                          ) : (
+                            <CheckCircleIcon className="w-5 h-5" />
+                          )}
                         </button>
                       </div>
                     </td>

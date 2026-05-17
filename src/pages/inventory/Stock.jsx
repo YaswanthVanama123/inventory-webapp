@@ -634,9 +634,6 @@ const Stock = () => {
                                             <thead className="bg-red-50 dark:bg-red-900/20">
                                               <tr>
                                                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
-                                                  Invoice Number
-                                                </th>
-                                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">
                                                   Reported Date
                                                 </th>
                                                 <th className="px-4 py-2 text-center text-xs font-medium text-gray-600 dark:text-gray-400">
@@ -662,9 +659,6 @@ const Stock = () => {
                                             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                               {(categoryDiscrepancies[item.categoryName] || []).map((record, recordIndex) => (
                                                 <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                                                  <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
-                                                    {record.invoiceNumber}
-                                                  </td>
                                                   <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
                                                     {record.reportedAt ? new Date(record.reportedAt).toLocaleDateString() : '-'}
                                                   </td>

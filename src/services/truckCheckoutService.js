@@ -2,9 +2,9 @@ import api from './api';
 
 const truckCheckoutService = {
   
-  searchItems: async (query = '', forSell = true, limit = 100) => {
+  searchItems: async (query = '', limit = 100) => {
     const response = await api.get('/truck-checkouts/items/search', {
-      params: { q: query, forSell, limit }
+      params: { q: query, limit }
     });
     return response;
   },

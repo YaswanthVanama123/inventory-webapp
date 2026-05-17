@@ -52,7 +52,7 @@ const TruckCheckoutForm = () => {
   const searchItems = async () => {
     try {
       setSearching(true);
-      const response = await truckCheckoutService.searchItems(searchQuery, true, 100);
+      const response = await truckCheckoutService.searchItems(searchQuery, 100);
       setSearchResults(response.data || []);
     } catch (error) {
       console.error('Search items error:', error);
@@ -517,8 +517,17 @@ const TruckCheckoutForm = () => {
                 className="w-full p-4 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-between"
               >
                 <div>
-                  <div className="font-medium text-gray-900 dark:text-white">
+                  <div className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
                     {item.itemName}
+                    {item.itemType === 'use' ? (
+                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                        USE
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                        SELL
+                      </span>
+                    )}
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
                     Stock: {item.currentStock || 0} • Purchased: {item.totalPurchased || 0} • Sold:{' '}

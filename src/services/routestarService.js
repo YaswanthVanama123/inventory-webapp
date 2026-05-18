@@ -226,6 +226,15 @@ export const deleteBulkClosedInvoicesByNumbers = async (invoiceNumbers) => {
     throw error;
   }
 };
+export const deleteManualInvoice = async (invoiceNumber) => {
+  try {
+    const response = await api.delete(`/routestar/invoices/manual/${encodeURIComponent(invoiceNumber)}`);
+    return response;
+  } catch (error) {
+    console.error('Error deleting manual invoice:', error);
+    throw error;
+  }
+};
 export const getItemsInvoiceUsage = async () => {
   try {
     const response = await api.get('/routestar/items/invoice-usage');
@@ -254,5 +263,6 @@ export default {
   deleteAllPendingInvoices,
   deleteAllClosedInvoices,
   deleteBulkClosedInvoicesByNumbers,
+  deleteManualInvoice,
   getItemsInvoiceUsage,
 };

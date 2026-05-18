@@ -302,7 +302,7 @@ function App() {
                   path="/invoices/new"
                   element={
                     <ErrorBoundary>
-                      <ProtectedRoute requireAdmin>
+                      <ProtectedRoute>
                         <InvoiceForm />
                       </ProtectedRoute>
                     </ErrorBoundary>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
-import { getInvoices, syncPendingInvoices, syncPendingInvoicesWithDetails, syncPendingInvoiceDetails, syncAllInvoiceDetails, getInvoiceRange, deleteAllPendingInvoices, checkPendingInvoicesInRouteStar } from '../../services/routestarService';
+import { getInvoices, syncPendingInvoices, syncPendingInvoicesWithDetails, syncPendingInvoiceDetails, syncAllInvoiceDetails, getInvoiceRange, deleteAllPendingInvoices, checkPendingInvoicesInRouteStar, deleteManualInvoice } from '../../services/routestarService';
 import SearchBar from '../../components/common/SearchBar';
 import Select from '../../components/common/Select';
 import Button from '../../components/common/Button';
@@ -273,6 +273,19 @@ const PendingInvoices = () => {
   };
   const handleViewInvoice = (invoiceNumber) => {
     navigate(`/invoices/routestar/${invoiceNumber}`);
+  };
+  const handleDeleteManual = async (invoiceNumber) => {
+    if (!window.confirm(`Delete manual invoice ${invoiceNumber}? This action cannot be undone.`)) {
+      return;
+    }
+    try {
+      await deleteManualInvoice(invoiceNumber);
+      showSuccess(`Invoice ${invoiceNumber} deleted`);
+      fetchInvoices();
+    } catch (error) {
+      const msg = error.response?.data?.message || error.message || 'Failed to delete invoice';
+      showError(msg);
+    }
   };
   const getStatusBadgeVariant = (status) => {
     const statusMap = {
@@ -748,8 +761,13 @@ const PendingInvoices = () => {
                       onClick={() => handleViewInvoice(invoice.invoiceNumber)}
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-slate-900 dark:text-white">
+                        <div className="text-sm font-medium text-slate-900 dark:text-white flex items-center gap-2">
                           #{invoice.invoiceNumber}
+                          {invoice.source === 'manual' && (
+                            <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
+                              MANUAL
+                            </span>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -790,15 +808,31 @@ const PendingInvoices = () => {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewInvoice(invoice.invoiceNumber);
-                          }}
-                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                        >
-                          View Details
-                        </button>
+                        <div className="flex items-center gap-3 justify-end">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewInvoice(invoice.invoiceNumber);
+                            }}
+                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                          >
+                            View Details
+                          </button>
+                          {isAdmin && invoice.source === 'manual' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteManual(invoice.invoiceNumber);
+                              }}
+                              className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                              title="Delete manual invoice"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

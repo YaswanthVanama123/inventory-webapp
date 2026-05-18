@@ -22,6 +22,10 @@ const truckCheckoutService = {
     });
     return response;
   },
+  getMyTruckInventory: async () => {
+    const response = await api.get('/truck-checkouts/my-truck-inventory');
+    return response;
+  },
   createCheckoutNew: async (checkoutData) => {
     const response = await api.post('/truck-checkouts/create-new', checkoutData);
     return response;

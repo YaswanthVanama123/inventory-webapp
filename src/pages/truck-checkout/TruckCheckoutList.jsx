@@ -32,13 +32,14 @@ import {
 const TruckCheckoutList = () => {
   const navigate = useNavigate();
   const { showError, showSuccess } = useContext(ToastContext);
-  const { isAdmin } = useContext(AuthContext);
+  const { isAdmin, user } = useContext(AuthContext);
 
   const [activeTab, setActiveTab] = useState('checkouts');
   const [checkoutsSubTab, setCheckoutsSubTab] = useState('all');
   const [salesSubTab, setSalesSubTab] = useState('all');
   const [loading, setLoading] = useState(true);
   const [checkouts, setCheckouts] = useState([]);
+  const [myCheckoutsByItem, setMyCheckoutsByItem] = useState([]);
   const [salesTracking, setSalesTracking] = useState([]);
   const [salesSummary, setSalesSummary] = useState({});
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 50, pages: 0 });
@@ -63,6 +64,8 @@ const TruckCheckoutList = () => {
         loadCheckouts();
       } else if (checkoutsSubTab === 'employees') {
         loadEmployees();
+      } else if (checkoutsSubTab === 'mine') {
+        loadMyCheckoutsByItem();
       }
     } else if (activeTab === 'sales') {
       if (salesSubTab === 'all') {
@@ -89,6 +92,114 @@ const TruckCheckoutList = () => {
     } catch (error) {
       console.error('Load checkouts error:', error);
       showError('Failed to load checkouts');
+    } finally {
+      setLoading(false);
+    }
+  };
+  const loadMyCheckoutsByItem = async () => {
+    try {
+      setLoading(true);
+      const myName = user?.fullName || user?.username || '';
+      if (!myName) {
+        setMyCheckoutsByItem([]);
+        return;
+      }
+      // Pull all my checkouts (status filter still applies, paginated higher)
+      const params = {
+        page: 1,
+        limit: 500,
+        employeeName: myName
+      };
+      if (statusFilter !== 'all') params.status = statusFilter;
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+
+      // Fetch checkouts AND truck inventory in parallel
+      const [checkoutsResp, truckInvResp] = await Promise.all([
+        truckCheckoutService.getCheckouts(params),
+        truckCheckoutService.getMyTruckInventory().catch((err) => {
+          console.warn('[MyCheckouts] my-truck-inventory call failed (backend may need restart):', err.message || err);
+          return { data: { items: [] } };
+        })
+      ]);
+      const mine = checkoutsResp.data.checkouts || [];
+      // Handle both wrapper shapes: {data: {items}} or {items} directly
+      const truckInvItems = truckInvResp?.data?.items || truckInvResp?.items || [];
+      console.log('[MyCheckouts] truck-inventory items received:', truckInvItems.length);
+
+      // Build lookup: itemName (lowercase) → { remainingInTruck, totalSold }
+      const truckInvLookup = new Map();
+      for (const ti of truckInvItems) {
+        if (ti.itemName) {
+          truckInvLookup.set(ti.itemName.toLowerCase().trim(), ti);
+        }
+      }
+
+      // Aggregate by item name (handle both new-shape with itemName and old-shape with itemsTaken)
+      const byItem = new Map();
+      for (const co of mine) {
+        // New shape: single itemName + quantityTaking
+        if (co.itemName) {
+          const key = co.itemName.trim();
+          if (!byItem.has(key)) {
+            byItem.set(key, {
+              itemName: key,
+              totalQuantity: 0,
+              checkoutCount: 0,
+              lastCheckoutDate: null,
+              truckNumbers: new Set()
+            });
+          }
+          const agg = byItem.get(key);
+          agg.totalQuantity += Number(co.quantityTaking || 0);
+          agg.checkoutCount += 1;
+          const date = co.checkoutDate ? new Date(co.checkoutDate) : null;
+          if (date && (!agg.lastCheckoutDate || date > agg.lastCheckoutDate)) {
+            agg.lastCheckoutDate = date;
+          }
+          if (co.truckNumber) agg.truckNumbers.add(co.truckNumber);
+        }
+        // Old shape: itemsTaken array
+        if (Array.isArray(co.itemsTaken)) {
+          for (const it of co.itemsTaken) {
+            const key = (it.name || '').trim();
+            if (!key) continue;
+            if (!byItem.has(key)) {
+              byItem.set(key, {
+                itemName: key,
+                totalQuantity: 0,
+                checkoutCount: 0,
+                lastCheckoutDate: null,
+                truckNumbers: new Set()
+              });
+            }
+            const agg = byItem.get(key);
+            agg.totalQuantity += Number(it.quantity || 0);
+            agg.checkoutCount += 1;
+            const date = co.checkoutDate ? new Date(co.checkoutDate) : null;
+            if (date && (!agg.lastCheckoutDate || date > agg.lastCheckoutDate)) {
+              agg.lastCheckoutDate = date;
+            }
+            if (co.truckNumber) agg.truckNumbers.add(co.truckNumber);
+          }
+        }
+      }
+
+      const result = Array.from(byItem.values())
+        .map(r => {
+          const inv = truckInvLookup.get(r.itemName.toLowerCase().trim());
+          return {
+            ...r,
+            truckNumbers: Array.from(r.truckNumbers),
+            remainingInTruck: inv ? inv.remainingInTruck : null,
+            totalSold: inv ? inv.totalSold : null
+          };
+        })
+        .sort((a, b) => b.totalQuantity - a.totalQuantity);
+      setMyCheckoutsByItem(result);
+    } catch (error) {
+      console.error('Load my checkouts error:', error);
+      showError('Failed to load your checkouts');
     } finally {
       setLoading(false);
     }
@@ -373,6 +484,16 @@ const TruckCheckoutList = () => {
               }`}
             >
               All Checkouts
+            </button>
+            <button
+              onClick={() => setCheckoutsSubTab('mine')}
+              className={`px-4 py-2 font-medium text-sm transition-colors ${
+                checkoutsSubTab === 'mine'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              My Checkouts
             </button>
             <button
               onClick={() => setCheckoutsSubTab('employees')}
@@ -736,6 +857,100 @@ const TruckCheckoutList = () => {
                   Next
                 </button>
               </div>
+            </div>
+          )}
+        </div>
+      )}
+      {activeTab === 'checkouts' && checkoutsSubTab === 'mine' && (
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+          <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">
+                My Checkouts by Item
+              </h2>
+              <p className="text-sm text-slate-500 mt-0.5">
+                {user?.fullName || user?.username || 'You'} — {myCheckoutsByItem.length} unique item{myCheckoutsByItem.length === 1 ? '' : 's'}
+              </p>
+            </div>
+            <div className="flex gap-6">
+              <div className="text-right">
+                <div className="text-xs text-slate-500 uppercase">Checked Out</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {myCheckoutsByItem.reduce((sum, r) => sum + r.totalQuantity, 0)}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-xs text-slate-500 uppercase">Remaining in Truck</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {myCheckoutsByItem.reduce((sum, r) => sum + (r.remainingInTruck ?? 0), 0)}
+                </div>
+              </div>
+            </div>
+          </div>
+          {loading ? (
+            <div className="p-12 text-center">
+              <LoadingSpinner />
+            </div>
+          ) : myCheckoutsByItem.length === 0 ? (
+            <div className="p-12 text-center">
+              <CubeIcon className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-slate-700 mb-2">No checkouts yet</h3>
+              <p className="text-slate-500">Items you check out will appear here grouped by name.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-200">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Item Name</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Total Checked Out</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Sold</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Remaining in Truck</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Checkouts</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Truck(s)</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Last Checkout</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 bg-white">
+                  {myCheckoutsByItem.map((row) => (
+                    <tr key={row.itemName} className="hover:bg-slate-50">
+                      <td className="px-6 py-4">
+                        <div className="font-medium text-slate-900">{row.itemName}</div>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <span className="text-lg font-bold text-blue-600">{row.totalQuantity}</span>
+                      </td>
+                      <td className="px-6 py-4 text-right text-sm text-slate-600">
+                        {row.totalSold !== null ? row.totalSold : '—'}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        {row.remainingInTruck !== null ? (
+                          <span className={`text-lg font-bold ${
+                            row.remainingInTruck > 0
+                              ? 'text-green-600'
+                              : row.remainingInTruck === 0
+                              ? 'text-slate-500'
+                              : 'text-red-600'
+                          }`}>
+                            {row.remainingInTruck}
+                          </span>
+                        ) : (
+                          <span className="text-slate-400">—</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-right text-sm text-slate-600">
+                        {row.checkoutCount}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-700">
+                        {row.truckNumbers.length > 0 ? row.truckNumbers.join(', ') : '—'}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-600">
+                        {row.lastCheckoutDate ? new Date(row.lastCheckoutDate).toLocaleString() : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

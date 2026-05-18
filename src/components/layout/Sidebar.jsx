@@ -404,6 +404,7 @@ const employeeMenuItems = [
     icon: InvoicesIcon,
     section: 'Daily Work',
     submenu: [
+      { label: 'Create New', path: '/invoices/new', icon: AddIcon },
       { label: 'Pending (RouteStar)', path: '/invoices/routestar/pending', icon: ClockHistoryIcon },
       { label: 'Closed (RouteStar)', path: '/invoices/routestar/closed', icon: CheckCircleIcon },
     ]

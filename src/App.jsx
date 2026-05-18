@@ -61,6 +61,7 @@ const Settings = lazy(() => import('./pages/settings/Settings'));
 const Trash = lazy(() => import('./pages/trash/Trash'));
 const EmployeeActivities = lazy(() => import('./pages/activities/EmployeeActivities'));
 const FetchHistory = lazy(() => import('./pages/system/FetchHistory'));
+const QuickBooksSync = lazy(() => import('./pages/system/QuickBooksSync'));
 const EmployeeWorkDashboard = lazy(() => import('./pages/employee/EmployeeWorkDashboard'));
 const TruckCheckoutList = lazy(() => import('./pages/truck-checkout/TruckCheckoutList'));
 const TruckCheckoutForm = lazy(() => import('./pages/truck-checkout/TruckCheckoutForm'));
@@ -631,6 +632,16 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute>
                         <FetchHistory />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/system/quickbooks-sync"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <QuickBooksSync />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

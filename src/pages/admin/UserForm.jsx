@@ -267,7 +267,11 @@ const UserForm = () => {
       // Save screen permissions for employees
       if (formData.role === 'employee') {
         try {
-          const userId = isEditMode ? id : response.data.user._id;
+          const createdUser = response?.data?.user || {};
+          const userId = isEditMode ? id : (createdUser._id || createdUser.id);
+          if (!userId) {
+            throw new Error('Could not determine user id from create response');
+          }
           await screenPermissionService.updateUserPermissions(userId, selectedScreenIds);
         } catch (permErr) {
           console.error('Error saving screen permissions:', permErr);

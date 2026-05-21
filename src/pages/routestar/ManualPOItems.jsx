@@ -23,6 +23,7 @@ const ManualPOItems = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
+    sku: '',
     name: '',
     description: '',
     mappedCategoryItemId: '',
@@ -78,6 +79,7 @@ const ManualPOItems = () => {
     if (item) {
       setEditingItem(item);
       setFormData({
+        sku: item.sku || '',
         name: item.name,
         description: item.description || '',
         mappedCategoryItemId: item.mappedCategoryItemId || '',
@@ -90,6 +92,7 @@ const ManualPOItems = () => {
     } else {
       setEditingItem(null);
       setFormData({
+        sku: '',
         name: '',
         description: '',
         mappedCategoryItemId: '',
@@ -107,6 +110,7 @@ const ManualPOItems = () => {
     setShowModal(false);
     setEditingItem(null);
     setFormData({
+      sku: '',
       name: '',
       description: '',
       mappedCategoryItemId: '',
@@ -165,6 +169,12 @@ const ManualPOItems = () => {
         vendorName: formData.vendorName || null,
         isActive: formData.isActive
       };
+      // SKU is optional on create (auto-generated if blank); editable on
+      // update — only include when the user typed something.
+      const trimmedSku = (formData.sku || '').trim();
+      if (trimmedSku) {
+        submitData.sku = trimmedSku.toUpperCase();
+      }
 
       if (editingItem) {
         await manualPOItemService.updateItem(editingItem.sku, submitData);
@@ -387,22 +397,25 @@ const ManualPOItems = () => {
         title={editingItem ? 'Edit Manual PO Item' : 'Add New Manual PO Item'}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          {editingItem && (
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
-                SKU
-              </label>
-              <Input
-                type="text"
-                value={editingItem.sku}
-                disabled
-                className="w-full bg-slate-100 dark:bg-gray-700"
-              />
-              <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
-                SKU is auto-generated and cannot be changed
-              </p>
-            </div>
-          )}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
+              SKU
+            </label>
+            <Input
+              type="text"
+              name="sku"
+              value={formData.sku}
+              onChange={handleInputChange}
+              placeholder={editingItem ? '' : 'Leave blank to auto-generate (CUSTOM-NNN)'}
+              className="w-full uppercase"
+              autoComplete="off"
+            />
+            <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
+              {editingItem
+                ? 'Editing the SKU will rename it on every linked manual order. Must be unique.'
+                : 'Optional. Leave blank to auto-generate. Must be unique if you set one.'}
+            </p>
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">

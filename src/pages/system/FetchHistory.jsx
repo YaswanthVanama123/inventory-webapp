@@ -27,6 +27,7 @@ const FetchHistory = () => {
   const [sourceFilter, setSourceFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [daysFilter, setDaysFilter] = useState('15');
+  const [cancelling, setCancelling] = useState(false);
   useEffect(() => {
     loadData();
     const interval = setInterval(loadData, 30000);
@@ -54,6 +55,31 @@ const FetchHistory = () => {
       showError('Failed to load fetch history');
     } finally {
       setLoading(false);
+    }
+  };
+  const handleCancelFetch = async () => {
+    if (!selectedFetch?._id) return;
+    if (selectedFetch.status !== 'in_progress') return;
+    const confirmed = window.confirm(
+      'Cancel this in-progress sync? The record will be marked as cancelled. Note: the server-side automation may take a moment to finish its current step before fully stopping.'
+    );
+    if (!confirmed) return;
+    try {
+      setCancelling(true);
+      const result = await fetchHistoryService.cancelFetch(selectedFetch._id);
+      const updated = result?.fetch || {...selectedFetch, status: 'cancelled'};
+      setSelectedFetch(updated);
+      showSuccess('Sync cancelled');
+      await loadData();
+    } catch (error) {
+      console.error('Error cancelling fetch:', error);
+      showError(
+        error?.response?.data?.message ||
+          error.message ||
+          'Failed to cancel sync'
+      );
+    } finally {
+      setCancelling(false);
     }
   };
   const formatDuration = (ms) => {
@@ -358,10 +384,23 @@ const FetchHistory = () => {
                       )}
                     </p>
                   </div>
-                  <div className={`px-4 py-2 rounded-lg border ${getStatusColor(selectedFetch.status)}`}>
-                    <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                      {selectedFetch.status.toUpperCase().replace('_', ' ')}
+                  <div className="flex items-center gap-3">
+                    <div className={`px-4 py-2 rounded-lg border ${getStatusColor(selectedFetch.status)}`}>
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                        {selectedFetch.status.toUpperCase().replace('_', ' ')}
+                      </div>
                     </div>
+                    {selectedFetch.status === 'in_progress' && (
+                      <button
+                        type="button"
+                        onClick={handleCancelFetch}
+                        disabled={cancelling}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
+                        title="Cancel this in-progress sync">
+                        <XCircleIcon className="w-4 h-4" />
+                        {cancelling ? 'Cancelling…' : 'Cancel Sync'}
+                      </button>
+                    )}
                   </div>
                 </div>
                 {/* Stats Grid */}

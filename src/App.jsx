@@ -15,6 +15,7 @@ const LoadingFallback = () => (
   </div>
 );
 const Login = lazy(() => import('./pages/Login'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const AdminDashboard = lazy(() => import('./pages/admin/EnhancedDashboard'));
 const EmployeeDashboard = lazy(() => import('./pages/employee/Dashboard'));
 const InventoryList = lazy(() => import('./pages/inventory/InventoryList'));
@@ -128,6 +129,14 @@ function App() {
                   element={
                     <ErrorBoundary>
                       <Login />
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/privacy-policy"
+                  element={
+                    <ErrorBoundary>
+                      <PrivacyPolicy />
                     </ErrorBoundary>
                   }
                 />

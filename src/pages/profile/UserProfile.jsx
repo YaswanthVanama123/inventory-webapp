@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import userService from '../../services/userService';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
-import { UserIcon, LockClosedIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import {
+  UserIcon,
+  LockClosedIcon,
+  Cog6ToothIcon,
+  ExclamationTriangleIcon,
+} from '@heroicons/react/24/outline';
 
 
 const UserProfile = () => {
-  const { user, changePassword, loading } = useAuth();
+  const { user, changePassword, logout, loading } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
@@ -149,10 +157,36 @@ const UserProfile = () => {
     }
     return user?.username?.slice(0, 2).toUpperCase() || 'U';
   };
+  // Self-service deactivation. Same effect as the admin's "Inactive" toggle —
+  // the account is deactivated, not hard-deleted. The user is signed out
+  // immediately because a deactivated account can't sign in again.
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText.trim().toUpperCase() !== 'DELETE') {
+      setMessage({
+        type: 'danger',
+        text: 'Please type DELETE in the confirmation field to continue.',
+      });
+      return;
+    }
+    try {
+      setDeletingAccount(true);
+      await userService.deactivateOwnAccount();
+      // Logout clears auth state and redirects to login.
+      await logout();
+    } catch (error) {
+      setMessage({
+        type: 'danger',
+        text: error?.message || 'Failed to delete account. Please try again.',
+      });
+    } finally {
+      setDeletingAccount(false);
+    }
+  };
   const tabs = [
     { id: 'profile', label: 'Profile Information', icon: UserIcon },
     { id: 'password', label: 'Change Password', icon: LockClosedIcon },
     { id: 'preferences', label: 'Preferences', icon: Cog6ToothIcon },
+    { id: 'danger', label: 'Delete Account', icon: ExclamationTriangleIcon },
   ];
   return (
     <div className="space-y-6">
@@ -497,6 +531,75 @@ const UserProfile = () => {
                   </Button>
                 </div>
               </form>
+            </div>
+          )}
+
+          {activeTab === 'danger' && (
+            <div className="max-w-2xl">
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                  <ExclamationTriangleIcon className="w-6 h-6 text-red-600" />
+                  Delete Account
+                </h3>
+                <p className="text-slate-600 dark:text-gray-400">
+                  Deactivate your account. You will be signed out immediately and won't be able to sign in again unless an administrator reactivates the account.
+                </p>
+              </div>
+
+              <div className="rounded-lg border border-red-200 dark:border-red-900/40 bg-red-50/60 dark:bg-red-950/20 p-5 mb-6">
+                <h4 className="text-sm font-semibold text-red-900 dark:text-red-200 mb-2">
+                  What happens when you delete your account
+                </h4>
+                <ul className="text-sm text-red-800 dark:text-red-300 list-disc pl-5 space-y-1">
+                  <li>Your account is marked <strong>inactive</strong> immediately.</li>
+                  <li>You are signed out and cannot sign in again.</li>
+                  <li>Inventory records and audit history you created remain unchanged.</li>
+                  <li>An administrator can reactivate your account later if needed.</li>
+                </ul>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-900 dark:text-white block mb-2">
+                    Type <span className="font-mono font-bold text-red-600 dark:text-red-400">DELETE</span> to confirm
+                  </label>
+                  <Input
+                    type="text"
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    placeholder="DELETE"
+                    autoComplete="off"
+                    className="font-mono"
+                    disabled={deletingAccount}
+                  />
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleDeleteAccount}
+                    disabled={
+                      deletingAccount ||
+                      deleteConfirmText.trim().toUpperCase() !== 'DELETE'
+                    }
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ExclamationTriangleIcon className="w-4 h-4" />
+                    {deletingAccount ? 'Deleting…' : 'Delete My Account'}
+                  </button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => {
+                      setDeleteConfirmText('');
+                      setActiveTab('profile');
+                    }}
+                    disabled={deletingAccount}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
         </div>

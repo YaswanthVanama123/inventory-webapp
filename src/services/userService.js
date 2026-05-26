@@ -112,5 +112,18 @@ const userService = {
       });
     }
   },
+  // Self-service deactivation. Hits the public (any-authenticated-user)
+  // endpoint POST /users/me/deactivate. The account is marked isActive:false;
+  // an admin can reactivate later.
+  deactivateOwnAccount: async () => {
+    try {
+      const response = await api.post('/users/me/deactivate');
+      return response;
+    } catch (error) {
+      throw handleApiError(error, {
+        network: 'Unable to deactivate account right now. Please try again.',
+      });
+    }
+  },
 };
 export default userService;

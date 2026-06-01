@@ -196,12 +196,10 @@ const OrdersList = () => {
     setSyncingAll(true);
     setSyncing(true);
     try {
-      // First sync new orders (this creates fetch history)
       const ordersResponse = await syncOrders(0, 'new');
       if (ordersResponse.success) {
         const { created = 0, updated = 0, skipped = 0 } = ordersResponse.data;
 
-        // Then sync order details for all orders without details
         let detailsSynced = 0;
         try {
           const detailsResponse = await syncAllOrderDetails(0);

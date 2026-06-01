@@ -13,7 +13,6 @@ const CustomerExport = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // Set default dates (last 30 days)
   useEffect(() => {
     const today = new Date();
     const thirtyDaysAgo = new Date();
@@ -55,7 +54,6 @@ const CustomerExport = () => {
         throw new Error('Failed to export customers');
       }
 
-      // Create download link
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');

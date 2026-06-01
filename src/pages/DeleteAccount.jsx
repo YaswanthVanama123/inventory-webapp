@@ -24,7 +24,7 @@ const DeleteAccount = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-gray-950 text-slate-800 dark:text-gray-200">
-      {/* Top bar */}
+      {}
       <header className="sticky top-0 z-30 bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-slate-200 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
           <Link
@@ -42,7 +42,7 @@ const DeleteAccount = () => {
         </div>
       </header>
 
-      {/* Hero */}
+      {}
       <section className="border-b border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
           <div className="flex flex-col items-start gap-4 max-w-3xl">
@@ -68,9 +68,9 @@ const DeleteAccount = () => {
         </div>
       </section>
 
-      {/* Body */}
+      {}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-10">
-        {/* Critical warning */}
+        {}
         <div className="rounded-xl border-2 border-red-300 dark:border-red-900 bg-red-50 dark:bg-red-950/30 p-6">
           <div className="flex items-start gap-4">
             <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center">
@@ -91,7 +91,7 @@ const DeleteAccount = () => {
           </div>
         </div>
 
-        {/* What gets deleted */}
+        {}
         <section>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 pb-2 border-b border-slate-200 dark:border-gray-800">
             What gets permanently deleted
@@ -124,7 +124,7 @@ const DeleteAccount = () => {
           </div>
         </section>
 
-        {/* What is retained */}
+        {}
         <section>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 pb-2 border-b border-slate-200 dark:border-gray-800">
             What we are legally required to keep
@@ -163,14 +163,14 @@ const DeleteAccount = () => {
           </p>
         </section>
 
-        {/* Steps */}
+        {}
         <section>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 pb-2 border-b border-slate-200 dark:border-gray-800">
             How to permanently delete your account
           </h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Web app */}
+            {}
             <MethodCard
               icon={<ComputerDesktopIcon className="w-6 h-6" />}
               title="From the Web App"
@@ -201,7 +201,7 @@ const DeleteAccount = () => {
               ]}
             />
 
-            {/* Mobile app */}
+            {}
             <MethodCard
               icon={<DevicePhoneMobileIcon className="w-6 h-6" />}
               title="From the Mobile App"
@@ -227,7 +227,7 @@ const DeleteAccount = () => {
             />
           </div>
 
-          {/* Email fallback */}
+          {}
           <div className="mt-6 rounded-xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center">
@@ -259,7 +259,7 @@ const DeleteAccount = () => {
           </div>
         </section>
 
-        {/* Timeline */}
+        {}
         <section>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 pb-2 border-b border-slate-200 dark:border-gray-800">
             What happens next
@@ -305,7 +305,7 @@ const DeleteAccount = () => {
           </ol>
         </section>
 
-        {/* FAQ */}
+        {}
         <section>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 pb-2 border-b border-slate-200 dark:border-gray-800">
             Frequently asked questions
@@ -346,7 +346,7 @@ const DeleteAccount = () => {
           </div>
         </section>
 
-        {/* CTA */}
+        {}
         <section className="rounded-xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
             <div className="flex-1 min-w-0">
@@ -377,7 +377,7 @@ const DeleteAccount = () => {
         </section>
       </main>
 
-      {/* Footer */}
+      {}
       <footer className="border-t border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500 dark:text-gray-500">
           <p>

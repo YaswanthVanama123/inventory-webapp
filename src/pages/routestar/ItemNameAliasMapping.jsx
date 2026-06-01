@@ -121,7 +121,6 @@ const ItemNameAliasMapping = () => {
     newAliases[index] = value;
     setModalData(prev => ({ ...prev, aliases: newAliases }));
 
-    // Show suggestions for unmapped items matching the typed text
     if (value.trim().length > 0) {
       const searchLower = value.toLowerCase();
       const currentAliasesLower = newAliases
@@ -129,12 +128,9 @@ const ItemNameAliasMapping = () => {
         .map(a => a.toLowerCase());
 
       const suggestions = uniqueItems.filter(item => {
-        // Show unmapped items, or items mapped to the current mapping being edited
         const isAvailable = !item.isMapped ||
           (editingMapping && item.canonicalName === editingMapping.canonicalName);
-        // Don't suggest items already in the aliases list
         const notAlreadyAdded = !currentAliasesLower.includes(item.itemName.toLowerCase());
-        // Match search text
         const matchesSearch = item.itemName.toLowerCase().includes(searchLower);
         return isAvailable && notAlreadyAdded && matchesSearch;
       }).slice(0, 10);
@@ -760,7 +756,6 @@ const ItemNameAliasMapping = () => {
                       }
                     }}
                     onBlur={() => {
-                      // Delay to allow click on suggestion
                       setTimeout(() => {
                         if (activeAliasIndex === index) {
                           setAliasSuggestions([]);
@@ -778,7 +773,7 @@ const ItemNameAliasMapping = () => {
                     disabled={modalData.aliases.length === 1}
                   />
                 </div>
-                {/* Autocomplete suggestions dropdown */}
+                {}
                 {activeAliasIndex === index && aliasSuggestions.length > 0 && (
                   <div className="absolute z-50 left-0 right-12 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                     {aliasSuggestions.map((item, sIdx) => (

@@ -1,16 +1,6 @@
-/**
- * Date formatting utilities with Virginia US timezone (America/New_York)
- * All dates are automatically converted to Eastern Time (ET)
- */
 
 const VIRGINIA_TIMEZONE = 'America/New_York';
 
-/**
- * Format date to localized string in Virginia timezone
- * @param {string|Date} date - Date to format
- * @param {Object} options - Intl.DateTimeFormat options
- * @returns {string} Formatted date string
- */
 export const formatDate = (date, options = {}) => {
   if (!date) return 'N/A';
 
@@ -32,12 +22,6 @@ export const formatDate = (date, options = {}) => {
   }
 };
 
-/**
- * Format date and time to localized string in Virginia timezone
- * @param {string|Date} date - Date to format
- * @param {Object} options - Intl.DateTimeFormat options
- * @returns {string} Formatted date and time string
- */
 export const formatDateTime = (date, options = {}) => {
   if (!date) return 'N/A';
 
@@ -61,12 +45,6 @@ export const formatDateTime = (date, options = {}) => {
   }
 };
 
-/**
- * Format time only in Virginia timezone
- * @param {string|Date} date - Date to format
- * @param {Object} options - Intl.DateTimeFormat options
- * @returns {string} Formatted time string
- */
 export const formatTime = (date, options = {}) => {
   if (!date) return 'N/A';
 
@@ -88,11 +66,6 @@ export const formatTime = (date, options = {}) => {
   }
 };
 
-/**
- * Format date with full details including timezone abbreviation
- * @param {string|Date} date - Date to format
- * @returns {string} Formatted date string with timezone
- */
 export const formatDateTimeFull = (date) => {
   if (!date) return 'N/A';
 
@@ -115,11 +88,6 @@ export const formatDateTimeFull = (date) => {
   }
 };
 
-/**
- * Format date for display in tables (short format)
- * @param {string|Date} date - Date to format
- * @returns {string} Formatted date string
- */
 export const formatDateShort = (date) => {
   if (!date) return 'N/A';
 
@@ -138,11 +106,6 @@ export const formatDateShort = (date) => {
   }
 };
 
-/**
- * Format date and time for display in tables (compact format)
- * @param {string|Date} date - Date to format
- * @returns {string} Formatted date and time string
- */
 export const formatDateTimeShort = (date) => {
   if (!date) return 'N/A';
 
@@ -163,12 +126,6 @@ export const formatDateTimeShort = (date) => {
   }
 };
 
-/**
- * Get relative time string (e.g., "2 hours ago", "3 days ago")
- * Calculated based on Virginia timezone
- * @param {string|Date} date - Date to format
- * @returns {string} Relative time string
- */
 export const formatRelativeTime = (date) => {
   if (!date) return 'N/A';
 
@@ -193,10 +150,6 @@ export const formatRelativeTime = (date) => {
   }
 };
 
-/**
- * Legacy compatibility - converts date to Virginia timezone locale string
- * @deprecated Use formatDate or formatDateTime instead
- */
 export const toVirginiaTime = (date) => {
   if (!date) return 'N/A';
 

@@ -9,7 +9,6 @@ import { ToastContext } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 
-
 const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = '', onFilteredCountChange }) => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useContext(ToastContext);
@@ -28,13 +27,13 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
   const [notes, setNotes] = useState('');
   useEffect(() => {
     fetchGroupedItems();
-  }, [searchTerm]); 
+  }, [searchTerm]);
 
   const fetchGroupedItems = async () => {
     setLoading(true);
     try {
       const params = {
-        limit: 1000 
+        limit: 1000
       };
 
       if (searchTerm) {
@@ -242,7 +241,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
 
       console.log('[FolderView] Verification successful, refetching from database...');
 
-      // Fetch fresh data from database
       const updatedOrders = await api.get(`/customerconnect/items/${encodeURIComponent(sku)}/orders`);
       const orders = updatedOrders.data?.data?.entries || updatedOrders.data?.entries || [];
 
@@ -257,7 +255,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
         });
       }
 
-      // Update state with fresh database data
       setGroupedItems(prev => prev.map(item => {
         if (item.sku === sku) {
           console.log('[FolderView] Updating SKU', sku, 'with fresh data from DB');
@@ -720,7 +717,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
         </div>
       </Modal>
 
-      {/* Verification Confirmation Modal */}
+      {}
       <Modal
         isOpen={verifyModalOpen}
         onClose={() => {
@@ -835,7 +832,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                 </div>
               </div>
 
-              {/* Verification History */}
+              {}
               {verificationHistory.length > 0 && (
                 <div className="space-y-3">
                   <h4 className="text-sm font-semibold text-gray-900">Previous Receipts:</h4>
@@ -881,7 +878,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                 </div>
               )}
 
-              {/* Quantity Information */}
+              {}
               <div className="space-y-3">
                 <h4 className="text-sm font-semibold text-gray-900">Quantity Information:</h4>
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 space-y-3">
@@ -927,7 +924,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                 </div>
               </div>
 
-              {/* Notes */}
+              {}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
                   Notes (Optional)

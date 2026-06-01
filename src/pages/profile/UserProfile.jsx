@@ -11,7 +11,6 @@ import {
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 
-
 const UserProfile = () => {
   const { user, changePassword, logout, loading } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
@@ -157,9 +156,6 @@ const UserProfile = () => {
     }
     return user?.username?.slice(0, 2).toUpperCase() || 'U';
   };
-  // Self-service deactivation. Same effect as the admin's "Inactive" toggle —
-  // the account is deactivated, not hard-deleted. The user is signed out
-  // immediately because a deactivated account can't sign in again.
   const handleDeleteAccount = async () => {
     if (deleteConfirmText.trim().toUpperCase() !== 'DELETE') {
       setMessage({
@@ -171,7 +167,6 @@ const UserProfile = () => {
     try {
       setDeletingAccount(true);
       await userService.deactivateOwnAccount();
-      // Logout clears auth state and redirects to login.
       await logout();
     } catch (error) {
       setMessage({

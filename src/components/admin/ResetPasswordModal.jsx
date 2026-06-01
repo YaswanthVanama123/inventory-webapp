@@ -112,7 +112,7 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
 
     setLoading(true);
     try {
-      const userId = user._id || user.id; // Handle both _id and id
+      const userId = user._id || user.id;
 
       if (!userId) {
         throw new Error('User ID is missing');

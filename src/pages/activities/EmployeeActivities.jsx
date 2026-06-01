@@ -101,7 +101,7 @@ const EmployeeActivities = () => {
     setFilters(prev => ({
       ...prev,
       [key]: value,
-      page: 1, 
+      page: 1,
     }));
   };
   const clearFilters = () => {
@@ -425,16 +425,13 @@ const EmployeeActivities = () => {
                     {activity.details && (
                       <div className="mt-3 space-y-1">
                         {Object.entries(activity.details).map(([key, value]) => {
-                          // Skip null, undefined, or empty values
                           if (value === null || value === undefined || value === '') return null;
 
-                          // Format the key to be more readable
                           const formattedKey = key
                             .replace(/([A-Z])/g, ' $1')
                             .replace(/^./, str => str.toUpperCase())
                             .trim();
 
-                          // Format the value
                           let formattedValue = value;
                           if (typeof value === 'object') {
                             formattedValue = JSON.stringify(value);

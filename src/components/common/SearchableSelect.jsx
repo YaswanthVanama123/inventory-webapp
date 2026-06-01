@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { MagnifyingGlassIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-
 const SearchableSelect = ({
   value,
   onChange,
@@ -22,7 +21,6 @@ const SearchableSelect = ({
   const containerRef = useRef(null);
   const searchInputRef = useRef(null);
   useEffect(() => {
-    // Ensure options is always an array
     const safeOptions = Array.isArray(options) ? options : [];
 
     if (!searchTerm) {
@@ -30,7 +28,6 @@ const SearchableSelect = ({
     } else {
       const searchLower = searchTerm.toLowerCase();
       const filtered = safeOptions.filter(option => {
-        // Safety check for undefined options
         if (!option) return false;
 
         try {

@@ -25,7 +25,6 @@ const RouteStarInvoiceDetail = () => {
     try {
       const response = await getInvoiceByNumber(invoiceNumber);
       if (response.success) {
-        // Handle double-nested response structure
         const invoiceData = response.data?.data || response.data;
         setInvoice(invoiceData);
       }
@@ -342,7 +341,7 @@ const RouteStarInvoiceDetail = () => {
             </div>
           </div>
 
-          {/* Time & Duration */}
+          {}
           {(invoice.arrivalTime || invoice.departureTime || invoice.elapsedTime) && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -411,7 +410,7 @@ const RouteStarInvoiceDetail = () => {
             </div>
           </div>
 
-          {/* Payment Information */}
+          {}
           {(invoice.payment || invoice.paymentMethod) && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -442,7 +441,7 @@ const RouteStarInvoiceDetail = () => {
             </div>
           )}
 
-          {/* Posting Information */}
+          {}
           {(invoice.postedBy || invoice.postedTimestamp || invoice.isPosted) && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">

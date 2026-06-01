@@ -180,7 +180,7 @@ const InvoiceForm = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Top: customer + invoice meta side-by-side, like RouteStar detail */}
+          {}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Customer Information</h2>
@@ -246,7 +246,7 @@ const InvoiceForm = () => {
               </div>
             </div>
 
-            {/* Right column: read-only invoice details */}
+            {}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Invoice Details</h2>
               <div className="space-y-4">
@@ -328,7 +328,7 @@ const InvoiceForm = () => {
             </div>
           </div>
 
-          {/* Line items */}
+          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Line Items</h2>
@@ -438,7 +438,7 @@ const InvoiceForm = () => {
             )}
           </div>
 
-          {/* Actions */}
+          {}
           <div className="flex justify-between items-center">
             <Button type="button" variant="ghost" onClick={handleCancel}>
               Cancel

@@ -178,7 +178,7 @@ const FetchHistory = () => {
   }
   return (
     <div className="h-screen flex flex-col bg-slate-50 dark:bg-gray-900">
-      {/* Header */}
+      {}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
@@ -209,7 +209,7 @@ const FetchHistory = () => {
             </Button>
           </div>
         </div>
-        {/* Filters Panel */}
+        {}
         {showFilters && (
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -263,11 +263,11 @@ const FetchHistory = () => {
           </div>
         )}
       </div>
-      {/* Main Content */}
+      {}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar - Builds List */}
+        {}
         <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
-          {/* Search */}
+          {}
           <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -280,9 +280,9 @@ const FetchHistory = () => {
               />
             </div>
           </div>
-          {/* Builds List */}
+          {}
           <div className="flex-1 overflow-y-auto">
-            {/* Active Fetches */}
+            {}
             {activeFetches.length > 0 && (
               <div className="p-2">
                 <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 py-1">
@@ -318,7 +318,7 @@ const FetchHistory = () => {
                 ))}
               </div>
             )}
-            {/* Historical Fetches */}
+            {}
             <div className="p-2">
               <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 py-1">
                 History
@@ -363,11 +363,11 @@ const FetchHistory = () => {
             </div>
           </div>
         </div>
-        {/* Right Content - Stage View */}
+        {}
         <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-gray-900">
           {selectedFetch ? (
             <div className="p-6">
-              {/* Header */}
+              {}
               <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
@@ -403,7 +403,7 @@ const FetchHistory = () => {
                     )}
                   </div>
                 </div>
-                {/* Stats Grid */}
+                {}
                 <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">Duration</div>
@@ -427,12 +427,12 @@ const FetchHistory = () => {
                   </div>
                 </div>
               </div>
-              {/* Stage View */}
+              {}
               <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
                   Stage View
                 </h3>
-                {/* Stage Timeline */}
+                {}
                 <div className="space-y-4">
                   {getStageData(selectedFetch).map((stage, index) => (
                     <div key={index} className="flex items-center gap-4">
@@ -456,14 +456,14 @@ const FetchHistory = () => {
                     </div>
                   ))}
                 </div>
-                {/* Average Times (if available) */}
+                {}
                 <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                   <div className="text-sm text-gray-600 dark:text-gray-400">
                     Total run time: {formatDuration(selectedFetch.duration || selectedFetch.calculatedDuration)}
                   </div>
                 </div>
               </div>
-              {/* Results Details */}
+              {}
               {selectedFetch.results && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 mt-6">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -501,7 +501,7 @@ const FetchHistory = () => {
                   </div>
                 </div>
               )}
-              {/* Error Message */}
+              {}
               {selectedFetch.errorMessage && (
                 <div className="bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 p-6 mt-6">
                   <h3 className="text-lg font-semibold text-red-900 dark:text-red-100 mb-2">

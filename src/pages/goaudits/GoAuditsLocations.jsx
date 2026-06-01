@@ -21,7 +21,7 @@ const GoAuditsLocations = () => {
   const [loading, setLoading] = useState(false);
   const [locations, setLocations] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const [filterActive, setFilterActive] = useState('all'); // all, active, inactive
+  const [filterActive, setFilterActive] = useState('all');
 
   const loadLocations = async () => {
     try {
@@ -47,11 +47,9 @@ const GoAuditsLocations = () => {
   }, []);
 
   const filteredLocations = locations.filter(location => {
-    // Filter by active status
     if (filterActive === 'active' && location.Active !== 'Yes') return false;
     if (filterActive === 'inactive' && location.Active === 'Yes') return false;
 
-    // Filter by search text
     if (!searchText) return true;
     const search = searchText.toLowerCase();
     return (
@@ -69,7 +67,7 @@ const GoAuditsLocations = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -90,7 +88,7 @@ const GoAuditsLocations = () => {
         </Button>
       </div>
 
-      {/* Stats */}
+      {}
       {locations.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5">
@@ -133,10 +131,10 @@ const GoAuditsLocations = () => {
         </div>
       )}
 
-      {/* Filters */}
+      {}
       <Card>
         <div className="p-4 space-y-4">
-          {/* Search */}
+          {}
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -149,7 +147,7 @@ const GoAuditsLocations = () => {
               />
             </div>
 
-            {/* Active Filter */}
+            {}
             <div className="flex gap-2">
               <Button
                 onClick={() => setFilterActive('all')}
@@ -177,7 +175,7 @@ const GoAuditsLocations = () => {
         </div>
       </Card>
 
-      {/* Locations Table */}
+      {}
       {locations.length === 0 && !loading ? (
         <Card>
           <div className="p-12 text-center">

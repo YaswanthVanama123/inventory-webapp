@@ -19,7 +19,6 @@ const ManualPOItems = () => {
   const [vendors, setVendors] = useState([]);
   const [searchText, setSearchText] = useState('');
 
-  // Modal state
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
@@ -39,7 +38,6 @@ const ManualPOItems = () => {
     loadData();
   }, []);
 
-  // Memoize filtered items to prevent recalculation on every render
   const filteredItems = useMemo(() => {
     if (!searchText) return items;
 
@@ -54,7 +52,6 @@ const ManualPOItems = () => {
     );
   }, [items, searchText]);
 
-  // Memoize stats calculations
   const stats = useMemo(() => ({
     total: items.length,
     mapped: items.filter(i => i.mappedCategoryItemId).length,
@@ -136,7 +133,7 @@ const ManualPOItems = () => {
       ...prev,
       mappedCategoryItemId: itemId,
       mappedCategoryItemName: item ? item.itemName : '',
-      itemType: item ? item.type : '' // 'canonical' or 'routestar'
+      itemType: item ? item.type : ''
     }));
   };
 
@@ -169,8 +166,6 @@ const ManualPOItems = () => {
         vendorName: formData.vendorName || null,
         isActive: formData.isActive
       };
-      // SKU is optional on create (auto-generated if blank); editable on
-      // update — only include when the user typed something.
       const trimmedSku = (formData.sku || '').trim();
       if (trimmedSku) {
         submitData.sku = trimmedSku.toUpperCase();
@@ -219,7 +214,7 @@ const ManualPOItems = () => {
 
   return (
     <div className="space-y-6 px-4 sm:px-6 pb-6">
-      {/* Header */}
+      {}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -239,7 +234,7 @@ const ManualPOItems = () => {
         </Button>
       </div>
 
-      {/* Search */}
+      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
         <Input
           type="text"
@@ -250,7 +245,7 @@ const ManualPOItems = () => {
         />
       </div>
 
-      {/* Stats */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <p className="text-sm text-slate-600 dark:text-gray-400">Total Items</p>
@@ -272,7 +267,7 @@ const ManualPOItems = () => {
         </div>
       </div>
 
-      {/* Items Table */}
+      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         {filteredItems.length === 0 ? (
           <EmptyState
@@ -390,7 +385,7 @@ const ManualPOItems = () => {
         )}
       </div>
 
-      {/* Add/Edit Modal */}
+      {}
       <Modal
         isOpen={showModal}
         onClose={handleCloseModal}

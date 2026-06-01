@@ -104,7 +104,6 @@ const TruckCheckoutList = () => {
         setMyCheckoutsByItem([]);
         return;
       }
-      // Pull all my checkouts (status filter still applies, paginated higher)
       const params = {
         page: 1,
         limit: 500,
@@ -114,7 +113,6 @@ const TruckCheckoutList = () => {
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
 
-      // Fetch checkouts AND truck inventory in parallel
       const [checkoutsResp, truckInvResp] = await Promise.all([
         truckCheckoutService.getCheckouts(params),
         truckCheckoutService.getMyTruckInventory().catch((err) => {
@@ -123,11 +121,9 @@ const TruckCheckoutList = () => {
         })
       ]);
       const mine = checkoutsResp.data.checkouts || [];
-      // Handle both wrapper shapes: {data: {items}} or {items} directly
       const truckInvItems = truckInvResp?.data?.items || truckInvResp?.items || [];
       console.log('[MyCheckouts] truck-inventory items received:', truckInvItems.length);
 
-      // Build lookup: itemName (lowercase) → { remainingInTruck, totalSold }
       const truckInvLookup = new Map();
       for (const ti of truckInvItems) {
         if (ti.itemName) {
@@ -135,10 +131,8 @@ const TruckCheckoutList = () => {
         }
       }
 
-      // Aggregate by item name (handle both new-shape with itemName and old-shape with itemsTaken)
       const byItem = new Map();
       for (const co of mine) {
-        // New shape: single itemName + quantityTaking
         if (co.itemName) {
           const key = co.itemName.trim();
           if (!byItem.has(key)) {
@@ -159,7 +153,6 @@ const TruckCheckoutList = () => {
           }
           if (co.truckNumber) agg.truckNumbers.add(co.truckNumber);
         }
-        // Old shape: itemsTaken array
         if (Array.isArray(co.itemsTaken)) {
           for (const it of co.itemsTaken) {
             const key = (it.name || '').trim();
@@ -650,14 +643,14 @@ const TruckCheckoutList = () => {
                   : { name: `${checkout.itemsTaken?.length || 0} items`, qty: checkout.itemsTaken?.reduce((sum, item) => sum + item.quantity, 0) || 0 };
                 return (
                   <div key={checkout._id}>
-                    {/* Row Header - Clickable */}
+                    {}
                     <div
                       onClick={() => setExpandedCheckout(isExpanded ? null : checkout._id)}
                       className={`flex items-center gap-4 px-6 py-4 cursor-pointer transition-colors ${
                         isExpanded ? 'bg-blue-50/50' : 'hover:bg-slate-50'
                       }`}
                     >
-                      {/* Expand Icon */}
+                      {}
                       <div className="text-slate-400">
                         {isExpanded ? (
                           <ChevronDownIcon className="w-5 h-5 text-blue-600" />
@@ -666,7 +659,7 @@ const TruckCheckoutList = () => {
                         )}
                       </div>
 
-                      {/* Item & Employee Info */}
+                      {}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-semibold text-slate-900 truncate">
@@ -689,10 +682,10 @@ const TruckCheckoutList = () => {
                         </div>
                       </div>
 
-                      {/* Status Badge */}
+                      {}
                       {getStatusBadge(checkout.status)}
 
-                      {/* Delete Button */}
+                      {}
                       <div onClick={(e) => e.stopPropagation()}>
                         <button
                           onClick={(e) => handleDelete(checkout._id, e)}
@@ -704,11 +697,11 @@ const TruckCheckoutList = () => {
                       </div>
                     </div>
 
-                    {/* Expanded Detail Panel */}
+                    {}
                     {isExpanded && (
                       <div className="px-6 pb-5 bg-blue-50/30 border-t border-slate-100">
                         <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {/* Employee & Truck Details */}
+                          {}
                           <div className="bg-white rounded-lg border border-slate-200 p-4">
                             <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
                               <UserIcon className="w-4 h-4 text-slate-500" />
@@ -743,7 +736,7 @@ const TruckCheckoutList = () => {
                             </dl>
                           </div>
 
-                          {/* Items Detail */}
+                          {}
                           <div className="bg-white rounded-lg border border-slate-200 p-4">
                             <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
                               <CubeIcon className="w-4 h-4 text-slate-500" />
@@ -783,7 +776,7 @@ const TruckCheckoutList = () => {
                             )}
                           </div>
 
-                          {/* Timing & Invoices */}
+                          {}
                           <div className="bg-white rounded-lg border border-slate-200 p-4">
                             <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
                               <CalendarIcon className="w-4 h-4 text-slate-500" />
@@ -817,7 +810,7 @@ const TruckCheckoutList = () => {
                             </dl>
                           </div>
                         </div>
-                        {/* View Full Detail Link */}
+                        {}
                         <div className="mt-4 text-center">
                           <button
                             onClick={() => handleRowClick(checkout._id)}
@@ -834,7 +827,7 @@ const TruckCheckoutList = () => {
             )}
           </div>
 
-          {/* Pagination */}
+          {}
           {pagination.pages > 1 && (
             <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
               <div className="text-sm text-slate-600">

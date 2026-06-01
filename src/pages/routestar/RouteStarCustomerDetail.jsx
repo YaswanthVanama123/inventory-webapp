@@ -25,7 +25,6 @@ const RouteStarCustomerDetail = () => {
       const response = await routeStarCustomerService.getCustomerById(customerId);
       console.log('Customer detail response:', response);
 
-      // The axios interceptor already extracts response.data
       setCustomer(response || null);
     } catch (error) {
       console.error('Error loading customer:', error);
@@ -60,7 +59,7 @@ const RouteStarCustomerDetail = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link
@@ -83,7 +82,7 @@ const RouteStarCustomerDetail = () => {
         </Badge>
       </div>
 
-      {/* Quick Info Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <div className="p-4">
@@ -134,7 +133,7 @@ const RouteStarCustomerDetail = () => {
         </Card>
       </div>
 
-      {/* Tabs */}
+      {}
       <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="-mb-px flex space-x-8">
           {tabs.map((tab) => {
@@ -164,11 +163,11 @@ const RouteStarCustomerDetail = () => {
         </nav>
       </div>
 
-      {/* Tab Content */}
+      {}
       <div className="space-y-6">
         {activeTab === 'details' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Basic Information */}
+            {}
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -209,7 +208,7 @@ const RouteStarCustomerDetail = () => {
               </div>
             </Card>
 
-            {/* Service Address */}
+            {}
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -257,7 +256,7 @@ const RouteStarCustomerDetail = () => {
               </div>
             </Card>
 
-            {/* Billing Address */}
+            {}
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -276,7 +275,7 @@ const RouteStarCustomerDetail = () => {
               </div>
             </Card>
 
-            {/* Account Information */}
+            {}
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">

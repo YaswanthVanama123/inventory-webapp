@@ -169,7 +169,7 @@ const EmployeeWorkDashboard = () => {
   }
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
@@ -196,10 +196,10 @@ const EmployeeWorkDashboard = () => {
           />
         </div>
       </div>
-      {/* Statistics Cards */}
+      {}
       {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Total Invoices */}
+          {}
           <Card className="hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
@@ -223,7 +223,7 @@ const EmployeeWorkDashboard = () => {
               </div>
             </div>
           </Card>
-          {/* Total Revenue */}
+          {}
           <Card className="hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
@@ -242,7 +242,7 @@ const EmployeeWorkDashboard = () => {
               </div>
             </div>
           </Card>
-          {/* Total Items Serviced */}
+          {}
           <Card className="hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
@@ -261,7 +261,7 @@ const EmployeeWorkDashboard = () => {
               </div>
             </div>
           </Card>
-          {/* Completion Rate */}
+          {}
           <Card className="hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
@@ -284,9 +284,9 @@ const EmployeeWorkDashboard = () => {
           </Card>
         </div>
       )}
-      {/* Performance and Recent Activity */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Services */}
+        {}
         {performance?.topItems && performance.topItems.length > 0 && (
           <Card>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
@@ -317,7 +317,7 @@ const EmployeeWorkDashboard = () => {
             </div>
           </Card>
         )}
-        {/* Recent Activity */}
+        {}
         <Card>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
@@ -376,7 +376,7 @@ const EmployeeWorkDashboard = () => {
           </div>
         </Card>
       </div>
-      {/* Daily Revenue Chart */}
+      {}
       {performance?.dailyRevenue && performance.dailyRevenue.length > 0 && (
         <Card>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">

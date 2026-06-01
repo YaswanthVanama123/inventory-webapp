@@ -34,22 +34,17 @@ const ScreenPermissionsManagement = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Screens data
   const [allScreens, setAllScreens] = useState([]);
   const [defaultScreenIds, setDefaultScreenIds] = useState([]);
 
-  // Users data
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userScreenIds, setUserScreenIds] = useState([]);
 
-  // Tabs
-  const [activeTab, setActiveTab] = useState('default'); // 'default' or 'users'
+  const [activeTab, setActiveTab] = useState('default');
 
-  // Modal state
   const [showInitializeModal, setShowInitializeModal] = useState(false);
 
-  // Expanded categories for user permissions tab
   const [expandedCategories, setExpandedCategories] = useState(new Set());
 
   useEffect(() => {
@@ -60,23 +55,19 @@ const ScreenPermissionsManagement = () => {
     try {
       setLoading(true);
 
-      // Fetch all screens
       const screensResult = await screenPermissionService.getAllScreens();
       if (screensResult.success) {
         setAllScreens(screensResult.data);
 
-        // Set default screen IDs
         const defaultIds = screensResult.data
           .filter(screen => screen.isDefault)
           .map(screen => screen._id);
         setDefaultScreenIds(defaultIds);
 
-        // Expand all categories by default
         const categories = [...new Set(screensResult.data.map(s => s.category))];
         setExpandedCategories(new Set(categories));
       }
 
-      // Fetch all users
       const usersResult = await screenPermissionService.getAllUsersWithPermissions();
       if (usersResult.success) {
         setUsers(usersResult.data);
@@ -190,7 +181,6 @@ const ScreenPermissionsManagement = () => {
     try {
       setSelectedUser(user);
 
-      // Fetch user's screens
       const result = await screenPermissionService.getUserScreens(user._id);
       if (result.success) {
         const screenIds = result.data.map(screen => screen._id);
@@ -280,7 +270,7 @@ const ScreenPermissionsManagement = () => {
         </div>
       </div>
 
-      {/* Tabs */}
+      {}
       <div className="bg-white rounded-lg shadow-sm border border-slate-200">
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex">
@@ -307,10 +297,10 @@ const ScreenPermissionsManagement = () => {
           </nav>
         </div>
 
-        {/* Default Screens Tab */}
+        {}
         {activeTab === 'default' && (
           <div className="p-6 space-y-6">
-            {/* Header */}
+            {}
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -342,7 +332,7 @@ const ScreenPermissionsManagement = () => {
               </Button>
             </div>
 
-            {/* Screens by Category */}
+            {}
             <div className="space-y-3">
               {Object.entries(groupedScreens).map(([category, screens]) => {
                 const CategoryIcon = getCategoryIcon(category);
@@ -369,7 +359,7 @@ const ScreenPermissionsManagement = () => {
                         </span>
                       </div>
 
-                      {/* Progress Bar */}
+                      {}
                       <div className="mt-3 h-1 bg-white bg-opacity-50 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-current transition-all duration-300"
@@ -430,10 +420,10 @@ const ScreenPermissionsManagement = () => {
           </div>
         )}
 
-        {/* User-Specific Permissions Tab */}
+        {}
         {activeTab === 'users' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
-            {/* Users List */}
+            {}
             <div className="lg:col-span-1">
               <div className="flex items-center gap-2 mb-4">
                 <Users className="w-5 h-5 text-indigo-600" />
@@ -496,7 +486,7 @@ const ScreenPermissionsManagement = () => {
               </div>
             </div>
 
-            {/* Screen Permissions for Selected User */}
+            {}
             <div className="lg:col-span-2">
               {selectedUser ? (
                 <>
@@ -585,7 +575,7 @@ const ScreenPermissionsManagement = () => {
                               </span>
                             </div>
 
-                            {/* Progress Bar */}
+                            {}
                             <div className="h-1 bg-white bg-opacity-50">
                               <div
                                 className="h-full bg-current transition-all duration-300"
@@ -678,7 +668,7 @@ const ScreenPermissionsManagement = () => {
         )}
       </div>
 
-      {/* Initialize Screens Confirmation Modal */}
+      {}
       <Modal
         isOpen={showInitializeModal}
         onClose={() => !saving && setShowInitializeModal(false)}

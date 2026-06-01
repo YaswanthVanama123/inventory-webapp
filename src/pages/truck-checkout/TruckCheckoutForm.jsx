@@ -33,20 +33,19 @@ const TruckCheckoutForm = () => {
   const [discrepancyInfo, setDiscrepancyInfo] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Truck inventory validation states
   const [actualTruckInventory, setActualTruckInventory] = useState('');
   const [truckInventory, setTruckInventory] = useState(null);
   const [loadingTruckInventory, setLoadingTruckInventory] = useState(false);
   const [truckDiscrepancyInfo, setTruckDiscrepancyInfo] = useState(null);
   useEffect(() => {
     if (!showItemPicker) {
-      setSearchQuery(''); 
+      setSearchQuery('');
       setSearchResults([]);
       return;
     }
     const delayDebounce = setTimeout(() => {
       searchItems();
-    }, searchQuery ? 300 : 0); 
+    }, searchQuery ? 300 : 0);
     return () => clearTimeout(delayDebounce);
   }, [showItemPicker, searchQuery]);
   const searchItems = async () => {
@@ -78,7 +77,6 @@ const TruckCheckoutForm = () => {
     setActualTruckInventory('');
     setTruckInventory(null);
 
-    // Fetch truck inventory when item is selected
     if (user?.truckNumber) {
       try {
         setLoadingTruckInventory(true);
@@ -148,7 +146,6 @@ const TruckCheckoutForm = () => {
       return;
     }
 
-    // Detect stock discrepancy
     let stockDisc = null;
     if (!validateStockMath()) {
       const currentStock = selectedItem.currentStock || 0;
@@ -165,7 +162,6 @@ const TruckCheckoutForm = () => {
       };
     }
 
-    // Detect truck inventory discrepancy
     let truckDisc = null;
     if (actualTruckInventory && actualTruckInventory.trim() !== '') {
       const actualTruck = parseFloat(actualTruckInventory);
@@ -190,7 +186,6 @@ const TruckCheckoutForm = () => {
       }
     }
 
-    // Show combined modal if either discrepancy exists
     if (stockDisc || truckDisc) {
       setDiscrepancyInfo(stockDisc);
       setTruckDiscrepancyInfo(truckDisc);
@@ -389,7 +384,7 @@ const TruckCheckoutForm = () => {
             </div>
           )}
 
-          {/* Current Truck Inventory Display */}
+          {}
           {selectedItem && truckInventory && (
             <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg">
               <div className="flex items-center justify-between mb-2">
@@ -416,7 +411,7 @@ const TruckCheckoutForm = () => {
             </div>
           )}
 
-          {/* Actual Truck Inventory Input */}
+          {}
           {selectedItem && truckInventory && (
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

@@ -3,7 +3,6 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { useUserScreens } from '../../hooks/useUserScreens';
 
-
 const DashboardIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -176,7 +175,6 @@ const ShieldCheckIcon = () => (
   </svg>
 );
 const adminMenuItems = [
-  // === CORE OPERATIONS ===
   {
     label: 'Dashboard',
     path: '/dashboard',
@@ -184,7 +182,6 @@ const adminMenuItems = [
     section: 'Core'
   },
 
-  // === INVENTORY MANAGEMENT ===
   {
     label: 'Stock',
     path: '/stock',
@@ -208,7 +205,6 @@ const adminMenuItems = [
     section: 'Inventory'
   },
 
-  // === DAILY OPERATIONS ===
   {
     label: 'Orders',
     path: '/orders',
@@ -241,7 +237,6 @@ const adminMenuItems = [
     ]
   },
 
-  // === ROUTESTAR INTEGRATION ===
   {
     label: 'RouteStar Items',
     path: '/routestar/items',
@@ -261,7 +256,6 @@ const adminMenuItems = [
     section: 'RouteStar'
   },
 
-  // === MASTER DATA ===
   {
     label: 'Vendors',
     path: '/vendors',
@@ -275,7 +269,6 @@ const adminMenuItems = [
     section: 'Master Data'
   },
 
-  // === REPORTS & ANALYTICS ===
   {
     label: 'Sales Report',
     path: '/routestar/sales-report',
@@ -295,7 +288,6 @@ const adminMenuItems = [
     section: 'Reports'
   },
 
-  // === SYSTEM & ADMIN ===
   {
     label: 'Users',
     path: '/users',
@@ -337,7 +329,6 @@ const adminMenuItems = [
     section: 'Administration'
   },
 
-  // === PERSONAL ===
   {
     label: 'Profile',
     path: '/profile',
@@ -347,7 +338,6 @@ const adminMenuItems = [
 ];
 
 const employeeMenuItems = [
-  // === CORE ===
   {
     label: 'Dashboard',
     path: '/dashboard',
@@ -355,7 +345,6 @@ const employeeMenuItems = [
     section: 'Core'
   },
 
-  // === STOCK & INVENTORY ===
   {
     label: 'Stock',
     path: '/stock',
@@ -378,7 +367,6 @@ const employeeMenuItems = [
     section: 'Inventory'
   },
 
-  // === MY DAILY WORK ===
   {
     label: 'Orders',
     path: '/orders',
@@ -410,7 +398,6 @@ const employeeMenuItems = [
     ]
   },
 
-  // === ROUTESTAR DATA ===
   {
     label: 'RouteStar Items',
     path: '/routestar/items',
@@ -418,7 +405,6 @@ const employeeMenuItems = [
     section: 'RouteStar'
   },
 
-  // === REPORTS ===
   {
     label: 'Sales Report',
     path: '/routestar/sales-report',
@@ -438,7 +424,6 @@ const employeeMenuItems = [
     section: 'Reports'
   },
 
-  // === PERSONAL ===
   {
     label: 'Profile',
     path: '/profile',
@@ -503,22 +488,18 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
     }
   }, [location.pathname, isMobile, onClose]);
 
-  // Filter menu items based on user permissions
   const filterMenuItems = (items) => {
-    if (isAdmin) return items; // Admins see everything
+    if (isAdmin) return items;
 
     return items
-      .map(item => ({ ...item })) // Clone to avoid mutation
+      .map(item => ({ ...item }))
       .filter(item => {
-        // Check if user has access to the main path
         const hasMainAccess = hasAccessToScreen(item.path);
 
-        // If it has submenu, check if user has access to any submenu item
         if (item.submenu && item.submenu.length > 0) {
           const hasSubAccess = hasAccessToAnySubScreen(item.submenu);
 
           if (hasSubAccess) {
-            // Filter submenu items as well (create new filtered array)
             item.submenu = item.submenu.filter(subItem => hasAccessToScreen(subItem.path));
             return true;
           }
@@ -647,7 +628,6 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
                 isActive = currentPathOnly === item.path;
               }
 
-              // Section header logic
               const previousSection = index > 0 ? menuItems[index - 1].section : null;
               const showSectionHeader = !isCollapsed && !isMobile && item.section !== previousSection;
 

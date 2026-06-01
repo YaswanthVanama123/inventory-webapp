@@ -122,11 +122,9 @@ const ScreenManagement = () => {
 
     try {
       if (selectedScreen) {
-        // Update existing screen
         await screenPermissionService.updateScreen(selectedScreen._id, formData);
         showSuccess('Screen updated successfully');
       } else {
-        // Create new screen
         await screenPermissionService.createScreen(formData);
         showSuccess('Screen created successfully');
       }
@@ -198,7 +196,7 @@ const ScreenManagement = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -227,7 +225,7 @@ const ScreenManagement = () => {
         </div>
       </div>
 
-      {/* Filters */}
+      {}
       <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <SearchBar
@@ -247,7 +245,7 @@ const ScreenManagement = () => {
         </div>
       </div>
 
-      {/* Screens List */}
+      {}
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
           <LoadingSpinner size="lg" text="Loading screens..." className="mx-auto" />
@@ -349,7 +347,7 @@ const ScreenManagement = () => {
         </div>
       )}
 
-      {/* Add/Edit Modal */}
+      {}
       <Modal
         isOpen={showAddEditModal}
         onClose={() => !modalLoading && setShowAddEditModal(false)}
@@ -508,7 +506,7 @@ const ScreenManagement = () => {
         </form>
       </Modal>
 
-      {/* Delete Confirmation Modal */}
+      {}
       <Modal
         isOpen={showDeleteModal}
         onClose={() => !modalLoading && setShowDeleteModal(false)}

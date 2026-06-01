@@ -20,7 +20,6 @@ const ManualOrderForm = () => {
   const [vendors, setVendors] = useState([]);
   const [manualPOItems, setManualPOItems] = useState([]);
 
-  // Form state
   const [selectedVendor, setSelectedVendor] = useState('');
   const [showNewVendorForm, setShowNewVendorForm] = useState(false);
   const [newVendor, setNewVendor] = useState({
@@ -48,7 +47,6 @@ const ManualOrderForm = () => {
         manualPOItemService.getActiveItems()
       ]);
 
-      // Handle different API response formats
       const orderNum = orderNumData.data?.orderNumber || orderNumData.orderNumber || '';
       const vendorsList = Array.isArray(vendorsData.data) ? vendorsData.data : (vendorsData.data?.vendors || vendorsData.vendors || []);
       const itemsList = Array.isArray(itemsData.data) ? itemsData.data : (itemsData.data?.items || itemsData.items || []);
@@ -91,7 +89,6 @@ const ManualOrderForm = () => {
       const response = await vendorService.createVendor(newVendor);
       showSuccess('Vendor created successfully');
 
-      // Reload vendors and select the new one
       const vendorsData = await vendorService.getActiveVendors();
       const vendorsList = Array.isArray(vendorsData.data) ? vendorsData.data : (vendorsData.data?.vendors || vendorsData.vendors || []);
       setVendors(vendorsList);
@@ -109,7 +106,6 @@ const ManualOrderForm = () => {
     const newItems = [...items];
     newItems[index][field] = value;
 
-    // If SKU changed, auto-fill name
     if (field === 'sku') {
       const item = manualPOItems.find(i => i?._id === value);
       if (item && item.name && item.sku) {
@@ -118,7 +114,6 @@ const ManualOrderForm = () => {
       }
     }
 
-    // Recalculate line total
     if (field === 'qty' || field === 'unitPrice') {
       const qty = parseFloat(newItems[index].qty) || 0;
       const unitPrice = parseFloat(newItems[index].unitPrice) || 0;
@@ -147,7 +142,6 @@ const ManualOrderForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
     if (!selectedVendor && !showNewVendorForm) {
       showError('Please select a vendor');
       return;
@@ -175,40 +169,32 @@ const ManualOrderForm = () => {
       let vendorData = null;
 
       if (showNewVendorForm) {
-        // Create vendor first
         const vendorResponse = await vendorService.createVendor(newVendor);
         console.log('Create vendor response:', vendorResponse);
 
-        // Extract vendor ID from response (handle different API response formats)
         const vendorId = vendorResponse.data?.data?._id || vendorResponse.data?._id || vendorResponse._id;
 
         if (!vendorId) {
           throw new Error('Failed to get vendor ID from response');
         }
 
-        // Fetch the full vendor details
         const vendorResult = await vendorService.getVendorById(vendorId);
         console.log('Fetch vendor result:', vendorResult);
 
-        // Extract vendor data (handle different API response formats)
         vendorData = vendorResult.data || vendorResult;
       } else {
-        // Get selected vendor
         const vendorResult = await vendorService.getVendorById(selectedVendor);
         console.log('Fetch vendor result:', vendorResult);
 
-        // Extract vendor data (handle different API response formats)
         vendorData = vendorResult.data || vendorResult;
       }
 
-      // Ensure we have valid vendor data
       if (!vendorData || !vendorData.name) {
         throw new Error('Invalid vendor data received');
       }
 
       console.log('Final vendor data:', vendorData);
 
-      // Prepare order data
       const orderData = {
         vendor: {
           name: vendorData.name,
@@ -249,7 +235,7 @@ const ManualOrderForm = () => {
 
   return (
     <div className="space-y-6 px-4 sm:px-6 pb-6">
-      {/* Header */}
+      {}
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigate('/orders')}
@@ -268,13 +254,13 @@ const ManualOrderForm = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Order Information Card */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-4">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
             Order Information
           </h2>
 
-          {/* Order Number */}
+          {}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
               Order Number
@@ -287,7 +273,7 @@ const ManualOrderForm = () => {
             />
           </div>
 
-          {/* Vendor Selection */}
+          {}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
               Vendor *
@@ -363,7 +349,7 @@ const ManualOrderForm = () => {
             )}
           </div>
 
-          {/* Order Date */}
+          {}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
               Order Date *
@@ -379,7 +365,7 @@ const ManualOrderForm = () => {
           </div>
         </div>
 
-        {/* Items Card */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -403,7 +389,7 @@ const ManualOrderForm = () => {
                 key={index}
                 className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border border-slate-200 dark:border-gray-700 rounded-lg"
               >
-                {/* SKU Selection */}
+                {}
                 <div className="md:col-span-4">
                   <label className="block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1">
                     Item *
@@ -418,7 +404,7 @@ const ManualOrderForm = () => {
                   />
                 </div>
 
-                {/* Quantity */}
+                {}
                 <div className="md:col-span-2">
                   <label className="block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1">
                     Quantity *
@@ -433,7 +419,7 @@ const ManualOrderForm = () => {
                   />
                 </div>
 
-                {/* Unit Price */}
+                {}
                 <div className="md:col-span-2">
                   <label className="block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1">
                     Unit Price *
@@ -448,7 +434,7 @@ const ManualOrderForm = () => {
                   />
                 </div>
 
-                {/* Line Total */}
+                {}
                 <div className="md:col-span-3">
                   <label className="block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1">
                     Line Total
@@ -461,7 +447,7 @@ const ManualOrderForm = () => {
                   />
                 </div>
 
-                {/* Remove Button */}
+                {}
                 <div className="md:col-span-1 flex items-end">
                   <button
                     type="button"
@@ -476,7 +462,7 @@ const ManualOrderForm = () => {
             ))}
           </div>
 
-          {/* Order Total */}
+          {}
           <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-gray-700">
             <div className="text-right">
               <p className="text-sm text-slate-600 dark:text-gray-400">Order Total</p>
@@ -487,7 +473,7 @@ const ManualOrderForm = () => {
           </div>
         </div>
 
-        {/* Notes Card */}
+        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
             Notes (Optional)
@@ -501,7 +487,7 @@ const ManualOrderForm = () => {
           />
         </div>
 
-        {/* Submit Buttons */}
+        {}
         <div className="flex justify-end gap-3">
           <Button
             type="button"

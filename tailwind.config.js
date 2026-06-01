@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 export default {
   content: [
     "./index.html",
@@ -13,7 +12,7 @@ export default {
           200: '#BFDBFE',
           300: '#93C5FD',
           400: '#60A5FA',
-          500: '#3B82F6', // Primary Blue
+          500: '#3B82F6',
           600: '#2563EB',
           700: '#1D4ED8',
           800: '#1E40AF',
@@ -26,7 +25,7 @@ export default {
           200: '#E9D5FF',
           300: '#D8B4FE',
           400: '#C084FC',
-          500: '#8B5CF6', // Secondary Purple
+          500: '#8B5CF6',
           600: '#9333EA',
           700: '#7C3AED',
           800: '#6B21A8',
@@ -39,7 +38,7 @@ export default {
           200: '#A7F3D0',
           300: '#6EE7B7',
           400: '#34D399',
-          500: '#10B981', // Success Green
+          500: '#10B981',
           600: '#059669',
           700: '#047857',
           800: '#065F46',
@@ -52,7 +51,7 @@ export default {
           200: '#FDE68A',
           300: '#FCD34D',
           400: '#FBBF24',
-          500: '#F59E0B', // Warning Orange
+          500: '#F59E0B',
           600: '#D97706',
           700: '#B45309',
           800: '#92400E',
@@ -65,7 +64,7 @@ export default {
           200: '#FECACA',
           300: '#FCA5A5',
           400: '#F87171',
-          500: '#EF4444', // Danger Red
+          500: '#EF4444',
           600: '#DC2626',
           700: '#B91C1C',
           800: '#991B1B',
@@ -192,8 +191,6 @@ export default {
     },
   },
   plugins: [],
-  // Mobile-first approach is default in Tailwind
-  // Optimizations for production
   future: {
     hoverOnlyWhenSupported: true,
   },

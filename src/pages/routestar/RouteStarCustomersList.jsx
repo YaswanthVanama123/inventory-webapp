@@ -54,7 +54,6 @@ const RouteStarCustomersList = () => {
       console.log('Customers response:', customersResponse);
       console.log('Stats response:', statsResponse);
 
-      // The axios interceptor already extracts response.data, so we get the data directly
       setCustomers(customersResponse?.customers || []);
       setPagination(customersResponse?.pagination || { totalCount: 0, currentPage: 1, limit: 50, totalPages: 0 });
       setStats(statsResponse || { totalCustomers: 0, activeCustomers: 0, inactiveCustomers: 0 });
@@ -142,7 +141,7 @@ const RouteStarCustomersList = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           RouteStar Customers
@@ -152,7 +151,7 @@ const RouteStarCustomersList = () => {
         </p>
       </div>
 
-      {/* Stats Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
@@ -191,10 +190,10 @@ const RouteStarCustomersList = () => {
         </div>
       </div>
 
-      {/* Filters and Actions */}
+      {}
       <Card>
         <div className="p-4 space-y-4">
-          {/* Search and Actions Row */}
+          {}
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -237,7 +236,7 @@ const RouteStarCustomersList = () => {
             </div>
           </div>
 
-          {/* Filters Row */}
+          {}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Select
               value={filterActive}
@@ -272,7 +271,7 @@ const RouteStarCustomersList = () => {
         </div>
       </Card>
 
-      {/* Customers Table */}
+      {}
       <Card>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -391,7 +390,7 @@ const RouteStarCustomersList = () => {
           </table>
         </div>
 
-        {/* Pagination */}
+        {}
         {pagination.totalPages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">

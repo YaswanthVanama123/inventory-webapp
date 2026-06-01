@@ -39,7 +39,7 @@ const InventoryList = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
-  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || ''); 
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
   const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'name');
   const [sortOrder, setSortOrder] = useState(searchParams.get('sortOrder') || 'asc');
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page')) || 1);
@@ -94,7 +94,6 @@ const InventoryList = () => {
     }
   }, [selectedCategory, statusFilter, sortBy, sortOrder, currentPage, itemsPerPage, activeTab, viewMode]);
 
-  // Frontend search filter
   const getFilteredItems = () => {
     if (!searchTerm || !items || items.length === 0) {
       return items;
@@ -104,12 +103,10 @@ const InventoryList = () => {
 
     return items.filter(item => {
       if (activeTab === 'purchases') {
-        // For purchases: search by model number (skuCode) or item name
         const matchesModelNumber = item.skuCode?.toLowerCase().includes(search);
         const matchesItemName = item.name?.toLowerCase().includes(search);
         return matchesModelNumber || matchesItemName;
       } else {
-        // For sells: search by RouteStar item name
         const matchesRouteStarName = item.routeStarItemName?.toLowerCase().includes(search) ||
                                       item.name?.toLowerCase().includes(search);
         return matchesRouteStarName;
@@ -135,7 +132,6 @@ const InventoryList = () => {
         sortBy,
         sortOrder,
       };
-      // Removed search from API params - now filtering on frontend
       if (selectedCategory) {
         params.category = selectedCategory;
       }
@@ -164,7 +160,7 @@ const InventoryList = () => {
   };
   const handleSearch = (value) => {
     setSearchTerm(value);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
   const handleCategoryChange = (e) => {
     setSelectedCategory(e.target.value);
@@ -186,7 +182,7 @@ const InventoryList = () => {
   };
   const handlePageSizeChange = (newSize) => {
     setItemsPerPage(newSize);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
   const handleAddNew = () => {
     navigate('/inventory/new');
@@ -209,7 +205,7 @@ const InventoryList = () => {
       showSuccess(`Successfully deleted "${itemToDelete.name}"`);
       setDeleteModalOpen(false);
       setItemToDelete(null);
-      fetchInventoryItems(); 
+      fetchInventoryItems();
     } catch (err) {
       console.error('Error deleting item:', err);
       showError(err.message || 'Failed to delete item');

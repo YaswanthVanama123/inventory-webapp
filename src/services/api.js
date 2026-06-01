@@ -1,17 +1,16 @@
 import axios from 'axios';
 
-
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api',
   headers: {
     'Content-Type': 'application/json'
   },
-  timeout: 30000, // Increased to 30 seconds for optimized endpoints
+  timeout: 30000,
 });
 const activeRequests = new Map();
 const RETRY_CONFIG = {
   maxRetries: 3,
-  retryDelay: 1000, 
+  retryDelay: 1000,
   retryableStatuses: [408, 429, 500, 502, 503, 504],
   retryableErrors: ['ECONNABORTED', 'ETIMEDOUT', 'ENOTFOUND', 'ECONNRESET', 'ECONNREFUSED'],
 };

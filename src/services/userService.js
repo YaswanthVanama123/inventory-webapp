@@ -1,7 +1,6 @@
 import api from './api';
 import { handleApiError } from './errorHandler';
 
-
 const userService = {
   getAll: async (params = {}) => {
     try {
@@ -112,9 +111,6 @@ const userService = {
       });
     }
   },
-  // Self-service deactivation. Hits the public (any-authenticated-user)
-  // endpoint POST /users/me/deactivate. The account is marked isActive:false;
-  // an admin can reactivate later.
   deactivateOwnAccount: async () => {
     try {
       const response = await api.post('/users/me/deactivate');

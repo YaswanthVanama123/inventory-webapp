@@ -17,7 +17,6 @@ const VendorManagement = () => {
   const [searchText, setSearchText] = useState('');
   const [filteredVendors, setFilteredVendors] = useState([]);
 
-  // Modal state
   const [showModal, setShowModal] = useState(false);
   const [editingVendor, setEditingVendor] = useState(null);
   const [formData, setFormData] = useState({
@@ -164,7 +163,7 @@ const VendorManagement = () => {
 
   return (
     <div className="space-y-6 px-4 sm:px-6 pb-6">
-      {/* Header */}
+      {}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -184,7 +183,7 @@ const VendorManagement = () => {
         </Button>
       </div>
 
-      {/* Search */}
+      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
         <Input
           type="text"
@@ -195,7 +194,7 @@ const VendorManagement = () => {
         />
       </div>
 
-      {/* Stats */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <p className="text-sm text-slate-600 dark:text-gray-400">Total Vendors</p>
@@ -217,7 +216,7 @@ const VendorManagement = () => {
         </div>
       </div>
 
-      {/* Vendors Table */}
+      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         {filteredVendors.length === 0 ? (
           <EmptyState
@@ -310,7 +309,7 @@ const VendorManagement = () => {
         )}
       </div>
 
-      {/* Add/Edit Modal */}
+      {}
       <Modal
         isOpen={showModal}
         onClose={handleCloseModal}

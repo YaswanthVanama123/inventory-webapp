@@ -44,7 +44,6 @@ const RouteStarClosedInvoiceCustomers = () => {
   };
 
   const handleSyncToGoAudits = async () => {
-    // Prevent multiple clicks
     if (syncing) {
       showError('Sync already in progress. Please wait...');
       return;
@@ -55,7 +54,6 @@ const RouteStarClosedInvoiceCustomers = () => {
       return;
     }
 
-    // Confirmation dialog
     const confirmed = window.confirm(
       `You are about to sync ${filteredCustomers.length} customer(s) to GoAudits.\n\n` +
       `The system will:\n` +
@@ -79,7 +77,6 @@ const RouteStarClosedInvoiceCustomers = () => {
       if (result.success) {
         const { created, mapped_existing, already_exists, errors, total } = result.data;
 
-        // Build detailed success message
         let message = `✓ Sync completed successfully!\n\n`;
         message += `Total customers processed: ${total || filteredCustomers.length}\n`;
         if (created > 0) message += `✓ ${created} new location(s) created in GoAudits\n`;
@@ -94,7 +91,6 @@ const RouteStarClosedInvoiceCustomers = () => {
     } catch (error) {
       console.error('Error syncing to GoAudits:', error);
 
-      // Better error message for sync lock
       if (error.message && error.message.includes('already in progress')) {
         showError('Another sync is currently running. Please wait for it to complete.');
       } else {
@@ -126,7 +122,7 @@ const RouteStarClosedInvoiceCustomers = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -149,7 +145,7 @@ const RouteStarClosedInvoiceCustomers = () => {
         )}
       </div>
 
-      {/* Stats Cards */}
+      {}
       {customers.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
@@ -192,10 +188,10 @@ const RouteStarClosedInvoiceCustomers = () => {
         </div>
       )}
 
-      {/* Filters and Actions */}
+      {}
       <Card>
         <div className="p-4 space-y-4">
-          {/* Date Range Row */}
+          {}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="flex flex-col">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -238,7 +234,7 @@ const RouteStarClosedInvoiceCustomers = () => {
             </div>
           </div>
 
-          {/* Search Row */}
+          {}
           {customers.length > 0 && (
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
@@ -256,7 +252,7 @@ const RouteStarClosedInvoiceCustomers = () => {
         </div>
       </Card>
 
-      {/* Customers Table */}
+      {}
       {customers.length === 0 && !loading ? (
         <Card>
           <div className="p-12 text-center">

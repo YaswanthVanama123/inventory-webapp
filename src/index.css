@@ -1,12 +1,10 @@
-/* Import Inter font from Google Fonts - must be first */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-/* Import Tailwind CSS directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Base layer customization */
 @layer base {
   * {
     @apply box-border;
@@ -24,16 +22,16 @@
     @apply font-sans text-base text-dark-800 bg-light;
     min-height: 100vh;
     scroll-behavior: smooth;
-    max-width: 100vw; /* Prevent body from exceeding viewport width */
+    max-width: 100vw; 
   }
 
   html, body, #root {
     width: 100%;
     height: 100%;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
+    overflow-x: hidden; 
   }
 
-  /* Heading styles */
+  
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight text-dark-900;
   }
@@ -62,7 +60,7 @@
     @apply text-base md:text-lg lg:text-xl;
   }
 
-  /* Link styles */
+  
   a {
     @apply text-primary-600 transition-colors duration-200;
   }
@@ -71,7 +69,7 @@
     @apply text-primary-700 underline;
   }
 
-  /* Form elements */
+  
   input,
   textarea,
   select {
@@ -84,7 +82,7 @@
     @apply bg-dark-100 cursor-not-allowed opacity-60;
   }
 
-  /* Better select dropdown styling */
+  
   select {
     background-image: none;
     padding-right: 2.5rem;
@@ -103,17 +101,17 @@
     display: block;
   }
 
-  /* Force proper spacing between options */
+  
   select option:not(:last-child) {
     margin-bottom: 1px;
   }
 
-  /* Ensure placeholder option is styled correctly */
+  
   select option:disabled {
     color: #9ca3af;
   }
 
-  /* Dark mode select options */
+  
   .dark select option {
     background-color: #1f2937;
     color: #f9fafb;
@@ -123,7 +121,7 @@
     color: #6b7280;
   }
 
-  /* Fix for webkit browsers (Safari, Chrome) */
+  
   @supports (-webkit-appearance: none) {
     select {
       -webkit-appearance: none;
@@ -138,29 +136,29 @@
     }
   }
 
-  /* Fix for Firefox */
+  
   @-moz-document url-prefix() {
     select option {
       padding: 4px 8px;
     }
   }
 
-  /* Button reset */
+  
   button {
     @apply font-medium transition-all duration-200;
   }
 
-  /* Focus visible for accessibility */
+  
   *:focus-visible {
     @apply outline-none ring-2 ring-primary-500 ring-offset-2;
   }
 
-  /* Code elements */
+  
   code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
   }
 
-  /* Scrollbar styling for webkit browsers */
+  
   ::-webkit-scrollbar {
     @apply w-2 h-2;
   }
@@ -178,9 +176,8 @@
   }
 }
 
-/* Components layer - reusable component classes */
 @layer components {
-  /* Button variants */
+  
   .btn {
     @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
@@ -221,7 +218,7 @@
     @apply px-6 py-3 text-lg;
   }
 
-  /* Card component */
+  
   .card {
     @apply bg-white rounded-xl shadow-md p-6 transition-shadow duration-200;
   }
@@ -230,7 +227,7 @@
     @apply card hover:shadow-xl;
   }
 
-  /* Input field */
+  
   .input {
     @apply w-full px-4 py-2 border border-dark-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200;
   }
@@ -239,7 +236,7 @@
     @apply input border-danger-500 focus:ring-danger-500 focus:border-danger-500;
   }
 
-  /* Badge component */
+  
   .badge {
     @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
   }
@@ -264,22 +261,22 @@
     @apply badge bg-danger-100 text-danger-800;
   }
 
-  /* Container */
+  
   .container-custom {
     @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  /* Section spacing */
+  
   .section {
     @apply py-12 md:py-16 lg:py-20;
   }
 
-  /* Loading spinner */
+  
   .spinner {
     @apply inline-block w-6 h-6 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin;
   }
 
-  /* Alert component */
+  
   .alert {
     @apply p-4 rounded-lg border;
   }
@@ -300,20 +297,19 @@
     @apply alert bg-danger-50 border-danger-200 text-danger-800;
   }
 
-  /* Divider */
+  
   .divider {
     @apply border-t border-dark-200 my-6;
   }
 
-  /* Glass morphism effect */
+  
   .glass {
     @apply backdrop-blur-md bg-white/30 border border-white/20 shadow-xl;
   }
 }
 
-/* Utilities layer - custom utility classes */
 @layer utilities {
-  /* Performance optimizations for CLS */
+  
   .will-change-auto {
     will-change: auto;
   }
@@ -326,7 +322,7 @@
     will-change: opacity;
   }
 
-  /* Contain layout to prevent reflows */
+  
   .contain-layout {
     contain: layout;
   }
@@ -339,7 +335,7 @@
     contain: strict;
   }
 
-  /* Text gradients */
+  
   .text-gradient-primary {
     @apply bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent;
   }
@@ -348,7 +344,7 @@
     @apply bg-gradient-to-r from-success-600 to-primary-600 bg-clip-text text-transparent;
   }
 
-  /* Background gradients */
+  
   .bg-gradient-primary {
     @apply bg-gradient-to-r from-primary-500 to-primary-700;
   }
@@ -361,7 +357,7 @@
     @apply bg-gradient-to-br from-primary-500 via-secondary-500 to-primary-600;
   }
 
-  /* Animations */
+  
   .animate-fade-in {
     animation: fadeIn 0.5s ease-in-out;
   }
@@ -374,7 +370,7 @@
     animation: slideDown 0.5s ease-out;
   }
 
-  /* Mobile-first responsive utilities */
+  
   .mobile-hidden {
     @apply hidden md:block;
   }
@@ -383,7 +379,7 @@
     @apply block md:hidden;
   }
 
-  /* Safe area padding for mobile devices */
+  
   .safe-top {
     padding-top: env(safe-area-inset-top);
   }
@@ -400,12 +396,12 @@
     padding-right: env(safe-area-inset-right);
   }
 
-  /* Touch-friendly tap targets (minimum 44x44px) */
+  
   .tap-target {
     @apply min-w-[44px] min-h-[44px];
   }
 
-  /* Touch-friendly buttons and interactive elements */
+  
   .touch-target-sm {
     @apply min-w-[40px] min-h-[40px];
   }
@@ -418,22 +414,22 @@
     @apply min-w-[48px] min-h-[48px];
   }
 
-  /* Mobile-optimized containers */
+  
   .mobile-container {
     @apply px-4 sm:px-6 lg:px-8;
   }
 
-  /* Mobile-optimized spacing */
+  
   .mobile-spacing {
     @apply space-y-4 sm:space-y-6;
   }
 
-  /* Mobile bottom navigation safe area */
+  
   .mobile-bottom-spacing {
     @apply pb-20 md:pb-6;
   }
 
-  /* Horizontal scroll container for tables on mobile */
+  
   .mobile-scroll {
     @apply overflow-x-auto -mx-4 sm:mx-0;
   }
@@ -442,7 +438,7 @@
     @apply inline-block min-w-full align-middle px-4 sm:px-0;
   }
 
-  /* Responsive table wrapper */
+  
   .table-responsive {
     @apply overflow-x-auto;
   }
@@ -451,19 +447,19 @@
     @apply min-w-full;
   }
 
-  /* Ensure tables don't break layout on mobile */
+  
   table {
     @apply max-w-full;
   }
 
-  /* Word break for long text in table cells */
+  
   td {
     @apply break-words;
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
 
-  /* Prevent text selection */
+  
   .no-select {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -471,13 +467,13 @@
     user-select: none;
   }
 
-  /* Hardware acceleration */
+  
   .gpu {
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
   }
 
-  /* Truncate text */
+  
   .truncate-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -493,7 +489,6 @@
   }
 }
 
-/* Keyframe animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -525,7 +520,6 @@
   }
 }
 
-/* Print styles */
 @media print {
   body {
     @apply text-dark-900 bg-white;
@@ -536,12 +530,10 @@
   }
 }
 
-/* Dark mode support (optional - can be enabled later) */
 @media (prefers-color-scheme: dark) {
-  /* Add dark mode styles here if needed */
+  
 }
 
-/* Reduced motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

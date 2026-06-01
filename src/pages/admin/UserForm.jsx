@@ -47,7 +47,6 @@ const UserForm = () => {
     }
   }, [id, isEditMode]);
 
-  // Fetch permissions when role changes to employee for new users
   useEffect(() => {
     if (!isEditMode && formData.role === 'employee' && allScreens.length === 0) {
       fetchScreens();
@@ -80,7 +79,6 @@ const UserForm = () => {
     try {
       const response = await screenPermissionService.getUserSpecificPermissions(id);
       if (response.success) {
-        // Get the IDs of screens this user has access to (beyond defaults)
         const screenIds = response.data.map(screen => screen._id);
         setSelectedScreenIds(screenIds);
       }
@@ -153,7 +151,6 @@ const UserForm = () => {
       [name]: type === 'checkbox' ? checked : value,
     }));
 
-    // Reset screen permissions if role is changed to admin
     if (name === 'role' && value === 'admin') {
       setSelectedScreenIds([]);
     }
@@ -264,7 +261,6 @@ const UserForm = () => {
         ? await userService.update(id, payload)
         : await userService.create(payload);
 
-      // Save screen permissions for employees
       if (formData.role === 'employee') {
         try {
           const createdUser = response?.data?.user || {};
@@ -549,7 +545,7 @@ const UserForm = () => {
             helperText="Unique truck/vehicle identifier for this employee (appears in Class column of invoices)"
             style={{ textTransform: 'uppercase' }}
           />
-          {/* Screen Permissions - Only show for employees */}
+          {}
           {formData.role === 'employee' && (
             <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
               <div className="flex items-center gap-2 mb-3">
@@ -564,7 +560,7 @@ const UserForm = () => {
                 <div className="text-center py-4 text-sm text-gray-500">Loading screens...</div>
               ) : (
                 <div className="space-y-4">
-                  {/* Default Screens (Read-only) */}
+                  {}
                   {defaultScreens.length > 0 && (
                     <div>
                       <h4 className="text-xs font-medium text-gray-700 mb-2 flex items-center gap-2">
@@ -585,7 +581,7 @@ const UserForm = () => {
                     </div>
                   )}
 
-                  {/* Additional Screens (Selectable) */}
+                  {}
                   {allScreens.filter(screen => !screen.isDefault).length > 0 && (
                     <div>
                       <h4 className="text-xs font-medium text-gray-700 mb-2">Additional Screens (Optional)</h4>
@@ -619,7 +615,7 @@ const UserForm = () => {
               )}
             </div>
           )}
-          {/* Active Status Toggle */}
+          {}
           <div className="flex items-center gap-3">
             <label className="relative inline-flex items-center cursor-pointer">
               <input

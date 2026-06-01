@@ -13,7 +13,7 @@ const Stock = () => {
   const { showSuccess, showError } = useContext(ToastContext);
 
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('use'); 
+  const [activeTab, setActiveTab] = useState('use');
   const [useStockData, setUseStockData] = useState({ items: [], totals: {} });
   const [sellStockData, setSellStockData] = useState({ items: [], totals: {} });
   const [expandedCategories, setExpandedCategories] = useState(new Set());
@@ -405,7 +405,7 @@ const Stock = () => {
                         </span>
                       </td>
                     </tr>
-                    {/* Expanded Category Content */}
+                    {}
                     {expandedCategories.has(item.categoryName) && (
                       <>
                         {loadingCategories.has(item.categoryName) ? (
@@ -419,9 +419,9 @@ const Stock = () => {
                           </tr>
                         ) : categorySkuData[item.categoryName] && categorySkuData[item.categoryName].length > 0 ? (
                           <>
-                            {/* Category-Level History Folders */}
+                            {}
                             <>
-                                {/* Sales History Folder */}
+                                {}
                                 <tr
                                   className="bg-green-50 dark:bg-green-900/10 hover:bg-green-100 dark:hover:bg-green-900/20 cursor-pointer"
                                   onClick={() => toggleCategorySales(item.categoryName)}
@@ -440,7 +440,7 @@ const Stock = () => {
                                     </div>
                                   </td>
                                 </tr>
-                                {/* Sales History Table */}
+                                {}
                                 {expandedCategorySales.has(item.categoryName) && (
                                   <tr>
                                     <td colSpan="8" className="px-0 py-0">
@@ -514,7 +514,7 @@ const Stock = () => {
                                   </tr>
                                 )}
 
-                                {/* Checkout History Folder */}
+                                {}
                                 <tr
                                   className="bg-orange-50 dark:bg-orange-900/10 hover:bg-orange-100 dark:hover:bg-orange-900/20 cursor-pointer"
                                   onClick={() => toggleCategoryCheckouts(item.categoryName)}
@@ -533,7 +533,7 @@ const Stock = () => {
                                     </div>
                                   </td>
                                 </tr>
-                                {/* Checkout History Table */}
+                                {}
                                 {expandedCategoryCheckouts.has(item.categoryName) && (
                                   <tr>
                                     <td colSpan="8" className="px-0 py-0">
@@ -587,7 +587,7 @@ const Stock = () => {
                                   </tr>
                                 )}
 
-                                {/* Discrepancy History Folder */}
+                                {}
                                 <tr
                                   className="bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 cursor-pointer"
                                   onClick={() => toggleCategoryDiscrepancies(item.categoryName)}
@@ -624,7 +624,7 @@ const Stock = () => {
                                     </div>
                                   </td>
                                 </tr>
-                                {/* Discrepancy History Table */}
+                                {}
                                 {expandedCategoryDiscrepancies.has(item.categoryName) && (
                                   <tr>
                                     <td colSpan="8" className="px-0 py-0">
@@ -713,7 +713,7 @@ const Stock = () => {
                                 )}
                               </>
 
-                            {/* SKU Items */}
+                            {}
                             {categorySkuData[item.categoryName].map((sku) => (
                             <React.Fragment key={sku.sku}>
                               <tr
@@ -774,10 +774,10 @@ const Stock = () => {
                                   </span>
                                 </td>
                               </tr>
-                              {/* SKU Expanded Content */}
+                              {}
                               {expandedSKUs.has(sku.sku) && (
                                 <>
-                                  {/* Purchase History Folder */}
+                                  {}
                                   <tr
                                     className="bg-blue-50 dark:bg-blue-900/10 hover:bg-blue-100 dark:hover:bg-blue-900/20 cursor-pointer"
                                     onClick={(e) => {
@@ -800,7 +800,7 @@ const Stock = () => {
                                     </td>
                                   </tr>
 
-                                  {/* Purchase History Table */}
+                                  {}
                                   {expandedSkuPurchases.has(sku.sku) && sku.purchaseHistory && sku.purchaseHistory.length > 0 && (
                                     <tr>
                                       <td colSpan="8" className="px-0 py-0">
@@ -1054,7 +1054,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
     });
   };
 
-  // Load category items when modal opens with category
   useEffect(() => {
     const loadCategoryItems = async () => {
       if (prefilledItem?.categoryName && !prefilledItem?.itemName) {
@@ -1063,13 +1062,11 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
           const response = await stockService.getCategorySales(prefilledItem.categoryName);
           const items = response.skus || [];
 
-          // Calculate current stock for each SKU item
           const itemsWithStock = items.map(item => ({
             ...item,
             currentStock: (item.totalPurchased || 0) - (item.totalSold || 0) - (item.totalCheckedOut || 0) + (item.totalDiscrepancyDifference || 0)
           }));
 
-          // Create category-level item option
           const categoryOption = {
             itemName: prefilledItem.categoryName,
             sku: '',
@@ -1103,7 +1100,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // For category-level stock adjustments, invoice is not required
     const isCategoryAdjustment = prefilledItem?.categoryName && !prefilledItem?.itemName;
 
     if (!isCategoryAdjustment && !formData.invoiceNumber) {
@@ -1159,7 +1155,7 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 </p>
               </div>
 
-              {/* Item Selection for Category */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Select Item *

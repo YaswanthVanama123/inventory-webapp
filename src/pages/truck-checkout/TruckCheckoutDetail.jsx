@@ -77,7 +77,7 @@ const TruckCheckoutDetail = () => {
       showSuccess('Invoices fetched successfully. Review the comparison below.');
       setComparisonData(response.data);
       setCheckWorkDone(true);
-      loadCheckout(); 
+      loadCheckout();
     } catch (error) {
       const errorData = error.response?.data;
       if (errorData?.duplicateCheckouts && errorData.duplicateCheckouts.length > 0) {
@@ -350,7 +350,7 @@ const TruckCheckoutDetail = () => {
   const canProcessStock = hasTally && !checkout.stockProcessed;
   return (
     <div className="space-y-5 max-w-7xl mx-auto">
-      {/* Header */}
+      {}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <button
           onClick={() => navigate('/truck-checkouts')}
@@ -381,7 +381,7 @@ const TruckCheckoutDetail = () => {
         </div>
       </div>
 
-      {/* Actions Bar */}
+      {}
       {checkout.status === 'checked_out' && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
           <div className="flex items-center gap-3 flex-wrap">
@@ -480,9 +480,9 @@ const TruckCheckoutDetail = () => {
         </div>
       )}
 
-      {/* Info Cards Grid */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {/* Employee & Checkout Info */}
+        {}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
           <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
             <UserIcon className="w-4 h-4 text-slate-500" />
@@ -522,7 +522,7 @@ const TruckCheckoutDetail = () => {
           )}
         </div>
 
-        {/* Invoices */}
+        {}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
           <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
             <DocumentTextIcon className="w-4 h-4 text-slate-500" />
@@ -557,7 +557,7 @@ const TruckCheckoutDetail = () => {
         </div>
       </div>
 
-      {/* Items Taken */}
+      {}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200">
         <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
@@ -597,7 +597,7 @@ const TruckCheckoutDetail = () => {
           )}
         </div>
       </div>
-      {/* Tally Results */}
+      {}
       {hasTally && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200">
           <div className="px-5 py-4 border-b border-slate-200">
@@ -606,7 +606,7 @@ const TruckCheckoutDetail = () => {
               Tally Results
             </h3>
           </div>
-          {/* Summary Stats */}
+          {}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-5">
             <div className="bg-blue-50 rounded-lg p-3 text-center">
               <p className="text-xs font-medium text-blue-600 uppercase tracking-wide">Taken</p>
@@ -634,7 +634,7 @@ const TruckCheckoutDetail = () => {
               </p>
             </div>
           </div>
-          {/* Item Comparison */}
+          {}
           {checkout.tallyResults.discrepancies && checkout.tallyResults.discrepancies.length > 0 && (
             <div className="border-t border-slate-200">
               <div className="px-5 py-3 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wide">

@@ -1,6 +1,5 @@
 import api from './api';
 
-
 export const getUnits = async (includeInactive = false) => {
   const response = await api.get('/settings/units', {
     params: { includeInactive },
@@ -27,7 +26,6 @@ export const updateSKUConfig = async (config) => {
   const response = await api.put('/settings/sku-config', config);
   return response;
 };
-// Combined endpoint to get both cutoff date and threshold in one call
 export const getGeneralSettings = async () => {
   const response = await api.get('/settings/general');
   return response;

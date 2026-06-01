@@ -32,7 +32,6 @@ const TABS = [
 
 const getDiscrepancySource = (discrepancy) => {
   const invoiceNumber = discrepancy.invoiceNumber || '';
-  // Truck discrepancies from TruckDiscrepancy collection
   if (discrepancy._discrepancySource === 'truck') return 'truck-return';
   if (invoiceNumber === 'STOCK-ADJUSTMENT') return 'stock-adjustment';
   if (invoiceNumber.startsWith('CHECKOUT-') || discrepancy.invoiceType === 'TruckCheckout') return 'stock-check';
@@ -280,7 +279,7 @@ const DiscrepancyManagement = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
@@ -292,7 +291,7 @@ const DiscrepancyManagement = () => {
         </div>
       </div>
 
-      {/* Summary Cards */}
+      {}
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
@@ -322,7 +321,7 @@ const DiscrepancyManagement = () => {
         </div>
       )}
 
-      {/* Source Tabs */}
+      {}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200">
         <div className="border-b border-slate-200">
           <div className="flex overflow-x-auto">
@@ -352,7 +351,7 @@ const DiscrepancyManagement = () => {
           </div>
         </div>
 
-        {/* Filters */}
+        {}
         <div className="p-4 border-b border-slate-200">
           <div className="flex flex-col lg:flex-row gap-3">
             <div className="flex-1">
@@ -381,7 +380,7 @@ const DiscrepancyManagement = () => {
           </div>
         </div>
 
-        {/* Discrepancy List */}
+        {}
         <div className="divide-y divide-slate-100">
           {filteredDiscrepancies.length === 0 ? (
             <div className="p-12 text-center">
@@ -399,14 +398,14 @@ const DiscrepancyManagement = () => {
               const source = getDiscrepancySource(discrepancy);
               return (
                 <div key={discrepancy._id} className="group">
-                  {/* Row Header - Clickable */}
+                  {}
                   <div
                     onClick={() => setExpandedRow(isExpanded ? null : discrepancy._id)}
                     className={`flex items-center gap-4 px-6 py-4 cursor-pointer transition-colors ${
                       isExpanded ? 'bg-blue-50/50' : 'hover:bg-slate-50'
                     }`}
                   >
-                    {/* Expand Icon */}
+                    {}
                     <div className="text-slate-400">
                       {isExpanded ? (
                         <ChevronDown className="w-5 h-5 text-blue-600" />
@@ -415,7 +414,7 @@ const DiscrepancyManagement = () => {
                       )}
                     </div>
 
-                    {/* Item Info */}
+                    {}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold text-slate-900 truncate">
@@ -437,7 +436,7 @@ const DiscrepancyManagement = () => {
                       </div>
                     </div>
 
-                    {/* Quantities */}
+                    {}
                     <div className="hidden md:flex items-center gap-4 text-sm">
                       <div className="text-center">
                         <div className="text-xs text-slate-500">System</div>
@@ -455,7 +454,7 @@ const DiscrepancyManagement = () => {
                       </div>
                     </div>
 
-                    {/* Badges */}
+                    {}
                     <div className="flex items-center gap-2">
                       {activeTab === 'all' && (
                         <span className={`hidden lg:inline-flex px-2 py-1 text-xs font-medium rounded border ${getSourceColor(source)}`}>
@@ -467,7 +466,7 @@ const DiscrepancyManagement = () => {
                       </span>
                     </div>
 
-                    {/* Actions (prevent row toggle) */}
+                    {}
                     <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => handleDelete(discrepancy._id)}
@@ -479,11 +478,11 @@ const DiscrepancyManagement = () => {
                     </div>
                   </div>
 
-                  {/* Expanded Detail Panel */}
+                  {}
                   {isExpanded && (
                     <div className="px-6 pb-5 bg-blue-50/30 border-t border-slate-100">
                       <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Discrepancy Details */}
+                        {}
                         <div className="bg-white rounded-lg border border-slate-200 p-4">
                           <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
                             <FileText className="w-4 h-4 text-slate-500" />
@@ -537,7 +536,7 @@ const DiscrepancyManagement = () => {
                           </dl>
                         </div>
 
-                        {/* Reporter & Timing */}
+                        {}
                         <div className="bg-white rounded-lg border border-slate-200 p-4">
                           <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
                             <User className="w-4 h-4 text-slate-500" />
@@ -579,7 +578,7 @@ const DiscrepancyManagement = () => {
                           </dl>
                         </div>
 
-                        {/* Notes & Reason */}
+                        {}
                         <div className="bg-white rounded-lg border border-slate-200 p-4">
                           <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
                             <Hash className="w-4 h-4 text-slate-500" />
@@ -631,7 +630,7 @@ const DiscrepancyManagement = () => {
           )}
         </div>
 
-        {/* Pagination */}
+        {}
         {pagination.totalPages > 1 && (
           <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
             <div className="text-sm text-slate-600">
@@ -657,7 +656,7 @@ const DiscrepancyManagement = () => {
         )}
       </div>
 
-      {/* Record Modal (kept for prefilled item flow) */}
+      {}
       {showRecordModal && (
         <RecordDiscrepancyModal
           onClose={() => {
@@ -674,7 +673,7 @@ const DiscrepancyManagement = () => {
         />
       )}
 
-      {/* Delete Confirmation Modal */}
+      {}
       {showDeleteModal && (
         <DeleteConfirmationModal
           onClose={() => {

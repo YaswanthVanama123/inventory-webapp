@@ -5,7 +5,6 @@ import { ToastProvider } from './contexts/ToastContext';
 import MainLayout from './components/layout/MainLayout';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
-
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50">
     <div className="text-center">
@@ -525,7 +524,7 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {/* Screen Permissions Management */}
+                {}
                 <Route
                   path="/admin/screen-permissions"
                   element={
@@ -536,7 +535,7 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {/* Screen Management */}
+                {}
                 <Route
                   path="/admin/screens"
                   element={

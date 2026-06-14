@@ -14,6 +14,7 @@ const LoadingFallback = () => (
   </div>
 );
 const Login = lazy(() => import('./pages/Login'));
+const Landing = lazy(() => import('./pages/Landing'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const DeleteAccount = lazy(() => import('./pages/DeleteAccount'));
 const AdminDashboard = lazy(() => import('./pages/admin/EnhancedDashboard'));
@@ -104,7 +105,7 @@ const RootRoute = () => {
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
-  return <Navigate to="/login" replace />;
+  return <Landing />;
 };
 function App() {
   return (

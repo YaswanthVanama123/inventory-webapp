@@ -3,6 +3,7 @@ import React, { createContext, useState, useEffect, useCallback, useContext } fr
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
 export const AuthContext = createContext(null);
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -10,21 +11,44 @@ export const useAuth = () => {
   }
   return context;
 };
+
+const getToken = () => localStorage.getItem('authToken');
+
+const setToken = (token) => {
+  if (token) {
+    localStorage.setItem('authToken', token);
+  } else {
+    localStorage.removeItem('authToken');
+  }
+};
+
+const authFetch = async (path, { method = 'GET', body, auth = false } = {}) => {
+  const headers = { 'Content-Type': 'application/json' };
+  if (auth) {
+    const token = getToken();
+    if (token) headers.Authorization = `Bearer ${token}`;
+  }
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error || data.message || `Request failed (${response.status})`);
+  }
+  return data;
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const isAuthenticated = !!user;
   const isAdmin = user?.role === 'admin';
   const isEmployee = user?.role === 'employee';
-  const getToken = () => localStorage.getItem('authToken');
-  const setToken = (token) => {
-    if (token) {
-      localStorage.setItem('authToken', token);
-    } else {
-      localStorage.removeItem('authToken');
-    }
-  };
+
   const loadUserFromStorage = useCallback(() => {
     const token = getToken();
     const storedUser = localStorage.getItem('user');
@@ -34,8 +58,7 @@ export const AuthProvider = ({ children }) => {
       return;
     }
     try {
-      const userData = JSON.parse(storedUser);
-      setUser(userData);
+      setUser(JSON.parse(storedUser));
     } catch (err) {
       console.error('Error parsing stored user:', err);
       setToken(null);
@@ -45,44 +68,32 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   }, []);
-  const login = async (username, password) => {
+
+  const login = useCallback(async (username, password) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const data = await authFetch('/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
+        body: { username, password },
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || data.message || 'Login failed');
-      }
       setToken(data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
       return { success: true, user: data.user };
     } catch (err) {
-      const errorMessage = err.message || 'An error occurred during login';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
+      const message = err.message || 'An error occurred during login';
+      setError(message);
+      return { success: false, error: message };
     } finally {
       setLoading(false);
     }
-  };
-  const logout = async () => {
-    const token = getToken();
+  }, []);
+
+  const logout = useCallback(async () => {
     try {
-      if (token) {
-        await fetch(`${API_BASE_URL}/auth/logout`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
+      if (getToken()) {
+        await authFetch('/auth/logout', { method: 'POST', auth: true });
       }
     } catch (err) {
       console.error('Error during logout:', err);
@@ -93,39 +104,34 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setError(null);
     }
-  };
-  const changePassword = async (currentPassword, newPassword) => {
-    const token = getToken();
-    if (!token) {
+  }, []);
+
+  const changePassword = useCallback(async (currentPassword, newPassword) => {
+    if (!getToken()) {
       return { success: false, error: 'Not authenticated' };
     }
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
+      const data = await authFetch('/auth/change-password', {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ currentPassword, newPassword }),
+        body: { currentPassword, newPassword },
+        auth: true,
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || data.message || 'Password change failed');
-      }
       return { success: true, message: data.message || 'Password changed successfully' };
     } catch (err) {
-      const errorMessage = err.message || 'An error occurred while changing password';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
+      const message = err.message || 'An error occurred while changing password';
+      setError(message);
+      return { success: false, error: message };
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
   useEffect(() => {
     loadUserFromStorage();
   }, [loadUserFromStorage]);
+
   const value = {
     user,
     loading,
@@ -138,8 +144,9 @@ export const AuthProvider = ({ children }) => {
     changePassword,
     refreshUser: loadUserFromStorage,
     setUser,
-    setIsAuthenticated: (value) => setUser(value ? user : null),
+    setIsAuthenticated: () => {},
     setError,
   };
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

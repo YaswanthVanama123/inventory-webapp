@@ -1,9 +1,31 @@
-
-
 export { default as api, setAuthToken, getAuthToken, isAuthenticated } from './api';
+export { handleApiError, withErrorHandling, getValidationErrors, shouldRetry } from './errorHandler';
+export { wrap, wrapAll, createResource } from './_factory';
+export { triggerBlobDownload, downloadReport, downloadExport } from './_download';
+
 export { default as authService } from './authService';
 export { default as inventoryService } from './inventoryService';
 export { default as userService } from './userService';
 export { default as invoiceService } from './invoiceService';
 export { default as reportService } from './reportService';
+export { default as ordersService } from './ordersService';
 export { default as routeStarItemAliasService } from './routeStarItemAliasService';
+export { default as routeStarItemsService } from './routeStarItemsService';
+export { default as routestarService } from './routestarService';
+export { default as routeStarCustomerService } from './routeStarCustomerService';
+export { default as vendorService } from './vendorService';
+export { default as purchaseOrderService } from './purchaseOrderService';
+export { default as manualOrderService } from './manualOrderService';
+export { default as manualPOItemService } from './manualPOItemService';
+export { default as modelCategoryService } from './modelCategoryService';
+export { default as goAuditsService } from './goAuditsService';
+export { default as settingsService } from './settingsService';
+export { default as stockService } from './stockService';
+export { default as truckCheckoutService } from './truckCheckoutService';
+export { default as screenPermissionService } from './screenPermissionService';
+export { default as dashboardService } from './dashboardService';
+export { default as employeeDataService } from './employeeDataService';
+export { default as fetchHistoryService } from './fetchHistoryService';
+export { default as quickBooksSyncService } from './quickBooksSyncService';
+export { default as discrepancyService } from './discrepancyService';
+export { default as orderDiscrepancyService } from './orderDiscrepancyService';

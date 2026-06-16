@@ -1,16 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import screenPermissionService from '../services/screenPermissionService';
+
+const normalize = (path) => (path ?? '').split('?')[0].replace(/\/$/, '');
 
 export const useUserScreens = () => {
   const [userScreens, setUserScreens] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchUserScreens();
-  }, []);
-
-  const fetchUserScreens = async () => {
+  const fetchUserScreens = useCallback(async () => {
     try {
       setLoading(true);
       const result = await screenPermissionService.getMyScreens();
@@ -23,30 +21,34 @@ export const useUserScreens = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const hasAccessToScreen = (path) => {
+  useEffect(() => {
+    fetchUserScreens();
+  }, [fetchUserScreens]);
+
+  const normalizedPaths = useMemo(
+    () => userScreens.map((screen) => normalize(screen.path)).filter(Boolean),
+    [userScreens]
+  );
+
+  const exactMatchSet = useMemo(() => new Set(normalizedPaths), [normalizedPaths]);
+
+  const hasAccessToScreen = useCallback((path) => {
     if (!path) return false;
+    const target = normalize(path);
+    if (!target) return false;
+    if (exactMatchSet.has(target)) return true;
+    for (const screenPath of normalizedPaths) {
+      if (screenPath && target.startsWith(`${screenPath}/`)) return true;
+    }
+    return false;
+  }, [exactMatchSet, normalizedPaths]);
 
-    const normalizedPath = path.split('?')[0].replace(/\/$/, '');
-
-    return userScreens.some(screen => {
-      const screenPath = screen.path.split('?')[0].replace(/\/$/, '');
-
-      if (screenPath === normalizedPath) return true;
-
-      if (normalizedPath.startsWith(screenPath + '/') && screenPath !== '') {
-        return true;
-      }
-
-      return false;
-    });
-  };
-
-  const hasAccessToAnySubScreen = (submenu) => {
+  const hasAccessToAnySubScreen = useCallback((submenu) => {
     if (!submenu || submenu.length === 0) return false;
-    return submenu.some(item => hasAccessToScreen(item.path));
-  };
+    return submenu.some((item) => hasAccessToScreen(item.path));
+  }, [hasAccessToScreen]);
 
   return {
     userScreens,
@@ -54,6 +56,6 @@ export const useUserScreens = () => {
     error,
     hasAccessToScreen,
     hasAccessToAnySubScreen,
-    refetch: fetchUserScreens
+    refetch: fetchUserScreens,
   };
 };

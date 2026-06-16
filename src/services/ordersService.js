@@ -1,137 +1,100 @@
 import api from './api';
 
+const longRunning = { timeout: 0, retry: false };
+
+const log = (msg, error) => {
+  console.error(msg, error);
+  throw error;
+};
 
 export const getOrders = async (params = {}) => {
   try {
-    const response = await api.get('/customerconnect/orders', { params });
-    return response;
+    return await api.get('/customerconnect/orders', { params });
   } catch (error) {
-    console.error('Error fetching orders:', error);
-    throw error;
+    log('Error fetching orders:', error);
   }
 };
+
 export const getOrderByNumber = async (orderNumber) => {
   try {
-    const response = await api.get(`/customerconnect/orders/${orderNumber}`);
-    return response;
+    return await api.get(`/customerconnect/orders/${orderNumber}`);
   } catch (error) {
-    console.error('Error fetching order:', error);
-    throw error;
+    log('Error fetching order:', error);
   }
 };
+
 export const getOrderStats = async (params = {}) => {
   try {
-    const response = await api.get('/customerconnect/stats', { params });
-    return response;
+    return await api.get('/customerconnect/stats', { params });
   } catch (error) {
-    console.error('Error fetching order stats:', error);
-    throw error;
+    log('Error fetching order stats:', error);
   }
 };
+
 export const getOrderRange = async () => {
   try {
-    const response = await api.get('/customerconnect/order-range');
-    return response;
+    return await api.get('/customerconnect/order-range');
   } catch (error) {
-    console.error('Error fetching order range:', error);
-    throw error;
+    log('Error fetching order range:', error);
   }
 };
+
 export const syncOrders = async (limit = 100, direction = 'new') => {
   try {
-    const response = await api.post('/customerconnect/sync/orders',
-      { limit, direction },
-      {
-        timeout: 0, 
-        retry: false 
-      }
-    );
-    return response;
+    return await api.post('/customerconnect/sync/orders', { limit, direction }, longRunning);
   } catch (error) {
-    console.error('Error syncing orders:', error);
-    throw error;
+    log('Error syncing orders:', error);
   }
 };
+
 export const syncOrderDetails = async (orderNumber) => {
   try {
-    const response = await api.post(`/customerconnect/sync/details/${orderNumber}`,
-      {},
-      {
-        timeout: 0, 
-        retry: false 
-      }
-    );
-    return response;
+    return await api.post(`/customerconnect/sync/details/${orderNumber}`, {}, longRunning);
   } catch (error) {
-    console.error('Error syncing order details:', error);
-    throw error;
+    log('Error syncing order details:', error);
   }
 };
+
 export const syncAllOrderDetails = async (limit = 50) => {
   try {
-    const response = await api.post('/customerconnect/sync/all-details',
-      { limit },
-      {
-        timeout: 0, 
-        retry: false 
-      }
-    );
-    return response;
+    return await api.post('/customerconnect/sync/all-details', { limit }, longRunning);
   } catch (error) {
-    console.error('Error syncing all order details:', error);
-    throw error;
+    log('Error syncing all order details:', error);
   }
 };
+
 export const processStockMovements = async () => {
   try {
-    const response = await api.post('/customerconnect/sync/stock',
-      {},
-      {
-        timeout: 0, 
-        retry: false 
-      }
-    );
-    return response;
+    return await api.post('/customerconnect/sync/stock', {}, longRunning);
   } catch (error) {
-    console.error('Error processing stock movements:', error);
-    throw error;
+    log('Error processing stock movements:', error);
   }
 };
+
 export const fullSync = async (options = {}) => {
   try {
-    const response = await api.post('/customerconnect/sync/full',
-      options,
-      {
-        timeout: 0, 
-        retry: false 
-      }
-    );
-    return response;
+    return await api.post('/customerconnect/sync/full', options, longRunning);
   } catch (error) {
-    console.error('Error performing full sync:', error);
-    throw error;
+    log('Error performing full sync:', error);
   }
 };
+
 export const deleteAllOrders = async () => {
   try {
-    const response = await api.delete('/customerconnect/orders/all');
-    return response;
+    return await api.delete('/customerconnect/orders/all');
   } catch (error) {
-    console.error('Error deleting all orders:', error);
-    throw error;
+    log('Error deleting all orders:', error);
   }
 };
+
 export const deleteBulkOrdersByNumbers = async (orderNumbers) => {
   try {
-    const response = await api.post('/customerconnect/orders/bulk-delete-by-numbers', {
-      orderNumbers
-    });
-    return response;
+    return await api.post('/customerconnect/orders/bulk-delete-by-numbers', { orderNumbers });
   } catch (error) {
-    console.error('Error deleting orders by numbers:', error);
-    throw error;
+    log('Error deleting orders by numbers:', error);
   }
 };
+
 export default {
   getOrders,
   getOrderByNumber,

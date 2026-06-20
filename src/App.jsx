@@ -16,6 +16,7 @@ const LoadingFallback = () => (
 const Login = lazy(() => import('./pages/Login'));
 const Landing = lazy(() => import('./pages/Landing'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const Support = lazy(() => import('./pages/Support'));
 const DeleteAccount = lazy(() => import('./pages/DeleteAccount'));
 const AdminDashboard = lazy(() => import('./pages/admin/EnhancedDashboard'));
 const EmployeeDashboard = lazy(() => import('./pages/employee/Dashboard'));
@@ -138,6 +139,14 @@ function App() {
                   element={
                     <ErrorBoundary>
                       <PrivacyPolicy />
+                    </ErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/support"
+                  element={
+                    <ErrorBoundary>
+                      <Support />
                     </ErrorBoundary>
                   }
                 />

@@ -6,7 +6,7 @@ import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { ArchiveBoxIcon, ShoppingCartIcon, ShoppingBagIcon, ArrowPathIcon, ArrowTrendingUpIcon, CurrencyDollarIcon, ChevronRightIcon, ChevronDownIcon, FolderIcon, DocumentTextIcon, TruckIcon, ExclamationTriangleIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { ArchiveBoxIcon, ShoppingCartIcon, ShoppingBagIcon, ArrowPathIcon, ArrowTrendingUpIcon, CurrencyDollarIcon, ChevronRightIcon, ChevronDownIcon, FolderIcon, DocumentTextIcon, TruckIcon, ExclamationTriangleIcon, PlusIcon, MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Package, CheckCircle2 } from 'lucide-react';
 
 const Stock = () => {
@@ -14,6 +14,10 @@ const Stock = () => {
 
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('use');
+  const [searchText, setSearchText] = useState('');
+  // Set of canonical category names returned by the backend fuzzy search
+  // (null = no active backend search). Merged with the instant local filter.
+  const [fuzzyMatches, setFuzzyMatches] = useState(null);
   const [useStockData, setUseStockData] = useState({ items: [], totals: {} });
   const [sellStockData, setSellStockData] = useState({ items: [], totals: {} });
   const [expandedCategories, setExpandedCategories] = useState(new Set());
@@ -43,6 +47,25 @@ const Stock = () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
+  // Debounced backend fuzzy/partial search.
+  useEffect(() => {
+    const q = searchText.trim();
+    if (q.length < 2) {
+      setFuzzyMatches(null);
+      return;
+    }
+    const handle = setTimeout(async () => {
+      try {
+        const res = await stockService.searchStock(q);
+        setFuzzyMatches(
+          new Set((res.matches || []).map((m) => (m.categoryName || '').toLowerCase())),
+        );
+      } catch (err) {
+        setFuzzyMatches(null);
+      }
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [searchText]);
   const loadData = async (showToast = false) => {
     try {
       setLoading(true);
@@ -158,6 +181,34 @@ const Stock = () => {
   };
 
   const currentData = activeTab === 'use' ? useStockData : sellStockData;
+  // Search across category name, its aliases (Enviromaster / order item names),
+  // and any already-loaded SKU codes / item names for that category.
+  const searchQuery = searchText.trim().toLowerCase();
+  const filteredItems = !searchQuery
+    ? currentData.items
+    : currentData.items.filter((item) => {
+        // Instant local match (substring) for snappy feedback.
+        if (item.categoryName?.toLowerCase().includes(searchQuery)) return true;
+        if (
+          Array.isArray(item.aliases) &&
+          item.aliases.some((a) => a?.toLowerCase().includes(searchQuery))
+        ) {
+          return true;
+        }
+        const skus = categorySkuData[item.categoryName] || [];
+        if (
+          skus.some(
+            (s) =>
+              s.sku?.toLowerCase().includes(searchQuery) ||
+              s.itemName?.toLowerCase().includes(searchQuery),
+          )
+        ) {
+          return true;
+        }
+        // Backend fuzzy / cross-collection match (typos, SKUs & order item
+        // names across categories that aren't expanded yet).
+        return !!fuzzyMatches && fuzzyMatches.has(item.categoryName?.toLowerCase());
+      });
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -297,15 +348,40 @@ const Stock = () => {
         </div>
       </div>
       {}
+      <div className="relative">
+        <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <input
+          type="text"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          placeholder="Search by category, alias or order item name..."
+          className="w-full pl-10 pr-10 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+        {searchText ? (
+          <button
+            type="button"
+            onClick={() => setSearchText('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            aria-label="Clear search"
+          >
+            <XMarkIcon className="w-5 h-5" />
+          </button>
+        ) : null}
+      </div>
+      {}
       <Card>
-        {currentData.items.length === 0 ? (
+        {filteredItems.length === 0 ? (
           <div className="text-center py-12">
             <ArchiveBoxIcon className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
             <p className="text-gray-600 dark:text-gray-400 text-lg">
-              No {activeTab === 'use' ? 'purchase' : 'sales'} data available
+              {searchQuery
+                ? 'No matching categories or items'
+                : `No ${activeTab === 'use' ? 'purchase' : 'sales'} data available`}
             </p>
             <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">
-              {activeTab === 'use'
+              {searchQuery
+                ? 'Try a different category, alias or order item name'
+                : activeTab === 'use'
                 ? 'Orders with mapped categories will appear here'
                 : 'Invoices with mapped categories will appear here'}
             </p>
@@ -342,7 +418,7 @@ const Stock = () => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                {currentData.items.map((item, index) => (
+                {filteredItems.map((item, index) => (
                   <React.Fragment key={item.categoryName}>
                     {}
                     <tr

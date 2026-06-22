@@ -96,7 +96,53 @@ const Login = () => {
     );
   }
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 relative">
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
+      {/* Left info panel — visible on medium and larger viewports */}
+      <div className="hidden md:flex md:w-1/2 lg:w-3/5 flex-col justify-between p-10 lg:p-16 bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white relative overflow-hidden">
+        <div className="absolute -top-28 -right-24 w-96 h-96 rounded-full bg-white/10"></div>
+        <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-white/10"></div>
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-14">
+            <div className="w-11 h-11 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            <span className="text-lg font-semibold tracking-tight">Inventory NVA</span>
+          </div>
+          <h1 className="text-4xl lg:text-5xl font-bold leading-tight tracking-tight">
+            Run your inventory<br />with confidence.
+          </h1>
+          <p className="mt-5 text-blue-100 text-lg leading-relaxed max-w-md">
+            One workspace for stock, orders, invoices, RouteStar sync, and truck checkouts — same data on web, iPad, and Mac.
+          </p>
+          <ul className="mt-12 space-y-5 max-w-md">
+            {[
+              ['Inventory & Stock', 'Real-time levels, low-stock alerts, history'],
+              ['Orders & POS', 'Purchase orders, invoices, point-of-sale'],
+              ['External Sync', 'RouteStar + CustomerConnect, automated'],
+              ['Truck Checkouts', 'Field reconciliation & discrepancy alerts'],
+            ].map(([title, desc]) => (
+              <li key={title} className="flex items-start gap-3">
+                <span className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span>
+                  <span className="font-semibold">{title}</span>
+                  <span className="block text-sm text-blue-100/90">{desc}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <p className="relative z-10 text-blue-200/80 text-sm">
+          © {new Date().getFullYear()} Inventory Management System
+        </p>
+      </div>
+      {/* Right form panel */}
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 relative">
       {}
       <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] opacity-20"></div>
       <div className="max-w-md w-full space-y-6 relative z-10">
@@ -435,6 +481,7 @@ const Login = () => {
         </p>
       </div>
     </div>
+      </div>
     <style>{`
       .bg-grid-slate-100 {
         background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http:

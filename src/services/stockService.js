@@ -21,6 +21,12 @@ const stockService = {
   getCategorySales: async (categoryName) => {
     const response = await api.get(`/stock/category/${encodeURIComponent(categoryName)}/sales`);
     return response.data;
+  },
+  // Fuzzy + partial search across category names, aliases / order item names,
+  // SKUs and item names. Returns { query, total, matches: [{categoryName, ...}] }.
+  searchStock: async (q) => {
+    const response = await api.get('/stock/search', {params: {q}});
+    return response.data;
   }
 };
 export default stockService;

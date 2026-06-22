@@ -529,7 +529,6 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
     border-r border-slate-200 dark:border-gray-700
     transition-all duration-300 ease-in-out
     z-40
-    shadow-lg
     ${isMobile ? 'w-64' : (isCollapsed ? 'w-20' : 'w-64')}
     ${isMobile ? (isOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'}
   `;

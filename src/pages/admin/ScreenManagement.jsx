@@ -12,7 +12,7 @@ import EmptyState from '../../components/common/EmptyState';
 import SearchBar from '../../components/common/SearchBar';
 import Select from '../../components/common/Select';
 import useDebounce from '../../hooks/useDebounce';
-import useClientPagination from '../../hooks/useClientPagination';
+import useServerPagination from '../../hooks/useServerPagination';
 import Pagination from '../../components/common/Pagination';
 
 const ScreenManagement = () => {
@@ -20,8 +20,6 @@ const ScreenManagement = () => {
   const { isAdmin } = useAuth();
   const { showSuccess, showError } = useContext(ToastContext);
 
-  const [screens, setScreens] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 400);
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -56,25 +54,28 @@ const ScreenManagement = () => {
     'Other'
   ];
 
-  useEffect(() => {
-    if (isAdmin) {
-      fetchScreens();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin, debouncedSearch]);
-
-  const fetchScreens = async () => {
-    setLoading(true);
-    try {
-      const response = await screenPermissionService.getAllScreens({ search: debouncedSearch });
-      setScreens(response.data || []);
-    } catch (error) {
-      console.error('Error fetching screens:', error);
-      showError(error.message || 'Failed to load screens');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Server-side pagination — both the text search and category facet run on the backend.
+  const {
+    items: screens,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    total,
+    totalPages,
+    loading,
+    refetch,
+  } = useServerPagination(
+    ({ page, limit }) =>
+      screenPermissionService
+        .getAllScreens({ search: debouncedSearch, category: categoryFilter, page, limit })
+        .then((res) => {
+          const d = res?.data || {};
+          return { items: d.screens || [], total: d.total || 0, pages: d.pages || 1 };
+        }),
+    { pageSize: 20, resetKey: `${debouncedSearch}|${categoryFilter}` }
+  );
+  const fetchScreens = refetch;
 
   const handleAddScreen = () => {
     setSelectedScreen(null);
@@ -177,13 +178,8 @@ const ScreenManagement = () => {
   };
 
   // Text search runs on the backend; only the category facet is applied here.
-  const filteredScreens = screens.filter(screen => {
-    const matchesCategory = !categoryFilter || screen.category === categoryFilter;
-    return matchesCategory;
-  });
-
-  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
-    useClientPagination(filteredScreens, { pageSize: 20, resetKey: `${debouncedSearch}|${categoryFilter}` });
+  // The current 20-row page comes straight from the backend (search + category applied there).
+  const filteredScreens = screens;
 
   if (!isAdmin) {
     return (
@@ -298,7 +294,7 @@ const ScreenManagement = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-slate-200">
-                {pageItems.map((screen) => (
+                {filteredScreens.map((screen) => (
                   <tr key={screen._id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContext } from '../../contexts/ToastContext';
 import routestarService from '../../services/routestarService';
 import useDebounce from '../../hooks/useDebounce';
-import useClientPagination from '../../hooks/useClientPagination';
+import useServerPagination from '../../hooks/useServerPagination';
 import Pagination from '../../components/common/Pagination';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
@@ -25,36 +25,32 @@ const ItemsInvoiceUsage = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useContext(ToastContext);
 
-  const [loading, setLoading] = useState(true);
-  const [items, setItems] = useState([]);
-  const [totals, setTotals] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredItems, setFilteredItems] = useState([]);
   const debouncedSearch = useDebounce(searchQuery, 400);
   const [expandedItems, setExpandedItems] = useState(new Set());
-  // Refetch from the backend whenever the debounced search query changes.
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch]);
-  // Backend already applied the search; mirror the result into the list.
-  useEffect(() => {
-    setFilteredItems(items);
-  }, [items]);
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const response = await routestarService.getItemsInvoiceUsage({ search: debouncedSearch });
-      setItems(response.data.items || []);
-      setTotals(response.data.totals || {});
-      setFilteredItems(response.data.items || []);
-    } catch (error) {
-      console.error('Error loading data:', error);
-      showError('Failed to load data: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+
+  // Server-side pagination: backend returns the 20-row page + aggregate totals.
+  const {
+    items: filteredItems,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    total,
+    totalPages,
+    extra,
+    loading,
+  } = useServerPagination(
+    ({ page, limit }) =>
+      routestarService
+        .getItemsInvoiceUsage({ search: debouncedSearch, page, limit })
+        .then((res) => {
+          const d = res?.data || {};
+          return { items: d.items || [], total: d.total || 0, pages: d.pages || 1, extra: d.totals || {} };
+        }),
+    { pageSize: 20, resetKey: debouncedSearch }
+  );
+  const totals = extra || {};
   const handleItemClick = (itemName) => {
     const newExpanded = new Set(expandedItems);
     if (newExpanded.has(itemName)) {
@@ -75,8 +71,6 @@ const ItemsInvoiceUsage = () => {
       day: 'numeric'
     });
   };
-  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
-    useClientPagination(filteredItems, { pageSize: 20, resetKey: debouncedSearch });
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -192,7 +186,7 @@ const ItemsInvoiceUsage = () => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                {pageItems.map((item, index) => (
+                {filteredItems.map((item, index) => (
                   <React.Fragment key={item.itemName}>
                     {}
                     <tr

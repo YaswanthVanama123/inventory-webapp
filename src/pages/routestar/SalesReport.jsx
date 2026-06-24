@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { ToastContext } from '../../contexts/ToastContext';
 import routeStarItemsService from '../../services/routeStarItemsService';
 import useDebounce from '../../hooks/useDebounce';
-import useClientPagination from '../../hooks/useClientPagination';
+import useServerPagination from '../../hooks/useServerPagination';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
@@ -14,36 +14,33 @@ import { MagnifyingGlassIcon, ArrowPathIcon, ChartBarIcon, ShoppingBagIcon, Curr
 const SalesReport = () => {
   const { showSuccess, showError } = useContext(ToastContext);
 
-  const [loading, setLoading] = useState(true);
-  const [items, setItems] = useState([]);
-  const [totals, setTotals] = useState({});
   const [searchText, setSearchText] = useState('');
-  const [filteredItems, setFilteredItems] = useState([]);
   const debouncedSearch = useDebounce(searchText, 400);
   const [expandedItems, setExpandedItems] = useState(new Set());
-  // Refetch from the backend whenever the debounced search text changes.
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch]);
-  // Backend already applied the search; mirror the result into the list.
-  useEffect(() => {
-    setFilteredItems(items);
-  }, [items]);
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const response = await routeStarItemsService.getSalesReport({ search: debouncedSearch });
-      setItems(response.items || []);
-      setFilteredItems(response.items || []);
-      setTotals(response.totals || {});
-    } catch (error) {
-      console.error('Error loading sales report:', error);
-      showError('Failed to load sales report: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Server-side pagination: backend returns the 20-row page + aggregate totals.
+  const {
+    items: filteredItems,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    total,
+    totalPages,
+    extra,
+    loading,
+  } = useServerPagination(
+    ({ page, limit }) =>
+      routeStarItemsService
+        .getSalesReport({ search: debouncedSearch, page, limit })
+        .then((res) => ({
+          items: res.items || [],
+          total: res.total || 0,
+          pages: res.pages || 1,
+          extra: res.totals || {},
+        })),
+    { pageSize: 20, resetKey: debouncedSearch }
+  );
+  const totals = extra || {};
   const handleItemClick = (itemId) => {
     const newExpanded = new Set(expandedItems);
     if (newExpanded.has(itemId)) {
@@ -53,8 +50,6 @@ const SalesReport = () => {
     }
     setExpandedItems(newExpanded);
   };
-  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
-    useClientPagination(filteredItems, { pageSize: 20, resetKey: debouncedSearch });
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -203,7 +198,7 @@ const SalesReport = () => {
                   </td>
                 </tr>
               ) : (
-                pageItems.map((item, index) => (
+                filteredItems.map((item, index) => (
                   <React.Fragment key={item._id}>
                     {}
                     <tr
@@ -347,13 +342,13 @@ const SalesReport = () => {
                   Total:
                 </td>
                 <td className="px-6 py-4 text-center text-lg text-green-600 dark:text-green-400">
-                  {filteredItems.reduce((sum, item) => sum + (item.soldQuantity || 0), 0)}
+                  {totals.totalSoldQuantity || 0}
                 </td>
                 <td className="px-6 py-4 text-right text-lg text-gray-900 dark:text-white">
-                  ${filteredItems.reduce((sum, item) => sum + (item.soldAmount || 0), 0).toFixed(2)}
+                  ${(totals.totalSoldAmount || 0).toFixed(2)}
                 </td>
                 <td className="px-6 py-4 text-center text-sm text-gray-900 dark:text-white">
-                  {filteredItems.reduce((sum, item) => sum + (item.invoiceCount || 0), 0)}
+                  {totals.totalInvoices || 0}
                 </td>
               </tr>
             </tfoot>

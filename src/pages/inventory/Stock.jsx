@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { ToastContext } from '../../contexts/ToastContext';
 import stockService from '../../services/stockService';
 import discrepancyService from '../../services/discrepancyService';
+import useClientPagination from '../../hooks/useClientPagination';
+import Pagination from '../../components/common/Pagination';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
@@ -209,6 +211,11 @@ const Stock = () => {
         // names across categories that aren't expanded yet).
         return !!fuzzyMatches && fuzzyMatches.has(item.categoryName?.toLowerCase());
       });
+  // Client-side pagination over the (search-filtered) categories. Stock's summary
+  // is computed holistically server-side and search runs client-side, so we page
+  // the rendered categories rather than the API.
+  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
+    useClientPagination(filteredItems, { pageSize: 20, resetKey: `${activeTab}|${searchText}` });
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -418,7 +425,7 @@ const Stock = () => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredItems.map((item, index) => (
+                {pageItems.map((item, index) => (
                   <React.Fragment key={item.categoryName}>
                     {}
                     <tr
@@ -1000,6 +1007,22 @@ const Stock = () => {
                 </tr>
               </tfoot>
             </table>
+          </div>
+        )}
+
+        {filteredItems.length > 0 && (
+          <div className="mt-4">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              totalItems={total}
+              itemsPerPage={pageSize}
+              onPageSizeChange={setPageSize}
+              pageSizeOptions={[10, 20, 50, 100]}
+              showPageSize={true}
+              showResultCount={true}
+            />
           </div>
         )}
       </Card>

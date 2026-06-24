@@ -15,6 +15,8 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
+import useClientPagination from '../../hooks/useClientPagination';
+import Pagination from '../../components/common/Pagination';
 
 const ItemNameAliasMapping = () => {
   const { showSuccess, showError, showWarning } = useContext(ToastContext);
@@ -334,6 +336,8 @@ const ItemNameAliasMapping = () => {
       setSaving(false);
     }
   };
+  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
+    useClientPagination(filteredItems, { pageSize: 20, resetKey: `${searchText}|${filterStatus}` });
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -637,9 +641,9 @@ const ItemNameAliasMapping = () => {
                   </td>
                 </tr>
               ) : (
-                filteredItems.map((item, index) => (
+                pageItems.map((item, index) => (
                   <tr
-                    key={index}
+                    key={item.itemName}
                     className={item.isMapped ? 'bg-green-50 dark:bg-green-900/10' : ''}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -653,7 +657,7 @@ const ItemNameAliasMapping = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {index + 1}
+                      {(page - 1) * pageSize + index + 1}
                     </td>
                     <td className="px-6 py-4">
                       <span className="font-mono text-sm text-gray-900 dark:text-white">
@@ -712,6 +716,21 @@ const ItemNameAliasMapping = () => {
             </tbody>
           </table>
         </div>
+        {filteredItems.length > 0 && (
+          <div className="mt-4">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              totalItems={total}
+              itemsPerPage={pageSize}
+              onPageSizeChange={setPageSize}
+              pageSizeOptions={[10, 20, 50, 100]}
+              showPageSize={true}
+              showResultCount={true}
+            />
+          </div>
+        )}
       </Card>
       {}
       <Modal

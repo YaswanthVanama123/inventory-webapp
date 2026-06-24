@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import { ToastContext } from '../../contexts/ToastContext';
 import { manualPOItemService } from '../../services/manualPOItemService';
+import useClientPagination from '../../hooks/useClientPagination';
+import Pagination from '../../components/common/Pagination';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import SearchableSelect from '../../components/common/SearchableSelect';
@@ -57,6 +59,9 @@ const ManualPOItems = () => {
     mapped: items.filter(i => i.mappedCategoryItemId).length,
     active: items.filter(i => i.isActive).length
   }), [items]);
+
+  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
+    useClientPagination(filteredItems, { pageSize: 20, resetKey: searchText });
 
   const loadData = useCallback(async () => {
     try {
@@ -310,7 +315,7 @@ const ManualPOItems = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-gray-700">
-                {filteredItems.map((item) => (
+                {pageItems.map((item) => (
                   <tr key={item.sku} className="hover:bg-slate-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-slate-900 dark:text-white">
@@ -384,6 +389,22 @@ const ManualPOItems = () => {
           </div>
         )}
       </div>
+
+      {filteredItems.length > 0 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            totalItems={total}
+            itemsPerPage={pageSize}
+            onPageSizeChange={setPageSize}
+            pageSizeOptions={[10, 20, 50, 100]}
+            showPageSize={true}
+            showResultCount={true}
+          />
+        </div>
+      )}
 
       {}
       <Modal

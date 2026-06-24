@@ -94,27 +94,8 @@ const InventoryList = () => {
     }
   }, [selectedCategory, statusFilter, sortBy, sortOrder, currentPage, itemsPerPage, activeTab, viewMode]);
 
-  const getFilteredItems = () => {
-    if (!searchTerm || !items || items.length === 0) {
-      return items;
-    }
-
-    const search = searchTerm.toLowerCase().trim();
-
-    return items.filter(item => {
-      if (activeTab === 'purchases') {
-        const matchesModelNumber = item.skuCode?.toLowerCase().includes(search);
-        const matchesItemName = item.name?.toLowerCase().includes(search);
-        return matchesModelNumber || matchesItemName;
-      } else {
-        const matchesRouteStarName = item.routeStarItemName?.toLowerCase().includes(search) ||
-                                      item.name?.toLowerCase().includes(search);
-        return matchesRouteStarName;
-      }
-    });
-  };
-
-  const filteredItems = getFilteredItems();
+  // Search is applied on the backend (params.search); render the result as-is.
+  const filteredItems = items;
 
   useEffect(() => {
     setError(null);

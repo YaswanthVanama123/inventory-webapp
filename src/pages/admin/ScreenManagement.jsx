@@ -11,6 +11,9 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import SearchBar from '../../components/common/SearchBar';
 import Select from '../../components/common/Select';
+import useDebounce from '../../hooks/useDebounce';
+import useClientPagination from '../../hooks/useClientPagination';
+import Pagination from '../../components/common/Pagination';
 
 const ScreenManagement = () => {
   const navigate = useNavigate();
@@ -20,6 +23,7 @@ const ScreenManagement = () => {
   const [screens, setScreens] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearch = useDebounce(searchTerm, 400);
   const [categoryFilter, setCategoryFilter] = useState('');
   const [showAddEditModal, setShowAddEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -56,12 +60,13 @@ const ScreenManagement = () => {
     if (isAdmin) {
       fetchScreens();
     }
-  }, [isAdmin]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin, debouncedSearch]);
 
   const fetchScreens = async () => {
     setLoading(true);
     try {
-      const response = await screenPermissionService.getAllScreens();
+      const response = await screenPermissionService.getAllScreens({ search: debouncedSearch });
       setScreens(response.data || []);
     } catch (error) {
       console.error('Error fetching screens:', error);
@@ -171,14 +176,14 @@ const ScreenManagement = () => {
     }
   };
 
+  // Text search runs on the backend; only the category facet is applied here.
   const filteredScreens = screens.filter(screen => {
-    const matchesSearch = !searchTerm ||
-      screen.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      screen.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      screen.path?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !categoryFilter || screen.category === categoryFilter;
-    return matchesSearch && matchesCategory;
+    return matchesCategory;
   });
+
+  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
+    useClientPagination(filteredScreens, { pageSize: 20, resetKey: `${debouncedSearch}|${categoryFilter}` });
 
   if (!isAdmin) {
     return (
@@ -293,7 +298,7 @@ const ScreenManagement = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-slate-200">
-                {filteredScreens.map((screen) => (
+                {pageItems.map((screen) => (
                   <tr key={screen._id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
@@ -344,6 +349,22 @@ const ScreenManagement = () => {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {filteredScreens.length > 0 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            totalItems={total}
+            itemsPerPage={pageSize}
+            onPageSizeChange={setPageSize}
+            pageSizeOptions={[10, 20, 50, 100]}
+            showPageSize={true}
+            showResultCount={true}
+          />
         </div>
       )}
 

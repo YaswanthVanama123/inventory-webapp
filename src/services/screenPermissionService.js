@@ -1,8 +1,8 @@
 import api from './api';
 
 const screenPermissionService = {
-  getAllScreens: async () => {
-    const response = await api.get('/screen-permissions/screens');
+  getAllScreens: async (params = {}) => {
+    const response = await api.get('/screen-permissions/screens', { params });
     return response;
   },
 

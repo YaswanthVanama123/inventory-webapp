@@ -235,9 +235,9 @@ export const deleteManualInvoice = async (invoiceNumber) => {
     throw error;
   }
 };
-export const getItemsInvoiceUsage = async () => {
+export const getItemsInvoiceUsage = async (params = {}) => {
   try {
-    const response = await api.get('/routestar/items/invoice-usage');
+    const response = await api.get('/routestar/items/invoice-usage', { params });
     return response;
   } catch (error) {
     console.error('Error fetching items invoice usage:', error);

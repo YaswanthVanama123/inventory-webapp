@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ToastContext } from '../../contexts/ToastContext';
 import { vendorService } from '../../services/vendorService';
+import useDebounce from '../../hooks/useDebounce';
+import useServerPagination from '../../hooks/useServerPagination';
+import Pagination from '../../components/common/Pagination';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Modal from '../../components/common/Modal';
@@ -12,10 +15,8 @@ import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 const VendorManagement = () => {
   const { showSuccess, showError } = useContext(ToastContext);
 
-  const [loading, setLoading] = useState(true);
-  const [vendors, setVendors] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const [filteredVendors, setFilteredVendors] = useState([]);
+  const debouncedSearch = useDebounce(searchText, 400);
 
   const [showModal, setShowModal] = useState(false);
   const [editingVendor, setEditingVendor] = useState(null);
@@ -29,41 +30,26 @@ const VendorManagement = () => {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  // Server-side pagination: the backend returns only the current 20-row page.
+  const {
+    items: filteredVendors,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    total,
+    totalPages,
+    loading,
+    refetch,
+  } = useServerPagination(
+    ({ page, limit }) =>
+      vendorService
+        .getAllVendors({ search: debouncedSearch, page, limit })
+        .then((res) => ({ items: res.vendors || [], total: res.total || 0, pages: res.pages || 1 })),
+    { pageSize: 20, resetKey: debouncedSearch }
+  );
 
-  useEffect(() => {
-    filterVendors();
-  }, [vendors, searchText]);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const response = await vendorService.getAllVendors();
-      setVendors(response.vendors || []);
-    } catch (error) {
-      showError('Failed to load vendors: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filterVendors = () => {
-    if (!searchText) {
-      setFilteredVendors(vendors);
-      return;
-    }
-
-    const searchLower = searchText.toLowerCase();
-    const filtered = vendors.filter(vendor =>
-      vendor.name.toLowerCase().includes(searchLower) ||
-      (vendor.email && vendor.email.toLowerCase().includes(searchLower)) ||
-      (vendor.phone && vendor.phone.toLowerCase().includes(searchLower)) ||
-      (vendor.address && vendor.address.toLowerCase().includes(searchLower))
-    );
-    setFilteredVendors(filtered);
-  };
+  const loadData = refetch;
 
   const handleOpenModal = (vendor = null) => {
     if (vendor) {
@@ -308,6 +294,22 @@ const VendorManagement = () => {
           </div>
         )}
       </div>
+
+      {filteredVendors.length > 0 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            totalItems={total}
+            itemsPerPage={pageSize}
+            onPageSizeChange={setPageSize}
+            pageSizeOptions={[10, 20, 50, 100]}
+            showPageSize={true}
+            showResultCount={true}
+          />
+        </div>
+      )}
 
       {}
       <Modal

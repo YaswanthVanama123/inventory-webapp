@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ToastContext } from '../../contexts/ToastContext';
 import routeStarItemsService from '../../services/routeStarItemsService';
+import useDebounce from '../../hooks/useDebounce';
+import useClientPagination from '../../hooks/useClientPagination';
+import Pagination from '../../components/common/Pagination';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Card from '../../components/common/Card';
@@ -16,30 +19,24 @@ const SalesReport = () => {
   const [totals, setTotals] = useState({});
   const [searchText, setSearchText] = useState('');
   const [filteredItems, setFilteredItems] = useState([]);
+  const debouncedSearch = useDebounce(searchText, 400);
   const [expandedItems, setExpandedItems] = useState(new Set());
+  // Refetch from the backend whenever the debounced search text changes.
   useEffect(() => {
     loadData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
+  // Backend already applied the search; mirror the result into the list.
   useEffect(() => {
-    if (searchText) {
-      const filtered = items.filter(item =>
-        item.itemName.toLowerCase().includes(searchText.toLowerCase()) ||
-        (item.itemParent && item.itemParent.toLowerCase().includes(searchText.toLowerCase())) ||
-        (item.description && item.description.toLowerCase().includes(searchText.toLowerCase()))
-      );
-      setFilteredItems(filtered);
-    } else {
-      setFilteredItems(items);
-    }
-  }, [searchText, items]);
+    setFilteredItems(items);
+  }, [items]);
   const loadData = async () => {
     try {
       setLoading(true);
-      const response = await routeStarItemsService.getSalesReport();
+      const response = await routeStarItemsService.getSalesReport({ search: debouncedSearch });
       setItems(response.items || []);
       setFilteredItems(response.items || []);
       setTotals(response.totals || {});
-      showSuccess('Sales report loaded successfully');
     } catch (error) {
       console.error('Error loading sales report:', error);
       showError('Failed to load sales report: ' + error.message);
@@ -56,6 +53,8 @@ const SalesReport = () => {
     }
     setExpandedItems(newExpanded);
   };
+  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
+    useClientPagination(filteredItems, { pageSize: 20, resetKey: debouncedSearch });
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -204,7 +203,7 @@ const SalesReport = () => {
                   </td>
                 </tr>
               ) : (
-                filteredItems.map((item, index) => (
+                pageItems.map((item, index) => (
                   <React.Fragment key={item._id}>
                     {}
                     <tr
@@ -212,7 +211,7 @@ const SalesReport = () => {
                       onClick={() => handleItemClick(item._id)}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        {index + 1}
+                        {(page - 1) * pageSize + index + 1}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -360,6 +359,21 @@ const SalesReport = () => {
             </tfoot>
           </table>
         </div>
+        {filteredItems.length > 0 && (
+          <div className="mt-4">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              totalItems={total}
+              itemsPerPage={pageSize}
+              onPageSizeChange={setPageSize}
+              pageSizeOptions={[10, 20, 50, 100]}
+              showPageSize={true}
+              showResultCount={true}
+            />
+          </div>
+        )}
       </Card>
       {}
       <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">

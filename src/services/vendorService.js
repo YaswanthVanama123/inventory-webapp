@@ -1,9 +1,9 @@
 import api from './api';
 
 export const vendorService = {
-  async getAllVendors() {
+  async getAllVendors(params = {}) {
     try {
-      const response = await api.get('/vendors');
+      const response = await api.get('/vendors', { params });
       return response.data;
     } catch (error) {
       throw new Error(error.message || 'Failed to fetch vendors');

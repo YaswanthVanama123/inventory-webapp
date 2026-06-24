@@ -10,6 +10,8 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Badge from '../../components/common/Badge';
 import { MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon, XCircleIcon, TrashIcon } from '@heroicons/react/24/solid';
+import useClientPagination from '../../hooks/useClientPagination';
+import Pagination from '../../components/common/Pagination';
 
 const ModelCategoryMapping = () => {
   const { showSuccess, showError, showWarning } = useContext(ToastContext);
@@ -150,6 +152,8 @@ const ModelCategoryMapping = () => {
       showError('Failed to delete mapping: ' + error.message);
     }
   };
+  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
+    useClientPagination(filteredModels, { pageSize: 20, resetKey: `${searchText}|${filterStatus}` });
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -329,13 +333,13 @@ const ModelCategoryMapping = () => {
                   </td>
                 </tr>
               ) : (
-                filteredModels.map((record, index) => (
+                pageItems.map((record, index) => (
                   <tr
                     key={record.modelNumber}
                     className={record.categoryItemName ? 'bg-green-50 dark:bg-green-900/10' : ''}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {index + 1}
+                      {(page - 1) * pageSize + index + 1}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="font-mono font-semibold text-gray-900 dark:text-white">
@@ -464,6 +468,21 @@ const ModelCategoryMapping = () => {
             </tbody>
           </table>
         </div>
+        {filteredModels.length > 0 && (
+          <div className="mt-4">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              totalItems={total}
+              itemsPerPage={pageSize}
+              onPageSizeChange={setPageSize}
+              pageSizeOptions={[10, 20, 50, 100]}
+              showPageSize={true}
+              showResultCount={true}
+            />
+          </div>
+        )}
       </Card>
     </div>
   );

@@ -2,6 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ToastContext } from '../../contexts/ToastContext';
 import routestarService from '../../services/routestarService';
+import useDebounce from '../../hooks/useDebounce';
+import useClientPagination from '../../hooks/useClientPagination';
+import Pagination from '../../components/common/Pagination';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -27,30 +30,24 @@ const ItemsInvoiceUsage = () => {
   const [totals, setTotals] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredItems, setFilteredItems] = useState([]);
+  const debouncedSearch = useDebounce(searchQuery, 400);
   const [expandedItems, setExpandedItems] = useState(new Set());
+  // Refetch from the backend whenever the debounced search query changes.
   useEffect(() => {
     loadData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
+  // Backend already applied the search; mirror the result into the list.
   useEffect(() => {
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      const filtered = items.filter(item =>
-        item.itemName.toLowerCase().includes(query) ||
-        item.aliases.some(alias => alias.toLowerCase().includes(query))
-      );
-      setFilteredItems(filtered);
-    } else {
-      setFilteredItems(items);
-    }
-  }, [searchQuery, items]);
+    setFilteredItems(items);
+  }, [items]);
   const loadData = async () => {
     try {
       setLoading(true);
-      const response = await routestarService.getItemsInvoiceUsage();
+      const response = await routestarService.getItemsInvoiceUsage({ search: debouncedSearch });
       setItems(response.data.items || []);
       setTotals(response.data.totals || {});
       setFilteredItems(response.data.items || []);
-      showSuccess('Data loaded successfully');
     } catch (error) {
       console.error('Error loading data:', error);
       showError('Failed to load data: ' + error.message);
@@ -78,6 +75,8 @@ const ItemsInvoiceUsage = () => {
       day: 'numeric'
     });
   };
+  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
+    useClientPagination(filteredItems, { pageSize: 20, resetKey: debouncedSearch });
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -193,7 +192,7 @@ const ItemsInvoiceUsage = () => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredItems.map((item, index) => (
+                {pageItems.map((item, index) => (
                   <React.Fragment key={item.itemName}>
                     {}
                     <tr
@@ -337,6 +336,21 @@ const ItemsInvoiceUsage = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+        {filteredItems.length > 0 && (
+          <div className="mt-4">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              totalItems={total}
+              itemsPerPage={pageSize}
+              onPageSizeChange={setPageSize}
+              pageSizeOptions={[10, 20, 50, 100]}
+              showPageSize={true}
+              showResultCount={true}
+            />
           </div>
         )}
       </Card>

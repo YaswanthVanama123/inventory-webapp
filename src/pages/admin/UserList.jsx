@@ -13,6 +13,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import ResetPasswordModal from '../../components/admin/ResetPasswordModal';
 import ScreenPermissionsModal from '../../components/admin/ScreenPermissionsModal';
+import useDebounce from '../../hooks/useDebounce';
 
 const UserList = () => {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ const UserList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearch = useDebounce(searchTerm, 400);
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [viewMode, setViewMode] = useState('table');
@@ -39,12 +41,15 @@ const UserList = () => {
     if (isAdmin) {
       fetchUsers();
     }
-  }, [isAdmin]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin, debouncedSearch]);
   const fetchUsers = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get('/users');
+      const params = { limit: 1000 };
+      if (debouncedSearch) params.search = debouncedSearch;
+      const response = await api.get('/users', { params });
       const usersData = response.data?.data?.users || response.data?.users || [];
       setUsers(Array.isArray(usersData) ? usersData : []);
     } catch (err) {
@@ -55,15 +60,11 @@ const UserList = () => {
       setLoading(false);
     }
   };
+  // Text search runs on the backend; role/status remain client-side facets.
   const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      !searchTerm ||
-      user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = !roleFilter || user.role === roleFilter;
     const matchesStatus = !statusFilter || (statusFilter === 'active' ? user.isActive : !user.isActive);
-    return matchesSearch && matchesRole && matchesStatus;
+    return matchesRole && matchesStatus;
   });
   const totalItems = filteredUsers.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);

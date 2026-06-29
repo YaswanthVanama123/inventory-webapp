@@ -6,6 +6,7 @@ import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import Pagination from '../../components/common/Pagination';
 import {
   UserIcon,
   TruckIcon,
@@ -24,17 +25,23 @@ const EmployeeCheckouts = () => {
   const [loading, setLoading] = useState(true);
   const [checkouts, setCheckouts] = useState([]);
   const [stats, setStats] = useState(null);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20, pages: 0 });
   useEffect(() => {
     loadData();
-  }, [employeeName]);
+  }, [employeeName, pagination.page, pagination.limit]);
   const loadData = async () => {
     try {
       setLoading(true);
       const [checkoutsResponse, statsResponse] = await Promise.all([
-        truckCheckoutService.getEmployeeCheckouts(employeeName, 100),
+        truckCheckoutService.getCheckouts({
+          employeeName,
+          page: pagination.page,
+          limit: pagination.limit
+        }),
         truckCheckoutService.getEmployeeStats(employeeName)
       ]);
-      setCheckouts(checkoutsResponse.data || []);
+      setCheckouts(checkoutsResponse.data.checkouts || []);
+      setPagination(checkoutsResponse.data.pagination || { total: 0, page: 1, limit: 20, pages: 0 });
       setStats(statsResponse.data);
     } catch (error) {
       console.error('Load employee data error:', error);
@@ -67,7 +74,7 @@ const EmployeeCheckouts = () => {
       minute: '2-digit'
     });
   };
-  if (loading) {
+  if (loading && !stats && checkouts.length === 0) {
     return <LoadingSpinner />;
   }
   return (
@@ -153,7 +160,7 @@ const EmployeeCheckouts = () => {
       {}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-          Checkout History ({checkouts.length} records)
+          Checkout History ({pagination.total} records)
         </h2>
         {checkouts.length === 0 ? (
           <div className="text-center py-12">
@@ -228,6 +235,21 @@ const EmployeeCheckouts = () => {
                 )}
               </div>
             ))}
+          </div>
+        )}
+        {(pagination.pages > 1 || pagination.total > 0) && (
+          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.pages}
+              totalItems={pagination.total}
+              itemsPerPage={pagination.limit}
+              onPageChange={(p) => setPagination(prev => ({ ...prev, page: p }))}
+              onPageSizeChange={(s) => setPagination(prev => ({ ...prev, limit: s, page: 1 }))}
+              pageSizeOptions={[10, 20, 50, 100]}
+              showPageSize
+              showResultCount
+            />
           </div>
         )}
       </Card>

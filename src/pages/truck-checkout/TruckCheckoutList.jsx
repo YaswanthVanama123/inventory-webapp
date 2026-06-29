@@ -11,6 +11,7 @@ import Input from '../../components/common/Input';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Modal from '../../components/common/Modal';
 import Alert from '../../components/common/Alert';
+import Pagination from '../../components/common/Pagination';
 import {
   TruckIcon,
   PlusIcon,
@@ -417,7 +418,7 @@ const TruckCheckoutList = () => {
         <div className="border-b border-gray-200 dark:border-gray-700">
           <div className="flex gap-1">
             <button
-              onClick={() => setActiveTab('checkouts')}
+              onClick={() => { setActiveTab('checkouts'); setPagination(prev => ({ ...prev, page: 1 })); }}
               className={`px-6 py-3 font-medium transition-colors ${
                 activeTab === 'checkouts'
                   ? 'text-blue-600 border-b-2 border-blue-600'
@@ -443,7 +444,7 @@ const TruckCheckoutList = () => {
         <div className="border-b border-gray-200 dark:border-gray-700">
           <div className="flex gap-1">
             <button
-              onClick={() => setActiveTab('checkouts')}
+              onClick={() => { setActiveTab('checkouts'); setPagination(prev => ({ ...prev, page: 1 })); }}
               className={`px-6 py-3 font-medium transition-colors ${
                 activeTab === 'checkouts'
                   ? 'text-blue-600 border-b-2 border-blue-600'
@@ -469,27 +470,28 @@ const TruckCheckoutList = () => {
         <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           <div className="flex gap-1 px-4">
             <button
-              onClick={() => setCheckoutsSubTab('all')}
+              onClick={() => { setCheckoutsSubTab('all'); setPagination(prev => ({ ...prev, page: 1 })); }}
               className={`px-4 py-2 font-medium text-sm transition-colors ${
                 checkoutsSubTab === 'all'
                   ? 'text-blue-600 border-b-2 border-blue-600'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
-              All Checkouts
+              {isAdmin ? 'All Checkouts' : 'My Checkouts'}
             </button>
             <button
-              onClick={() => setCheckoutsSubTab('mine')}
+              onClick={() => { setCheckoutsSubTab('mine'); setPagination(prev => ({ ...prev, page: 1 })); }}
               className={`px-4 py-2 font-medium text-sm transition-colors ${
                 checkoutsSubTab === 'mine'
                   ? 'text-blue-600 border-b-2 border-blue-600'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
-              My Checkouts
+              My Items
             </button>
+            {isAdmin && (
             <button
-              onClick={() => setCheckoutsSubTab('employees')}
+              onClick={() => { setCheckoutsSubTab('employees'); setPagination(prev => ({ ...prev, page: 1 })); }}
               className={`px-4 py-2 font-medium text-sm transition-colors ${
                 checkoutsSubTab === 'employees'
                   ? 'text-blue-600 border-b-2 border-blue-600'
@@ -498,6 +500,7 @@ const TruckCheckoutList = () => {
             >
               Organize by Employees
             </button>
+            )}
           </div>
         </div>
       )}
@@ -514,6 +517,7 @@ const TruckCheckoutList = () => {
             >
               All Sales
             </button>
+            {isAdmin && (
             <button
               onClick={() => setSalesSubTab('employees')}
               className={`px-4 py-2 font-medium text-sm transition-colors ${
@@ -524,6 +528,7 @@ const TruckCheckoutList = () => {
             >
               Organize by Employees
             </button>
+            )}
           </div>
         </div>
       )}
@@ -828,28 +833,19 @@ const TruckCheckoutList = () => {
           </div>
 
           {}
-          {pagination.pages > 1 && (
-            <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-              <div className="text-sm text-slate-600">
-                Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
-                {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
-                  disabled={pagination.page === 1}
-                  className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
-                  disabled={pagination.page === pagination.pages}
-                  className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
-              </div>
+          {(pagination.pages > 1 || pagination.total > 0) && (
+            <div className="px-6 py-4 border-t border-slate-200">
+              <Pagination
+                currentPage={pagination.page}
+                totalPages={pagination.pages}
+                totalItems={pagination.total}
+                itemsPerPage={pagination.limit}
+                onPageChange={(p) => setPagination(prev => ({ ...prev, page: p }))}
+                onPageSizeChange={(s) => setPagination(prev => ({ ...prev, limit: s, page: 1 }))}
+                pageSizeOptions={[10, 20, 50, 100]}
+                showPageSize
+                showResultCount
+              />
             </div>
           )}
         </div>

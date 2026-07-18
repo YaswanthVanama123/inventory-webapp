@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { ToastContext } from '../../contexts/ToastContext';
 import stockService from '../../services/stockService';
 import discrepancyService from '../../services/discrepancyService';
-import useClientPagination from '../../hooks/useClientPagination';
+import useDebounce from '../../hooks/useDebounce';
+import useServerPagination from '../../hooks/useServerPagination';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
@@ -14,12 +15,12 @@ import { Package, CheckCircle2 } from 'lucide-react';
 const Stock = () => {
   const { showSuccess, showError } = useContext(ToastContext);
 
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('use');
   const [searchText, setSearchText] = useState('');
-  // Set of canonical category names returned by the backend fuzzy search
-  // (null = no active backend search). Merged with the instant local filter.
-  const [fuzzyMatches, setFuzzyMatches] = useState(null);
+  const debouncedSearch = useDebounce(searchText, 300);
+  // Full-set tab totals (summary tiles + table footer). Populated as a side
+  // effect of the paginated fetch below so the tiles stay holistic while the
+  // category list is paginated server-side.
   const [useStockData, setUseStockData] = useState({ items: [], totals: {} });
   const [sellStockData, setSellStockData] = useState({ items: [], totals: {} });
   const [expandedCategories, setExpandedCategories] = useState(new Set());
@@ -35,55 +36,55 @@ const Stock = () => {
   const [loadingCategories, setLoadingCategories] = useState(new Set());
   const [showDiscrepancyModal, setShowDiscrepancyModal] = useState(false);
   const [prefilledItem, setPrefilledItem] = useState(null);
-  useEffect(() => {
-    loadData();
-  }, []);
+
+  // Server-side pagination of the category list for the active tab. The backend
+  // returns { summary, categories, pagination, useStock, sellStock }. We stash
+  // the full useStock/sellStock for the tiles + footer and page `categories`.
+  const {
+    items: pageItems,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    total,
+    totalPages,
+    loading,
+    refetch,
+  } = useServerPagination(
+    ({ page, limit }) =>
+      stockService
+        .getStockSummary({ page, limit, search: debouncedSearch.trim(), tab: activeTab })
+        .then((res) => {
+          if (res.useStock) setUseStockData(res.useStock);
+          if (res.sellStock) setSellStockData(res.sellStock);
+          return {
+            items: res.categories || [],
+            total: res.pagination?.total ?? (res.categories || []).length,
+            pages: res.pagination?.totalPages || 1,
+          };
+        }),
+    { pageSize: 20, resetKey: `${activeTab}|${debouncedSearch.trim()}` }
+  );
+
+  const loadData = (showToast = false) => {
+    refetch();
+    if (showToast) {
+      showSuccess('Stock data refreshed successfully');
+    }
+  };
+
+  // Refresh when the tab becomes visible again.
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        loadData();
+        refetch();
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
-  // Debounced backend fuzzy/partial search.
-  useEffect(() => {
-    const q = searchText.trim();
-    if (q.length < 2) {
-      setFuzzyMatches(null);
-      return;
-    }
-    const handle = setTimeout(async () => {
-      try {
-        const res = await stockService.searchStock(q);
-        setFuzzyMatches(
-          new Set((res.matches || []).map((m) => (m.categoryName || '').toLowerCase())),
-        );
-      } catch (err) {
-        setFuzzyMatches(null);
-      }
-    }, 300);
-    return () => clearTimeout(handle);
-  }, [searchText]);
-  const loadData = async (showToast = false) => {
-    try {
-      setLoading(true);
-      const response = await stockService.getStockSummary();
-      setUseStockData(response.useStock || { items: [], totals: {} });
-      setSellStockData(response.sellStock || { items: [], totals: {} });
-      if (showToast) {
-        showSuccess('Stock data refreshed successfully');
-      }
-    } catch (error) {
-      console.error('Error loading stock data:', error);
-      showError('Failed to load stock data: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [refetch]);
   const handleCategoryClick = async (categoryName) => {
     const newExpanded = new Set(expandedCategories);
     if (newExpanded.has(categoryName)) {
@@ -183,39 +184,10 @@ const Stock = () => {
   };
 
   const currentData = activeTab === 'use' ? useStockData : sellStockData;
-  // Search across category name, its aliases (Enviromaster / order item names),
-  // and any already-loaded SKU codes / item names for that category.
+  // Search is now performed server-side (backend param, debounced). `pageItems`
+  // is the current page of (search-filtered) categories; `total` is the full
+  // filtered count. `searchQuery` only drives the empty-state copy.
   const searchQuery = searchText.trim().toLowerCase();
-  const filteredItems = !searchQuery
-    ? currentData.items
-    : currentData.items.filter((item) => {
-        // Instant local match (substring) for snappy feedback.
-        if (item.categoryName?.toLowerCase().includes(searchQuery)) return true;
-        if (
-          Array.isArray(item.aliases) &&
-          item.aliases.some((a) => a?.toLowerCase().includes(searchQuery))
-        ) {
-          return true;
-        }
-        const skus = categorySkuData[item.categoryName] || [];
-        if (
-          skus.some(
-            (s) =>
-              s.sku?.toLowerCase().includes(searchQuery) ||
-              s.itemName?.toLowerCase().includes(searchQuery),
-          )
-        ) {
-          return true;
-        }
-        // Backend fuzzy / cross-collection match (typos, SKUs & order item
-        // names across categories that aren't expanded yet).
-        return !!fuzzyMatches && fuzzyMatches.has(item.categoryName?.toLowerCase());
-      });
-  // Client-side pagination over the (search-filtered) categories. Stock's summary
-  // is computed holistically server-side and search runs client-side, so we page
-  // the rendered categories rather than the API.
-  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
-    useClientPagination(filteredItems, { pageSize: 20, resetKey: `${activeTab}|${searchText}` });
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -377,7 +349,7 @@ const Stock = () => {
       </div>
       {}
       <Card>
-        {filteredItems.length === 0 ? (
+        {total === 0 ? (
           <div className="text-center py-12">
             <ArchiveBoxIcon className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
             <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -999,7 +971,7 @@ const Stock = () => {
                     {currentData.totals.totalDiscrepancyDifference !== undefined ? currentData.totals.totalDiscrepancyDifference : currentData.totals.totalDiscrepancies || 0}
                   </td>
                   <td className="px-6 py-4 text-center text-sm text-gray-900 dark:text-white">
-                    {currentData.items.reduce((sum, item) => sum + (item.itemCount || 0), 0)} / {currentData.items.reduce((sum, item) => sum + (item.invoiceCount || 0), 0)}
+                    {currentData.totals.totalItemCount || 0} / {currentData.totals.totalInvoiceCount || 0}
                   </td>
                   <td className="px-6 py-4 text-right text-lg text-gray-900 dark:text-white">
                     ${(currentData.totals.totalPurchaseValue || 0).toFixed(2)}
@@ -1010,7 +982,7 @@ const Stock = () => {
           </div>
         )}
 
-        {filteredItems.length > 0 && (
+        {total > 0 && (
           <div className="mt-4">
             <Pagination
               currentPage={page}

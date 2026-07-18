@@ -2,9 +2,9 @@ import api from './api';
 
 export const modelCategoryService = {
   
-  async getUniqueModels() {
+  async getUniqueModels(params = {}) {
     try {
-      const response = await api.get('/model-category/unique-models');
+      const response = await api.get('/model-category/unique-models', { params });
       return response.data;
     } catch (error) {
       throw new Error(error.message || 'Failed to fetch models');

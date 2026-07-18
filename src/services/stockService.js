@@ -10,8 +10,11 @@ const stockService = {
     const response = await api.get('/stock/sell');
     return response.data;
   },
-  getStockSummary: async () => {
-    const response = await api.get('/stock/summary');
+  // Backend-paginated category list for the active tab. Accepts
+  // { page, limit, search, tab }. Returns { summary, categories, pagination,
+  // useStock, sellStock } (full useStock/sellStock kept for the totals footer).
+  getStockSummary: async (params = {}) => {
+    const response = await api.get('/stock/summary', { params });
     return response.data;
   },
   getCategorySKUs: async (categoryName) => {

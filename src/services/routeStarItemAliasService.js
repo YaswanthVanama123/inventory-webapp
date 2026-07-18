@@ -2,19 +2,19 @@ import api from './api';
 
 
 const routeStarItemAliasService = {
-  getPageData: async () => {
+  getPageData: async (params = {}) => {
     try {
-      const response = await api.get('/routestar-item-alias/page-data');
+      const response = await api.get('/routestar-item-alias/page-data', { params });
       return response.data || {
         mappings: { mappings: [], total: 0 },
-        uniqueItems: { items: [], stats: { totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 } },
+        uniqueItems: { items: [], allItems: [], stats: { totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 } },
         stats: { totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 }
       };
     } catch (error) {
       console.error('getPageData error:', error);
       return {
         mappings: { mappings: [], total: 0 },
-        uniqueItems: { items: [], stats: { totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 } },
+        uniqueItems: { items: [], allItems: [], stats: { totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 } },
         stats: { totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 }
       };
     }

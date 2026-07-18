@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { ToastContext } from '../../contexts/ToastContext';
 import { manualPOItemService } from '../../services/manualPOItemService';
-import useClientPagination from '../../hooks/useClientPagination';
+import useDebounce from '../../hooks/useDebounce';
+import useServerPagination from '../../hooks/useServerPagination';
 import Pagination from '../../components/common/Pagination';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
@@ -15,11 +16,11 @@ import { PlusIcon, PencilIcon, CheckCircleIcon, NoSymbolIcon } from '@heroicons/
 const ManualPOItems = () => {
   const { showSuccess, showError } = useContext(ToastContext);
 
-  const [loading, setLoading] = useState(true);
-  const [items, setItems] = useState([]);
   const [routeStarItems, setRouteStarItems] = useState([]);
   const [vendors, setVendors] = useState([]);
+  const [stats, setStats] = useState({ total: 0, mapped: 0, active: 0 });
   const [searchText, setSearchText] = useState('');
+  const debouncedSearch = useDebounce(searchText, 400);
 
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -36,46 +37,44 @@ const ManualPOItems = () => {
   });
   const [submitting, setSubmitting] = useState(false);
 
+  // Server-paginated items list. Dropdown sources (routeStarItems, vendors) and
+  // stats ride along through `extra` as FULL sets.
+  const {
+    items: pageItems,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    total,
+    totalPages,
+    extra,
+    loading,
+    refetch,
+  } = useServerPagination(
+    ({ page, limit }) =>
+      manualPOItemService
+        .getPageData({ page, limit, search: debouncedSearch || undefined })
+        .then((pageData) => ({
+          items: pageData.items || [],
+          total: pageData.pagination?.total ?? 0,
+          pages: pageData.pagination?.totalPages ?? 1,
+          extra: {
+            routeStarItems: pageData.routeStarItems || [],
+            vendors: pageData.vendors || [],
+            stats: pageData.stats || { total: 0, mapped: 0, active: 0 },
+          },
+        })),
+    { pageSize: 20, resetKey: debouncedSearch }
+  );
+
   useEffect(() => {
-    loadData();
-  }, []);
+    if (!extra) return;
+    setRouteStarItems(extra.routeStarItems || []);
+    setVendors(extra.vendors || []);
+    setStats(extra.stats || { total: 0, mapped: 0, active: 0 });
+  }, [extra]);
 
-  const filteredItems = useMemo(() => {
-    if (!searchText) return items;
-
-    const searchLower = searchText.toLowerCase();
-    return items.filter(item =>
-      item.sku.toLowerCase().includes(searchLower) ||
-      item.name.toLowerCase().includes(searchLower) ||
-      (item.description && item.description.toLowerCase().includes(searchLower)) ||
-      (item.mappedCategoryItemName && item.mappedCategoryItemName.toLowerCase().includes(searchLower)) ||
-      (item.vendorName && item.vendorName.toLowerCase().includes(searchLower)) ||
-      (item.vendorId?.name && item.vendorId.name.toLowerCase().includes(searchLower))
-    );
-  }, [items, searchText]);
-
-  const stats = useMemo(() => ({
-    total: items.length,
-    mapped: items.filter(i => i.mappedCategoryItemId).length,
-    active: items.filter(i => i.isActive).length
-  }), [items]);
-
-  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
-    useClientPagination(filteredItems, { pageSize: 20, resetKey: searchText });
-
-  const loadData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const pageData = await manualPOItemService.getPageData();
-      setItems(pageData.items || []);
-      setRouteStarItems(pageData.routeStarItems || []);
-      setVendors(pageData.vendors || []);
-    } catch (error) {
-      showError('Failed to load data: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [showError]);
+  const loadData = refetch;
 
   const handleOpenModal = (item = null) => {
     if (item) {
@@ -274,7 +273,7 @@ const ManualPOItems = () => {
 
       {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
-        {filteredItems.length === 0 ? (
+        {pageItems.length === 0 ? (
           <EmptyState
             title="No items found"
             description={searchText ? "Try adjusting your search" : "Create your first manual PO item to get started"}
@@ -390,7 +389,7 @@ const ManualPOItems = () => {
         )}
       </div>
 
-      {filteredItems.length > 0 && (
+      {total > 0 && (
         <div className="mt-4">
           <Pagination
             currentPage={page}

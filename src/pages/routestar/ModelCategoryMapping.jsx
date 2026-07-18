@@ -10,92 +10,119 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Badge from '../../components/common/Badge';
 import { MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon, XCircleIcon, TrashIcon } from '@heroicons/react/24/solid';
-import useClientPagination from '../../hooks/useClientPagination';
+import useDebounce from '../../hooks/useDebounce';
+import useServerPagination from '../../hooks/useServerPagination';
 import Pagination from '../../components/common/Pagination';
 
 const ModelCategoryMapping = () => {
   const { showSuccess, showError, showWarning } = useContext(ToastContext);
 
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [models, setModels] = useState([]);
+  // Per-model local edits (categoryItemId/categoryItemName/notes) keyed by modelNumber.
+  // Survives page changes so Save / Save All keep working across pages.
+  const [edits, setEdits] = useState({});
   const [routeStarItems, setRouteStarItems] = useState([]);
-  const [filteredModels, setFilteredModels] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const debouncedSearch = useDebounce(searchText, 400);
   const [filterStatus, setFilterStatus] = useState('all');
   const [pendingChanges, setPendingChanges] = useState(new Set());
   const [stats, setStats] = useState({ total: 0, mapped: 0, unmapped: 0 });
+
+  // Load the FULL RouteStar items list once (dropdown source, must stay full).
   useEffect(() => {
-    loadData();
+    const loadItems = async () => {
+      try {
+        setInitialLoading(true);
+        const itemsData = await modelCategoryService.getRouteStarItems();
+        setRouteStarItems(itemsData.items || []);
+      } catch (error) {
+        showError('Failed to load data: ' + error.message);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    loadItems();
   }, []);
+
+  // Server-paginated models list.
+  const {
+    items: pageModels,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    total,
+    totalPages,
+    extra,
+    loading,
+    refetch,
+  } = useServerPagination(
+    ({ page, limit }) =>
+      modelCategoryService
+        .getUniqueModels({
+          page,
+          limit,
+          search: debouncedSearch || undefined,
+          status: filterStatus !== 'all' ? filterStatus : undefined,
+        })
+        .then((res) => ({
+          items: res.models || [],
+          total: res.pagination?.total ?? res.total ?? 0,
+          pages: res.pagination?.totalPages ?? 1,
+          extra: res.stats || null,
+        })),
+    { pageSize: 20, resetKey: `${debouncedSearch}|${filterStatus}` }
+  );
+
+  // Stats come from the backend (computed over the full set).
   useEffect(() => {
-    filterModels();
-  }, [models, searchText, filterStatus]);
-  useEffect(() => {
-    updateStats();
-  }, [models]);
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [modelsData, itemsData] = await Promise.all([
-        modelCategoryService.getUniqueModels(),
-        modelCategoryService.getRouteStarItems()
-      ]);
-      setModels(modelsData.models || []);
-      setRouteStarItems(itemsData.items || []);
-    } catch (error) {
-      showError('Failed to load data: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
+    if (extra) setStats(extra);
+  }, [extra]);
+
+  // Apply any pending local edits on top of the freshly-fetched page rows.
+  const models = pageModels.map((m) =>
+    edits[m.modelNumber] ? { ...m, ...edits[m.modelNumber] } : m
+  );
+
+  const loadData = () => {
+    setEdits({});
+    setPendingChanges(new Set());
+    refetch();
   };
-  const updateStats = () => {
-    const mapped = models.filter(m => m.categoryItemName).length;
-    const unmapped = models.length - mapped;
-    setStats({ total: models.length, mapped, unmapped });
-  };
-  const filterModels = () => {
-    let filtered = [...models];
-    if (searchText) {
-      const searchLower = searchText.toLowerCase();
-      filtered = filtered.filter(m =>
-        m.modelNumber.toLowerCase().includes(searchLower) ||
-        (m.orderItemName && m.orderItemName.toLowerCase().includes(searchLower)) ||
-        (m.categoryItemName && m.categoryItemName.toLowerCase().includes(searchLower))
-      );
-    }
-    if (filterStatus === 'mapped') {
-      filtered = filtered.filter(m => m.categoryItemName);
-    } else if (filterStatus === 'unmapped') {
-      filtered = filtered.filter(m => !m.categoryItemName);
-    }
-    setFilteredModels(filtered);
-  };
+
   const handleCategoryChange = (modelNumber, categoryItemId) => {
     const item = routeStarItems.find(i => i._id === categoryItemId);
-    setModels(prevModels =>
-      prevModels.map(m =>
-        m.modelNumber === modelNumber
-          ? {
-              ...m,
-              categoryItemId,
-              categoryItemName: item ? item.itemName : null
-            }
-          : m
-      )
-    );
+    setEdits(prev => ({
+      ...prev,
+      [modelNumber]: {
+        ...prev[modelNumber],
+        categoryItemId,
+        categoryItemName: item ? item.itemName : null,
+      },
+    }));
     setPendingChanges(prev => new Set([...prev, modelNumber]));
   };
   const handleNotesChange = (modelNumber, notes) => {
-    setModels(prevModels =>
-      prevModels.map(m =>
-        m.modelNumber === modelNumber ? { ...m, notes } : m
-      )
-    );
+    setEdits(prev => ({
+      ...prev,
+      [modelNumber]: {
+        ...prev[modelNumber],
+        notes,
+      },
+    }));
     setPendingChanges(prev => new Set([...prev, modelNumber]));
   };
+  // Resolve the current view of a model (page row merged with local edits).
+  const getModel = (modelNumber) => {
+    const base = pageModels.find(m => m.modelNumber === modelNumber);
+    const edit = edits[modelNumber];
+    if (base) return { ...base, ...(edit || {}) };
+    // Falling back to edits alone (e.g. saving from Save All after page change).
+    return edit ? { modelNumber, ...edit } : null;
+  };
   const saveMapping = async (modelNumber) => {
-    const model = models.find(m => m.modelNumber === modelNumber);
+    const model = getModel(modelNumber);
     if (!model || !model.categoryItemId) {
       showError('Please select a category first');
       return;
@@ -114,6 +141,12 @@ const ModelCategoryMapping = () => {
         newSet.delete(modelNumber);
         return newSet;
       });
+      setEdits(prev => {
+        const next = { ...prev };
+        delete next[modelNumber];
+        return next;
+      });
+      refetch();
     } catch (error) {
       showError('Failed to save mapping: ' + error.message);
     } finally {
@@ -127,13 +160,22 @@ const ModelCategoryMapping = () => {
     }
     try {
       setSaving(true);
-      const promises = Array.from(pendingChanges).map(modelNumber =>
-        saveMapping(modelNumber)
-      );
+      const modelNumbers = Array.from(pendingChanges);
+      const promises = modelNumbers.map(async (modelNumber) => {
+        const model = getModel(modelNumber);
+        if (!model || !model.categoryItemId) return;
+        await modelCategoryService.saveMapping({
+          modelNumber: model.modelNumber,
+          categoryItemName: model.categoryItemName,
+          categoryItemId: model.categoryItemId,
+          notes: model.notes || ''
+        });
+      });
       await Promise.all(promises);
       showSuccess(`Saved ${pendingChanges.size} changes`);
       setPendingChanges(new Set());
-      loadData();
+      setEdits({});
+      refetch();
     } catch (error) {
       showError('Some changes failed to save');
     } finally {
@@ -147,14 +189,22 @@ const ModelCategoryMapping = () => {
     try {
       await modelCategoryService.deleteMapping(modelNumber);
       showSuccess(`Mapping deleted for ${modelNumber}`);
-      loadData();
+      setEdits(prev => {
+        const next = { ...prev };
+        delete next[modelNumber];
+        return next;
+      });
+      setPendingChanges(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(modelNumber);
+        return newSet;
+      });
+      refetch();
     } catch (error) {
       showError('Failed to delete mapping: ' + error.message);
     }
   };
-  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
-    useClientPagination(filteredModels, { pageSize: 20, resetKey: `${searchText}|${filterStatus}` });
-  if (loading) {
+  if (initialLoading) {
     return <LoadingSpinner />;
   }
   return (
@@ -326,14 +376,14 @@ const ModelCategoryMapping = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredModels.length === 0 ? (
+              {models.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                     No models found
                   </td>
                 </tr>
               ) : (
-                pageItems.map((record, index) => (
+                models.map((record, index) => (
                   <tr
                     key={record.modelNumber}
                     className={record.categoryItemName ? 'bg-green-50 dark:bg-green-900/10' : ''}
@@ -468,7 +518,7 @@ const ModelCategoryMapping = () => {
             </tbody>
           </table>
         </div>
-        {filteredModels.length > 0 && (
+        {total > 0 && (
           <div className="mt-4">
             <Pagination
               currentPage={page}

@@ -64,9 +64,9 @@ export const manualPOItemService = {
     }
   },
 
-  async getPageData() {
+  async getPageData(params = {}) {
     try {
-      const response = await api.get('/manual-po-items/page-data');
+      const response = await api.get('/manual-po-items/page-data', { params });
       return response.data;
     } catch (error) {
       throw new Error(error.message || 'Failed to fetch page data');

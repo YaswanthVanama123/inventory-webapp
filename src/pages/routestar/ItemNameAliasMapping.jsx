@@ -15,19 +15,20 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
-import useClientPagination from '../../hooks/useClientPagination';
+import useDebounce from '../../hooks/useDebounce';
+import useServerPagination from '../../hooks/useServerPagination';
 import Pagination from '../../components/common/Pagination';
 
 const ItemNameAliasMapping = () => {
   const { showSuccess, showError, showWarning } = useContext(ToastContext);
 
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [mappings, setMappings] = useState([]);
+  // Full set of unique items (dropdown / suggestion / quick-map / select-all source).
   const [uniqueItems, setUniqueItems] = useState([]);
-  const [filteredItems, setFilteredItems] = useState([]);
   const [stats, setStats] = useState({ totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 });
   const [searchText, setSearchText] = useState('');
+  const debouncedSearch = useDebounce(searchText, 400);
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedItems, setSelectedItems] = useState(new Set());
   const [showBulkMapModal, setShowBulkMapModal] = useState(false);
@@ -46,52 +47,70 @@ const ItemNameAliasMapping = () => {
     description: '',
     autoMerge: true
   });
+
+  // Server-paginated item-names table. The fetch also carries the full aux data
+  // (mappings, full uniqueItems set, stats) through `extra`.
+  const {
+    items: pageItems,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    total,
+    totalPages,
+    extra,
+    loading,
+    refetch,
+  } = useServerPagination(
+    ({ page, limit }) =>
+      routeStarItemAliasService
+        .getPageData({
+          page,
+          limit,
+          search: debouncedSearch || undefined,
+          status: filterStatus !== 'all' ? filterStatus : undefined,
+        })
+        .then((pageData) => ({
+          items: pageData.uniqueItems?.items || [],
+          total: pageData.uniqueItems?.pagination?.total ?? 0,
+          pages: pageData.uniqueItems?.pagination?.totalPages ?? 1,
+          extra: {
+            mappings: pageData.mappings?.mappings || [],
+            allItems: pageData.uniqueItems?.allItems || [],
+            stats: pageData.uniqueItems?.stats || pageData.stats || {
+              totalUniqueItems: 0,
+              mappedItems: 0,
+              unmappedItems: 0
+            },
+          },
+        })),
+    { pageSize: 20, resetKey: `${debouncedSearch}|${filterStatus}` }
+  );
+
+  // Surface aux data from the fetch into the aux state.
   useEffect(() => {
-    loadData();
-  }, []);
-  useEffect(() => {
-    filterItems();
-  }, [uniqueItems, searchText, filterStatus]);
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const pageData = await routeStarItemAliasService.getPageData();
-      console.log('Combined API response:', pageData);
-      setMappings(pageData.mappings?.mappings || []);
-      setUniqueItems(pageData.uniqueItems?.items || []);
-      setStats(pageData.uniqueItems?.stats || pageData.stats || {
-        totalUniqueItems: 0,
-        mappedItems: 0,
-        unmappedItems: 0
-      });
-      console.log('State after setting:', {
-        mappings: pageData.mappings?.mappings?.length,
-        uniqueItems: pageData.uniqueItems?.items?.length,
-        stats: pageData.uniqueItems?.stats || pageData.stats
-      });
-    } catch (error) {
-      console.error('loadData error:', error);
-      showError('Failed to load data: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const filterItems = () => {
-    let filtered = [...uniqueItems];
-    if (searchText) {
-      const searchLower = searchText.toLowerCase();
-      filtered = filtered.filter(item =>
+    if (!extra) return;
+    setMappings(extra.mappings || []);
+    setUniqueItems(extra.allItems || []);
+    setStats(extra.stats || { totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 });
+  }, [extra]);
+
+  const loadData = refetch;
+
+  // Client-side filter over the FULL set — used for select-all / header checkbox
+  // (NOT for the table, which renders the server `pageItems`).
+  const filteredItems = uniqueItems.filter((item) => {
+    if (debouncedSearch) {
+      const searchLower = debouncedSearch.toLowerCase();
+      const matches =
         item.itemName.toLowerCase().includes(searchLower) ||
-        (item.canonicalName && item.canonicalName.toLowerCase().includes(searchLower))
-      );
+        (item.canonicalName && item.canonicalName.toLowerCase().includes(searchLower));
+      if (!matches) return false;
     }
-    if (filterStatus === 'mapped') {
-      filtered = filtered.filter(item => item.isMapped);
-    } else if (filterStatus === 'unmapped') {
-      filtered = filtered.filter(item => !item.isMapped);
-    }
-    setFilteredItems(filtered);
-  };
+    if (filterStatus === 'mapped') return item.isMapped;
+    if (filterStatus === 'unmapped') return !item.isMapped;
+    return true;
+  });
   const openCreateModal = () => {
     setEditingMapping(null);
     setModalData({
@@ -336,9 +355,7 @@ const ItemNameAliasMapping = () => {
       setSaving(false);
     }
   };
-  const { page, setPage, pageSize, setPageSize, total, totalPages, pageItems } =
-    useClientPagination(filteredItems, { pageSize: 20, resetKey: `${searchText}|${filterStatus}` });
-  if (loading) {
+  if (loading && pageItems.length === 0) {
     return <LoadingSpinner />;
   }
   return (
@@ -587,7 +604,7 @@ const ItemNameAliasMapping = () => {
       {}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-          Item Names ({filteredItems.length})
+          Item Names ({total})
         </h2>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -634,7 +651,7 @@ const ItemNameAliasMapping = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredItems.length === 0 ? (
+              {pageItems.length === 0 ? (
                 <tr>
                   <td colSpan="9" className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                     No items found
@@ -716,7 +733,7 @@ const ItemNameAliasMapping = () => {
             </tbody>
           </table>
         </div>
-        {filteredItems.length > 0 && (
+        {total > 0 && (
           <div className="mt-4">
             <Pagination
               currentPage={page}

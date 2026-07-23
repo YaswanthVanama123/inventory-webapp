@@ -5,6 +5,7 @@ import Badge from '../common/Badge';
 import Button from '../common/Button';
 import LoadingSpinner from '../common/LoadingSpinner';
 import Modal from '../common/Modal';
+import Pagination from '../common/Pagination';
 import { ToastContext } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
@@ -25,15 +26,28 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
   const [itemToVerify, setItemToVerify] = useState(null);
   const [receivedQuantity, setReceivedQuantity] = useState('');
   const [notes, setNotes] = useState('');
+  // Server-side pagination of the grouped items list.
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Reset to the first page whenever the search term changes.
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
+
   useEffect(() => {
     fetchGroupedItems();
-  }, [searchTerm]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, page, pageSize]);
 
   const fetchGroupedItems = async () => {
     setLoading(true);
     try {
       const params = {
-        limit: 1000
+        page,
+        limit: pageSize,
       };
 
       if (searchTerm) {
@@ -41,15 +55,18 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
       }
 
       const response = await api.get('/customerconnect/items/grouped', { params });
-      console.log('[FolderView] Full API response:', response);
-      console.log('[FolderView] response.data:', response.data);
-      console.log('[FolderView] response.data.data:', response.data?.data);
-      const items = response.data?.data?.items || response.data?.items || [];
-      console.log('[FolderView] Parsed items:', items.length, 'items', items);
+      const payload = response.data?.data || response.data || {};
+      const items = payload.items || [];
+      const pagination = payload.pagination || {};
       setGroupedItems(items);
+      const total = pagination.total ?? items.length;
+      setTotalItems(total);
+      setTotalPages(pagination.pages || pagination.totalPages || Math.max(1, Math.ceil(total / pageSize)));
     } catch (err) {
       console.error('Error fetching grouped items:', err);
       setGroupedItems([]);
+      setTotalItems(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -283,9 +300,9 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
 
   useEffect(() => {
     if (onFilteredCountChange) {
-      onFilteredCountChange(filteredItems.length, groupedItems.length);
+      onFilteredCountChange(totalItems, totalItems);
     }
-  }, [filteredItems.length, groupedItems.length, onFilteredCountChange]);
+  }, [totalItems, onFilteredCountChange]);
 
   const handleSelectAll = () => {
     if (selectedItems.length === filteredItems.length && filteredItems.length > 0) {
@@ -949,6 +966,22 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
           );
         })()}
       </Modal>
+
+      {totalItems > 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            totalItems={totalItems}
+            itemsPerPage={pageSize}
+            onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+            pageSizeOptions={[10, 20, 50, 100]}
+            showPageSize={true}
+            showResultCount={true}
+          />
+        </div>
+      )}
     </div>
   );
 };

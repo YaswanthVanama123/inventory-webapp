@@ -6,6 +6,7 @@ import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import Pagination from '../../components/common/Pagination';
 import { CheckCircle, XCircle, Eye, Clock, User, DollarSign, Calendar, Package, Trash2 } from 'lucide-react';
 
 const Approvals = () => {
@@ -16,6 +17,27 @@ const Approvals = () => {
   const [pendingPurchaseDeletions, setPendingPurchaseDeletions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(15);
+
+  // Client-side numbered pagination over the active tab's pending list.
+  const activeList =
+    activeTab === 'invoices' ? pendingInvoices : pendingPurchaseDeletions;
+  const totalPages = Math.max(1, Math.ceil(activeList.length / itemsPerPage));
+  const pagedList = activeList.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Switching tab / page size starts over; approving can shrink the list past
+  // the current page, so clamp back onto a valid one.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, itemsPerPage]);
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
+
 
   useEffect(() => {
     fetchPendingInvoices();
@@ -198,8 +220,9 @@ const Approvals = () => {
                 </p>
               </Card>
             ) : (
+              <>
               <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                {pendingInvoices.map((invoice) => (
+                {pagedList.map((invoice) => (
                   <Card
                     key={invoice._id}
                     padding="lg"
@@ -299,6 +322,18 @@ const Approvals = () => {
                   </Card>
                 ))}
               </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                totalItems={activeList.length}
+                itemsPerPage={itemsPerPage}
+                onPageSizeChange={setItemsPerPage}
+                pageSizeOptions={[10, 15, 25, 50]}
+                showPageSize={true}
+                showResultCount={true}
+              />
+            </>
             )}
           </>
         )}
@@ -316,8 +351,9 @@ const Approvals = () => {
                 </p>
               </Card>
             ) : (
+              <>
               <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                {pendingPurchaseDeletions.map((purchase) => (
+                {pagedList.map((purchase) => (
                   <Card
                     key={purchase._id}
                     padding="lg"
@@ -416,6 +452,18 @@ const Approvals = () => {
                   </Card>
                 ))}
               </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                totalItems={activeList.length}
+                itemsPerPage={itemsPerPage}
+                onPageSizeChange={setItemsPerPage}
+                pageSizeOptions={[10, 15, 25, 50]}
+                showPageSize={true}
+                showResultCount={true}
+              />
+            </>
             )}
           </>
         )}

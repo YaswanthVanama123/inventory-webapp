@@ -28,6 +28,7 @@ import {
 import Card from '../../components/common/Card';
 import Modal from '../../components/common/Modal';
 import Button from '../../components/common/Button';
+import Pagination from '../../components/common/Pagination';
 
 const ScreenPermissionsManagement = () => {
   const { showSuccess, showError } = useContext(ToastContext);
@@ -46,6 +47,18 @@ const ScreenPermissionsManagement = () => {
   const [showInitializeModal, setShowInitializeModal] = useState(false);
 
   const [expandedCategories, setExpandedCategories] = useState(new Set());
+
+  // Numbered pagination over the employees list.
+  const [userPage, setUserPage] = useState(1);
+  const [userPageSize, setUserPageSize] = useState(15);
+  const userTotalPages = Math.max(1, Math.ceil(users.length / userPageSize));
+  const pagedUsers = users.slice(
+    (userPage - 1) * userPageSize,
+    userPage * userPageSize
+  );
+  useEffect(() => {
+    if (userPage > userTotalPages) setUserPage(userTotalPages);
+  }, [userPage, userTotalPages]);
 
   useEffect(() => {
     fetchData();
@@ -430,7 +443,7 @@ const ScreenPermissionsManagement = () => {
                 <h2 className="text-lg font-semibold text-gray-900">Employees</h2>
               </div>
               <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
-                {users.map(user => {
+                {pagedUsers.map(user => {
                   const isSelected = selectedUser?._id === user._id;
                   return (
                     <button
@@ -484,6 +497,19 @@ const ScreenPermissionsManagement = () => {
                   );
                 })}
               </div>
+              {users.length > 0 && (
+                <Pagination
+                  currentPage={userPage}
+                  totalPages={userTotalPages}
+                  onPageChange={setUserPage}
+                  totalItems={users.length}
+                  itemsPerPage={userPageSize}
+                  onPageSizeChange={setUserPageSize}
+                  pageSizeOptions={[10, 15, 25, 50]}
+                  showPageSize={true}
+                  showResultCount={true}
+                />
+              )}
             </div>
 
             {}

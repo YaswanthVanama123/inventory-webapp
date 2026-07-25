@@ -37,51 +37,59 @@ const UserList = () => {
   const [modalError, setModalError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(15);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   useEffect(() => {
     if (isAdmin) {
       fetchUsers();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin, debouncedSearch]);
+  }, [isAdmin, debouncedSearch, roleFilter, statusFilter, currentPage, itemsPerPage]);
+  // Search, role and status all run on the backend, so paging spans every
+  // matching user rather than a client-side slice of the first N fetched.
   const fetchUsers = async () => {
     setLoading(true);
     setError(null);
     try {
-      const params = { limit: 1000 };
+      const params = { page: currentPage, limit: itemsPerPage };
       if (debouncedSearch) params.search = debouncedSearch;
+      if (roleFilter) params.role = roleFilter;
+      if (statusFilter) params.isActive = statusFilter === 'active';
       const response = await api.get('/users', { params });
       const usersData = response.data?.data?.users || response.data?.users || [];
+      const pagination = response.data?.data?.pagination;
+      const resolvedTotal = pagination?.total ?? usersData.length;
+      const resolvedPages = pagination?.pages || 1;
+      // Deleting the last row on the last page can leave currentPage past the
+      // end — fall back to the final page instead of rendering an empty list.
+      if (currentPage > resolvedPages && resolvedTotal > 0) {
+        setCurrentPage(resolvedPages);
+        return;
+      }
       setUsers(Array.isArray(usersData) ? usersData : []);
+      setTotalItems(resolvedTotal);
+      setTotalPages(resolvedPages);
     } catch (err) {
       console.error('Error fetching users:', err);
       setError(err.message || 'Failed to load users');
       setUsers([]);
+      setTotalItems(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
   };
-  // Text search runs on the backend; role/status remain client-side facets.
-  const filteredUsers = users.filter((user) => {
-    const matchesRole = !roleFilter || user.role === roleFilter;
-    const matchesStatus = !statusFilter || (statusFilter === 'active' ? user.isActive : !user.isActive);
-    return matchesRole && matchesStatus;
-  });
-  const totalItems = filteredUsers.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
   const handleSearch = (value) => {
     setSearchTerm(value);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
   const handleRoleFilterChange = (e) => {
     setRoleFilter(e.target.value);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
   const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -238,7 +246,7 @@ const UserList = () => {
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">User Management</h1>
             <p className="text-slate-600 mt-1">
-              {filteredUsers.length} {filteredUsers.length === 1 ? 'user' : 'users'}
+              {totalItems} {totalItems === 1 ? 'user' : 'users'}
             </p>
           </div>
           <Button variant="primary" onClick={handleAddUser} className="w-full sm:w-auto">
@@ -289,6 +297,7 @@ const UserList = () => {
                   setSearchTerm('');
                   setRoleFilter('');
                   setStatusFilter('');
+                  setCurrentPage(1);
                 }}
               >
                 Clear Filters
@@ -356,7 +365,7 @@ const UserList = () => {
         <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
           <LoadingSpinner size="lg" text="Loading..." className="mx-auto" />
         </div>
-      ) : filteredUsers.length === 0 ? (
+      ) : users.length === 0 ? (
         <div className="bg-white rounded-lg shadow-sm border border-slate-200">
           <EmptyState
             icon={
@@ -414,7 +423,7 @@ const UserList = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-slate-200">
-                    {paginatedUsers.map((user) => (
+                    {users.map((user) => (
                       <tr
                         key={user._id}
                         className="hover:bg-slate-50 transition-colors cursor-pointer"
@@ -511,7 +520,7 @@ const UserList = () => {
           {}
           {viewMode === 'card' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {paginatedUsers.map((user) => (
+              {users.map((user) => (
                 <div
                   key={user._id}
                   className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer"

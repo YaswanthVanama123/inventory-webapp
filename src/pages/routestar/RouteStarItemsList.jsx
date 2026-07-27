@@ -387,6 +387,18 @@ const RouteStarItemsList = () => {
                             {item.mergedCount} merged
                           </Badge>
                         )}
+                        {/* Canonical group built only from CustomerConnect /
+                            Manual PO names — there is no RouteStarItem behind
+                            it, so usage flags cannot be set. */}
+                        {item.hasMasterRecord === false && (
+                          <Badge
+                            variant="warning"
+                            className="text-xs"
+                            title="Not in the RouteStar master list — sync from RouteStar to set usage flags"
+                          >
+                            no master record
+                          </Badge>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
@@ -406,7 +418,9 @@ const RouteStarItemsList = () => {
                       <select
                         value={item.itemCategory || 'Item'}
                         onChange={(e) => handleCategoryChange(item._id, e.target.value)}
-                        className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        disabled={item.hasMasterRecord === false}
+                        title={item.hasMasterRecord === false ? 'Not in the RouteStar master list' : undefined}
+                        className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <option value="Item">Item</option>
                         <option value="Service">Service</option>
@@ -418,12 +432,19 @@ const RouteStarItemsList = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <button
                         onClick={() => handleFlagChange(item._id, 'forUse', item.forUse)}
+                        disabled={item.hasMasterRecord === false}
                         className={`inline-flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
-                          item.forUse
+                          item.hasMasterRecord === false
+                            ? 'bg-gray-100 text-gray-300 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
+                            : item.forUse
                             ? 'bg-blue-500 text-white hover:bg-blue-600'
                             : 'bg-gray-200 text-gray-400 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-500 dark:hover:bg-gray-600'
                         }`}
-                        title={item.forUse ? 'Unmark for use' : 'Mark for use'}
+                        title={
+                          item.hasMasterRecord === false
+                            ? 'Not in the RouteStar master list — usage flags cannot be set'
+                            : item.forUse ? 'Unmark for use' : 'Mark for use'
+                        }
                       >
                         {item.forUse ? <CheckIcon className="w-5 h-5" /> : <XMarkIcon className="w-5 h-5" />}
                       </button>
@@ -431,12 +452,19 @@ const RouteStarItemsList = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <button
                         onClick={() => handleFlagChange(item._id, 'forSell', item.forSell)}
+                        disabled={item.hasMasterRecord === false}
                         className={`inline-flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
-                          item.forSell
+                          item.hasMasterRecord === false
+                            ? 'bg-gray-100 text-gray-300 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
+                            : item.forSell
                             ? 'bg-green-500 text-white hover:bg-green-600'
                             : 'bg-gray-200 text-gray-400 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-500 dark:hover:bg-gray-600'
                         }`}
-                        title={item.forSell ? 'Unmark for sell' : 'Mark for sell'}
+                        title={
+                          item.hasMasterRecord === false
+                            ? 'Not in the RouteStar master list — usage flags cannot be set'
+                            : item.forSell ? 'Unmark for sell' : 'Mark for sell'
+                        }
                       >
                         {item.forSell ? <CheckIcon className="w-5 h-5" /> : <XMarkIcon className="w-5 h-5" />}
                       </button>

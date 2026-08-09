@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
 import { getInvoices, syncClosedInvoices, syncClosedInvoicesWithDetails, syncClosedInvoiceDetails, syncAllInvoiceDetails, getInvoiceRange, deleteAllClosedInvoices, deleteBulkClosedInvoicesByNumbers, deleteManualInvoice } from '../../services/routestarService';
+import fetchHistoryService from '../../services/fetchHistoryService';
 import SearchBar from '../../components/common/SearchBar';
 import Select from '../../components/common/Select';
 import Button from '../../components/common/Button';
@@ -23,6 +24,10 @@ const ClosedInvoices = () => {
   const [syncingOld, setSyncingOld] = useState(false);
   const [syncingAll, setSyncingAll] = useState(false);
   const [syncingDetails, setSyncingDetails] = useState(false);
+  // A sync runs server-side in the background, so "is one running?" is server
+  // state — not local. Polling it means the buttons stay disabled across a page
+  // reload, in a second tab, and while the 3 AM scheduled run is going.
+  const [activeSync, setActiveSync] = useState(null);
   const [invoiceRange, setInvoiceRange] = useState({ highest: null, lowest: null, totalInvoices: 0 });
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -44,6 +49,42 @@ const ClosedInvoices = () => {
     fetchInvoices();
     fetchInvoiceRange();
   }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, dateFrom, dateTo, searchTerm]);
+
+  // Busy if this tab kicked one off OR the server says one is running.
+  const syncBusy = syncing || !!activeSync;
+
+  // Poll for a running sync so the buttons can't be clicked a second time.
+  // When one finishes, refresh the list so the new invoices show up.
+  useEffect(() => {
+    let cancelled = false;
+    let wasRunning = false;
+
+    const check = async () => {
+      try {
+        const res = await fetchHistoryService.getActiveFetches('routestar_invoices');
+        if (cancelled) return;
+        const running = (res?.activeFetches || []).find((f) => f.fetchType === 'closed') || null;
+        setActiveSync(running);
+        if (wasRunning && !running) {
+          // Just finished — pull in whatever it stored.
+          fetchInvoices();
+          fetchInvoiceRange();
+        }
+        wasRunning = !!running;
+      } catch (e) {
+        // Never let a polling hiccup lock the buttons.
+        if (!cancelled) setActiveSync(null);
+      }
+    };
+
+    check();
+    const id = setInterval(check, 5000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const fetchInvoiceRange = async () => {
     try {
       const response = await getInvoiceRange('closed');
@@ -125,6 +166,10 @@ const ClosedInvoices = () => {
         fetchInvoiceRange();
       }
     } catch (err) {
+      if (err?.code === 'SYNC_IN_PROGRESS' || err?.status === 409) {
+        showError(err.message || 'A sync is already running.');
+        return;
+      }
       console.error('Error syncing new invoices:', err);
       showError(err.message || 'Failed to sync new invoices');
     } finally {
@@ -160,6 +205,10 @@ const ClosedInvoices = () => {
         fetchInvoiceRange();
       }
     } catch (err) {
+      if (err?.code === 'SYNC_IN_PROGRESS' || err?.status === 409) {
+        showError(err.message || 'A sync is already running.');
+        return;
+      }
       console.error('Error syncing old invoices:', err);
       showError(err.message || 'Failed to sync old invoices');
     } finally {
@@ -400,7 +449,7 @@ const ClosedInvoices = () => {
               <div className="relative group">
                 <Button
                   onClick={handleSyncNew}
-                  disabled={syncing}
+                  disabled={syncBusy}
                   variant="primary"
                   className="whitespace-nowrap"
                   title="Fetch newer invoices (higher invoice numbers)"
@@ -426,7 +475,7 @@ const ClosedInvoices = () => {
               <div className="relative group">
                 <Button
                   onClick={handleSyncOld}
-                  disabled={syncing}
+                  disabled={syncBusy}
                   variant="secondary"
                   className="whitespace-nowrap"
                   title="Fetch older invoices (lower invoice numbers)"
@@ -452,7 +501,7 @@ const ClosedInvoices = () => {
               <div className="relative group">
                 <Button
                   onClick={handleSyncAll}
-                  disabled={syncing}
+                  disabled={syncBusy}
                   variant="success"
                   className="whitespace-nowrap"
                   title="Fetch all invoices from RouteStar"
@@ -478,7 +527,7 @@ const ClosedInvoices = () => {
               <div className="relative group">
                 <Button
                   onClick={handleSyncDetails}
-                  disabled={syncing}
+                  disabled={syncBusy}
                   variant="info"
                   className="whitespace-nowrap"
                   title="Fetch detailed line items for CLOSED invoices"
@@ -636,6 +685,18 @@ const ClosedInvoices = () => {
           </div>
         )}
       </div>
+      {/* A sync runs server-side, so say so — otherwise the disabled buttons
+          look broken rather than intentional. */}
+      {activeSync && (
+        <div className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-900 dark:bg-blue-900/20 dark:text-blue-300">
+          <LoadingSpinner size="sm" />
+          <span>
+            A closed invoices sync is already running
+            {activeSync.startedAt ? ` (started ${new Date(activeSync.startedAt).toLocaleTimeString('en-US', { timeZone: 'America/New_York' })} ET)` : ''}
+            . Sync buttons are disabled until it finishes — progress is in Fetch History.
+          </span>
+        </div>
+      )}
       {}
       <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

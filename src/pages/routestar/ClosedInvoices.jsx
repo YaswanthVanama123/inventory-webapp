@@ -108,8 +108,15 @@ const ClosedInvoices = () => {
     setSyncing(true);
     try {
       const response = await syncClosedInvoices(limit, 'new');
+      // A full scrape runs for minutes, so the API now accepts the job and
+      // returns 202 immediately rather than holding the request open until the
+      // proxy times out. Progress lives in Fetch History.
+      if (response.started) {
+        showSuccess('Sync started — it runs in the background. Track progress in Fetch History.');
+        return;
+      }
       if (response.success) {
-        const { created = 0, updated = 0, skipped = 0 } = response.data;
+        const { created = 0, updated = 0, skipped = 0 } = response.data || {};
         const limitText = isUnlimited ? 'AUTO (new invoices only)' : limit;
         showSuccess(
           `Synced: ${created} new, ${updated} updated, ${skipped} skipped | Limit: ${limitText} | Range: #${invoiceRange.highest || 'N/A'}+`
@@ -136,8 +143,15 @@ const ClosedInvoices = () => {
     setSyncing(true);
     try {
       const response = await syncClosedInvoices(limit, 'old');
+      // A full scrape runs for minutes, so the API now accepts the job and
+      // returns 202 immediately rather than holding the request open until the
+      // proxy times out. Progress lives in Fetch History.
+      if (response.started) {
+        showSuccess('Sync started — it runs in the background. Track progress in Fetch History.');
+        return;
+      }
       if (response.success) {
-        const { created = 0, updated = 0, skipped = 0 } = response.data;
+        const { created = 0, updated = 0, skipped = 0 } = response.data || {};
         const limitText = isUnlimited ? 'AUTO (all available)' : limit;
         showSuccess(
           `Synced: ${created} new, ${updated} updated, ${skipped} skipped | Limit: ${limitText} | Range: <#${invoiceRange.lowest || 'N/A'}`

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ToastContext } from '../../contexts/ToastContext';
 import fetchHistoryService from '../../services/fetchHistoryService';
+import { formatDateTime, formatTime } from '../../utils/dateUtils';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import {
@@ -305,7 +306,7 @@ const FetchHistory = () => {
                           {getSourceLabel(fetch.source, fetch.fetchType)}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(fetch.startedAt).toLocaleTimeString()}
+                          {formatTime(fetch.startedAt)}
                         </div>
                         {fetch.user && (
                           <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
@@ -345,7 +346,7 @@ const FetchHistory = () => {
                           {getSourceLabel(fetch.source, fetch.fetchType)}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(fetch.startedAt).toLocaleString()}
+                          {formatDateTime(fetch.startedAt)}
                         </div>
                         {fetch.user && (
                           <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
@@ -376,7 +377,7 @@ const FetchHistory = () => {
                       {getSourceLabel(selectedFetch.source, selectedFetch.fetchType)}
                     </h2>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Started: {new Date(selectedFetch.startedAt).toLocaleString()}
+                      Started: {formatDateTime(selectedFetch.startedAt)} ET
                       {selectedFetch.user && (
                         <span className="ml-3">
                           • By: {selectedFetch.user.fullName || selectedFetch.user.username}

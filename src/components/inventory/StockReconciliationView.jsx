@@ -261,6 +261,9 @@ const StockReconciliationView = () => {
                     </div>
                     <div className="text-xs text-slate-500">
                       {item.purchased.orderCount} orders
+                      {item.unitsPerCase > 1 && (
+                        <> · {item.purchased.cases} × {item.unitsPerCase}</>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">

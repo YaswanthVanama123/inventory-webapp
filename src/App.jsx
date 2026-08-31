@@ -34,6 +34,7 @@ const RouteStarInvoiceDetail = lazy(() => import('./pages/routestar/RouteStarInv
 const ModelCategoryMapping = lazy(() => import('./pages/routestar/ModelCategoryMapping'));
 const ItemNameAliasMapping = lazy(() => import('./pages/routestar/ItemNameAliasMapping'));
 const ManualPOItems = lazy(() => import('./pages/routestar/ManualPOItems'));
+const CaseQuantityMapping = lazy(() => import('./pages/inventory/CaseQuantityMapping'));
 const VendorManagement = lazy(() => import('./pages/vendors/VendorManagement'));
 const RouteStarItemsList = lazy(() => import('./pages/routestar/RouteStarItemsList'));
 const RouteStarCustomersList = lazy(() => import('./pages/routestar/RouteStarCustomersList'));
@@ -53,6 +54,7 @@ const Approvals = lazy(() => import('./pages/approvals/Approvals'));
 const UserList = lazy(() => import('./pages/admin/UserList'));
 const UserForm = lazy(() => import('./pages/admin/UserForm'));
 const ScreenManagement = lazy(() => import('./pages/admin/ScreenManagement'));
+const DataCleanup = lazy(() => import('./pages/admin/DataCleanup'));
 const Reports = lazy(() => import('./pages/reports/Reports'));
 const SalesReport = lazy(() => import('./pages/reports/SalesReport'));
 const ToastDemo = lazy(() => import('./pages/ToastDemo'));
@@ -399,6 +401,17 @@ function App() {
                 />
                 {}
                 <Route
+                  path="/case-quantity-mapping"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <CaseQuantityMapping />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                {}
+                <Route
                   path="/routestar/items"
                   element={
                     <ErrorBoundary>
@@ -552,6 +565,17 @@ function App() {
                     <ErrorBoundary>
                       <ProtectedRoute requireAdmin>
                         <ScreenManagement />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  }
+                />
+                {}
+                <Route
+                  path="/admin/data-cleanup"
+                  element={
+                    <ErrorBoundary>
+                      <ProtectedRoute requireAdmin>
+                        <DataCleanup />
                       </ProtectedRoute>
                     </ErrorBoundary>
                   }

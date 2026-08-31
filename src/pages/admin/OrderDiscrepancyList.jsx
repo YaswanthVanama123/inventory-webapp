@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { ToastContext } from '../../contexts/ToastContext';
 import orderDiscrepancyService from '../../services/orderDiscrepancyService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import BulkPurgeBar from '../../components/common/BulkPurgeBar';
 import {
   AlertTriangle, Search, ChevronDown, ChevronRight,
   Trash2, Package, User, Calendar, FileText, Hash
@@ -25,6 +26,34 @@ const OrderDiscrepancyList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDiscrepancy, setSelectedDiscrepancy] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  // Ticked rows for the admin bulk-purge bar.
+  const [selectedIds, setSelectedIds] = useState(new Set());
+
+  const toggleSelected = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const allOnPageSelected =
+    discrepancies.length > 0 && discrepancies.every((d) => selectedIds.has(d._id));
+
+  const toggleSelectAll = () => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      discrepancies.forEach((d) => (allOnPageSelected ? next.delete(d._id) : next.add(d._id)));
+      return next;
+    });
+  };
+
+  const afterPurge = () => {
+    setSelectedIds(new Set());
+    fetchDiscrepancies();
+    fetchStats();
+  };
 
   useEffect(() => {
     fetchDiscrepancies();
@@ -182,6 +211,25 @@ const OrderDiscrepancyList = () => {
               </button>
             )}
           </div>
+          {}
+          <div className="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-slate-100">
+            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={allOnPageSelected}
+                onChange={toggleSelectAll}
+                disabled={discrepancies.length === 0}
+                className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
+              />
+              Select all on this page
+            </label>
+            <BulkPurgeBar
+              type="order-discrepancies"
+              label="Order Discrepancies"
+              selectedIds={Array.from(selectedIds)}
+              onDone={afterPurge}
+            />
+          </div>
         </div>
 
         {}
@@ -204,6 +252,15 @@ const OrderDiscrepancyList = () => {
                       isExpanded ? 'bg-blue-50/50' : 'hover:bg-slate-50'
                     }`}
                   >
+                    {}
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(discrepancy._id)}
+                      onChange={() => toggleSelected(discrepancy._id)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
+                      aria-label={`Select discrepancy for order ${discrepancy.orderNumber}`}
+                    />
                     {}
                     <div className="text-slate-400">
                       {isExpanded ? (

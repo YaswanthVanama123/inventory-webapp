@@ -733,7 +733,7 @@ const ClosedInvoices = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
-              From Date
+              From Date (Completed)
             </label>
             <input
               type="date"
@@ -744,7 +744,7 @@ const ClosedInvoices = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
-              To Date
+              To Date (Completed)
             </label>
             <input
               type="date"

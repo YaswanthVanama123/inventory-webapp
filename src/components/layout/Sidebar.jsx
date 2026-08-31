@@ -268,6 +268,12 @@ const adminMenuItems = [
     icon: TagIcon,
     section: 'Master Data'
   },
+  {
+    label: 'Case Quantity Mapping',
+    path: '/case-quantity-mapping',
+    icon: CubeIcon,
+    section: 'Master Data'
+  },
 
   {
     label: 'Sales Report',
@@ -308,6 +314,12 @@ const adminMenuItems = [
     label: 'Screen Management',
     path: '/admin/screens',
     icon: ClipboardListIcon,
+    section: 'Administration'
+  },
+  {
+    label: 'Data Cleanup',
+    path: '/admin/data-cleanup',
+    icon: TrashIcon,
     section: 'Administration'
   },
   {

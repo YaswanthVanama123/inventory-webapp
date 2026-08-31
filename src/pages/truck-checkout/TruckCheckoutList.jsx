@@ -12,6 +12,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Modal from '../../components/common/Modal';
 import Alert from '../../components/common/Alert';
 import Pagination from '../../components/common/Pagination';
+import BulkPurgeBar from '../../components/common/BulkPurgeBar';
 import {
   TruckIcon,
   PlusIcon,
@@ -40,6 +41,8 @@ const TruckCheckoutList = () => {
   const [salesSubTab, setSalesSubTab] = useState('all');
   const [loading, setLoading] = useState(true);
   const [checkouts, setCheckouts] = useState([]);
+  // Ticked rows for the admin bulk-purge bar.
+  const [selectedCheckoutIds, setSelectedCheckoutIds] = useState(new Set());
   const [myCheckoutsByItem, setMyCheckoutsByItem] = useState([]);
   const [salesTracking, setSalesTracking] = useState([]);
   const [salesSummary, setSalesSummary] = useState({});
@@ -76,6 +79,31 @@ const TruckCheckoutList = () => {
       }
     }
   }, [statusFilter, employeeFilter, pagination.page, startDate, endDate, activeTab, checkoutsSubTab, salesSubTab]);
+  const toggleCheckoutSelected = (id) => {
+    setSelectedCheckoutIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const allCheckoutsSelected =
+    checkouts.length > 0 && checkouts.every((c) => selectedCheckoutIds.has(c._id));
+
+  const toggleSelectAllCheckouts = () => {
+    setSelectedCheckoutIds((prev) => {
+      const next = new Set(prev);
+      checkouts.forEach((c) => (allCheckoutsSelected ? next.delete(c._id) : next.add(c._id)));
+      return next;
+    });
+  };
+
+  const afterPurge = () => {
+    setSelectedCheckoutIds(new Set());
+    loadCheckouts();
+  };
+
   const loadCheckouts = async () => {
     try {
       setLoading(true);
@@ -628,9 +656,27 @@ const TruckCheckoutList = () => {
       {activeTab === 'checkouts' && checkoutsSubTab === 'all' && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200">
           <div className="px-6 py-4 border-b border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Checkouts ({pagination.total} records)
-            </h2>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold text-slate-900">
+                Checkouts ({pagination.total} records)
+              </h2>
+              <BulkPurgeBar
+                type="truck-checkouts"
+                label="Truck Checkouts"
+                selectedIds={Array.from(selectedCheckoutIds)}
+                onDone={afterPurge}
+              />
+            </div>
+            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer mt-3">
+              <input
+                type="checkbox"
+                checked={allCheckoutsSelected}
+                onChange={toggleSelectAllCheckouts}
+                disabled={checkouts.length === 0}
+                className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
+              />
+              Select all on this page
+            </label>
           </div>
 
           <div className="divide-y divide-slate-100">
@@ -655,6 +701,15 @@ const TruckCheckoutList = () => {
                         isExpanded ? 'bg-blue-50/50' : 'hover:bg-slate-50'
                       }`}
                     >
+                      {}
+                      <input
+                        type="checkbox"
+                        checked={selectedCheckoutIds.has(checkout._id)}
+                        onChange={() => toggleCheckoutSelected(checkout._id)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
+                        aria-label={`Select checkout for ${checkout.employeeName}`}
+                      />
                       {}
                       <div className="text-slate-400">
                         {isExpanded ? (

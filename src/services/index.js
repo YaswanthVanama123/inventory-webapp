@@ -18,6 +18,8 @@ export { default as purchaseOrderService } from './purchaseOrderService';
 export { default as manualOrderService } from './manualOrderService';
 export { default as manualPOItemService } from './manualPOItemService';
 export { default as modelCategoryService } from './modelCategoryService';
+export { default as itemCaseQuantityService } from './itemCaseQuantityService';
+export { default as dataPurgeService } from './dataPurgeService';
 export { default as goAuditsService } from './goAuditsService';
 export { default as settingsService } from './settingsService';
 export { default as stockService } from './stockService';

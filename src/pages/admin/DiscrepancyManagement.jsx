@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { ToastContext } from '../../contexts/ToastContext';
 import discrepancyService from '../../services/discrepancyService';
+import BulkPurgeBar from '../../components/common/BulkPurgeBar';
 import {
   Package,
   AlertTriangle,
@@ -62,6 +63,7 @@ const DiscrepancyManagement = () => {
   const location = useLocation();
 
   const [discrepancies, setDiscrepancies] = useState([]);
+  const [selectedIds, setSelectedIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [selectedDiscrepancies, setSelectedDiscrepancies] = useState([]);
   const [activeTab, setActiveTab] = useState('all');
@@ -255,8 +257,36 @@ const DiscrepancyManagement = () => {
     return true;
   });
 
-  const getTabCounts = () => {
-    const counts = { all: discrepancies.length, 'truck-return': 0, 'stock-check': 0, 'stock-adjustment': 0 };
+  // Ticked rows for the admin bulk-purge bar.
+  const allOnPageSelected =
+    filteredDiscrepancies.length > 0 &&
+    filteredDiscrepancies.every((d) => selectedIds.has(d._id));
+
+  const toggleSelected = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      filteredDiscrepancies.forEach((d) =>
+        allOnPageSelected ? next.delete(d._id) : next.add(d._id)
+      );
+      return next;
+    });
+  };
+
+  const afterPurge = () => {
+    setSelectedIds(new Set());
+    fetchDiscrepancies();
+  };
+
+  const getTabCounts = () => {    const counts = { all: discrepancies.length, 'truck-return': 0, 'stock-check': 0, 'stock-adjustment': 0 };
     discrepancies.forEach(d => {
       const source = getDiscrepancySource(d);
       counts[source] = (counts[source] || 0) + 1;
@@ -378,6 +408,25 @@ const DiscrepancyManagement = () => {
               <option value="Missing">Missing</option>
             </select>
           </div>
+          {}
+          <div className="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-slate-100">
+            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={allOnPageSelected}
+                onChange={toggleSelectAll}
+                disabled={filteredDiscrepancies.length === 0}
+                className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
+              />
+              Select all shown
+            </label>
+            <BulkPurgeBar
+              type="stock-discrepancies"
+              label="Stock Discrepancies"
+              selectedIds={Array.from(selectedIds)}
+              onDone={afterPurge}
+            />
+          </div>
         </div>
 
         {}
@@ -405,6 +454,15 @@ const DiscrepancyManagement = () => {
                       isExpanded ? 'bg-blue-50/50' : 'hover:bg-slate-50'
                     }`}
                   >
+                    {}
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(discrepancy._id)}
+                      onChange={() => toggleSelected(discrepancy._id)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
+                      aria-label={`Select discrepancy ${discrepancy.itemName || ''}`}
+                    />
                     {}
                     <div className="text-slate-400">
                       {isExpanded ? (

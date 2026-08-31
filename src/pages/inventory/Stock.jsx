@@ -790,6 +790,14 @@ const Stock = () => {
                                       <div className="text-xs text-gray-500 dark:text-gray-400">
                                         {sku.itemName}
                                       </div>
+                                      {sku.unitsPerCase > 1 && (
+                                        <div className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">
+                                          {sku.unitsPerCase} units per case
+                                          {sku.totalQuantityCases !== undefined && (
+                                            <> · {sku.totalQuantityCases} cases = {sku.totalQuantity} units</>
+                                          )}
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
                                 </td>
@@ -903,6 +911,11 @@ const Stock = () => {
                                                     </td>
                                                     <td className="px-4 py-2 text-center text-xs font-medium text-gray-900 dark:text-white">
                                                       {record.quantity}
+                                                      {record.unitsPerCase > 1 && (
+                                                        <div className="text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                          {record.caseQuantity} × {record.unitsPerCase}
+                                                        </div>
+                                                      )}
                                                     </td>
                                                     <td className="px-4 py-2 text-right text-xs text-gray-900 dark:text-white">
                                                       ${(record.unitPrice || 0).toFixed(2)}

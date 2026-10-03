@@ -962,14 +962,14 @@ const TruckCheckoutList = () => {
                         <div className="font-medium text-slate-900">{row.itemName}</div>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <span className="text-lg font-bold text-blue-600">{row.totalQuantity}</span>
+                        <span className="text-sm font-bold text-blue-600">{row.totalQuantity}</span>
                       </td>
                       <td className="px-6 py-4 text-right text-sm text-slate-600">
                         {row.totalSold !== null ? row.totalSold : '—'}
                       </td>
                       <td className="px-6 py-4 text-right">
                         {row.remainingInTruck !== null ? (
-                          <span className={`text-lg font-bold ${
+                          <span className={`text-sm font-bold ${
                             row.remainingInTruck > 0
                               ? 'text-green-600'
                               : row.remainingInTruck === 0

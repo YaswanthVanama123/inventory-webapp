@@ -375,10 +375,10 @@ const SalesReport = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-200">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Category</th>
-                  <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">Sales</th>
-                  <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">Orders</th>
-                  <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">%</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider text-slate-700">Category</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold uppercase tracking-wider text-slate-700">Sales</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold uppercase tracking-wider text-slate-700">Orders</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold uppercase tracking-wider text-slate-700">%</th>
                 </tr>
               </thead>
               <tbody>

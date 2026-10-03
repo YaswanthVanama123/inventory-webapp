@@ -549,7 +549,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                                 </span>
                               </td>
                               <td className="px-6 py-4">
-                                <span className="text-base font-bold text-slate-900">
+                                <span className="text-sm font-bold text-slate-900">
                                   {order.qty}
                                 </span>
                               </td>
@@ -557,7 +557,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                                 {formatCurrency(order.unitPrice)}
                               </td>
                               <td className="px-6 py-4">
-                                <span className="text-base font-semibold text-green-600">
+                                <span className="text-sm font-semibold text-green-600">
                                   {formatCurrency(order.lineTotal)}
                                 </span>
                               </td>
@@ -624,7 +624,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                             Totals:
                           </td>
                           <td className="px-6 py-3">
-                            <span className="text-base font-bold text-slate-900">
+                            <span className="text-sm font-bold text-slate-900">
                               {group.orders.reduce((sum, order) => sum + order.qty, 0)}
                             </span>
                           </td>
@@ -632,7 +632,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                             Avg: {formatCurrency(group.avgUnitPrice)}
                           </td>
                           <td className="px-6 py-3">
-                            <span className="text-base font-semibold text-green-600">
+                            <span className="text-sm font-semibold text-green-600">
                               {formatCurrency(group.totalValue)}
                             </span>
                           </td>

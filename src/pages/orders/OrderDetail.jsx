@@ -311,7 +311,7 @@ const OrderDetail = () => {
                   <td colSpan="5" className="px-6 py-4 text-right text-sm font-semibold text-slate-900 dark:text-white">
                     Total:
                   </td>
-                  <td className="px-6 py-4 text-right text-lg font-bold text-slate-900 dark:text-white">
+                  <td className="px-6 py-4 text-right text-sm font-bold text-slate-900 dark:text-white">
                     {formatCurrency(order.total)}
                   </td>
                 </tr>

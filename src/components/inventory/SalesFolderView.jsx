@@ -555,7 +555,7 @@ const SalesFolderView = ({ searchTerm = '' }) => {
                                 </div>
                               </td>
                               <td className="px-6 py-4">
-                                <span className="text-base font-bold text-slate-900">
+                                <span className="text-sm font-bold text-slate-900">
                                   {invoice.quantity}
                                 </span>
                               </td>
@@ -563,7 +563,7 @@ const SalesFolderView = ({ searchTerm = '' }) => {
                                 {formatCurrency(invoice.rate)}
                               </td>
                               <td className="px-6 py-4">
-                                <span className="text-base font-semibold text-green-600">
+                                <span className="text-sm font-semibold text-green-600">
                                   {formatCurrency(invoice.amount)}
                                 </span>
                               </td>
@@ -587,7 +587,7 @@ const SalesFolderView = ({ searchTerm = '' }) => {
                             Totals:
                           </td>
                           <td className="px-6 py-3">
-                            <span className="text-base font-bold text-slate-900">
+                            <span className="text-sm font-bold text-slate-900">
                               {group.invoices.reduce((sum, inv) => sum + inv.quantity, 0)}
                             </span>
                           </td>
@@ -595,7 +595,7 @@ const SalesFolderView = ({ searchTerm = '' }) => {
                             Avg: {formatCurrency(group.avgUnitPrice)}
                           </td>
                           <td className="px-6 py-3">
-                            <span className="text-base font-semibold text-green-600">
+                            <span className="text-sm font-semibold text-green-600">
                               {formatCurrency(group.totalValue)}
                             </span>
                           </td>

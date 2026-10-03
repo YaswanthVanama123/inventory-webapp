@@ -555,7 +555,7 @@ const ItemNameAliasMapping = () => {
                 mappings.map((mapping) => (
                   <tr key={mapping._id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="font-mono font-semibold text-lg text-gray-900 dark:text-white">
+                      <span className="font-mono font-semibold text-sm text-gray-900 dark:text-white">
                         {mapping.canonicalName}
                       </span>
                     </td>

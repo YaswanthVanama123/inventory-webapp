@@ -577,15 +577,15 @@ const DiscrepancyManagement = () => {
                               <div className="grid grid-cols-3 gap-2 text-center">
                                 <div>
                                   <div className="text-xs text-slate-500">System</div>
-                                  <div className="text-lg font-bold text-slate-900">{discrepancy.systemQuantity}</div>
+                                  <div className="text-sm font-bold text-slate-900">{discrepancy.systemQuantity}</div>
                                 </div>
                                 <div>
                                   <div className="text-xs text-slate-500">Actual</div>
-                                  <div className="text-lg font-bold text-slate-900">{discrepancy.actualQuantity}</div>
+                                  <div className="text-sm font-bold text-slate-900">{discrepancy.actualQuantity}</div>
                                 </div>
                                 <div>
                                   <div className="text-xs text-slate-500">Diff</div>
-                                  <div className={`text-lg font-bold ${discrepancy.difference > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                  <div className={`text-sm font-bold ${discrepancy.difference > 0 ? 'text-green-600' : 'text-red-600'}`}>
                                     {discrepancy.difference > 0 ? '+' : ''}{discrepancy.difference}
                                   </div>
                                 </div>

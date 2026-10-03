@@ -425,27 +425,27 @@ const Stock = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                        <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
                           {item.totalPurchased || 0}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                        <span className="text-sm font-bold text-green-600 dark:text-green-400">
                           {item.totalSold || 0}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                        <span className="text-sm font-bold text-orange-600 dark:text-orange-400">
                           {item.totalCheckedOut || 0}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                        <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
                           {item.stockRemaining || 0}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <span className="text-lg font-bold text-red-600 dark:text-red-400">
+                        <span className="text-sm font-bold text-red-600 dark:text-red-400">
                           {item.totalDiscrepancyDifference !== undefined ? item.totalDiscrepancyDifference : item.totalDiscrepancies || 0}
                         </span>
                       </td>
@@ -455,7 +455,7 @@ const Stock = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
                           ${(item.totalPurchaseValue || 0).toFixed(2)}
                         </span>
                       </td>
@@ -530,25 +530,25 @@ const Stock = () => {
                                             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                               {(categorySalesHistory[item.categoryName] || []).map((record, recordIndex) => (
                                                 <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                                                  <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
+                                                  <td className="px-4 py-2 text-sm text-gray-900 dark:text-white">
                                                     {record.invoiceNumber}
                                                   </td>
-                                                  <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                  <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
                                                     {record.invoiceDate ? new Date(record.invoiceDate).toLocaleDateString() : '-'}
                                                   </td>
-                                                  <td className="px-4 py-2 text-center text-xs font-medium text-gray-900 dark:text-white">
+                                                  <td className="px-4 py-2 text-center text-sm font-medium text-gray-900 dark:text-white">
                                                     {record.quantity}
                                                   </td>
-                                                  <td className="px-4 py-2 text-right text-xs text-gray-900 dark:text-white">
+                                                  <td className="px-4 py-2 text-right text-sm text-gray-900 dark:text-white">
                                                     ${(record.rate || 0).toFixed(2)}
                                                   </td>
-                                                  <td className="px-4 py-2 text-right text-xs font-semibold text-gray-900 dark:text-white">
+                                                  <td className="px-4 py-2 text-right text-sm font-semibold text-gray-900 dark:text-white">
                                                     ${(record.amount || 0).toFixed(2)}
                                                   </td>
-                                                  <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                  <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
                                                     {record.customer || '-'}
                                                   </td>
-                                                  <td className="px-4 py-2 text-xs">
+                                                  <td className="px-4 py-2 text-sm">
                                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                                                       record.status === 'Completed' || record.status === 'Closed'
                                                         ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
@@ -617,19 +617,19 @@ const Stock = () => {
                                             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                               {(categoryCheckoutHistory[item.categoryName] || []).map((record, recordIndex) => (
                                                 <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                                                  <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
+                                                  <td className="px-4 py-2 text-sm text-gray-900 dark:text-white">
                                                     {record.employeeName || '-'}
                                                   </td>
-                                                  <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                  <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
                                                     {record.truckNumber || '-'}
                                                   </td>
-                                                  <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                  <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
                                                     {record.checkoutDate ? new Date(record.checkoutDate).toLocaleDateString() : '-'}
                                                   </td>
-                                                  <td className="px-4 py-2 text-center text-xs font-medium text-gray-900 dark:text-white">
+                                                  <td className="px-4 py-2 text-center text-sm font-medium text-gray-900 dark:text-white">
                                                     {record.quantity}
                                                   </td>
-                                                  <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                  <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
                                                     {record.notes || '-'}
                                                   </td>
                                                 </tr>
@@ -714,21 +714,21 @@ const Stock = () => {
                                             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                               {(categoryDiscrepancies[item.categoryName] || []).map((record, recordIndex) => (
                                                 <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                                                  <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                  <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
                                                     {record.reportedAt ? new Date(record.reportedAt).toLocaleDateString() : '-'}
                                                   </td>
-                                                  <td className="px-4 py-2 text-center text-xs text-gray-900 dark:text-white">
+                                                  <td className="px-4 py-2 text-center text-sm text-gray-900 dark:text-white">
                                                     {record.systemQuantity}
                                                   </td>
-                                                  <td className="px-4 py-2 text-center text-xs text-gray-900 dark:text-white">
+                                                  <td className="px-4 py-2 text-center text-sm text-gray-900 dark:text-white">
                                                     {record.actualQuantity}
                                                   </td>
-                                                  <td className="px-4 py-2 text-center text-xs font-bold">
+                                                  <td className="px-4 py-2 text-center text-sm font-bold">
                                                     <span className={record.difference > 0 ? 'text-green-600' : 'text-red-600'}>
                                                       {record.difference > 0 ? '+' : ''}{record.difference}
                                                     </span>
                                                   </td>
-                                                  <td className="px-4 py-2 text-xs">
+                                                  <td className="px-4 py-2 text-sm">
                                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                                                       record.discrepancyType === 'Overage'
                                                         ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
@@ -741,7 +741,7 @@ const Stock = () => {
                                                       {record.discrepancyType}
                                                     </span>
                                                   </td>
-                                                  <td className="px-4 py-2 text-xs">
+                                                  <td className="px-4 py-2 text-sm">
                                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                                                       record.status === 'Approved'
                                                         ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
@@ -754,7 +754,7 @@ const Stock = () => {
                                                       {record.status}
                                                     </span>
                                                   </td>
-                                                  <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                  <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
                                                     {record.reportedBy?.fullName || record.reportedBy?.username || '-'}
                                                   </td>
                                                 </tr>
@@ -898,7 +898,7 @@ const Stock = () => {
                                               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                                 {sku.purchaseHistory.map((record, recordIndex) => (
                                                   <tr key={recordIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                                                    <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
+                                                    <td className="px-4 py-2 text-sm text-gray-900 dark:text-white">
                                                       <div className="flex items-center gap-2">
                                                         <span>{record.orderNumber}</span>
                                                         {record.source === 'manual' && (
@@ -906,10 +906,10 @@ const Stock = () => {
                                                         )}
                                                       </div>
                                                     </td>
-                                                    <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                    <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
                                                       {record.orderDate ? new Date(record.orderDate).toLocaleDateString() : '-'}
                                                     </td>
-                                                    <td className="px-4 py-2 text-center text-xs font-medium text-gray-900 dark:text-white">
+                                                    <td className="px-4 py-2 text-center text-sm font-medium text-gray-900 dark:text-white">
                                                       {record.quantity}
                                                       {record.unitsPerCase > 1 && (
                                                         <div className="text-xs font-normal text-gray-500 dark:text-gray-400">
@@ -917,16 +917,16 @@ const Stock = () => {
                                                         </div>
                                                       )}
                                                     </td>
-                                                    <td className="px-4 py-2 text-right text-xs text-gray-900 dark:text-white">
+                                                    <td className="px-4 py-2 text-right text-sm text-gray-900 dark:text-white">
                                                       ${(record.unitPrice || 0).toFixed(2)}
                                                     </td>
-                                                    <td className="px-4 py-2 text-right text-xs font-semibold text-gray-900 dark:text-white">
+                                                    <td className="px-4 py-2 text-right text-sm font-semibold text-gray-900 dark:text-white">
                                                       ${(record.lineTotal || 0).toFixed(2)}
                                                     </td>
-                                                    <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                                    <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
                                                       {record.vendor || '-'}
                                                     </td>
-                                                    <td className="px-4 py-2 text-xs">
+                                                    <td className="px-4 py-2 text-sm">
                                                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                                                         record.status === 'Complete'
                                                           ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'

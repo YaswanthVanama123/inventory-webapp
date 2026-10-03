@@ -291,19 +291,19 @@ const ItemsInvoiceUsage = () => {
                                       className="hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                                       onClick={() => handleInvoiceClick(invoice.invoiceNumber)}
                                     >
-                                      <td className="px-4 py-2 text-xs font-medium text-blue-600 dark:text-blue-400">
+                                      <td className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400">
                                         {invoice.invoiceNumber}
                                       </td>
-                                      <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                      <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
                                         {formatDate(invoice.invoiceDate)}
                                       </td>
-                                      <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
+                                      <td className="px-4 py-2 text-sm text-gray-900 dark:text-white">
                                         {invoice.customer}
                                       </td>
-                                      <td className="px-4 py-2 text-center text-xs font-semibold text-gray-900 dark:text-white">
+                                      <td className="px-4 py-2 text-center text-sm font-semibold text-gray-900 dark:text-white">
                                         {invoice.totalQuantity}
                                       </td>
-                                      <td className="px-4 py-2 text-xs">
+                                      <td className="px-4 py-2 text-sm">
                                         <Badge
                                           variant={
                                             invoice.status === 'Completed' || invoice.status === 'Closed'
@@ -314,7 +314,7 @@ const ItemsInvoiceUsage = () => {
                                           {invoice.status}
                                         </Badge>
                                       </td>
-                                      <td className="px-4 py-2 text-right text-xs font-semibold text-gray-900 dark:text-white">
+                                      <td className="px-4 py-2 text-right text-sm font-semibold text-gray-900 dark:text-white">
                                         ${(invoice.total || 0).toFixed(2)}
                                       </td>
                                     </tr>

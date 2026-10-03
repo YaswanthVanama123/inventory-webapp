@@ -354,15 +354,15 @@ const OrderDiscrepancyList = () => {
                               <div className="grid grid-cols-3 gap-2 text-center">
                                 <div>
                                   <div className="text-xs text-slate-500">Expected</div>
-                                  <div className="text-lg font-bold text-slate-900">{discrepancy.expectedQuantity}</div>
+                                  <div className="text-sm font-bold text-slate-900">{discrepancy.expectedQuantity}</div>
                                 </div>
                                 <div>
                                   <div className="text-xs text-slate-500">Received</div>
-                                  <div className="text-lg font-bold text-slate-900">{discrepancy.receivedQuantity}</div>
+                                  <div className="text-sm font-bold text-slate-900">{discrepancy.receivedQuantity}</div>
                                 </div>
                                 <div>
                                   <div className="text-xs text-slate-500">Diff</div>
-                                  <div className={`text-lg font-bold ${
+                                  <div className={`text-sm font-bold ${
                                     discrepancy.discrepancyQuantity > 0 ? 'text-blue-600' : discrepancy.discrepancyQuantity < 0 ? 'text-orange-600' : 'text-green-600'
                                   }`}>
                                     {discrepancy.discrepancyQuantity > 0 ? '+' : ''}{discrepancy.discrepancyQuantity}

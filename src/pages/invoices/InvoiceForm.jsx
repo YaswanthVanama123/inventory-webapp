@@ -421,7 +421,7 @@ const InvoiceForm = () => {
                     <td colSpan="3" className="px-3 py-3 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">
                       Total:
                     </td>
-                    <td className="px-3 py-3 text-right text-lg font-bold text-blue-600 dark:text-blue-400">
+                    <td className="px-3 py-3 text-right text-sm font-bold text-blue-600 dark:text-blue-400">
                       ${subtotal.toFixed(2)}
                     </td>
                     <td></td>

@@ -228,9 +228,9 @@ const QuickBooksSync = () => {
                         </Badge>
                       </td>
                       <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300">{rec.retries || 0}</td>
-                      <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">{formatDateTime(rec.enqueuedAt)}</td>
-                      <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">{formatDateTime(rec.syncedAt)}</td>
-                      <td className="px-4 py-2 text-xs text-red-600 dark:text-red-400 max-w-xs truncate" title={rec.lastError}>
+                      <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">{formatDateTime(rec.enqueuedAt)}</td>
+                      <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">{formatDateTime(rec.syncedAt)}</td>
+                      <td className="px-4 py-2 text-sm text-red-600 dark:text-red-400 max-w-xs truncate" title={rec.lastError}>
                         {rec.lastError || '-'}
                       </td>
                       <td className="px-4 py-2 text-right">

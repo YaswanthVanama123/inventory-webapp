@@ -452,11 +452,25 @@
     @apply max-w-full;
   }
 
-  
+  /* Data tables share one text size app-wide (as on Purchase Orders): 12px
+     headers, 14px cells. An explicit text-* class on a cell still wins. */
+  th {
+    @apply text-xs;
+  }
+
   td {
-    @apply break-words;
+    @apply break-words text-sm;
     word-wrap: break-word;
     overflow-wrap: break-word;
+  }
+
+  /* Inline-edit fields in table rows match the row text. Input hard-codes
+     text-base, so this needs !important. */
+  td input,
+  td select,
+  td textarea {
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
   }
 
   

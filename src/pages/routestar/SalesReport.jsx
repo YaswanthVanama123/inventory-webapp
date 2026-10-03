@@ -233,12 +233,12 @@ const SalesReport = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <span className={`text-lg font-bold ${item.soldQuantity > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                        <span className={`text-sm font-bold ${item.soldQuantity > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
                           {item.soldQuantity || 0}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
                           ${(item.soldAmount || 0).toFixed(2)}
                         </span>
                       </td>
@@ -287,25 +287,25 @@ const SalesReport = () => {
                                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                     {item.invoiceDetails.map((invoice, invIndex) => (
                                       <tr key={invIndex} className="hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        <td className="px-4 py-2 text-xs text-gray-900 dark:text-white">
+                                        <td className="px-4 py-2 text-sm text-gray-900 dark:text-white">
                                           {invoice.invoiceNumber}
                                         </td>
-                                        <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                        <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
                                           {invoice.invoiceDate ? new Date(invoice.invoiceDate).toLocaleDateString() : '-'}
                                         </td>
-                                        <td className="px-4 py-2 text-center text-xs font-medium text-gray-900 dark:text-white">
+                                        <td className="px-4 py-2 text-center text-sm font-medium text-gray-900 dark:text-white">
                                           {invoice.quantity}
                                         </td>
-                                        <td className="px-4 py-2 text-right text-xs text-gray-900 dark:text-white">
+                                        <td className="px-4 py-2 text-right text-sm text-gray-900 dark:text-white">
                                           ${(invoice.rate || 0).toFixed(2)}
                                         </td>
-                                        <td className="px-4 py-2 text-right text-xs font-semibold text-gray-900 dark:text-white">
+                                        <td className="px-4 py-2 text-right text-sm font-semibold text-gray-900 dark:text-white">
                                           ${(invoice.amount || 0).toFixed(2)}
                                         </td>
-                                        <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                                        <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
                                           {invoice.customer || '-'}
                                         </td>
-                                        <td className="px-4 py-2 text-xs">
+                                        <td className="px-4 py-2 text-sm">
                                           <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                                             invoice.status === 'Completed' || invoice.status === 'Closed'
                                               ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'

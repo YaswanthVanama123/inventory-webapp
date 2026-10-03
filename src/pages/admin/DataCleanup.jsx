@@ -230,7 +230,7 @@ const DataCleanup = () => {
                       </td>
                       <td className="px-4 py-4 text-right whitespace-nowrap">
                         <span
-                          className={`text-lg font-bold ${
+                          className={`text-sm font-bold ${
                             type.count > 0
                               ? 'text-gray-900 dark:text-white'
                               : 'text-gray-400 dark:text-gray-600'

@@ -366,19 +366,19 @@ const InvoiceDetail = () => {
               <table className="w-full min-w-full">
                 <thead>
                   <tr className="border-b-2 border-gray-200 dark:border-gray-700">
-                    <th className="text-left py-2 sm:py-3 px-2 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <th className="text-left py-2 sm:py-3 px-2 text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                       Item
                     </th>
-                    <th className="text-left py-2 sm:py-3 px-2 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 hidden sm:table-cell">
+                    <th className="text-left py-2 sm:py-3 px-2 text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 hidden sm:table-cell">
                       SKU
                     </th>
-                    <th className="text-right py-2 sm:py-3 px-2 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <th className="text-right py-2 sm:py-3 px-2 text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                       Qty
                     </th>
-                    <th className="text-right py-2 sm:py-3 px-2 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 hidden sm:table-cell">
+                    <th className="text-right py-2 sm:py-3 px-2 text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 hidden sm:table-cell">
                       Unit Price
                     </th>
-                    <th className="text-right py-2 sm:py-3 px-2 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <th className="text-right py-2 sm:py-3 px-2 text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                       Total
                     </th>
                   </tr>
@@ -390,7 +390,7 @@ const InvoiceDetail = () => {
                       className="border-b border-gray-200 dark:border-gray-700 last:border-0"
                     >
                       <td className="py-3 sm:py-4 px-2">
-                        <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
                           {item.itemName}
                         </p>
                         {item.description && (
@@ -405,16 +405,16 @@ const InvoiceDetail = () => {
                           {formatCurrency(item.priceAtSale)} each
                         </p>
                       </td>
-                      <td className="py-3 sm:py-4 px-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 hidden sm:table-cell">
+                      <td className="py-3 sm:py-4 px-2 text-sm text-gray-600 dark:text-gray-400 hidden sm:table-cell">
                         {item.skuCode}
                       </td>
-                      <td className="py-3 sm:py-4 px-2 text-xs sm:text-sm text-right text-gray-900 dark:text-white">
+                      <td className="py-3 sm:py-4 px-2 text-sm text-right text-gray-900 dark:text-white">
                         {item.quantity} {item.unit || ''}
                       </td>
-                      <td className="py-3 sm:py-4 px-2 text-xs sm:text-sm text-right text-gray-900 dark:text-white hidden sm:table-cell">
+                      <td className="py-3 sm:py-4 px-2 text-sm text-right text-gray-900 dark:text-white hidden sm:table-cell">
                         {formatCurrency(item.priceAtSale)}
                       </td>
-                      <td className="py-3 sm:py-4 px-2 text-xs sm:text-sm text-right font-medium text-gray-900 dark:text-white">
+                      <td className="py-3 sm:py-4 px-2 text-sm text-right font-medium text-gray-900 dark:text-white">
                         {formatCurrency(item.subtotal)}
                       </td>
                     </tr>

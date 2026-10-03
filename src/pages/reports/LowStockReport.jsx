@@ -252,11 +252,11 @@ const LowStockReport = () => {
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Item</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Stock Level</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Priority</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Supplier</th>
-                <th className="text-right py-4 px-6 text-sm font-semibold text-slate-700">Actions</th>
+                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-700">Item</th>
+                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-700">Stock Level</th>
+                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-700">Priority</th>
+                <th className="text-left py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-700">Supplier</th>
+                <th className="text-right py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-700">Actions</th>
               </tr>
             </thead>
             <tbody>

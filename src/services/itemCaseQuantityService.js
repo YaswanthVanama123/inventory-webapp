@@ -1,13 +1,5 @@
 import api from './api';
 
-/**
- * Case Quantity (pack size) mappings.
- *
- * Purchase orders record quantities in purchase units - a "case". Stock,
- * sales and truck checkouts are counted in single selling units. These
- * mappings tell the backend how many selling units a case contains, so
- * buying 1 case of 200 adds 200 to stock while selling 1 removes 1.
- */
 export const itemCaseQuantityService = {
   async getPurchasedItems(params = {}) {
     try {

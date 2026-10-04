@@ -235,7 +235,6 @@ const ManualOrderForm = () => {
 
   return (
     <div className="space-y-6 px-4 sm:px-6 pb-6">
-      {}
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigate('/orders')}
@@ -254,13 +253,11 @@ const ManualOrderForm = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-4">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
             Order Information
           </h2>
 
-          {}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
               Order Number
@@ -273,7 +270,6 @@ const ManualOrderForm = () => {
             />
           </div>
 
-          {}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
               Vendor *
@@ -349,7 +345,6 @@ const ManualOrderForm = () => {
             )}
           </div>
 
-          {}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
               Order Date *
@@ -365,7 +360,6 @@ const ManualOrderForm = () => {
           </div>
         </div>
 
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -389,7 +383,6 @@ const ManualOrderForm = () => {
                 key={index}
                 className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border border-slate-200 dark:border-gray-700 rounded-lg"
               >
-                {}
                 <div className="md:col-span-4">
                   <label className="block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1">
                     Item *
@@ -404,7 +397,6 @@ const ManualOrderForm = () => {
                   />
                 </div>
 
-                {}
                 <div className="md:col-span-2">
                   <label className="block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1">
                     Quantity *
@@ -419,7 +411,6 @@ const ManualOrderForm = () => {
                   />
                 </div>
 
-                {}
                 <div className="md:col-span-2">
                   <label className="block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1">
                     Unit Price *
@@ -434,7 +425,6 @@ const ManualOrderForm = () => {
                   />
                 </div>
 
-                {}
                 <div className="md:col-span-3">
                   <label className="block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1">
                     Line Total
@@ -447,7 +437,6 @@ const ManualOrderForm = () => {
                   />
                 </div>
 
-                {}
                 <div className="md:col-span-1 flex items-end">
                   <button
                     type="button"
@@ -462,7 +451,6 @@ const ManualOrderForm = () => {
             ))}
           </div>
 
-          {}
           <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-gray-700">
             <div className="text-right">
               <p className="text-sm text-slate-600 dark:text-gray-400">Order Total</p>
@@ -473,7 +461,6 @@ const ManualOrderForm = () => {
           </div>
         </div>
 
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
             Notes (Optional)
@@ -487,7 +474,6 @@ const ManualOrderForm = () => {
           />
         </div>
 
-        {}
         <div className="flex justify-end gap-3">
           <Button
             type="button"

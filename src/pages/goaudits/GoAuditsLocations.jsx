@@ -67,7 +67,6 @@ const GoAuditsLocations = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -88,7 +87,6 @@ const GoAuditsLocations = () => {
         </Button>
       </div>
 
-      {}
       {locations.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5">
@@ -131,10 +129,8 @@ const GoAuditsLocations = () => {
         </div>
       )}
 
-      {}
       <Card>
         <div className="p-4 space-y-4">
-          {}
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -147,7 +143,6 @@ const GoAuditsLocations = () => {
               />
             </div>
 
-            {}
             <div className="flex gap-2">
               <Button
                 onClick={() => setFilterActive('all')}
@@ -175,7 +170,6 @@ const GoAuditsLocations = () => {
         </div>
       </Card>
 
-      {}
       {locations.length === 0 && !loading ? (
         <Card>
           <div className="p-12 text-center">

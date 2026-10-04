@@ -160,7 +160,6 @@ const LowStockReport = () => {
   }
   return (
     <div className="space-y-6">
-      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
@@ -185,7 +184,6 @@ const LowStockReport = () => {
           </div>
         </div>
       </div>
-      {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
           <div className="flex items-center justify-between mb-2">
@@ -216,10 +214,8 @@ const LowStockReport = () => {
           <p className="text-3xl font-bold text-blue-700">{stats.medium}</p>
         </div>
       </div>
-      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
@@ -230,7 +226,6 @@ const LowStockReport = () => {
               className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          {}
           <div>
             <select
               value={filterPriority}
@@ -246,7 +241,6 @@ const LowStockReport = () => {
           </div>
         </div>
       </div>
-      {}
       <div className="hidden lg:block bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -345,13 +339,11 @@ const LowStockReport = () => {
           </table>
         </div>
       </div>
-      {}
       <div className="lg:hidden space-y-4">
         {filteredItems.map((item, index) => {
           const priority = getPriorityLevel(item.currentStock, item.minStock, item.reorderPoint);
           return (
             <div key={index} className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
-              {}
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <h3 className="font-semibold text-slate-900">{item.itemName}</h3>
@@ -360,7 +352,6 @@ const LowStockReport = () => {
                 </div>
                 {getPriorityBadge(priority)}
               </div>
-              {}
               <div className="mb-3 p-3 bg-slate-50 rounded-lg">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm text-slate-700">Stock Level</span>
@@ -386,7 +377,6 @@ const LowStockReport = () => {
                   <span>Reorder: {item.reorderPoint}</span>
                 </div>
               </div>
-              {}
               {item.supplier && (
                 <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
                   <p className="text-sm font-semibold text-blue-900 mb-2">Supplier</p>
@@ -405,7 +395,6 @@ const LowStockReport = () => {
                   )}
                 </div>
               )}
-              {}
               <button
                 onClick={() => handleOrderNow(item._id, item.itemName)}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -417,7 +406,6 @@ const LowStockReport = () => {
           );
         })}
       </div>
-      {}
       {filteredItems.length === 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-12 text-center">
           <Package className="w-16 h-16 text-slate-300 mx-auto mb-4" />

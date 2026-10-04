@@ -185,7 +185,6 @@ const InventoryDetail = () => {
     : ['/placeholder-product.png'];
   return (
     <div className="container mx-auto px-4 py-6 sm:py-8">
-      {}
       <div className="mb-6">
         <Button variant="ghost" onClick={() => navigate('/inventory')} className="mb-4">
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -231,18 +230,14 @@ const InventoryDetail = () => {
           </div>
         </div>
       </div>
-      {}
       {error && (
         <Alert variant="danger" dismissible onDismiss={() => setError(null)} className="mb-6">
           {error}
         </Alert>
       )}
-      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {}
         <div className="space-y-4">
           <Card padding="none" className="overflow-hidden">
-            {}
             <div
               className="relative bg-gray-100 dark:bg-gray-700 aspect-square cursor-zoom-in"
               onClick={() => setLightboxOpen(true)}
@@ -255,7 +250,6 @@ const InventoryDetail = () => {
                 alt={item.itemName}
                 className="w-full h-full object-contain"
               />
-              {}
               {images.length > 1 && (
                 <>
                   <button
@@ -284,14 +278,12 @@ const InventoryDetail = () => {
                   </button>
                 </>
               )}
-              {}
               {images.length > 1 && (
                 <div className="absolute bottom-2 right-2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
                   {selectedImage + 1} / {images.length}
                 </div>
               )}
             </div>
-            {}
             {images.length > 1 && (
               <div className="p-4 bg-white dark:bg-gray-800">
                 <div className="flex gap-2 overflow-x-auto">
@@ -332,9 +324,7 @@ const InventoryDetail = () => {
             )}
           </Card>
         </div>
-        {}
         <div className="space-y-6">
-          {}
           <div className="border-b border-gray-200 dark:border-gray-700">
             <nav className="flex space-x-4 sm:space-x-8">
               <button
@@ -359,13 +349,10 @@ const InventoryDetail = () => {
               </button>
             </nav>
           </div>
-          {}
           <div className="min-h-[400px]">
-            {}
             {activeTab === 'info' && (
               <Card title="Item Details">
                 <div className="space-y-6">
-                  {}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -390,7 +377,6 @@ const InventoryDetail = () => {
                       </div>
                     )}
                   </div>
-                  {}
                   <div>
                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       Description
@@ -402,10 +388,8 @@ const InventoryDetail = () => {
                 </div>
               </Card>
             )}
-            {}
             {activeTab === 'history' && (
               <div className="space-y-6">
-                {}
                 <Card title="Complete Activity History">
                   {activityLogs.length === 0 ? (
                     <div className="text-center py-8">
@@ -428,7 +412,6 @@ const InventoryDetail = () => {
                     </div>
                   ) : (
                     <div className="space-y-6">
-                      {}
                       {item?.createdBy && (
                         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                           <div className="flex items-start space-x-3">
@@ -451,7 +434,6 @@ const InventoryDetail = () => {
                           </div>
                         </div>
                       )}
-                      {}
                       {activityLogs.length > 0 && (
                         <div>
                           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -460,12 +442,10 @@ const InventoryDetail = () => {
                           <div className="relative">
                             {activityLogs.map((activity, index) => (
                               <div key={activity._id || index} className="relative pb-8 last:pb-0">
-                                {}
                                 {index < activityLogs.length - 1 && (
                                   <div className="absolute left-4 top-8 -bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
                                 )}
                                 <div className="relative flex items-start space-x-3">
-                                  {}
                                   <div
                                     className={`relative flex h-8 w-8 items-center justify-center rounded-full ${
                                       activity.action === 'CREATE'
@@ -515,7 +495,6 @@ const InventoryDetail = () => {
                                       )}
                                     </svg>
                                   </div>
-                                  {}
                                   <div className="flex-1 min-w-0 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center space-x-2">
@@ -594,7 +573,6 @@ const InventoryDetail = () => {
           </div>
         </div>
       </div>
-      {}
       {lightboxOpen && (
         <Modal
           isOpen={lightboxOpen}
@@ -625,7 +603,6 @@ const InventoryDetail = () => {
           </div>
         </Modal>
       )}
-      {}
       {uploadImagesModal && (
         <Modal
           isOpen={uploadImagesModal}
@@ -681,7 +658,6 @@ const InventoryDetail = () => {
           </div>
         </Modal>
       )}
-      {}
       {deleteConfirmModal && (
         <Modal
           isOpen={deleteConfirmModal}
@@ -742,7 +718,6 @@ const InventoryDetail = () => {
           </div>
         </Modal>
       )}
-      {}
       {deleteImageModal && imageToDelete && (
         <Modal
           isOpen={deleteImageModal}

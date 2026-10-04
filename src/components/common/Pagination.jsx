@@ -53,16 +53,13 @@ const Pagination = ({
   if (totalPages <= 1 && !showPageSize && !showResultCount) return null;
   return (
     <div className="space-y-4">
-      {}
       {(showResultCount || showPageSize) && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          {}
           {showResultCount && totalItems > 0 && (
             <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">
               {getResultCountText()}
             </div>
           )}
-          {}
           {showPageSize && onPageSizeChange && (
             <div className="flex items-center gap-2">
               <label htmlFor="page-size" className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
@@ -84,13 +81,11 @@ const Pagination = ({
           )}
         </div>
       )}
-      {}
       {totalPages > 1 && (
         <nav
           className={`flex items-center justify-center gap-2 ${className}`}
           aria-label="Pagination"
         >
-          {}
           {showFirstLast && currentPage > 1 && (
             <button
               onClick={() => handlePageChange(1)}
@@ -102,7 +97,6 @@ const Pagination = ({
               </svg>
             </button>
           )}
-          {}
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -113,7 +107,6 @@ const Pagination = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          {}
           {showPageNumbers && (
             <>
               {pages[0] > 1 && (
@@ -137,11 +130,9 @@ const Pagination = ({
               )}
             </>
           )}
-          {}
           <span className="sm:hidden px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
             {currentPage} / {totalPages}
           </span>
-          {}
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
@@ -152,7 +143,6 @@ const Pagination = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
-          {}
           {showFirstLast && currentPage < totalPages && (
             <button
               onClick={() => handlePageChange(totalPages)}

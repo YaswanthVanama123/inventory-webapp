@@ -77,7 +77,6 @@ const EnhancedStatCard = ({ title, value, subtitle, change, changeType, icon: Ic
   };
   return (
     <div className="group relative bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-xl transition-all duration-300 overflow-hidden">
-      {}
       <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses[color]} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
       <div className="relative z-10">
         <div className="flex items-start justify-between mb-4">
@@ -101,7 +100,6 @@ const EnhancedStatCard = ({ title, value, subtitle, change, changeType, icon: Ic
             </div>
           </div>
         )}
-        {}
         {trend && (
           <div className="mt-3 h-8">
             <ResponsiveContainer width="100%" height="100%">
@@ -246,9 +244,7 @@ const EnhancedDashboard = () => {
   ];
   return (
     <div className="space-y-6">
-      {}
       <div className="relative bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-xl shadow-xl p-8 overflow-hidden">
-        {}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`

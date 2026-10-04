@@ -289,7 +289,6 @@ const SalesReport = () => {
   const categories = data.categories || ['All'];
   return (
     <div className="space-y-4 md:space-y-6 p-4 md:p-6 bg-gray-50 min-h-screen">
-      {}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-4 md:p-6 lg:p-8 text-white">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div className="flex-1">
@@ -327,14 +326,12 @@ const SalesReport = () => {
           </div>
         </div>
       </div>
-      {}
       <Card className="p-4 md:p-6">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-5 h-5 text-gray-600" />
           <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Calendar className="w-4 h-4 inline mr-1" />
@@ -359,7 +356,6 @@ const SalesReport = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
             />
           </div>
-          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Filter className="w-4 h-4 inline mr-1" />
@@ -377,7 +373,6 @@ const SalesReport = () => {
               ))}
             </select>
           </div>
-          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Group By
@@ -395,13 +390,11 @@ const SalesReport = () => {
           </div>
         </div>
       </Card>
-      {}
       {error && !reportData && (
         <Card className="p-6">
           <ErrorState message={error} onRetry={fetchSalesReport} />
         </Card>
       )}
-      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <SummaryCard
           title="Total Sales"
@@ -439,9 +432,7 @@ const SalesReport = () => {
           loading={loading}
         />
       </div>
-      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        {}
         <Card className="p-4 md:p-6">
           {loading ? (
             <ChartSkeleton />
@@ -531,7 +522,6 @@ const SalesReport = () => {
             </>
           )}
         </Card>
-        {}
         <Card className="p-4 md:p-6">
           {loading ? (
             <ChartSkeleton />
@@ -578,7 +568,6 @@ const SalesReport = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              {}
               <div className="grid grid-cols-2 gap-2 mt-4">
                 {categoryBreakdown.map((category, index) => (
                   <div key={index} className="flex items-center gap-2">
@@ -594,7 +583,6 @@ const SalesReport = () => {
           )}
         </Card>
       </div>
-      {}
       <Card className="p-4 md:p-6">
         <div className="mb-4">
           <h2 className="text-base md:text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -629,7 +617,6 @@ const SalesReport = () => {
           </div>
         )}
       </Card>
-      {}
       <Card className="p-4 md:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
           <div>

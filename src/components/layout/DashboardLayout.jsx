@@ -73,13 +73,10 @@ const DashboardLayout = () => {
   };
   return (
     <div className="min-h-screen bg-gray-50">
-      {}
       <nav className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-30">
         <div className="px-4 lg:px-6">
           <div className="flex items-center justify-between h-16">
-            {}
             <div className="flex items-center gap-4">
-              {}
               <button
                 id="menu-button"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -92,7 +89,6 @@ const DashboardLayout = () => {
                   <Menu className="w-6 h-6 text-gray-600" />
                 )}
               </button>
-              {}
               <Link to="/dashboard" className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-lg">S</span>
@@ -102,9 +98,7 @@ const DashboardLayout = () => {
                 </span>
               </Link>
             </div>
-            {}
             <div className="flex items-center gap-2 sm:gap-4">
-              {}
               <button className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors">
                 <Search className="w-4 h-4 text-gray-500" />
                 <span className="text-sm text-gray-600">Search...</span>
@@ -112,12 +106,10 @@ const DashboardLayout = () => {
                   ⌘K
                 </kbd>
               </button>
-              {}
               <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
                 <Bell className="w-5 h-5 text-gray-600" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
-              {}
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -132,7 +124,6 @@ const DashboardLayout = () => {
                   </div>
                   <ChevronDown className="hidden sm:block w-4 h-4 text-gray-500" />
                 </button>
-                {}
                 {userMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
                     <Link
@@ -169,14 +160,12 @@ const DashboardLayout = () => {
           </div>
         </div>
       </nav>
-      {}
       {isMobile && sidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden transition-opacity"
           aria-hidden="true"
         />
       )}
-      {}
       <aside
         id="sidebar"
         className={`
@@ -187,7 +176,6 @@ const DashboardLayout = () => {
         `}
       >
         <div className="flex flex-col h-full">
-          {}
           <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -214,7 +202,6 @@ const DashboardLayout = () => {
               );
             })}
           </nav>
-          {}
           <div className="p-4 border-t border-gray-200">
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4">
               <h3 className="text-sm font-semibold text-gray-900 mb-1">
@@ -230,7 +217,6 @@ const DashboardLayout = () => {
           </div>
         </div>
       </aside>
-      {}
       <main
         className={`
           pt-16 min-h-screen transition-all duration-300
@@ -240,7 +226,6 @@ const DashboardLayout = () => {
         <div className="px-4 py-6 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <Outlet />
         </div>
-        {}
         <footer className="border-t border-gray-200 bg-white mt-auto">
           <div className="px-4 py-6 sm:px-6 lg:px-8 max-w-7xl mx-auto">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">

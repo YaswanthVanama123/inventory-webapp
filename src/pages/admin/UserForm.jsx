@@ -312,7 +312,6 @@ const UserForm = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        {}
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             {isEditMode ? 'Edit User' : 'Add New User'}
@@ -323,7 +322,6 @@ const UserForm = () => {
               : 'Create a new user account with appropriate role and permissions'}
           </p>
         </div>
-        {}
         {alert && (
           <div className="mb-6">
             <Alert
@@ -335,9 +333,7 @@ const UserForm = () => {
             </Alert>
           </div>
         )}
-        {}
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6">
-          {}
           <Input
             label="Username"
             name="username"
@@ -353,7 +349,6 @@ const UserForm = () => {
             helperText={isEditMode ? "Username cannot be changed" : "3+ characters, letters, numbers, and underscores only"}
             readOnly={isEditMode}
           />
-          {}
           <Input
             label="Email"
             name="email"
@@ -368,7 +363,6 @@ const UserForm = () => {
             disabled={loading}
             helperText="Valid email address required"
           />
-          {}
           <Input
             label="Full Name"
             name="fullName"
@@ -382,7 +376,6 @@ const UserForm = () => {
             icon={<User className="w-5 h-5" />}
             disabled={loading}
           />
-          {}
           <div>
             {isEditMode && (
               <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -423,7 +416,6 @@ const UserForm = () => {
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
-            {}
             {formData.password && (
               <div className="mt-2">
                 <div className="flex items-center justify-between mb-1">
@@ -487,7 +479,6 @@ const UserForm = () => {
               </div>
             )}
           </div>
-          {}
           <div>
             <div className="relative">
               <Input
@@ -514,7 +505,6 @@ const UserForm = () => {
               </button>
             </div>
           </div>
-          {}
           <Select
             label="Role"
             name="role"
@@ -531,7 +521,6 @@ const UserForm = () => {
             disabled={loading}
             helperText="Admin has full access, Employee has limited access"
           />
-          {}
           <Input
             label="Truck Number"
             name="truckNumber"
@@ -545,7 +534,6 @@ const UserForm = () => {
             helperText="Unique truck/vehicle identifier for this employee (appears in Class column of invoices)"
             style={{ textTransform: 'uppercase' }}
           />
-          {}
           {formData.role === 'employee' && (
             <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
               <div className="flex items-center gap-2 mb-3">
@@ -560,7 +548,6 @@ const UserForm = () => {
                 <div className="text-center py-4 text-sm text-gray-500">Loading screens...</div>
               ) : (
                 <div className="space-y-4">
-                  {}
                   {defaultScreens.length > 0 && (
                     <div>
                       <h4 className="text-xs font-medium text-gray-700 mb-2 flex items-center gap-2">
@@ -581,7 +568,6 @@ const UserForm = () => {
                     </div>
                   )}
 
-                  {}
                   {allScreens.filter(screen => !screen.isDefault).length > 0 && (
                     <div>
                       <h4 className="text-xs font-medium text-gray-700 mb-2">Additional Screens (Optional)</h4>
@@ -615,7 +601,6 @@ const UserForm = () => {
               )}
             </div>
           )}
-          {}
           <div className="flex items-center gap-3">
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -637,7 +622,6 @@ const UserForm = () => {
               </p>
             </div>
           </div>
-          {}
           <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-gray-200">
             <Button
               type="button"
@@ -661,7 +645,6 @@ const UserForm = () => {
             </Button>
           </div>
         </form>
-        {}
         {isEditMode && (
           <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex items-start gap-3">

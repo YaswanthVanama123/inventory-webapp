@@ -24,9 +24,6 @@ const ClosedInvoices = () => {
   const [syncingOld, setSyncingOld] = useState(false);
   const [syncingAll, setSyncingAll] = useState(false);
   const [syncingDetails, setSyncingDetails] = useState(false);
-  // A sync runs server-side in the background, so "is one running?" is server
-  // state — not local. Polling it means the buttons stay disabled across a page
-  // reload, in a second tab, and while the 3 AM scheduled run is going.
   const [activeSync, setActiveSync] = useState(null);
   const [invoiceRange, setInvoiceRange] = useState({ highest: null, lowest: null, totalInvoices: 0 });
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,11 +47,8 @@ const ClosedInvoices = () => {
     fetchInvoiceRange();
   }, [currentPage, itemsPerPage, statusFilter, stockProcessedFilter, dateFrom, dateTo, searchTerm]);
 
-  // Busy if this tab kicked one off OR the server says one is running.
   const syncBusy = syncing || !!activeSync;
 
-  // Poll for a running sync so the buttons can't be clicked a second time.
-  // When one finishes, refresh the list so the new invoices show up.
   useEffect(() => {
     let cancelled = false;
     let wasRunning = false;
@@ -66,13 +60,11 @@ const ClosedInvoices = () => {
         const running = (res?.activeFetches || []).find((f) => f.fetchType === 'closed') || null;
         setActiveSync(running);
         if (wasRunning && !running) {
-          // Just finished — pull in whatever it stored.
           fetchInvoices();
           fetchInvoiceRange();
         }
         wasRunning = !!running;
       } catch (e) {
-        // Never let a polling hiccup lock the buttons.
         if (!cancelled) setActiveSync(null);
       }
     };
@@ -149,9 +141,6 @@ const ClosedInvoices = () => {
     setSyncing(true);
     try {
       const response = await syncClosedInvoices(limit, 'new');
-      // A full scrape runs for minutes, so the API now accepts the job and
-      // returns 202 immediately rather than holding the request open until the
-      // proxy times out. Progress lives in Fetch History.
       if (response.started) {
         showSuccess('Sync started — it runs in the background. Track progress in Fetch History.');
         return;
@@ -188,9 +177,6 @@ const ClosedInvoices = () => {
     setSyncing(true);
     try {
       const response = await syncClosedInvoices(limit, 'old');
-      // A full scrape runs for minutes, so the API now accepts the job and
-      // returns 202 immediately rather than holding the request open until the
-      // proxy times out. Progress lives in Fetch History.
       if (response.started) {
         showSuccess('Sync started — it runs in the background. Track progress in Fetch History.');
         return;
@@ -416,7 +402,6 @@ const ClosedInvoices = () => {
   }
   return (
     <div className="space-y-6">
-      {}
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -566,7 +551,6 @@ const ClosedInvoices = () => {
             </div>
           )}
         </div>
-        {}
         {isAdmin && showSyncOptions && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -598,7 +582,6 @@ const ClosedInvoices = () => {
                 <Button onClick={() => setSyncLimit(500)} variant="secondary" size="sm">500</Button>
               </div>
             </div>
-            {}
             <div className="border-t border-blue-200 dark:border-blue-800 mt-4 pt-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
@@ -624,7 +607,6 @@ const ClosedInvoices = () => {
             </div>
           </div>
         )}
-        {}
         {showDeleteConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
@@ -685,8 +667,6 @@ const ClosedInvoices = () => {
           </div>
         )}
       </div>
-      {/* A sync runs server-side, so say so — otherwise the disabled buttons
-          look broken rather than intentional. */}
       {activeSync && (
         <div className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-900 dark:bg-blue-900/20 dark:text-blue-300">
           <LoadingSpinner size="sm" />
@@ -697,7 +677,6 @@ const ClosedInvoices = () => {
           </span>
         </div>
       )}
-      {}
       <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <SearchBar
@@ -755,7 +734,6 @@ const ClosedInvoices = () => {
           </div>
         </div>
       </div>
-      {}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <p className="text-sm text-slate-600 dark:text-gray-400">Total Closed</p>
@@ -776,7 +754,6 @@ const ClosedInvoices = () => {
           </p>
         </div>
       </div>
-      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         {invoices.length === 0 ? (
           <EmptyState
@@ -797,7 +774,6 @@ const ClosedInvoices = () => {
           />
         ) : (
           <>
-            {}
             {isAdmin && invoices.length > 0 && (
               <div className="border-b border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-700 px-6 py-3">
                 <div className="flex items-center justify-between">
@@ -969,7 +945,6 @@ const ClosedInvoices = () => {
                 </tbody>
               </table>
             </div>
-            {}
             <div className="border-t border-slate-200 dark:border-gray-700 p-4">
               <Pagination
                 currentPage={currentPage}
@@ -983,7 +958,6 @@ const ClosedInvoices = () => {
           </>
         )}
       </div>
-      {}
       {showBulkDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">

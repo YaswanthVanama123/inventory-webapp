@@ -118,7 +118,6 @@ function App() {
           <Router>
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
-                {}
                 <Route
                   path="/"
                   element={
@@ -127,7 +126,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/login"
                   element={
@@ -160,7 +158,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/dashboard"
                   element={
@@ -171,7 +168,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/inventory"
                   element={
@@ -272,7 +268,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/pos"
                   element={
@@ -283,7 +278,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/categories"
                   element={
@@ -294,7 +288,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/units"
                   element={
@@ -305,7 +298,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/coupons"
                   element={
@@ -316,7 +308,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/invoices"
                   element={
@@ -377,7 +368,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/routestar/model-mapping"
                   element={
@@ -388,7 +378,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/routestar/item-alias-mapping"
                   element={
@@ -399,7 +388,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/case-quantity-mapping"
                   element={
@@ -410,7 +398,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/routestar/items"
                   element={
@@ -461,7 +448,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/manual-po-items"
                   element={
@@ -472,7 +458,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/vendors"
                   element={
@@ -483,7 +468,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/routestar/sales-report"
                   element={
@@ -494,7 +478,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/routestar/items-invoice-usage"
                   element={
@@ -505,7 +488,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/approvals"
                   element={
@@ -516,7 +498,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/users"
                   element={
@@ -547,7 +528,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/admin/screen-permissions"
                   element={
@@ -558,7 +538,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/admin/screens"
                   element={
@@ -569,7 +548,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/admin/data-cleanup"
                   element={
@@ -580,7 +558,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/reports"
                   element={
@@ -621,7 +598,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/settings"
                   element={
@@ -632,7 +608,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/toast-demo"
                   element={
@@ -643,7 +618,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/error-boundary-demo"
                   element={
@@ -654,7 +628,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/trash"
                   element={
@@ -665,7 +638,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/activities"
                   element={
@@ -676,7 +648,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/system/fetch-history"
                   element={
@@ -697,7 +668,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/profile"
                   element={
@@ -708,7 +678,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/my-work"
                   element={
@@ -719,7 +688,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="/truck-checkouts"
                   element={
@@ -760,7 +728,6 @@ function App() {
                     </ErrorBoundary>
                   }
                 />
-                {}
                 <Route
                   path="*"
                   element={

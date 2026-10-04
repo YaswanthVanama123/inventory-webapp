@@ -169,7 +169,6 @@ const EmployeeWorkDashboard = () => {
   }
   return (
     <div className="p-6 space-y-6">
-      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
@@ -196,10 +195,8 @@ const EmployeeWorkDashboard = () => {
           />
         </div>
       </div>
-      {}
       {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {}
           <Card className="hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
@@ -223,7 +220,6 @@ const EmployeeWorkDashboard = () => {
               </div>
             </div>
           </Card>
-          {}
           <Card className="hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
@@ -242,7 +238,6 @@ const EmployeeWorkDashboard = () => {
               </div>
             </div>
           </Card>
-          {}
           <Card className="hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
@@ -261,7 +256,6 @@ const EmployeeWorkDashboard = () => {
               </div>
             </div>
           </Card>
-          {}
           <Card className="hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
@@ -284,9 +278,7 @@ const EmployeeWorkDashboard = () => {
           </Card>
         </div>
       )}
-      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {}
         {performance?.topItems && performance.topItems.length > 0 && (
           <Card>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
@@ -317,7 +309,6 @@ const EmployeeWorkDashboard = () => {
             </div>
           </Card>
         )}
-        {}
         <Card>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
@@ -376,7 +367,6 @@ const EmployeeWorkDashboard = () => {
           </div>
         </Card>
       </div>
-      {}
       {performance?.dailyRevenue && performance.dailyRevenue.length > 0 && (
         <Card>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">

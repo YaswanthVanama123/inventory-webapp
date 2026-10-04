@@ -26,7 +26,6 @@ const OrderDiscrepancyList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDiscrepancy, setSelectedDiscrepancy] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
-  // Ticked rows for the admin bulk-purge bar.
   const [selectedIds, setSelectedIds] = useState(new Set());
 
   const toggleSelected = (id) => {
@@ -144,7 +143,6 @@ const OrderDiscrepancyList = () => {
 
   return (
     <div className="space-y-5">
-      {}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 text-center">
@@ -166,9 +164,7 @@ const OrderDiscrepancyList = () => {
         </div>
       )}
 
-      {}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-        {}
         <div className="p-4 border-b border-slate-200">
           <div className="flex flex-col lg:flex-row gap-3">
             <div className="flex-1">
@@ -211,7 +207,6 @@ const OrderDiscrepancyList = () => {
               </button>
             )}
           </div>
-          {}
           <div className="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-slate-100">
             <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
               <input
@@ -232,7 +227,6 @@ const OrderDiscrepancyList = () => {
           </div>
         </div>
 
-        {}
         <div className="divide-y divide-slate-100">
           {discrepancies.length === 0 ? (
             <div className="p-12 text-center">
@@ -245,14 +239,12 @@ const OrderDiscrepancyList = () => {
               const isExpanded = expandedRow === discrepancy._id;
               return (
                 <div key={discrepancy._id}>
-                  {}
                   <div
                     onClick={() => setExpandedRow(isExpanded ? null : discrepancy._id)}
                     className={`flex items-center gap-4 px-6 py-4 cursor-pointer transition-colors ${
                       isExpanded ? 'bg-blue-50/50' : 'hover:bg-slate-50'
                     }`}
                   >
-                    {}
                     <input
                       type="checkbox"
                       checked={selectedIds.has(discrepancy._id)}
@@ -261,7 +253,6 @@ const OrderDiscrepancyList = () => {
                       className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
                       aria-label={`Select discrepancy for order ${discrepancy.orderNumber}`}
                     />
-                    {}
                     <div className="text-slate-400">
                       {isExpanded ? (
                         <ChevronDown className="w-5 h-5 text-blue-600" />
@@ -270,7 +261,6 @@ const OrderDiscrepancyList = () => {
                       )}
                     </div>
 
-                    {}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold text-slate-900 truncate">
@@ -292,7 +282,6 @@ const OrderDiscrepancyList = () => {
                       </div>
                     </div>
 
-                    {}
                     <div className="hidden md:flex items-center gap-4 text-sm">
                       <div className="text-center">
                         <div className="text-xs text-slate-500">Expected</div>
@@ -310,12 +299,10 @@ const OrderDiscrepancyList = () => {
                       </div>
                     </div>
 
-                    {}
                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(discrepancy.discrepancyType)}`}>
                       {discrepancy.discrepancyType}
                     </span>
 
-                    {}
                     <div onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => handleDelete(discrepancy)}
@@ -327,11 +314,9 @@ const OrderDiscrepancyList = () => {
                     </div>
                   </div>
 
-                  {}
                   {isExpanded && (
                     <div className="px-6 pb-5 bg-blue-50/30 border-t border-slate-100">
                       <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {}
                         <div className="bg-white rounded-lg border border-slate-200 p-4">
                           <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
                             <FileText className="w-4 h-4 text-slate-500" />
@@ -373,7 +358,6 @@ const OrderDiscrepancyList = () => {
                           </dl>
                         </div>
 
-                        {}
                         <div className="bg-white rounded-lg border border-slate-200 p-4">
                           <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
                             <User className="w-4 h-4 text-slate-500" />
@@ -413,7 +397,6 @@ const OrderDiscrepancyList = () => {
                           </dl>
                         </div>
 
-                        {}
                         <div className="bg-white rounded-lg border border-slate-200 p-4">
                           <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
                             <Hash className="w-4 h-4 text-slate-500" />
@@ -452,7 +435,6 @@ const OrderDiscrepancyList = () => {
           )}
         </div>
 
-        {}
         {pagination.pages > 1 && (
           <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
             <div className="text-sm text-slate-600">
@@ -479,7 +461,6 @@ const OrderDiscrepancyList = () => {
         )}
       </div>
 
-      {}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full">

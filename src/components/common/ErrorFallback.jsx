@@ -98,13 +98,11 @@ const ErrorFallback = ({
     <div
       className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm ${sizeStyles[size].container} ${className}`}
     >
-      {}
       <div className="flex justify-center mb-4">
         <div className={`${sizeStyles[size].icon} bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center`}>
           {icons[icon] || icons.alert}
         </div>
       </div>
-      {}
       <div className="text-center mb-4">
         <h3 className={`${sizeStyles[size].title} font-semibold text-gray-900 dark:text-white mb-2`}>
           {title}
@@ -113,7 +111,6 @@ const ErrorFallback = ({
           {message}
         </p>
       </div>
-      {}
       {(showReload || showRetry) && (
         <div className="flex flex-col sm:flex-row gap-2 justify-center">
           {showRetry && onRetry && (

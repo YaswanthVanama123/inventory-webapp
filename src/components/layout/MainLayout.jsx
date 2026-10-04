@@ -16,18 +16,15 @@ const MainLayout = ({ children }) => {
   }, []);
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-gray-900">
-      {}
       <MobileMenuButton
         onClick={handleToggleMobileMenu}
         isOpen={isMobileMenuOpen}
       />
-      {}
       <Sidebar
         isOpen={isMobileMenuOpen}
         onClose={handleCloseMobileMenu}
         onToggleCollapse={handleToggleSidebar}
       />
-      {}
       <div className={`transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
         <main className="pt-20 md:pt-0 p-4 md:p-6 lg:p-8">
           {children}

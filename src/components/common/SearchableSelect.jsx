@@ -100,7 +100,6 @@ const SearchableSelect = ({
   }
   return (
     <div ref={containerRef} className={`relative ${className}`}>
-      {}
       <button
         type="button"
         onClick={handleToggle}
@@ -131,10 +130,8 @@ const SearchableSelect = ({
           />
         </div>
       </button>
-      {}
       {isOpen && (
         <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-80 overflow-hidden">
-          {}
           <div className="p-2 border-b border-gray-200 dark:border-gray-700">
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -148,7 +145,6 @@ const SearchableSelect = ({
               />
             </div>
           </div>
-          {}
           <div className="overflow-y-auto max-h-64">
             {filteredOptions.length === 0 ? (
               <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">

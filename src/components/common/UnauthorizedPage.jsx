@@ -21,7 +21,6 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 text-center">
-        {}
         <div className="flex justify-center">
           <div className="rounded-full bg-red-100 dark:bg-red-900/30 p-6">
             <svg
@@ -40,7 +39,6 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
             </svg>
           </div>
         </div>
-        {}
         <div>
           <h1 className="text-6xl font-bold text-gray-900 dark:text-white">
             403
@@ -49,7 +47,6 @@ const UnauthorizedPage = ({ userRole, requiredRoles = [] }) => {
             Access Denied
           </h2>
         </div>
-        {}
         <div className="space-y-2">
           <p className="text-base text-gray-600 dark:text-gray-400">
             You don't have permission to access this page.

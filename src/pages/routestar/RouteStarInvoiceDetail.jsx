@@ -105,7 +105,6 @@ const RouteStarInvoiceDetail = () => {
   }
   return (
     <div className="space-y-6">
-      {}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -163,11 +162,8 @@ const RouteStarInvoiceDetail = () => {
           )}
         </div>
       </div>
-      {}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {}
         <div className="lg:col-span-2 space-y-6">
-          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
               Customer Information
@@ -213,7 +209,6 @@ const RouteStarInvoiceDetail = () => {
               )}
             </div>
           </div>
-          {}
           {(invoice.assignedTo || invoice.signedBy || invoice.serviceNotes || invoice.invoiceMemo || invoice.enteredBy || invoice.customerGrouping) && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -284,9 +279,7 @@ const RouteStarInvoiceDetail = () => {
             </div>
           )}
         </div>
-        {}
         <div className="space-y-6">
-          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
               Invoice Details
@@ -341,7 +334,6 @@ const RouteStarInvoiceDetail = () => {
             </div>
           </div>
 
-          {}
           {(invoice.arrivalTime || invoice.departureTime || invoice.elapsedTime) && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -381,7 +373,6 @@ const RouteStarInvoiceDetail = () => {
               </div>
             </div>
           )}
-          {}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
               Invoice Total
@@ -410,7 +401,6 @@ const RouteStarInvoiceDetail = () => {
             </div>
           </div>
 
-          {}
           {(invoice.payment || invoice.paymentMethod) && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -441,7 +431,6 @@ const RouteStarInvoiceDetail = () => {
             </div>
           )}
 
-          {}
           {(invoice.postedBy || invoice.postedTimestamp || invoice.isPosted) && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -487,7 +476,6 @@ const RouteStarInvoiceDetail = () => {
           )}
         </div>
       </div>
-      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -598,7 +586,6 @@ const RouteStarInvoiceDetail = () => {
           </div>
         )}
       </div>
-      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
           Sync Information

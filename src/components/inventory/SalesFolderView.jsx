@@ -22,7 +22,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  // Server-side pagination of the grouped sales items list.
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [totalItems, setTotalItems] = useState(0);
@@ -227,9 +226,7 @@ const SalesFolderView = ({ searchTerm = '' }) => {
   }
   return (
     <div className="space-y-3">
-      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -246,7 +243,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
             </p>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -267,7 +263,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
             </p>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -288,7 +283,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
             </p>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -310,7 +304,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
           </div>
         </div>
       </div>
-      {}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
         <p className="text-sm text-blue-800 dark:text-blue-300 flex items-start gap-2">
           <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -319,11 +312,9 @@ const SalesFolderView = ({ searchTerm = '' }) => {
           <span>Items with multiple name variations are automatically merged and displayed with their canonical names</span>
         </p>
       </div>
-      {}
       {groupedItems.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            {}
             {isAdmin && (
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -350,7 +341,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
                 )}
               </div>
             )}
-            {}
             <Button
               variant="outline"
               size="sm"
@@ -373,9 +363,7 @@ const SalesFolderView = ({ searchTerm = '' }) => {
               isSelected ? 'border-emerald-500 shadow-md' : 'border-emerald-200 hover:shadow-md'
             }`}
           >
-            {}
             <div className="flex items-center gap-4 p-4">
-              {}
               {isAdmin && (
                 <div className="flex-shrink-0">
                   <input
@@ -389,7 +377,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
                   />
                 </div>
               )}
-              {}
               <button
                 className="flex-shrink-0 p-1.5 hover:bg-emerald-200 rounded transition-colors"
                 onClick={(e) => {
@@ -403,7 +390,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
                   <ChevronRight className="w-5 h-5 text-emerald-600" />
                 )}
               </button>
-              {}
               <div
                 className="flex-shrink-0 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -412,7 +398,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
                   <ShoppingCart className="w-7 h-7 text-emerald-600" />
                 </div>
               </div>
-              {}
               <div
                 className="flex-1 min-w-0 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -442,7 +427,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
                   )}
                 </p>
               </div>
-              {}
               <div className="lg:hidden w-full mt-3 grid grid-cols-3 gap-2">
                 <div className="bg-slate-50 rounded p-2 text-center">
                   <p className="text-xs text-slate-500 font-medium">Sold</p>
@@ -457,7 +441,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
                   <p className="text-sm font-bold text-green-700">{formatCurrency(group.totalValue)}</p>
                 </div>
               </div>
-              {}
               <div
                 className="hidden lg:flex items-center gap-6 mr-2 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -482,7 +465,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
                 </div>
               </div>
             </div>
-            {}
             {isExpanded && (
               <div className="border-t border-emerald-200 bg-emerald-50">
                 {loadingInvoices[group.sku] ? (
@@ -610,7 +592,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
           </div>
         );
       })}
-      {}
       {filteredItems.length === 0 && searchTerm && (
         <div className="bg-white rounded-lg shadow-sm p-8 text-center border border-slate-200">
           <ShoppingCart className="w-16 h-16 mx-auto text-slate-300 mb-4" />
@@ -620,7 +601,6 @@ const SalesFolderView = ({ searchTerm = '' }) => {
           </p>
         </div>
       )}
-      {}
       <Modal
         isOpen={deleteModalOpen}
         onClose={() => {

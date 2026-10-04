@@ -180,7 +180,6 @@ const InvoiceDetail = () => {
   }
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 print:hidden">
         <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-4 max-w-7xl">
           <div className="flex items-center justify-between flex-wrap gap-2 sm:gap-4">
@@ -277,10 +276,8 @@ const InvoiceDetail = () => {
           </div>
         </div>
       </div>
-      {}
       <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-7xl">
         <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg print:shadow-none print:rounded-none">
-          {}
           <div className="border-b border-gray-200 dark:border-gray-700 p-3 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               <div>
@@ -331,7 +328,6 @@ const InvoiceDetail = () => {
               </div>
             </div>
           </div>
-          {}
           <div className="border-b border-gray-200 dark:border-gray-700 p-3 sm:p-6">
             <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
               Bill To
@@ -357,7 +353,6 @@ const InvoiceDetail = () => {
               )}
             </div>
           </div>
-          {}
           <div className="p-3 sm:p-6">
             <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
               Invoice Items
@@ -423,7 +418,6 @@ const InvoiceDetail = () => {
               </table>
             </div>
           </div>
-          {}
           <div className="border-t border-gray-200 dark:border-gray-700 p-3 sm:p-6">
             <div className="flex justify-end">
               <div className="w-full space-y-2">
@@ -476,7 +470,6 @@ const InvoiceDetail = () => {
               </div>
             </div>
           </div>
-          {}
           {invoice.notes && (
             <div className="border-t border-gray-200 dark:border-gray-700 p-3 sm:p-6">
               <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
@@ -487,7 +480,6 @@ const InvoiceDetail = () => {
               </p>
             </div>
           )}
-          {}
           {invoice.paymentHistory && invoice.paymentHistory.length > 0 && (
             <div className="border-t border-gray-200 dark:border-gray-700 p-3 sm:p-6 print:hidden">
               <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
@@ -526,7 +518,6 @@ const InvoiceDetail = () => {
               </div>
             </div>
           )}
-          {}
           {invoice.qrCode && (
             <div className="border-t border-gray-200 dark:border-gray-700 p-6 sm:p-8 flex justify-center">
               <div className="text-center">
@@ -541,7 +532,6 @@ const InvoiceDetail = () => {
               </div>
             </div>
           )}
-          {}
           <div className="border-t border-gray-200 dark:border-gray-700 p-6 sm:p-8 bg-gray-50 dark:bg-gray-900/50">
             <div className="text-center text-sm text-gray-600 dark:text-gray-400">
               {invoice.footer || (
@@ -556,7 +546,6 @@ const InvoiceDetail = () => {
           </div>
         </div>
       </div>
-      {}
       <Modal
         isOpen={showMarkAsPaidModal}
         onClose={() => !actionLoading && setShowMarkAsPaidModal(false)}
@@ -596,7 +585,6 @@ const InvoiceDetail = () => {
           </div>
         )}
       </Modal>
-      {}
       <Modal
         isOpen={showCancelModal}
         onClose={() => !actionLoading && setShowCancelModal(false)}
@@ -658,7 +646,6 @@ const InvoiceDetail = () => {
           )}
         </div>
       </Modal>
-      {}
       <style jsx>{`
         @media print {
           body {

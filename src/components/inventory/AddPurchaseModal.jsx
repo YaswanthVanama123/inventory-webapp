@@ -175,7 +175,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
             </div>
           </div>
         </div>
-        {}
         <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
           <div className="flex items-center gap-2 mb-3">
             <DollarSign className="w-5 h-5 text-blue-600" />
@@ -196,7 +195,6 @@ const AddPurchaseModal = ({ isOpen, onClose, inventoryItem, onSuccess }) => {
               step="0.01"
               helperText="Enter the price at which you'll sell this item"
             />
-            {}
             {formData.sellingPrice && formData.purchasePrice && (
               <div className="flex items-end">
                 <div className="w-full p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">

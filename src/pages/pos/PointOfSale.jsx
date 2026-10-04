@@ -428,7 +428,6 @@ const PointOfSale = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-6 lg:px-8 py-8 max-w-[1800px]">
-        {}
         <div className="mb-6 md:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -465,10 +464,8 @@ const PointOfSale = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-8">
-          {}
           <div className="lg:col-span-7">
             <Card padding="lg" className="h-full shadow-sm border border-slate-200 dark:border-gray-700">
-              {}
               <div className="mb-6 space-y-4">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
@@ -509,7 +506,6 @@ const PointOfSale = () => {
                     </button>
                   </div>
                 </div>
-                {}
                 {(searchTerm || selectedCategory) && (
                   <div className="flex items-center gap-3 flex-wrap bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-750 p-5 rounded-xl border-2 border-blue-200 dark:border-gray-700 shadow-sm">
                     <span className="text-sm font-bold text-slate-700 dark:text-gray-300 flex items-center gap-2">
@@ -546,7 +542,6 @@ const PointOfSale = () => {
                   </div>
                 )}
               </div>
-              {}
               <div className={`max-h-[600px] overflow-y-auto ${
                 viewMode === 'grid'
                   ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3'
@@ -660,7 +655,6 @@ const PointOfSale = () => {
               </div>
             </Card>
           </div>
-          {}
           <div className="lg:col-span-3">
             <Card padding="lg" className="sticky top-4 shadow-sm border border-slate-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200 dark:border-gray-700">
@@ -687,7 +681,6 @@ const PointOfSale = () => {
                   </div>
                 )}
               </div>
-              {}
               <div className="space-y-2 mb-4 max-h-[350px] overflow-y-auto">
                 {cart.length > 0 ? (
                   cart.map((item) => (
@@ -758,7 +751,6 @@ const PointOfSale = () => {
                   </div>
                 )}
               </div>
-              {}
               {cart.length > 0 && (
                 <>
                   <div className="border-t border-slate-200 dark:border-gray-700 pt-3 space-y-2 bg-slate-50 dark:bg-gray-800 p-3 rounded-lg">
@@ -793,7 +785,6 @@ const PointOfSale = () => {
             </Card>
           </div>
         </div>
-        {}
         <Modal
           isOpen={showCheckoutModal}
           onClose={() => !processingCheckout && setShowCheckoutModal(false)}
@@ -801,7 +792,6 @@ const PointOfSale = () => {
           size="lg"
         >
           <div className="space-y-6">
-            {}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
               <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                 <User className="w-5 h-5 text-blue-600" />
@@ -851,13 +841,11 @@ const PointOfSale = () => {
                 />
               </div>
             </div>
-            {}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
               <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                 <Tag className="w-5 h-5 text-blue-600" />
                 Coupon & Discount (Optional)
               </h3>
-              {}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Apply Coupon Code
@@ -901,7 +889,6 @@ const PointOfSale = () => {
                   </div>
                 )}
               </div>
-              {}
               {!appliedCoupon && (
                 <>
                   <div className="relative mb-4">
@@ -937,7 +924,6 @@ const PointOfSale = () => {
                 </>
               )}
             </div>
-            {}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
               <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                 <CreditCard className="w-5 h-5 text-blue-600" />
@@ -954,7 +940,6 @@ const PointOfSale = () => {
                 <option value="other">Other</option>
               </Select>
             </div>
-            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Notes (Optional)
@@ -967,7 +952,6 @@ const PointOfSale = () => {
                 rows={3}
               />
             </div>
-            {}
             <div className="bg-slate-50 dark:from-gray-800 dark:to-gray-700 p-5 rounded-lg border border-slate-200 dark:border-gray-600">
               <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                 <DollarSign className="w-5 h-5 text-blue-600" />
@@ -997,7 +981,6 @@ const PointOfSale = () => {
                 </div>
               </div>
             </div>
-            {}
             <div className="flex gap-4 pt-4 border-t border-slate-200 dark:border-gray-700">
               <Button
                 variant="outline"
@@ -1018,7 +1001,6 @@ const PointOfSale = () => {
             </div>
           </div>
         </Modal>
-        {}
         <Modal
           isOpen={showSavedCarts}
           onClose={() => setShowSavedCarts(false)}
@@ -1064,7 +1046,6 @@ const PointOfSale = () => {
             )}
           </div>
         </Modal>
-        {}
         <Modal
           isOpen={showPurchaseModal}
           onClose={closePurchaseModal}
@@ -1073,7 +1054,6 @@ const PointOfSale = () => {
         >
           {selectedProduct && (
             <div className="space-y-4">
-              {}
               <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
                 <img
                   src={getImageUrl(selectedProduct.image)}
@@ -1089,7 +1069,6 @@ const PointOfSale = () => {
                   <p className="text-2xl font-bold text-blue-600">{getTotalAllocatedQuantity()}</p>
                 </div>
               </div>
-              {}
               {loadingPurchases ? (
                 <div className="text-center py-8 bg-slate-50 rounded-lg">
                   <LoadingSpinner size="md" />
@@ -1097,12 +1076,10 @@ const PointOfSale = () => {
                 </div>
               ) : productPurchases.length > 0 ? (
                 <>
-                  {}
                   <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <Layers className="w-4 h-4 text-blue-600 flex-shrink-0" />
                     <p className="text-xs text-blue-700">Check boxes to select purchase batches, then enter quantity. Mix multiple batches for FIFO management.</p>
                   </div>
-                  {}
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {productPurchases.map((purchase, index) => {
                       const allocation = purchaseAllocations[purchase._id] || {};
@@ -1124,7 +1101,6 @@ const PointOfSale = () => {
                           }`}
                         >
                           <div className="flex items-center gap-3">
-                            {}
                             <button
                               onClick={() => togglePurchaseSelection(purchase._id)}
                               className="flex-shrink-0"
@@ -1135,7 +1111,6 @@ const PointOfSale = () => {
                                 <Square className="w-5 h-5 text-slate-400" />
                               )}
                             </button>
-                            {}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1.5">
                                 <span className="text-xs text-slate-500">
@@ -1167,7 +1142,6 @@ const PointOfSale = () => {
                                 </div>
                               </div>
                             </div>
-                            {}
                             <div className="flex-shrink-0">
                               <div className="flex items-center gap-1 bg-white rounded-md border border-slate-300 p-1">
                                 <button
@@ -1200,7 +1174,6 @@ const PointOfSale = () => {
                               </p>
                             </div>
                           </div>
-                          {}
                           {allocation.selected && (
                             <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-slate-200">
                               <span className="text-xs text-slate-600 font-medium">Quick:</span>
@@ -1234,9 +1207,7 @@ const PointOfSale = () => {
                       );
                     })}
                   </div>
-                  {}
                   <div className="space-y-3">
-                    {}
                     <div className="flex items-center gap-3 p-3 bg-white rounded-lg border-2 border-blue-200">
                       <div className="flex-1">
                         <label className="block text-xs text-slate-600 font-medium mb-1">Selling Price (per unit)</label>
@@ -1260,7 +1231,6 @@ const PointOfSale = () => {
                         </p>
                       </div>
                     </div>
-                    {}
                     <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
                       <div>
                         <p className="text-xs text-slate-500">Total Quantity</p>

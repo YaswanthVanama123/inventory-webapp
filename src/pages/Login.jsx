@@ -97,7 +97,6 @@ const Login = () => {
   }
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
-      {/* Left info panel — visible on medium and larger viewports */}
       <div className="hidden md:flex md:w-1/2 lg:w-3/5 flex-col justify-between p-10 lg:p-16 bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white relative overflow-hidden">
         <div className="absolute -top-28 -right-24 w-96 h-96 rounded-full bg-white/10"></div>
         <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-white/10"></div>
@@ -141,17 +140,12 @@ const Login = () => {
           © {new Date().getFullYear()} Inventory Management System
         </p>
       </div>
-      {/* Right form panel */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 relative">
-      {}
       <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] opacity-20"></div>
       <div className="max-w-md w-full space-y-6 relative z-10">
-        {}
         <div className="bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
-          {}
           <div className="h-2 bg-gradient-to-r from-blue-600 to-blue-500"></div>
           <div className="p-8 sm:p-10">
-            {}
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-blue-600 mb-4 shadow-lg">
                 <svg
@@ -175,7 +169,6 @@ const Login = () => {
               Sign in to access your dashboard
             </p>
           </div>
-          {}
           <div className="flex rounded-lg bg-slate-100 p-1 mb-6">
             <button
               type="button"
@@ -238,7 +231,6 @@ const Login = () => {
               </div>
             </button>
           </div>
-          {}
           {error && (
             <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200">
               <div className="flex items-center">
@@ -257,9 +249,7 @@ const Login = () => {
               </div>
             </div>
           )}
-          {}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {}
             <div>
               <label
                 htmlFor="username"
@@ -304,7 +294,6 @@ const Login = () => {
                 <p className="mt-1 text-sm text-red-600">{fieldErrors.username}</p>
               )}
             </div>
-            {}
             <div>
               <label
                 htmlFor="password"
@@ -381,7 +370,6 @@ const Login = () => {
                 <p className="mt-1 text-sm text-red-600">{fieldErrors.password}</p>
               )}
             </div>
-            {}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input
@@ -409,7 +397,6 @@ const Login = () => {
                 </a>
               </div>
             </div>
-            {}
             <div>
               <button
                 type="submit"
@@ -461,7 +448,6 @@ const Login = () => {
               </button>
             </div>
           </form>
-          {}
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-600">
               Don't have an account?{' '}

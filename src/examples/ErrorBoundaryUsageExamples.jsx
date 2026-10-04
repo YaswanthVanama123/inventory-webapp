@@ -39,7 +39,6 @@ export const DashboardWithMultipleErrorBoundaries = () => {
   return (
     <div className="container">
       <h1>Dashboard</h1>
-      {}
       <ErrorBoundary
         errorMessage="Unable to load statistics"
         fallback={
@@ -52,7 +51,6 @@ export const DashboardWithMultipleErrorBoundaries = () => {
       >
         <StatsSection />
       </ErrorBoundary>
-      {}
       <ErrorBoundary
         errorMessage="Unable to load recent activity"
         fallback={
@@ -65,7 +63,6 @@ export const DashboardWithMultipleErrorBoundaries = () => {
       >
         <RecentActivitySection />
       </ErrorBoundary>
-      {}
       <ErrorBoundary
         errorMessage="Unable to load charts"
         fallback={
@@ -102,19 +99,15 @@ export const NestedErrorBoundaries = () => {
     <div className="container">
       <h1>Complex Page Layout</h1>
       <div className="grid grid-cols-2 gap-4">
-        {}
         <div>
           <ErrorBoundary>
             <Sidebar />
           </ErrorBoundary>
         </div>
-        {}
         <div>
-          {}
           <ErrorBoundary>
             <MainContent />
           </ErrorBoundary>
-          {}
           <ErrorBoundary
             fallback={
               <ErrorFallback
@@ -135,7 +128,6 @@ export const ConditionalErrorBoundary = ({ isComplexView }) => {
   return (
     <div className="container">
       <h1>Dynamic View</h1>
-      {}
       {isComplexView ? (
         <ErrorBoundary>
           <ComplexView />

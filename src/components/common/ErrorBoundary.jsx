@@ -53,7 +53,6 @@ class ErrorBoundary extends React.Component {
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4">
           <div className="w-full max-w-2xl">
             <Card padding="lg">
-              {}
               <div className="flex justify-center mb-6">
                 <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
                   <svg
@@ -72,7 +71,6 @@ class ErrorBoundary extends React.Component {
                   </svg>
                 </div>
               </div>
-              {}
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                   Oops! Something went wrong
@@ -82,20 +80,17 @@ class ErrorBoundary extends React.Component {
                     "We're sorry, but something unexpected happened. Please try reloading the page."}
                 </p>
               </div>
-              {}
               {process.env.NODE_ENV === 'development' && this.state.error && (
                 <div className="mb-6">
                   <details className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
                     <summary className="cursor-pointer font-semibold text-red-900 dark:text-red-300 mb-2">
                       Error Details (Development Mode)
                     </summary>
-                    {}
                     <div className="mb-4">
                       <p className="font-mono text-sm text-red-800 dark:text-red-400 font-semibold">
                         {this.state.error.name}: {this.state.error.message}
                       </p>
                     </div>
-                    {}
                     {this.state.error.stack && (
                       <div className="mb-4">
                         <h4 className="font-semibold text-sm text-red-900 dark:text-red-300 mb-2">
@@ -106,7 +101,6 @@ class ErrorBoundary extends React.Component {
                         </pre>
                       </div>
                     )}
-                    {}
                     {this.state.errorInfo && this.state.errorInfo.componentStack && (
                       <div>
                         <h4 className="font-semibold text-sm text-red-900 dark:text-red-300 mb-2">
@@ -120,7 +114,6 @@ class ErrorBoundary extends React.Component {
                   </details>
                 </div>
               )}
-              {}
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button
                   variant="primary"
@@ -179,7 +172,6 @@ class ErrorBoundary extends React.Component {
                   </Button>
                 )}
               </div>
-              {}
               {process.env.NODE_ENV === 'development' && this.state.errorCount > 1 && (
                 <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
                   Error occurred {this.state.errorCount} times

@@ -20,7 +20,6 @@ const Approvals = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(15);
 
-  // Client-side numbered pagination over the active tab's pending list.
   const activeList =
     activeTab === 'invoices' ? pendingInvoices : pendingPurchaseDeletions;
   const totalPages = Math.max(1, Math.ceil(activeList.length / itemsPerPage));
@@ -29,8 +28,6 @@ const Approvals = () => {
     currentPage * itemsPerPage
   );
 
-  // Switching tab / page size starts over; approving can shrink the list past
-  // the current page, so clamp back onto a valid one.
   useEffect(() => {
     setCurrentPage(1);
   }, [activeTab, itemsPerPage]);
@@ -135,7 +132,6 @@ const Approvals = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 max-w-[1800px]">
-        {}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4">
             <div>
@@ -157,7 +153,6 @@ const Approvals = () => {
             </div>
           </div>
         </div>
-        {}
         <div className="mb-4 sm:mb-6">
           <div className="border-b border-slate-200 dark:border-gray-700">
             <nav className="-mb-px flex space-x-4 sm:space-x-8 overflow-x-auto">
@@ -206,7 +201,6 @@ const Approvals = () => {
             </nav>
           </div>
         </div>
-        {}
         {activeTab === 'invoices' && (
           <>
             {pendingInvoices.length === 0 ? (
@@ -229,7 +223,6 @@ const Approvals = () => {
                     className="shadow-sm border border-slate-200 dark:border-gray-700 transition-all bg-white dark:from-gray-800 dark:to-gray-700"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
-                      {}
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-3 sm:mb-4 gap-3">
                           <div className="flex-1 min-w-0">
@@ -263,7 +256,6 @@ const Approvals = () => {
                             </div>
                           </div>
                         </div>
-                        {}
                         <div className="bg-blue-50 dark:bg-gray-750 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-blue-200 dark:border-blue-800">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
                             <div className="min-w-0">
@@ -287,7 +279,6 @@ const Approvals = () => {
                           </div>
                         </div>
                       </div>
-                      {}
                       <div className="flex flex-col sm:flex-row lg:flex-col gap-2 sm:gap-3 lg:min-w-[180px]">
                         <Button
                           onClick={() => handleView(invoice._id)}
@@ -337,7 +328,6 @@ const Approvals = () => {
             )}
           </>
         )}
-        {}
         {activeTab === 'purchase-deletions' && (
           <>
             {pendingPurchaseDeletions.length === 0 ? (
@@ -360,7 +350,6 @@ const Approvals = () => {
                     className="shadow-sm border border-slate-200 dark:border-gray-700 transition-all bg-white dark:from-gray-800 dark:to-gray-700"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
-                      {}
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-3 sm:mb-4 gap-3">
                           <div className="flex-1 min-w-0">
@@ -395,7 +384,6 @@ const Approvals = () => {
                             </div>
                           </div>
                         </div>
-                        {}
                         <div className="bg-orange-50 dark:bg-gray-750 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-orange-200 dark:border-orange-800">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
                             <div>
@@ -425,7 +413,6 @@ const Approvals = () => {
                           </div>
                         </div>
                       </div>
-                      {}
                       <div className="flex flex-col sm:flex-row lg:flex-col gap-2 sm:gap-3 lg:min-w-[180px]">
                         <Button
                           onClick={() => handleApprovePurchaseDeletion(purchase._id)}

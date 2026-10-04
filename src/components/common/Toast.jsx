@@ -92,7 +92,6 @@ const Toast = ({ message, type = 'info', onClose }) => {
       `}
       role="alert"
     >
-      {}
       <div className={`flex-shrink-0 ${styles.icon}`}>
         <svg
           className="w-6 h-6"
@@ -103,11 +102,9 @@ const Toast = ({ message, type = 'info', onClose }) => {
           {styles.iconPath}
         </svg>
       </div>
-      {}
       <div className={`flex-1 ${styles.text} text-sm font-medium`}>
         {message}
       </div>
-      {}
       <button
         onClick={handleClose}
         className={`

@@ -8,24 +8,10 @@ import Input from './Input';
 import Modal from './Modal';
 import { TrashIcon } from '@heroicons/react/24/solid';
 
-/**
- * Admin-only bulk purge controls for a list screen.
- *
- * Renders "Delete Selected" (the rows the user ticked) and "Delete All" (every
- * record of this data type). Both are permanent — there is no trash and no
- * restore — so "Delete All" is gated behind typing the confirm phrase.
- *
- * Renders nothing for non-admins.
- *
- * @param type      purge type key, e.g. 'truck-checkouts' (see dataPurge.service)
- * @param label     human name used in the confirmation copy
- * @param selectedIds ids of the currently ticked rows
- * @param onDone    called after a successful purge so the list can refetch
- */
 const BulkPurgeBar = ({ type, label, selectedIds = [], onDone, className = '' }) => {
   const { showSuccess, showError } = useContext(ToastContext);
   const { isAdmin } = useContext(AuthContext);
-  const [confirmMode, setConfirmMode] = useState(null); // 'selected' | 'all'
+  const [confirmMode, setConfirmMode] = useState(null);
   const [confirmText, setConfirmText] = useState('');
   const [purging, setPurging] = useState(false);
 
@@ -55,8 +41,6 @@ const BulkPurgeBar = ({ type, label, selectedIds = [], onDone, className = '' })
     }
   };
 
-  // Deleting a handful of ticked rows is a normal action; wiping the whole
-  // collection is not, so only that one demands the typed phrase.
   const needsPhrase = confirmMode === 'all';
   const canConfirm = !purging && (!needsPhrase || confirmText === PURGE_CONFIRM_PHRASE);
 

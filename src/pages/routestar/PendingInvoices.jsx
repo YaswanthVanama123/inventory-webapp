@@ -323,7 +323,6 @@ const PendingInvoices = () => {
   }
   return (
     <div className="space-y-6">
-      {}
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -482,7 +481,6 @@ const PendingInvoices = () => {
             </div>
           )}
         </div>
-        {}
         {isAdmin && showSyncOptions && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -514,7 +512,6 @@ const PendingInvoices = () => {
                 <Button onClick={() => setSyncLimit(500)} variant="secondary" size="sm">500</Button>
               </div>
             </div>
-            {}
             <div className="border-t border-blue-200 dark:border-blue-800 mt-4 pt-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
@@ -549,7 +546,6 @@ const PendingInvoices = () => {
             </div>
           </div>
         )}
-        {}
         {showDeleteConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
@@ -626,7 +622,6 @@ const PendingInvoices = () => {
           </div>
         )}
       </div>
-      {}
       <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <SearchBar
@@ -684,7 +679,6 @@ const PendingInvoices = () => {
           </div>
         </div>
       </div>
-      {}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <p className="text-sm text-slate-600 dark:text-gray-400">Total Pending</p>
@@ -705,7 +699,6 @@ const PendingInvoices = () => {
           </p>
         </div>
       </div>
-      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         {invoices.length === 0 ? (
           <EmptyState
@@ -839,7 +832,6 @@ const PendingInvoices = () => {
                 </tbody>
               </table>
             </div>
-            {}
             <div className="border-t border-slate-200 dark:border-gray-700 p-4">
               <Pagination
                 currentPage={currentPage}

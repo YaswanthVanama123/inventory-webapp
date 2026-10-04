@@ -350,7 +350,6 @@ const TruckCheckoutDetail = () => {
   const canProcessStock = hasTally && !checkout.stockProcessed;
   return (
     <div className="space-y-5 max-w-7xl mx-auto">
-      {}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <button
           onClick={() => navigate('/truck-checkouts')}
@@ -381,7 +380,6 @@ const TruckCheckoutDetail = () => {
         </div>
       </div>
 
-      {}
       {checkout.status === 'checked_out' && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
           <div className="flex items-center gap-3 flex-wrap">
@@ -480,9 +478,7 @@ const TruckCheckoutDetail = () => {
         </div>
       )}
 
-      {}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
           <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
             <UserIcon className="w-4 h-4 text-slate-500" />
@@ -522,7 +518,6 @@ const TruckCheckoutDetail = () => {
           )}
         </div>
 
-        {}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
           <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
             <DocumentTextIcon className="w-4 h-4 text-slate-500" />
@@ -557,7 +552,6 @@ const TruckCheckoutDetail = () => {
         </div>
       </div>
 
-      {}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200">
         <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
@@ -597,7 +591,6 @@ const TruckCheckoutDetail = () => {
           )}
         </div>
       </div>
-      {}
       {hasTally && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200">
           <div className="px-5 py-4 border-b border-slate-200">
@@ -606,7 +599,6 @@ const TruckCheckoutDetail = () => {
               Tally Results
             </h3>
           </div>
-          {}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-5">
             <div className="bg-blue-50 rounded-lg p-3 text-center">
               <p className="text-xs font-medium text-blue-600 uppercase tracking-wide">Taken</p>
@@ -634,7 +626,6 @@ const TruckCheckoutDetail = () => {
               </p>
             </div>
           </div>
-          {}
           {checkout.tallyResults.discrepancies && checkout.tallyResults.discrepancies.length > 0 && (
             <div className="border-t border-slate-200">
               <div className="px-5 py-3 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wide">
@@ -681,7 +672,6 @@ const TruckCheckoutDetail = () => {
           )}
         </div>
       )}
-      {}
       <Modal
         isOpen={showCompleteModal}
         onClose={() => {
@@ -732,14 +722,12 @@ const TruckCheckoutDetail = () => {
         }
       >
         <div className="space-y-4">
-          {}
           {!checkWorkDone && (
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Invoice Numbers
                 </label>
-                {}
                 <div className="min-h-[120px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
                   <div className="flex flex-wrap gap-2 mb-2">
                     {invoiceNumbers.map((invoice, index) => (
@@ -789,13 +777,11 @@ const TruckCheckoutDetail = () => {
               </Alert>
             </>
           )}
-          {}
           {checkWorkDone && comparisonData && (
             <>
               <Alert variant="success" title="Invoices Fetched">
                 {comparisonData.summary.fetchedInvoices} of {comparisonData.summary.totalInvoices} invoices fetched successfully. Review the comparison below.
               </Alert>
-              {}
               <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                 <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Item Comparison</h3>
@@ -849,7 +835,6 @@ const TruckCheckoutDetail = () => {
           )}
         </div>
       </Modal>
-      {}
       <Modal
         isOpen={showCancelModal}
         onClose={() => !actionLoading && setShowCancelModal(false)}
@@ -890,7 +875,6 @@ const TruckCheckoutDetail = () => {
           </div>
         </div>
       </Modal>
-      {}
       <Modal
         isOpen={showDeleteModal}
         onClose={() => !actionLoading && setShowDeleteModal(false)}
@@ -918,7 +902,6 @@ const TruckCheckoutDetail = () => {
           This will permanently delete this checkout. This action cannot be undone!
         </Alert>
       </Modal>
-      {}
       <Modal
         isOpen={showAddInvoicesModal}
         onClose={() => {
@@ -969,7 +952,6 @@ const TruckCheckoutDetail = () => {
         }
       >
         <div className="space-y-4">
-          {}
           {!additionalCheckWorkDone && (
             <>
               <Alert variant="info" title="Current Invoices">
@@ -979,7 +961,6 @@ const TruckCheckoutDetail = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Additional Invoice Numbers
                 </label>
-                {}
                 <div className="min-h-[120px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
                   <div className="flex flex-wrap gap-2 mb-2">
                     {additionalInvoices.map((invoice, index) => (
@@ -1029,13 +1010,11 @@ const TruckCheckoutDetail = () => {
               </Alert>
             </>
           )}
-          {}
           {additionalCheckWorkDone && additionalComparisonData && (
             <>
               <Alert variant="success" title="Invoices Fetched">
                 Total of {additionalComparisonData.summary.totalInvoices} invoices ({checkout.invoiceNumbers?.length || 0} existing + {additionalInvoices.length} new). Review the updated comparison below.
               </Alert>
-              {}
               <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                 <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Updated Item Comparison</h3>

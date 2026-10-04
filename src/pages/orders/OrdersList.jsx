@@ -23,8 +23,6 @@ const OrdersList = () => {
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  // Full-page spinner only until the first load finishes; searches and
-  // filters then refresh just the list (keeps the search box focused).
   const [hasLoaded, setHasLoaded] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncingNew, setSyncingNew] = useState(false);
@@ -479,7 +477,6 @@ const OrdersList = () => {
   }
   return (
     <div className="space-y-6 px-4 sm:px-6 pb-6">
-      {}
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -601,7 +598,6 @@ const OrdersList = () => {
             </div>
           )}
         </div>
-        {}
         {isAdmin && showSyncOptions && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -664,7 +660,6 @@ const OrdersList = () => {
                 </Button>
               </div>
             </div>
-            {}
             <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
               <div className="flex flex-col gap-4">
                 <div>
@@ -721,7 +716,6 @@ const OrdersList = () => {
                 </div>
               </div>
             </div>
-            {}
             <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
               <div className="flex items-center justify-between">
                 <div>
@@ -748,9 +742,7 @@ const OrdersList = () => {
           </div>
         )}
       </div>
-      {}
       <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-4">
-        {}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           <div className="lg:col-span-2">
             <SearchBar
@@ -802,7 +794,6 @@ const OrdersList = () => {
             <option value="false">Not Verified</option>
           </Select>
         </div>
-        {}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1">
@@ -837,7 +828,6 @@ const OrdersList = () => {
           </div>
         </div>
       </div>
-      {}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <p className="text-sm text-slate-600 dark:text-gray-400">Total Orders</p>
@@ -858,7 +848,6 @@ const OrdersList = () => {
           </p>
         </div>
       </div>
-      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         {orders.length === 0 ? (
           <EmptyState
@@ -879,7 +868,6 @@ const OrdersList = () => {
           />
         ) : (
           <>
-            {}
             {isAdmin && orders.length > 0 && (
               <div className="border-b border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-700 px-6 py-3">
                 <div className="flex items-center justify-between">
@@ -1052,7 +1040,6 @@ const OrdersList = () => {
                 </tbody>
               </table>
             </div>
-            {}
             <div className="border-t border-slate-200 dark:border-gray-700 p-4">
               <Pagination
                 currentPage={currentPage}
@@ -1066,7 +1053,6 @@ const OrdersList = () => {
           </>
         )}
       </div>
-      {}
       <Modal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -1131,7 +1117,6 @@ const OrdersList = () => {
           </div>
         </div>
       </Modal>
-      {}
       <Modal
         isOpen={showBulkDeleteModal}
         onClose={() => {
@@ -1214,7 +1199,6 @@ const OrdersList = () => {
           </div>
         </div>
       </Modal>
-      {}
       <Modal
         isOpen={showVerifyModal}
         onClose={() => !submittingVerification && setShowVerifyModal(false)}
@@ -1223,7 +1207,6 @@ const OrdersList = () => {
       >
         {verifyingOrder && (
           <div className="space-y-4">
-            {}
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
               <div className="grid grid-cols-3 gap-4">
                 <div>
@@ -1252,13 +1235,11 @@ const OrdersList = () => {
                 </div>
               </div>
             </div>
-            {}
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
               <p className="text-xs text-gray-700 dark:text-gray-300">
                 <strong>Instructions:</strong> Enter the quantity being received now for each item. Previously received quantities are shown. If all remaining items are being received, click "All Good". Otherwise, adjust quantities and submit.
               </p>
             </div>
-            {}
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
               <div className="max-h-96 overflow-y-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -1359,7 +1340,6 @@ const OrdersList = () => {
                 </table>
               </div>
             </div>
-            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Notes (Optional)
@@ -1372,7 +1352,6 @@ const OrdersList = () => {
                 placeholder="Add any notes about this order verification..."
               />
             </div>
-            {}
             {hasDiscrepancies && (
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
                 <p className="text-xs text-blue-800 dark:text-blue-200">
@@ -1380,7 +1359,6 @@ const OrdersList = () => {
                 </p>
               </div>
             )}
-            {}
             <div className="flex justify-end gap-3 pt-2">
               <Button
                 variant="ghost"

@@ -54,7 +54,6 @@ const ScreenManagement = () => {
     'Other'
   ];
 
-  // Server-side pagination — both the text search and category facet run on the backend.
   const {
     items: screens,
     page,
@@ -177,8 +176,6 @@ const ScreenManagement = () => {
     }
   };
 
-  // Text search runs on the backend; only the category facet is applied here.
-  // The current 20-row page comes straight from the backend (search + category applied there).
   const filteredScreens = screens;
 
   if (!isAdmin) {
@@ -197,7 +194,6 @@ const ScreenManagement = () => {
 
   return (
     <div className="space-y-6">
-      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -226,7 +222,6 @@ const ScreenManagement = () => {
         </div>
       </div>
 
-      {}
       <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <SearchBar
@@ -246,7 +241,6 @@ const ScreenManagement = () => {
         </div>
       </div>
 
-      {}
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
           <LoadingSpinner size="lg" text="Loading screens..." className="mx-auto" />
@@ -364,7 +358,6 @@ const ScreenManagement = () => {
         </div>
       )}
 
-      {}
       <Modal
         isOpen={showAddEditModal}
         onClose={() => !modalLoading && setShowAddEditModal(false)}
@@ -523,7 +516,6 @@ const ScreenManagement = () => {
         </form>
       </Modal>
 
-      {}
       <Modal
         isOpen={showDeleteModal}
         onClose={() => !modalLoading && setShowDeleteModal(false)}

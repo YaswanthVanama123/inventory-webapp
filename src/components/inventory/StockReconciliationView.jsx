@@ -108,7 +108,6 @@ const StockReconciliationView = () => {
   }
   return (
     <div className="space-y-4">
-      {}
       {summary && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
@@ -149,10 +148,8 @@ const StockReconciliationView = () => {
           </div>
         </div>
       )}
-      {}
       <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          {}
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setFilter('all')}
@@ -195,7 +192,6 @@ const StockReconciliationView = () => {
               Oversold ({summary?.oversold || 0})
             </button>
           </div>
-          {}
           <Button
             variant="outline"
             size="sm"
@@ -207,7 +203,6 @@ const StockReconciliationView = () => {
           </Button>
         </div>
       </div>
-      {}
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full">

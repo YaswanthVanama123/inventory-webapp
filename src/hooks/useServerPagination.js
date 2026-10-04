@@ -1,21 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-/**
- * Server-side pagination. Calls `fetchPage({ page, limit })` (which should hit
- * the backend with those query params) and exposes the returned slice plus
- * `total`/`totalPages` for the shared <Pagination /> component.
- *
- * `fetchPage` must resolve to `{ items, total, pages, extra? }`:
- *   - items: the current page rows
- *   - total: full filtered count (for the result-count label)
- *   - pages: total page count
- *   - extra: optional side payload (e.g. aggregate totals/stats) surfaced as `extra`
- *
- * @param {(args:{page:number,limit:number}) => Promise<object>} fetchPage
- * @param {object} [opts]
- * @param {number} [opts.pageSize=20]
- * @param {*} [opts.resetKey] change this (search text / tab) to jump back to page 1
- */
 export default function useServerPagination(fetchPage, { pageSize = 20, resetKey } = {}) {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(pageSize);
@@ -26,19 +10,13 @@ export default function useServerPagination(fetchPage, { pageSize = 20, resetKey
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [reloadFlag, setReloadFlag] = useState(0);
-  // True only until the FIRST fetch completes. Pages should gate their
-  // full-page spinner on this - NOT on `loading` - so search / tab / page
-  // refetches only refresh the table and keep the search box mounted.
   const [hasLoaded, setHasLoaded] = useState(false);
 
-  // Keep the latest fetcher without making it a fetch trigger.
   const fetchRef = useRef(fetchPage);
   fetchRef.current = fetchPage;
 
   const refetch = useCallback(() => setReloadFlag((f) => f + 1), []);
 
-  // Jump back to the first page when the filter identity or page size changes.
-  // (No-op re-set when already on page 1, so it doesn't double-fetch the common case.)
   useEffect(() => {
     setPage(1);
   }, [resetKey, size]);

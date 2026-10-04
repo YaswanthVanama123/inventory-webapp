@@ -21,8 +21,6 @@ const InvoiceList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
-  // Full-page spinner only until the first load finishes; searches and
-  // filters then refresh just the list (keeps the search box focused).
   const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
@@ -241,7 +239,6 @@ const InvoiceList = () => {
   }
   return (
     <div className="space-y-6">
-      {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -264,10 +261,8 @@ const InvoiceList = () => {
           )}
         </div>
       </div>
-      {}
       <div className="sticky top-0 z-20 bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="space-y-4">
-          {}
           <div className="w-full">
             <SearchBar
               value={searchTerm}
@@ -276,9 +271,7 @@ const InvoiceList = () => {
               fullWidth
             />
           </div>
-          {}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {}
             <Select
               name="status"
               value={statusFilter}
@@ -286,7 +279,6 @@ const InvoiceList = () => {
               options={statusOptions}
               fullWidth
             />
-            {}
             <Select
               name="paymentStatus"
               value={paymentStatusFilter}
@@ -294,7 +286,6 @@ const InvoiceList = () => {
               options={paymentStatusOptions}
               fullWidth
             />
-            {}
             <Input
               type="date"
               name="dateFrom"
@@ -303,7 +294,6 @@ const InvoiceList = () => {
               placeholder="From Date"
               fullWidth
             />
-            {}
             <Input
               type="date"
               name="dateTo"
@@ -313,7 +303,6 @@ const InvoiceList = () => {
               fullWidth
             />
           </div>
-          {}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             {hasActiveFilters && (
               <Button
@@ -328,7 +317,6 @@ const InvoiceList = () => {
                 Clear Filters
               </Button>
             )}
-            {}
             <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1 ml-auto">
               <button
                 onClick={() => setViewMode('table')}
@@ -360,7 +348,6 @@ const InvoiceList = () => {
           </div>
         </div>
       </div>
-      {}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-center gap-3">
@@ -371,7 +358,6 @@ const InvoiceList = () => {
           </div>
         </div>
       )}
-      {}
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
           <LoadingSpinner size="lg" text="Loading..." className="mx-auto" />
@@ -401,7 +387,6 @@ const InvoiceList = () => {
         </div>
       ) : (
         <>
-          {}
           {viewMode === 'table' && (
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
               <div className="overflow-x-auto">
@@ -467,7 +452,6 @@ const InvoiceList = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex items-center justify-end gap-2">
-                            {}
                             <button
                               onClick={() => handleView(invoice._id)}
                               className="text-blue-600 hover:text-blue-800 p-1 rounded-lg hover:bg-blue-50 transition-colors"
@@ -478,7 +462,6 @@ const InvoiceList = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                               </svg>
                             </button>
-                            {}
                             <button
                               onClick={() => handleDownloadPDF(invoice._id, invoice.invoiceNumber)}
                               className="text-green-600 hover:text-green-800 p-1 rounded-lg hover:bg-green-50 transition-colors"
@@ -488,7 +471,6 @@ const InvoiceList = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                               </svg>
                             </button>
-                            {}
                             <button
                               onClick={() => handleEmailClick(invoice)}
                               className="text-teal-600 hover:text-teal-800 p-1 rounded-lg hover:bg-teal-50 transition-colors"
@@ -498,7 +480,6 @@ const InvoiceList = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                               </svg>
                             </button>
-                            {}
                             {isAdmin && (
                               <button
                                 onClick={() => handleEdit(invoice._id)}
@@ -510,7 +491,6 @@ const InvoiceList = () => {
                                 </svg>
                               </button>
                             )}
-                            {}
                             {isAdmin && (
                               <button
                                 onClick={() => handleDelete(invoice._id, invoice.invoiceNumber)}
@@ -531,7 +511,6 @@ const InvoiceList = () => {
               </div>
             </div>
           )}
-          {}
           {viewMode === 'card' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {invoices.map((invoice) => (
@@ -539,7 +518,6 @@ const InvoiceList = () => {
                   key={invoice._id}
                   className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow duration-200"
                 >
-                  {}
                   <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 text-white">
                     <div className="flex items-center justify-between">
                       <div className="font-mono text-lg font-semibold">
@@ -554,9 +532,7 @@ const InvoiceList = () => {
                       </Badge>
                     </div>
                   </div>
-                  {}
                   <div className="p-4 space-y-3">
-                    {}
                     <div>
                       <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Customer</div>
                       <div className="text-sm font-semibold text-gray-900">
@@ -566,7 +542,6 @@ const InvoiceList = () => {
                         <div className="text-xs text-gray-500">{invoice.customer.email}</div>
                       )}
                     </div>
-                    {}
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Date</div>
@@ -579,7 +554,6 @@ const InvoiceList = () => {
                         </div>
                       </div>
                     </div>
-                    {}
                     <div>
                       <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Payment Status</div>
                       <Badge variant={getPaymentStatusBadgeVariant(invoice.paymentStatus)} size="sm">
@@ -587,10 +561,8 @@ const InvoiceList = () => {
                       </Badge>
                     </div>
                   </div>
-                  {}
                   <div className="border-t border-gray-200 bg-gray-50 p-3">
                     <div className="flex items-center justify-between gap-2">
-                      {}
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleView(invoice._id)}
@@ -621,7 +593,6 @@ const InvoiceList = () => {
                           </svg>
                         </button>
                       </div>
-                      {}
                       {isAdmin && (
                         <div className="flex items-center gap-2">
                           <button
@@ -650,7 +621,6 @@ const InvoiceList = () => {
               ))}
             </div>
           )}
-          {}
           <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
             <Pagination
               currentPage={currentPage}
@@ -666,7 +636,6 @@ const InvoiceList = () => {
           </div>
         </>
       )}
-      {}
       <Modal
         isOpen={emailModalOpen}
         onClose={() => setEmailModalOpen(false)}
@@ -724,7 +693,6 @@ const InvoiceList = () => {
           </div>
         </div>
       </Modal>
-      {}
       <Modal
         isOpen={deleteModalOpen}
         onClose={() => {

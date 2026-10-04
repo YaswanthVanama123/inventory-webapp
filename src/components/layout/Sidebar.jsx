@@ -541,11 +541,8 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
   `;
   return (
     <>
-      {}
       <div className={overlayClasses} onClick={onClose} />
-      {}
       <aside className={sidebarClasses}>
-        {}
         <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200 dark:border-gray-700">
           {(!isCollapsed || isMobile) && (
             <div className="flex items-center space-x-3">
@@ -557,7 +554,6 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
               </h1>
             </div>
           )}
-          {}
           {isMobile && (
             <button
               onClick={onClose}
@@ -567,7 +563,6 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
               <CloseIcon />
             </button>
           )}
-          {}
           {!isMobile && (
             <button
               onClick={handleToggleCollapse}
@@ -578,7 +573,6 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
             </button>
           )}
         </div>
-        {}
         {user && (!isCollapsed || isMobile) && (
           <div className="px-4 py-4 border-b border-slate-200 dark:border-gray-700">
             <div className="flex items-center space-x-3">
@@ -598,7 +592,6 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
             </div>
           </div>
         )}
-        {}
         {user && isCollapsed && !isMobile && (
           <div className="px-4 py-4 border-b border-slate-200 dark:border-gray-700 flex justify-center">
             <div className="w-10 h-10 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center">
@@ -608,7 +601,6 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
             </div>
           </div>
         )}
-        {}
         <nav className="flex-1 overflow-y-auto py-4 px-2">
           <ul className="space-y-1">
             {menuItems.map((item, index) => {
@@ -653,7 +645,6 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
                     </li>
                   )}
                   <li>
-                  {}
                   {hasSubmenu ? (
                     <div>
                       <button
@@ -669,11 +660,9 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
                         `}
                         title={isCollapsed && !isMobile ? item.label : ''}
                       >
-                        {}
                         <span className={`${isCollapsed && !isMobile ? '' : 'ml-1'} flex-shrink-0`}>
                           <Icon />
                         </span>
-                        {}
                         {(!isCollapsed || isMobile) && (
                           <>
                             <span className="font-medium text-sm flex-1 truncate text-left">
@@ -685,7 +674,6 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
                           </>
                         )}
                       </button>
-                      {}
                       {(!isCollapsed || isMobile) && isExpanded && (
                         <ul className="mt-1 ml-4 space-y-1">
                           {item.submenu.map((subItem) => {
@@ -733,11 +721,9 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
                       `}
                       title={isCollapsed && !isMobile ? item.label : ''}
                     >
-                      {}
                       <span className={`${isCollapsed && !isMobile ? '' : 'ml-1'} flex-shrink-0`}>
                         <Icon />
                       </span>
-                      {}
                       {(!isCollapsed || isMobile) && (
                         <span className="font-medium text-sm flex-1 truncate">
                           {item.label}
@@ -751,7 +737,6 @@ const Sidebar = ({ isOpen, onClose, onToggleCollapse }) => {
             })}
           </ul>
         </nav>
-        {}
         <div className="border-t border-slate-200 dark:border-gray-700 p-4">
           {(!isCollapsed || isMobile) ? (
             <div className="space-y-3">

@@ -94,7 +94,6 @@ const InventoryList = () => {
     }
   }, [selectedCategory, statusFilter, sortBy, sortOrder, currentPage, itemsPerPage, activeTab, viewMode]);
 
-  // Search is applied on the backend (params.search); render the result as-is.
   const filteredItems = items;
 
   useEffect(() => {
@@ -312,7 +311,6 @@ const InventoryList = () => {
             key={idx}
             className="bg-white rounded-lg border-2 border-emerald-200 p-3 hover:shadow-md hover:border-emerald-400 transition-all duration-200 transform hover:-translate-y-1"
           >
-            {}
             {(invoiceItem.inventory?.image || invoiceItem.item?.image) ? (
               <div className="mb-2 rounded-md overflow-hidden bg-slate-100">
                 <img
@@ -331,11 +329,9 @@ const InventoryList = () => {
                 </svg>
               </div>
             )}
-            {}
             <h6 className="text-xs font-semibold text-slate-800 mb-2 line-clamp-2 min-h-[2rem]">
               {invoiceItem.itemName || invoiceItem.item?.name || itemName}
             </h6>
-            {}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-500">Quantity:</span>
@@ -387,7 +383,6 @@ const InventoryList = () => {
                 <tr key={idx} className="hover:bg-emerald-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      {}
                       <div className="flex-shrink-0 h-12 w-12">
                         {itemImage ? (
                           <img
@@ -406,7 +401,6 @@ const InventoryList = () => {
                           </div>
                         )}
                       </div>
-                      {}
                       <div className="text-sm font-medium text-slate-900">{itemName}</div>
                     </div>
                   </td>
@@ -450,7 +444,6 @@ const InventoryList = () => {
   }
   return (
     <div className="space-y-6">
-      {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -480,7 +473,6 @@ const InventoryList = () => {
           )}
         </div>
       </div>
-      {}
       <div className="sticky top-0 z-20 bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="flex items-center gap-3 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-1.5 max-w-2xl border border-slate-200 dark:border-gray-700">
           <button
@@ -517,7 +509,6 @@ const InventoryList = () => {
           fullWidth
         />
       </div>
-      {}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-center gap-3">
@@ -528,10 +519,8 @@ const InventoryList = () => {
           </div>
         </div>
       )}
-      {}
       {activeTab === 'purchases' ? (
         <>
-          {}
           {viewMode === 'folder' ? (
             <FolderView
               items={items}
@@ -570,7 +559,6 @@ const InventoryList = () => {
             </div>
           ) : (
             <>
-          {}
           {viewMode === 'table' && (
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
               <div className="overflow-x-auto">
@@ -696,7 +684,6 @@ const InventoryList = () => {
                           </div>
                         </td>
                       </tr>
-                      {}
                       {activeTab === 'purchases' && expandedItems[item._id] && (
                         <tr>
                           <td colSpan="5" className="px-6 py-4 bg-slate-50">
@@ -778,7 +765,6 @@ const InventoryList = () => {
                           </td>
                         </tr>
                       )}
-                      {}
                       {activeTab === 'sells' && expandedSales[item._id] && (
                         <tr>
                           <td colSpan="5" className="px-6 py-4 bg-slate-50">
@@ -870,7 +856,6 @@ const InventoryList = () => {
               </div>
             </div>
           )}
-          {}
           {viewMode === 'card' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {filteredItems.map((item) => (
@@ -878,7 +863,6 @@ const InventoryList = () => {
                   key={item._id}
                   className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow duration-200"
                 >
-                  {}
                   <div className="aspect-square bg-slate-100 relative">
                     {item.image ? (
                       <img
@@ -897,7 +881,6 @@ const InventoryList = () => {
                       </div>
                     )}
                   </div>
-                  {}
                   <div className="p-4">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="text-lg font-semibold text-slate-900 line-clamp-1">
@@ -918,7 +901,6 @@ const InventoryList = () => {
                         <span className="font-mono text-slate-900">{item.skuCode}</span>
                       </div>
                     </div>
-                    {}
                     <button
                       onClick={() => toggleExpand(item._id)}
                       className={`w-full mb-3 px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 ${
@@ -937,10 +919,8 @@ const InventoryList = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </button>
-                    {}
                     {expandedItems[item._id] && (
                       <>
-                        {}
                         {activeTab === 'purchases' && (
                           <div className="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
                             {loadingPurchases[item._id] ? (
@@ -1018,7 +998,6 @@ const InventoryList = () => {
                             )}
                           </div>
                         )}
-                        {}
                         {activeTab === 'sells' && (
                           <div className="mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
                             {loadingSales[item._id] ? (
@@ -1033,7 +1012,6 @@ const InventoryList = () => {
                                     const compoundKey = `${item._id}-${invoice._id}`;
                                     return (
                                     <div key={invoice._id} className="bg-white rounded border border-green-200 overflow-hidden">
-                                      {}
                                       <button
                                         onClick={() => setExpandedSales(prev => ({
                                           ...prev,
@@ -1070,7 +1048,6 @@ const InventoryList = () => {
                                           </svg>
                                         </div>
                                       </button>
-                                      {}
                                       {expandedSales[compoundKey] && invoice.items && (
                                         <div className="px-3 pb-3 pt-2 bg-emerald-50 border-t border-emerald-200">
                                           <div className="text-xs font-semibold text-emerald-800 mb-2">Items Sold:</div>
@@ -1098,7 +1075,6 @@ const InventoryList = () => {
                         )}
                       </>
                     )}
-                    {}
                     <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
@@ -1135,7 +1111,6 @@ const InventoryList = () => {
               ))}
             </div>
           )}
-          {}
           {viewMode !== 'folder' && (
             <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
               <Pagination
@@ -1157,7 +1132,6 @@ const InventoryList = () => {
       ) : activeTab === 'sells' ? (
         <SalesFolderView searchTerm={debouncedSearchTerm} />
       ) : null}
-      {}
       <Modal
         isOpen={deleteModalOpen}
         onClose={() => {
@@ -1258,7 +1232,6 @@ const InventoryList = () => {
         inventoryItem={selectedItemForPurchase}
         onSuccess={handlePurchaseSuccess}
       />
-      {}
       <Modal
         isOpen={deletePurchaseModalOpen}
         onClose={() => {

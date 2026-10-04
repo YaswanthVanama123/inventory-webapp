@@ -182,7 +182,6 @@ const StockUpdateForm = ({
   const currentAction = actionConfig[formData.action];
   return (
     <div className={standalone ? 'max-w-2xl mx-auto p-4 sm:p-6' : ''}>
-      {}
       <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -199,7 +198,6 @@ const StockUpdateForm = ({
           <p className="text-sm text-gray-600 dark:text-gray-400">SKU: {item.sku}</p>
         )}
       </div>
-      {}
       {alert && (
         <div className="mb-4">
           <Alert variant={alert.variant} dismissible onDismiss={() => setAlert(null)}>
@@ -207,9 +205,7 @@ const StockUpdateForm = ({
           </Alert>
         </div>
       )}
-      {}
       <form onSubmit={handleSubmit} className="space-y-5">
-        {}
         <div>
           <Select
             label="Action"
@@ -221,7 +217,6 @@ const StockUpdateForm = ({
             fullWidth
           />
         </div>
-        {}
         <div
           className={`p-4 rounded-lg border-2 flex items-center gap-3 transition-all duration-200 ${currentAction.bgColor} ${currentAction.borderColor}`}
         >
@@ -237,7 +232,6 @@ const StockUpdateForm = ({
             </p>
           </div>
         </div>
-        {}
         <div>
           <Input
             label="Quantity"
@@ -253,7 +247,6 @@ const StockUpdateForm = ({
             step="1"
           />
         </div>
-        {}
         {formData.quantity && (
           <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
             <div className="flex items-center justify-between">
@@ -311,7 +304,6 @@ const StockUpdateForm = ({
             </div>
           </div>
         )}
-        {}
         <div>
           <label
             htmlFor="reason"
@@ -344,7 +336,6 @@ const StockUpdateForm = ({
             Minimum 3 characters. Be specific for better tracking.
           </p>
         </div>
-        {}
         <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
           {onCancel && (
             <Button
@@ -380,7 +371,6 @@ const StockUpdateForm = ({
           </Button>
         </div>
       </form>
-      {}
       <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
         <div className="flex gap-2">
           <svg

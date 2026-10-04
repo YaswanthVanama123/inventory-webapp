@@ -47,7 +47,6 @@ const ReportCard = ({
   return (
     <Card className="p-6 hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
       <div className="flex flex-col h-full">
-        {}
         <div className="flex items-start justify-between mb-4">
           <div className={`p-3 rounded-lg ${iconBgColor}`}>
             <Icon className={`w-6 h-6 ${iconColor}`} />
@@ -61,12 +60,10 @@ const ReportCard = ({
             </div>
           )}
         </div>
-        {}
         <div className="flex-1 mb-4">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
           <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
         </div>
-        {}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-4 border-t border-gray-100">
           <button
             onClick={onView}
@@ -440,7 +437,6 @@ const Reports = () => {
   const stats = quickStats || getMockStats();
   return (
     <div className="space-y-6">
-      {}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 md:p-8 text-white">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
@@ -462,7 +458,6 @@ const Reports = () => {
           </button>
         </div>
       </div>
-      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <QuickStat
           icon={TrendingUp}
@@ -493,7 +488,6 @@ const Reports = () => {
           changeType={stats.lowStockItems?.changeType || 'positive'}
         />
       </div>
-      {}
       <Card className="p-4">
         <FilterBar
           dateRange={dateRange}
@@ -502,7 +496,6 @@ const Reports = () => {
           setReportType={setReportType}
         />
       </Card>
-      {}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-900">Available Reports</h2>
@@ -525,7 +518,6 @@ const Reports = () => {
           ))}
         </div>
       </div>
-      {}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -543,7 +535,6 @@ const Reports = () => {
           onViewReport={handleViewRecentReport}
         />
       </Card>
-      {}
       <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
           <div className="p-3 bg-blue-100 rounded-lg">

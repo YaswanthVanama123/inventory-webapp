@@ -430,7 +430,6 @@ const InventoryForm = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8 px-4 sm:px-6 lg:px-8 pb-20 sm:pb-8">
       <div className="max-w-4xl mx-auto">
-        {}
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             {isEditMode ? 'Edit Inventory Item' : 'Add New Inventory Item'}
@@ -440,7 +439,6 @@ const InventoryForm = () => {
               ? 'Update the details of your inventory item'
               : 'Fill in the details to add a new item to your inventory'}
           </p>
-          {}
           {formData.skuCode && (
             <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg">
               <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -458,7 +456,6 @@ const InventoryForm = () => {
             </p>
           )}
         </div>
-        {}
         <div className="mb-6 sm:mb-8 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
           <div className="flex items-center justify-between min-w-max sm:min-w-0">
             {steps.map((step, index) => (
@@ -503,7 +500,6 @@ const InventoryForm = () => {
             ))}
           </div>
         </div>
-        {}
         {alert && (
           <div className="mb-6">
             <Alert
@@ -515,10 +511,8 @@ const InventoryForm = () => {
             </Alert>
           </div>
         )}
-        {}
         <form onSubmit={handleSubmit} onKeyDown={handleKeyDown}>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-            {}
             {currentStep === 0 && (
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
@@ -666,7 +660,6 @@ const InventoryForm = () => {
                 </div>
               </div>
             )}
-            {}
             {currentStep === 1 && (
               <div
                 className="space-y-6"
@@ -677,7 +670,6 @@ const InventoryForm = () => {
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                   Images
                 </h2>
-                {}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
                     Upload Images
@@ -740,13 +732,11 @@ const InventoryForm = () => {
                             alt={`Preview ${index + 1}`}
                             className="w-full h-32 object-cover"
                           />
-                          {}
                           {formData.primaryImageIndex === index && (
                             <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
                               Primary
                             </div>
                           )}
-                          {}
                           <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                             {formData.primaryImageIndex !== index && (
                               <button
@@ -788,7 +778,6 @@ const InventoryForm = () => {
               </div>
             )}
           </div>
-          {}
           <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
             <div className="flex gap-3 order-2 sm:order-1">
               {currentStep > 0 && (
@@ -827,7 +816,6 @@ const InventoryForm = () => {
           </div>
         </form>
       </div>
-      {}
       <Modal
         isOpen={showCancelModal}
         onClose={() => setShowCancelModal(false)}

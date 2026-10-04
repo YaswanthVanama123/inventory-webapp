@@ -73,7 +73,6 @@ const PrivacyPolicy = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-gray-950 text-slate-800 dark:text-gray-200">
-      {}
       <header className="sticky top-0 z-30 bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-slate-200 dark:border-gray-800 print:hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
           <Link
@@ -99,7 +98,6 @@ const PrivacyPolicy = () => {
         </div>
       </header>
 
-      {}
       <section className="border-b border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
           <div className="flex flex-col items-start gap-4 max-w-3xl">
@@ -130,10 +128,8 @@ const PrivacyPolicy = () => {
         </div>
       </section>
 
-      {}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 lg:py-14">
         <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-10 lg:gap-12">
-          {}
           <aside className="lg:sticky lg:top-20 lg:self-start print:hidden">
             <nav aria-label="Table of contents" className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-gray-500 mb-3">
@@ -159,7 +155,6 @@ const PrivacyPolicy = () => {
             </nav>
           </aside>
 
-          {}
           <article className="prose-policy max-w-none">
             <Section id="overview" title="1. Overview">
               <p>
@@ -532,7 +527,6 @@ const PrivacyPolicy = () => {
         </div>
       </div>
 
-      {}
       <footer className="border-t border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 print:hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500 dark:text-gray-500">
           <p>
@@ -555,7 +549,6 @@ const PrivacyPolicy = () => {
         </div>
       </footer>
 
-      {}
       {showTopButton && (
         <button
           type="button"

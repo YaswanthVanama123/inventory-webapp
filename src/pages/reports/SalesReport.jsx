@@ -141,7 +141,6 @@ const SalesReport = () => {
   const categoryBreakdown = salesData?.categoryBreakdown || [];
   return (
     <div className="space-y-6">
-      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
@@ -166,14 +165,12 @@ const SalesReport = () => {
           </div>
         </div>
       </div>
-      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-5 h-5 text-slate-600" />
           <h2 className="text-lg font-semibold text-slate-900">Filters</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Start Date
@@ -196,7 +193,6 @@ const SalesReport = () => {
               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          {}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Category
@@ -212,7 +208,6 @@ const SalesReport = () => {
               ))}
             </select>
           </div>
-          {}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Quick Select
@@ -240,7 +235,6 @@ const SalesReport = () => {
           </div>
         </div>
       </div>
-      {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm p-6 text-white">
           <div className="flex items-center justify-between mb-2">
@@ -271,7 +265,6 @@ const SalesReport = () => {
           <p className="text-3xl font-bold">${summary.averageOrderValue?.toFixed(2) || 0}</p>
         </div>
       </div>
-      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <h2 className="text-lg font-semibold text-slate-900 mb-4">Sales Trend</h2>
         <div className="h-80">
@@ -310,7 +303,6 @@ const SalesReport = () => {
           </ResponsiveContainer>
         </div>
       </div>
-      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <h2 className="text-lg font-semibold text-slate-900 mb-4">Daily Orders</h2>
         <div className="h-80">
@@ -336,9 +328,7 @@ const SalesReport = () => {
           </ResponsiveContainer>
         </div>
       </div>
-      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Category Distribution</h2>
           <div className="h-80">
@@ -368,7 +358,6 @@ const SalesReport = () => {
             </ResponsiveContainer>
           </div>
         </div>
-        {}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Category Breakdown</h2>
           <div className="overflow-x-auto">

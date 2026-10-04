@@ -59,7 +59,6 @@ const RouteStarCustomerDetail = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link
@@ -82,7 +81,6 @@ const RouteStarCustomerDetail = () => {
         </Badge>
       </div>
 
-      {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <div className="p-4">
@@ -133,7 +131,6 @@ const RouteStarCustomerDetail = () => {
         </Card>
       </div>
 
-      {}
       <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="-mb-px flex space-x-8">
           {tabs.map((tab) => {
@@ -163,11 +160,9 @@ const RouteStarCustomerDetail = () => {
         </nav>
       </div>
 
-      {}
       <div className="space-y-6">
         {activeTab === 'details' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {}
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -208,7 +203,6 @@ const RouteStarCustomerDetail = () => {
               </div>
             </Card>
 
-            {}
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -256,7 +250,6 @@ const RouteStarCustomerDetail = () => {
               </div>
             </Card>
 
-            {}
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -275,7 +268,6 @@ const RouteStarCustomerDetail = () => {
               </div>
             </Card>
 
-            {}
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">

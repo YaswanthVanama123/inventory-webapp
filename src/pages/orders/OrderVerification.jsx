@@ -142,7 +142,6 @@ const OrderVerification = () => {
   }
   return (
     <div className="p-6 space-y-5">
-      {}
       <div className="flex items-center justify-between pb-2">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -156,7 +155,6 @@ const OrderVerification = () => {
           Back to Orders
         </Button>
       </div>
-      {}
       <Card variant="elevated" padding="lg">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
@@ -175,7 +173,6 @@ const OrderVerification = () => {
           </div>
         </div>
       </Card>
-      {}
       <Alert variant="info" title="Instructions">
         <ul className="list-disc list-inside space-y-1 mt-2 text-sm">
           <li>Enter the actual quantity received for each item</li>
@@ -183,7 +180,6 @@ const OrderVerification = () => {
           <li>If there are differences, they will be recorded as discrepancies for admin approval</li>
         </ul>
       </Alert>
-      {}
       <Card variant="elevated" padding="none">
         <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -285,7 +281,6 @@ const OrderVerification = () => {
           </table>
         </div>
       </Card>
-      {}
       <Card variant="elevated" padding="lg">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Notes (Optional)
@@ -298,7 +293,6 @@ const OrderVerification = () => {
           placeholder="Add any notes about this order verification..."
         />
       </Card>
-      {}
       {hasDiscrepancies && (
         <Alert variant="warning" title="Discrepancies Detected">
           <p className="mt-2">
@@ -306,7 +300,6 @@ const OrderVerification = () => {
           </p>
         </Alert>
       )}
-      {}
       <div className="flex justify-end gap-4">
         <Button
           variant="ghost"

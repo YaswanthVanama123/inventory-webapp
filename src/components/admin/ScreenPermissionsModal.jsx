@@ -231,7 +231,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
       hideFooter
     >
       <div className="flex flex-col h-full">
-        {}
         <div className="px-6 pt-6 pb-4 border-b border-gray-200">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -252,7 +251,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
             </button>
           </div>
 
-          {}
           <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl font-semibold text-indigo-600 border-2 border-indigo-200">
@@ -269,7 +267,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
           </div>
         </div>
 
-        {}
         {alert && (
           <div className="px-6 pt-4">
             <Alert variant={alert.type} dismissible onDismiss={() => setAlert(null)}>
@@ -278,7 +275,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
           </div>
         )}
 
-        {}
         {loading ? (
           <div className="flex-1 flex flex-col items-center justify-center py-12">
             <LoadingSpinner size="lg" />
@@ -286,10 +282,8 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
           </div>
         ) : (
           <>
-            {}
             <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
               <div className="flex flex-col sm:flex-row gap-3 mb-3">
-                {}
                 <div className="flex-1 relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -301,7 +295,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
                   />
                 </div>
 
-                {}
                 <select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
@@ -316,7 +309,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
                 </select>
               </div>
 
-              {}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
@@ -354,7 +346,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
                 </button>
               </div>
 
-              {}
               {categoryFilter === 'all' && !searchTerm && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {categories.map(category => {
@@ -384,7 +375,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
               )}
             </div>
 
-            {}
             <div className="flex-1 overflow-y-auto px-6 py-4">
               {Object.keys(groupedScreens).length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12">
@@ -405,7 +395,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
 
                     return (
                       <div key={category} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-                        {}
                         <div className={`${getCategoryColor(category)} border-b`}>
                           <div className="flex items-center justify-between p-4">
                             <button
@@ -439,7 +428,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
                             </button>
                           </div>
 
-                          {}
                           <div className="h-1 bg-white bg-opacity-50">
                             <div
                               className="h-full bg-current transition-all duration-300"
@@ -448,7 +436,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
                           </div>
                         </div>
 
-                        {}
                         {isExpanded && (
                           <div className="divide-y divide-gray-100">
                             {screens.map(screen => {
@@ -462,7 +449,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
                                     isSelected ? 'bg-indigo-50 bg-opacity-50' : ''
                                   }`}
                                 >
-                                  {}
                                   <div className="flex-shrink-0">
                                     <input
                                       type="checkbox"
@@ -481,7 +467,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
                                     </div>
                                   </div>
 
-                                  {}
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
                                       <p className="font-semibold text-gray-900">
@@ -504,7 +489,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
                                     </p>
                                   </div>
 
-                                  {}
                                   {isSelected && (
                                     <div className="flex-shrink-0">
                                       <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -524,7 +508,6 @@ const ScreenPermissionsModal = ({ isOpen, onClose, user }) => {
               )}
             </div>
 
-            {}
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2 text-sm text-gray-600">

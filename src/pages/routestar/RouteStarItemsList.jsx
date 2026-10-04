@@ -137,7 +137,6 @@ const RouteStarItemsList = () => {
   }
   return (
     <div className="p-6 space-y-6">
-      {}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           RouteStar Items List
@@ -146,9 +145,7 @@ const RouteStarItemsList = () => {
           Manage items usage flags (For Use / For Sell)
         </p>
       </div>
-      {}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -162,7 +159,6 @@ const RouteStarItemsList = () => {
             </div>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -176,7 +172,6 @@ const RouteStarItemsList = () => {
             </div>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -190,7 +185,6 @@ const RouteStarItemsList = () => {
             </div>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -204,7 +198,6 @@ const RouteStarItemsList = () => {
             </div>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -219,11 +212,9 @@ const RouteStarItemsList = () => {
           </div>
         </div>
       </div>
-      {}
       <Card className="sticky top-0 z-20">
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {}
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <Input
@@ -234,7 +225,6 @@ const RouteStarItemsList = () => {
                 className="pl-10"
               />
             </div>
-            {}
             <Select
               value={selectedParent}
               onChange={(e) => setSelectedParent(e.target.value)}
@@ -244,7 +234,6 @@ const RouteStarItemsList = () => {
                 <option key={parent} value={parent}>{parent}</option>
               ))}
             </Select>
-            {}
             <Select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
@@ -254,7 +243,6 @@ const RouteStarItemsList = () => {
                 <option key={type} value={type}>{type}</option>
               ))}
             </Select>
-            {}
             <Select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -264,7 +252,6 @@ const RouteStarItemsList = () => {
               <option value="Service">Service</option>
             </Select>
           </div>
-          {}
           <div className="flex flex-wrap gap-2">
             <Button
               variant="secondary"
@@ -293,7 +280,6 @@ const RouteStarItemsList = () => {
               {deleting ? 'Deleting...' : 'Delete All'}
             </Button>
           </div>
-          {}
           <div className="flex gap-4 items-center">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -325,7 +311,6 @@ const RouteStarItemsList = () => {
           </div>
         </div>
       </Card>
-      {}
       <Card>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -387,9 +372,6 @@ const RouteStarItemsList = () => {
                             {item.mergedCount} merged
                           </Badge>
                         )}
-                        {/* Canonical group built only from CustomerConnect /
-                            Manual PO names — there is no RouteStarItem behind
-                            it, so usage flags cannot be set. */}
                         {item.hasMasterRecord === false && (
                           <Badge
                             variant="warning"
@@ -483,7 +465,6 @@ const RouteStarItemsList = () => {
             </tbody>
           </table>
         </div>
-        {}
         {pagination.pages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">

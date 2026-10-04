@@ -48,7 +48,6 @@ const ScreenPermissionsManagement = () => {
 
   const [expandedCategories, setExpandedCategories] = useState(new Set());
 
-  // Numbered pagination over the employees list.
   const [userPage, setUserPage] = useState(1);
   const [userPageSize, setUserPageSize] = useState(15);
   const userTotalPages = Math.max(1, Math.ceil(users.length / userPageSize));
@@ -283,7 +282,6 @@ const ScreenPermissionsManagement = () => {
         </div>
       </div>
 
-      {}
       <div className="bg-white rounded-lg shadow-sm border border-slate-200">
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex">
@@ -310,10 +308,8 @@ const ScreenPermissionsManagement = () => {
           </nav>
         </div>
 
-        {}
         {activeTab === 'default' && (
           <div className="p-6 space-y-6">
-            {}
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -345,7 +341,6 @@ const ScreenPermissionsManagement = () => {
               </Button>
             </div>
 
-            {}
             <div className="space-y-3">
               {Object.entries(groupedScreens).map(([category, screens]) => {
                 const CategoryIcon = getCategoryIcon(category);
@@ -372,7 +367,6 @@ const ScreenPermissionsManagement = () => {
                         </span>
                       </div>
 
-                      {}
                       <div className="mt-3 h-1 bg-white bg-opacity-50 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-current transition-all duration-300"
@@ -433,10 +427,8 @@ const ScreenPermissionsManagement = () => {
           </div>
         )}
 
-        {}
         {activeTab === 'users' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
-            {}
             <div className="lg:col-span-1">
               <div className="flex items-center gap-2 mb-4">
                 <Users className="w-5 h-5 text-indigo-600" />
@@ -512,7 +504,6 @@ const ScreenPermissionsManagement = () => {
               )}
             </div>
 
-            {}
             <div className="lg:col-span-2">
               {selectedUser ? (
                 <>
@@ -601,7 +592,6 @@ const ScreenPermissionsManagement = () => {
                               </span>
                             </div>
 
-                            {}
                             <div className="h-1 bg-white bg-opacity-50">
                               <div
                                 className="h-full bg-current transition-all duration-300"
@@ -694,7 +684,6 @@ const ScreenPermissionsManagement = () => {
         )}
       </div>
 
-      {}
       <Modal
         isOpen={showInitializeModal}
         onClose={() => !saving && setShowInitializeModal(false)}

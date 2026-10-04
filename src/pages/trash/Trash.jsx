@@ -76,7 +76,6 @@ const Trash = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-gray-900">
       <div className="container mx-auto px-6 lg:px-8 py-8 max-w-[1800px]">
-        {}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
             <div className="bg-gradient-to-br from-red-500 to-red-600 p-3 rounded-xl shadow-md">
@@ -88,11 +87,9 @@ const Trash = () => {
             Restore or permanently delete items
           </p>
         </div>
-        {}
         <Card padding="lg" className="mb-6 border border-slate-200 dark:border-gray-700">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex flex-col sm:flex-row gap-3 flex-1">
-              {}
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
@@ -103,7 +100,6 @@ const Trash = () => {
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                 />
               </div>
-              {}
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
@@ -115,7 +111,6 @@ const Trash = () => {
                 <option value="users">Users</option>
               </select>
             </div>
-            {}
             {deletedItems.length > 0 && (
               <Button
                 variant="danger"
@@ -128,7 +123,6 @@ const Trash = () => {
             )}
           </div>
         </Card>
-        {}
         {filteredItems.length === 0 ? (
           <Card padding="lg" className="text-center py-20 border border-slate-200 dark:border-gray-700">
             <Trash2 className="w-20 h-20 text-slate-400 dark:text-gray-500 mx-auto mb-4" />
@@ -191,7 +185,6 @@ const Trash = () => {
             ))}
           </div>
         )}
-        {}
         <Card padding="lg" className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
           <div className="flex gap-3">
             <AlertTriangle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />

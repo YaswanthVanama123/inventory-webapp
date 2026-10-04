@@ -274,7 +274,6 @@ const TruckCheckoutForm = () => {
         </p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-6">
-        {}
         <Card>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Employee Information
@@ -315,7 +314,6 @@ const TruckCheckoutForm = () => {
             </div>
           </div>
         </Card>
-        {}
         <Card>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Select Item
@@ -384,7 +382,6 @@ const TruckCheckoutForm = () => {
             </div>
           )}
 
-          {}
           {selectedItem && truckInventory && (
             <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg">
               <div className="flex items-center justify-between mb-2">
@@ -411,7 +408,6 @@ const TruckCheckoutForm = () => {
             </div>
           )}
 
-          {}
           {selectedItem && truckInventory && (
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -440,7 +436,6 @@ const TruckCheckoutForm = () => {
             </div>
           )}
         </Card>
-        {}
         <Card>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Additional Notes
@@ -453,7 +448,6 @@ const TruckCheckoutForm = () => {
             rows={4}
           />
         </Card>
-        {}
         <div className="flex items-center justify-end gap-3">
           <Button
             type="button"
@@ -473,7 +467,6 @@ const TruckCheckoutForm = () => {
           </Button>
         </div>
       </form>
-      {}
       <Modal
         isOpen={showItemPicker}
         onClose={() => setShowItemPicker(false)}
@@ -538,7 +531,6 @@ const TruckCheckoutForm = () => {
           </div>
         </div>
       </Modal>
-      {}
       <Modal
         isOpen={showDiscrepancyModal}
         onClose={() => !submitting && setShowDiscrepancyModal(false)}

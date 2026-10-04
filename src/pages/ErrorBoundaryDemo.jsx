@@ -93,7 +93,6 @@ const ErrorBoundaryDemo = () => {
             Test different error scenarios and see how ErrorBoundary handles them
           </p>
         </div>
-        {}
         <Card className="mb-6 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
           <div className="flex items-start gap-3">
             <svg
@@ -121,7 +120,6 @@ const ErrorBoundaryDemo = () => {
             </div>
           </div>
         </Card>
-        {}
         <Card title="Select a Test Scenario" className="mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {scenarios.map((s) => (
@@ -144,7 +142,6 @@ const ErrorBoundaryDemo = () => {
             ))}
           </div>
         </Card>
-        {}
         {scenario && (
           <Card title="Test Result" className="mb-6">
             <div className="mb-4">
@@ -152,7 +149,6 @@ const ErrorBoundaryDemo = () => {
                 Reset Scenario
               </Button>
             </div>
-            {}
             {scenarios.map((s) => {
               if (s.id !== scenario) return null;
               return (
@@ -170,7 +166,6 @@ const ErrorBoundaryDemo = () => {
             })}
           </Card>
         )}
-        {}
         <Card title="Working Component" className="mb-6">
           <p className="text-gray-600 dark:text-gray-400 mb-4">
             This component is wrapped in an ErrorBoundary but works normally:
@@ -179,7 +174,6 @@ const ErrorBoundaryDemo = () => {
             <ErrorThrower shouldThrow={false} errorType="none" />
           </ErrorBoundary>
         </Card>
-        {}
         <Card title="Usage Examples">
           <div className="space-y-4">
             <div>

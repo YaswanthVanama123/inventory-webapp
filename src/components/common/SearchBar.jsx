@@ -35,7 +35,6 @@ const SearchBar = ({
   const widthClass = fullWidth ? 'w-full' : 'w-full sm:w-96';
   return (
     <div className={`relative ${widthClass} ${className}`}>
-      {}
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         {loading ? (
           <svg
@@ -74,7 +73,6 @@ const SearchBar = ({
           </svg>
         )}
       </div>
-      {}
       <input
         type="text"
         value={value}
@@ -86,7 +84,6 @@ const SearchBar = ({
         aria-label="Search"
         {...props}
       />
-      {}
       {value && (
         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
           <button

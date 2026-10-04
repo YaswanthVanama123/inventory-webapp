@@ -17,7 +17,6 @@ const SalesReport = () => {
   const [searchText, setSearchText] = useState('');
   const debouncedSearch = useDebounce(searchText, 400);
   const [expandedItems, setExpandedItems] = useState(new Set());
-  // Server-side pagination: backend returns the 20-row page + aggregate totals.
   const {
     items: filteredItems,
     page,
@@ -52,13 +51,11 @@ const SalesReport = () => {
     }
     setExpandedItems(newExpanded);
   };
-  // Full-page spinner only for the first load; searches refresh just the table.
   if (initialLoading) {
     return <LoadingSpinner />;
   }
   return (
     <div className="p-6 space-y-6">
-      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -77,9 +74,7 @@ const SalesReport = () => {
           Refresh
         </Button>
       </div>
-      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -96,7 +91,6 @@ const SalesReport = () => {
             </p>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -113,7 +107,6 @@ const SalesReport = () => {
             </p>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -130,7 +123,6 @@ const SalesReport = () => {
             </p>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -148,7 +140,6 @@ const SalesReport = () => {
           </div>
         </div>
       </div>
-      {}
       <Card className="sticky top-0 z-20">
         <div className="relative">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -161,7 +152,6 @@ const SalesReport = () => {
           />
         </div>
       </Card>
-      {}
       <Card>
         <div className={`overflow-x-auto transition-opacity ${loading ? 'opacity-60' : ''}`}>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -203,7 +193,6 @@ const SalesReport = () => {
               ) : (
                 filteredItems.map((item, index) => (
                   <React.Fragment key={item._id}>
-                    {}
                     <tr
                       className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                       onClick={() => handleItemClick(item._id)}
@@ -251,7 +240,6 @@ const SalesReport = () => {
                         </span>
                       </td>
                     </tr>
-                    {}
                     {expandedItems.has(item._id) && (
                       <tr>
                         <td colSpan="8" className="px-0 py-0">
@@ -373,7 +361,6 @@ const SalesReport = () => {
           </div>
         )}
       </Card>
-      {}
       <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
         <div className="flex items-start gap-3">
           <ChartBarIcon className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />

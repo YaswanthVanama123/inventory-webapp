@@ -29,7 +29,6 @@ const ItemsInvoiceUsage = () => {
   const debouncedSearch = useDebounce(searchQuery, 400);
   const [expandedItems, setExpandedItems] = useState(new Set());
 
-  // Server-side pagination: backend returns the 20-row page + aggregate totals.
   const {
     items: filteredItems,
     page,
@@ -73,13 +72,11 @@ const ItemsInvoiceUsage = () => {
       day: 'numeric'
     });
   };
-  // Full-page spinner only for the first load; searches refresh just the table.
   if (initialLoading) {
     return <LoadingSpinner />;
   }
   return (
     <div className="p-6 space-y-6">
-      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -94,7 +91,6 @@ const ItemsInvoiceUsage = () => {
           Refresh
         </Button>
       </div>
-      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between">
@@ -141,7 +137,6 @@ const ItemsInvoiceUsage = () => {
           </div>
         </div>
       </div>
-      {}
       <Card className="sticky top-0 z-20">
         <div className="relative">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -154,7 +149,6 @@ const ItemsInvoiceUsage = () => {
           />
         </div>
       </Card>
-      {}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Items ({filteredItems.length} items)
@@ -193,7 +187,6 @@ const ItemsInvoiceUsage = () => {
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                 {filteredItems.map((item, index) => (
                   <React.Fragment key={item.itemName}>
-                    {}
                     <tr
                       className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                       onClick={() => handleItemClick(item.itemName)}
@@ -236,7 +229,6 @@ const ItemsInvoiceUsage = () => {
                         </span>
                       </td>
                     </tr>
-                    {}
                     {expandedItems.has(item.itemName) && item.aliases.length > 0 && (
                       <tr className="bg-purple-50 dark:bg-purple-900/10">
                         <td colSpan="5" className="px-6 py-3">
@@ -256,7 +248,6 @@ const ItemsInvoiceUsage = () => {
                         </td>
                       </tr>
                     )}
-                    {}
                     {expandedItems.has(item.itemName) && item.invoices.length > 0 && (
                       <tr className="bg-gray-50 dark:bg-gray-800">
                         <td colSpan="5" className="px-6 py-4">

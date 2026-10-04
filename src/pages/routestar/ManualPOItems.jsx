@@ -37,8 +37,6 @@ const ManualPOItems = () => {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  // Server-paginated items list. Dropdown sources (routeStarItems, vendors) and
-  // stats ride along through `extra` as FULL sets.
   const {
     items: pageItems,
     page,
@@ -219,7 +217,6 @@ const ManualPOItems = () => {
 
   return (
     <div className="space-y-6 px-4 sm:px-6 pb-6">
-      {}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -239,7 +236,6 @@ const ManualPOItems = () => {
         </Button>
       </div>
 
-      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
         <Input
           type="text"
@@ -250,7 +246,6 @@ const ManualPOItems = () => {
         />
       </div>
 
-      {}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <p className="text-sm text-slate-600 dark:text-gray-400">Total Items</p>
@@ -272,7 +267,6 @@ const ManualPOItems = () => {
         </div>
       </div>
 
-      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         {loading && pageItems.length === 0 ? (
           <LoadingSpinner text="Loading items..." className="py-12" />
@@ -408,7 +402,6 @@ const ManualPOItems = () => {
         </div>
       )}
 
-      {}
       <Modal
         isOpen={showModal}
         onClose={handleCloseModal}

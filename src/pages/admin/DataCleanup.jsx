@@ -21,7 +21,6 @@ const DataCleanup = () => {
   const [loading, setLoading] = useState(true);
   const [purging, setPurging] = useState(false);
   const [selected, setSelected] = useState(new Set());
-  // { mode: 'single' | 'bulk', type?: object }
   const [confirmTarget, setConfirmTarget] = useState(null);
   const [confirmText, setConfirmText] = useState('');
 

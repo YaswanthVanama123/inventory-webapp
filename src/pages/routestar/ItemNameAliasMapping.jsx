@@ -24,7 +24,6 @@ const ItemNameAliasMapping = () => {
 
   const [saving, setSaving] = useState(false);
   const [mappings, setMappings] = useState([]);
-  // Full set of unique items (dropdown / suggestion / quick-map / select-all source).
   const [uniqueItems, setUniqueItems] = useState([]);
   const [stats, setStats] = useState({ totalUniqueItems: 0, mappedItems: 0, unmappedItems: 0 });
   const [searchText, setSearchText] = useState('');
@@ -48,8 +47,6 @@ const ItemNameAliasMapping = () => {
     autoMerge: true
   });
 
-  // Server-paginated item-names table. The fetch also carries the full aux data
-  // (mappings, full uniqueItems set, stats) through `extra`.
   const {
     items: pageItems,
     page,
@@ -88,7 +85,6 @@ const ItemNameAliasMapping = () => {
     { pageSize: 20, resetKey: `${debouncedSearch}|${filterStatus}` }
   );
 
-  // Surface aux data from the fetch into the aux state.
   useEffect(() => {
     if (!extra) return;
     setMappings(extra.mappings || []);
@@ -98,8 +94,6 @@ const ItemNameAliasMapping = () => {
 
   const loadData = refetch;
 
-  // Client-side filter over the FULL set — used for select-all / header checkbox
-  // (NOT for the table, which renders the server `pageItems`).
   const filteredItems = uniqueItems.filter((item) => {
     if (debouncedSearch) {
       const searchLower = debouncedSearch.toLowerCase();
@@ -356,13 +350,11 @@ const ItemNameAliasMapping = () => {
       setSaving(false);
     }
   };
-  // Full-page spinner only for the first load; searches refresh just the table.
   if (initialLoading) {
     return <LoadingSpinner />;
   }
   return (
     <div className="p-6 space-y-6">
-      {}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Item Name Alias Mapping
@@ -374,9 +366,7 @@ const ItemNameAliasMapping = () => {
           📦 Items shown below are from the RouteStarItem master list
         </p>
       </div>
-      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -390,7 +380,6 @@ const ItemNameAliasMapping = () => {
             </div>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -409,7 +398,6 @@ const ItemNameAliasMapping = () => {
             </p>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -428,7 +416,6 @@ const ItemNameAliasMapping = () => {
             </p>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -448,7 +435,6 @@ const ItemNameAliasMapping = () => {
           </div>
         </div>
       </div>
-      {}
       <Card className="sticky top-0 z-20">
         <div className="flex flex-col lg:flex-row justify-between gap-4">
           <div className="flex flex-wrap gap-2">
@@ -523,7 +509,6 @@ const ItemNameAliasMapping = () => {
           </div>
         </div>
       </Card>
-      {}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Existing Mappings ({mappings.length})
@@ -603,7 +588,6 @@ const ItemNameAliasMapping = () => {
           </table>
         </div>
       </Card>
-      {}
       <Card>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Item Names ({total})
@@ -751,7 +735,6 @@ const ItemNameAliasMapping = () => {
           </div>
         )}
       </Card>
-      {}
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
@@ -759,7 +742,6 @@ const ItemNameAliasMapping = () => {
         size="lg"
       >
         <div className="space-y-4">
-          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Canonical Name <span className="text-red-500">*</span>
@@ -775,7 +757,6 @@ const ItemNameAliasMapping = () => {
               This is the master name that will be displayed in reports
             </p>
           </div>
-          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Aliases <span className="text-red-500">*</span>
@@ -811,7 +792,6 @@ const ItemNameAliasMapping = () => {
                     disabled={modalData.aliases.length === 1}
                   />
                 </div>
-                {}
                 {activeAliasIndex === index && aliasSuggestions.length > 0 && (
                   <div className="absolute z-50 left-0 right-12 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                     {aliasSuggestions.map((item, sIdx) => (
@@ -846,7 +826,6 @@ const ItemNameAliasMapping = () => {
               All these variations will be mapped to the canonical name. Type to see suggestions from unmapped items.
             </p>
           </div>
-          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Description (Optional)
@@ -859,7 +838,6 @@ const ItemNameAliasMapping = () => {
               className="w-full"
             />
           </div>
-          {}
           <div className="flex items-center">
             <input
               type="checkbox"
@@ -872,7 +850,6 @@ const ItemNameAliasMapping = () => {
               Automatically merge in reports and analytics
             </label>
           </div>
-          {}
           <div className="flex justify-end gap-2 mt-6">
             <Button variant="secondary" onClick={() => setShowModal(false)}>
               Cancel
@@ -883,7 +860,6 @@ const ItemNameAliasMapping = () => {
           </div>
         </div>
       </Modal>
-      {}
       <Modal
         isOpen={showBulkMapModal}
         onClose={() => setShowBulkMapModal(false)}
@@ -931,7 +907,6 @@ const ItemNameAliasMapping = () => {
           </div>
         </div>
       </Modal>
-      {}
       <Modal
         isOpen={showQuickMapModal}
         onClose={() => setShowQuickMapModal(false)}
@@ -939,7 +914,6 @@ const ItemNameAliasMapping = () => {
         size="xl"
       >
         <div className="space-y-4">
-          {}
           <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded">
             <p className="text-sm text-blue-800 dark:text-blue-300">
               <strong>Main Item:</strong> {quickMapItem}
@@ -950,7 +924,6 @@ const ItemNameAliasMapping = () => {
               </p>
             )}
           </div>
-          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Canonical Name (Master Name) <span className="text-red-500">*</span>
@@ -966,7 +939,6 @@ const ItemNameAliasMapping = () => {
               All selected items will be displayed as this name in reports
             </p>
           </div>
-          {}
           <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded">
             <p className="text-sm font-medium text-green-800 dark:text-green-300 mb-2">
               Selected Items ({quickMapSelectedItems.size}):
@@ -979,7 +951,6 @@ const ItemNameAliasMapping = () => {
               ))}
             </div>
           </div>
-          {}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Select Items to Group Together
@@ -995,7 +966,6 @@ const ItemNameAliasMapping = () => {
               />
             </div>
           </div>
-          {}
           <div className="border border-gray-200 dark:border-gray-700 rounded-lg max-h-96 overflow-y-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
@@ -1053,7 +1023,6 @@ const ItemNameAliasMapping = () => {
               </tbody>
             </table>
           </div>
-          {}
           <div className="flex justify-between items-center pt-4 border-t">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {quickMapSelectedItems.size} item(s) selected

@@ -185,20 +185,16 @@ const UserProfile = () => {
   ];
   return (
     <div className="space-y-6">
-      {}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
         <h1 className="text-3xl font-bold text-slate-900 mb-2">My Profile</h1>
         <p className="text-slate-600">Manage your account settings and preferences</p>
       </div>
-      {}
       {message.text && (
         <Alert variant={message.type} dismissible onDismiss={() => setMessage({ type: '', text: '' })}>
           {message.text}
         </Alert>
       )}
-      {}
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-        {}
         <div className="border-b border-slate-200 bg-slate-50">
           <nav className="flex flex-col sm:flex-row -mb-px overflow-x-auto">
             {tabs.map((tab) => (
@@ -220,17 +216,13 @@ const UserProfile = () => {
             ))}
           </nav>
         </div>
-        {}
         <div className="p-6 sm:p-8">
-          {}
           {activeTab === 'profile' && (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-200">
-                {}
                 <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
                   {getUserInitials()}
                 </div>
-                {}
                 <div className="flex-1 text-center sm:text-left">
                   <h2 className="text-2xl font-bold text-slate-900">{user?.fullName}</h2>
                   <p className="text-slate-600 mt-1">{user?.email}</p>
@@ -247,7 +239,6 @@ const UserProfile = () => {
                   </div>
                 </div>
               </div>
-              {}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
                   <label className="block text-sm font-medium text-slate-600 mb-1">Username</label>
@@ -272,7 +263,6 @@ const UserProfile = () => {
               </div>
             </div>
           )}
-          {}
           {activeTab === 'password' && (
             <div className="max-w-2xl">
               <div className="mb-6">
@@ -311,7 +301,6 @@ const UserProfile = () => {
                     </svg>
                   }
                 />
-                {}
                 {passwordForm.newPassword && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
@@ -406,7 +395,6 @@ const UserProfile = () => {
               </form>
             </div>
           )}
-          {}
           {activeTab === 'preferences' && (
             <div className="max-w-2xl">
               <div className="mb-6">
@@ -414,7 +402,6 @@ const UserProfile = () => {
                 <p className="text-slate-600">Customize your application experience</p>
               </div>
               <form onSubmit={handlePreferencesSave} className="space-y-6">
-                {}
                 <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
                   <div className="flex-1">
                     <label htmlFor="emailNotifications" className="text-sm font-medium text-slate-900 block">
@@ -449,7 +436,6 @@ const UserProfile = () => {
                     </button>
                   </div>
                 </div>
-                {}
                 <div className="space-y-2">
                   <label htmlFor="language" className="block text-sm font-medium text-slate-700">
                     Language
@@ -471,7 +457,6 @@ const UserProfile = () => {
                     <option value="ja">Japanese</option>
                   </select>
                 </div>
-                {}
                 <div className="space-y-2">
                   <label htmlFor="timezone" className="block text-sm font-medium text-slate-700">
                     Timezone

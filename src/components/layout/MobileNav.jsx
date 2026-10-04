@@ -66,7 +66,6 @@ const MobileNav = () => {
   };
   return (
     <>
-      {}
       {isMoreMenuOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300"
@@ -74,7 +73,6 @@ const MobileNav = () => {
           aria-hidden="true"
         />
       )}
-      {}
       <div
         className={`
           fixed bottom-0 left-0 right-0 z-50 md:hidden
@@ -84,11 +82,9 @@ const MobileNav = () => {
         `}
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {}
         <div className="flex justify-center pt-3 pb-2">
           <div className="w-12 h-1.5 bg-slate-300 rounded-full" />
         </div>
-        {}
         <div className="flex items-center justify-between px-6 pb-3 border-b border-slate-200">
           <h3 className="text-lg font-semibold text-slate-900">More Options</h3>
           <button
@@ -99,7 +95,6 @@ const MobileNav = () => {
             <XMarkIcon className="w-5 h-5 text-slate-600" />
           </button>
         </div>
-        {}
         <nav className="px-4 py-4 pb-6">
           <ul className="space-y-1">
             {moreMenuItems.map((item) => {
@@ -126,14 +121,12 @@ const MobileNav = () => {
           </ul>
         </nav>
       </div>
-      {}
       <nav
         className="fixed bottom-0 left-0 right-0 z-30 md:hidden bg-white border-t border-slate-200 shadow-lg"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         aria-label="Mobile navigation"
       >
         <div className="flex items-center justify-around px-2 pt-2 pb-1">
-          {}
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = isActiveRoute(item.path);
@@ -152,11 +145,9 @@ const MobileNav = () => {
                   }
                 `}
               >
-                {}
                 {isActive && (
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full" />
                 )}
-                {}
                 <div
                   className={`
                     transition-all duration-200
@@ -168,7 +159,6 @@ const MobileNav = () => {
                     aria-hidden="true"
                   />
                 </div>
-                {}
                 <span
                   className={`
                     mt-1 text-xs font-medium truncate w-full text-center
@@ -178,14 +168,12 @@ const MobileNav = () => {
                 >
                   {item.label}
                 </span>
-                {}
                 {isActive && (
                   <div className="absolute inset-0 bg-blue-50 rounded-xl -z-10 scale-95" />
                 )}
               </NavLink>
             );
           })}
-          {}
           <button
             onClick={toggleMoreMenu}
             className={`
@@ -201,11 +189,9 @@ const MobileNav = () => {
             aria-label="More options"
             aria-expanded={isMoreMenuOpen}
           >
-            {}
             {isMoreMenuActive && (
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full" />
             )}
-            {}
             <div
               className={`
                 transition-all duration-200
@@ -224,7 +210,6 @@ const MobileNav = () => {
                 />
               )}
             </div>
-            {}
             <span
               className={`
                 mt-1 text-xs font-medium truncate w-full text-center
@@ -234,7 +219,6 @@ const MobileNav = () => {
             >
               More
             </span>
-            {}
             {(isMoreMenuActive || isMoreMenuOpen) && (
               <div className="absolute inset-0 bg-blue-50 rounded-xl -z-10 scale-95" />
             )}

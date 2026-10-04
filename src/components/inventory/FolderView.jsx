@@ -26,13 +26,11 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
   const [itemToVerify, setItemToVerify] = useState(null);
   const [receivedQuantity, setReceivedQuantity] = useState('');
   const [notes, setNotes] = useState('');
-  // Server-side pagination of the grouped items list.
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Reset to the first page whenever the search term changes.
   useEffect(() => {
     setPage(1);
   }, [searchTerm]);
@@ -332,11 +330,9 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
   }
   return (
     <div className="space-y-3">
-      {}
       {groupedItems.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            {}
             {isAdmin && (
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -363,7 +359,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                 )}
               </div>
             )}
-            {}
             <Button
               variant="outline"
               size="sm"
@@ -386,9 +381,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
               isSelected ? 'border-indigo-400 shadow-lg' : 'border-slate-200 hover:border-slate-300 hover:shadow-md'
             }`}
           >
-            {}
             <div className="flex items-center gap-4 p-4">
-              {}
               {isAdmin && (
                 <div className="flex-shrink-0">
                   <input
@@ -402,7 +395,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                   />
                 </div>
               )}
-              {}
               <button
                 className="flex-shrink-0 p-1.5 hover:bg-slate-100 rounded transition-colors"
                 onClick={(e) => {
@@ -416,7 +408,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                   <ChevronRight className="w-5 h-5 text-slate-600" />
                 )}
               </button>
-              {}
               <div
                 className="flex-shrink-0 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -425,7 +416,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                   <Package className="w-7 h-7 text-indigo-600" />
                 </div>
               </div>
-              {}
               <div
                 className="flex-1 min-w-0 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -439,7 +429,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                   <span className="text-slate-600">{group.orderCount} {group.orderCount === 1 ? 'order' : 'orders'}</span>
                 </p>
               </div>
-              {}
               <div
                 className="hidden lg:flex items-center gap-6 mr-2 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
@@ -464,7 +453,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                 </div>
               </div>
             </div>
-            {}
             {isExpanded && (
               <div className="border-t border-slate-200 bg-slate-50">
                 {loadingOrders[group.sku] ? (
@@ -656,7 +644,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
           </p>
         </div>
       )}
-      {}
       <Modal
         isOpen={deleteModalOpen}
         onClose={() => {
@@ -734,7 +721,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
         </div>
       </Modal>
 
-      {}
       <Modal
         isOpen={verifyModalOpen}
         onClose={() => {
@@ -849,7 +835,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                 </div>
               </div>
 
-              {}
               {verificationHistory.length > 0 && (
                 <div className="space-y-3">
                   <h4 className="text-sm font-semibold text-gray-900">Previous Receipts:</h4>
@@ -895,7 +880,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                 </div>
               )}
 
-              {}
               <div className="space-y-3">
                 <h4 className="text-sm font-semibold text-gray-900">Quantity Information:</h4>
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 space-y-3">
@@ -941,7 +925,6 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                 </div>
               </div>
 
-              {}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
                   Notes (Optional)

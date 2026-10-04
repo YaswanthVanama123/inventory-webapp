@@ -18,9 +18,6 @@ const Stock = () => {
   const [activeTab, setActiveTab] = useState('use');
   const [searchText, setSearchText] = useState('');
   const debouncedSearch = useDebounce(searchText, 300);
-  // Full-set tab totals (summary tiles + table footer). Populated as a side
-  // effect of the paginated fetch below so the tiles stay holistic while the
-  // category list is paginated server-side.
   const [useStockData, setUseStockData] = useState({ items: [], totals: {} });
   const [sellStockData, setSellStockData] = useState({ items: [], totals: {} });
   const [expandedCategories, setExpandedCategories] = useState(new Set());
@@ -37,9 +34,6 @@ const Stock = () => {
   const [showDiscrepancyModal, setShowDiscrepancyModal] = useState(false);
   const [prefilledItem, setPrefilledItem] = useState(null);
 
-  // Server-side pagination of the category list for the active tab. The backend
-  // returns { summary, categories, pagination, useStock, sellStock }. We stash
-  // the full useStock/sellStock for the tiles + footer and page `categories`.
   const {
     items: pageItems,
     page,
@@ -74,7 +68,6 @@ const Stock = () => {
     }
   };
 
-  // Refresh when the tab becomes visible again.
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
@@ -185,18 +178,12 @@ const Stock = () => {
   };
 
   const currentData = activeTab === 'use' ? useStockData : sellStockData;
-  // Search is now performed server-side (backend param, debounced). `pageItems`
-  // is the current page of (search-filtered) categories; `total` is the full
-  // filtered count. `searchQuery` only drives the empty-state copy.
   const searchQuery = searchText.trim().toLowerCase();
-  // Full-page spinner only for the first load; searches, tab switches and
-  // paging refresh just the table (keeps the search box mounted and focused).
   if (initialLoading) {
     return <LoadingSpinner />;
   }
   return (
     <div className="p-6 space-y-6">
-      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -215,7 +202,6 @@ const Stock = () => {
           Refresh
         </Button>
       </div>
-      {}
       <Card className="sticky top-0 z-20">
         <div className="flex border-b border-gray-200 dark:border-gray-700">
           <button
@@ -258,9 +244,7 @@ const Stock = () => {
           </button>
         </div>
       </Card>
-      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -277,7 +261,6 @@ const Stock = () => {
             </p>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -294,7 +277,6 @@ const Stock = () => {
             </p>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -311,7 +293,6 @@ const Stock = () => {
             </p>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -329,7 +310,6 @@ const Stock = () => {
           </div>
         </div>
       </div>
-      {}
       <div className="relative">
         <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
         <input
@@ -350,7 +330,6 @@ const Stock = () => {
           </button>
         ) : null}
       </div>
-      {}
       <Card>
         {loading && total === 0 ? (
           <LoadingSpinner text="Loading stock..." className="py-12" />
@@ -404,7 +383,6 @@ const Stock = () => {
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                 {pageItems.map((item, index) => (
                   <React.Fragment key={item.categoryName}>
-                    {}
                     <tr
                       className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                       onClick={() => handleCategoryClick(item.categoryName)}
@@ -465,7 +443,6 @@ const Stock = () => {
                         </span>
                       </td>
                     </tr>
-                    {}
                     {expandedCategories.has(item.categoryName) && (
                       <>
                         {loadingCategories.has(item.categoryName) ? (
@@ -479,9 +456,7 @@ const Stock = () => {
                           </tr>
                         ) : categorySkuData[item.categoryName] && categorySkuData[item.categoryName].length > 0 ? (
                           <>
-                            {}
                             <>
-                                {}
                                 <tr
                                   className="bg-green-50 dark:bg-green-900/10 hover:bg-green-100 dark:hover:bg-green-900/20 cursor-pointer"
                                   onClick={() => toggleCategorySales(item.categoryName)}
@@ -500,7 +475,6 @@ const Stock = () => {
                                     </div>
                                   </td>
                                 </tr>
-                                {}
                                 {expandedCategorySales.has(item.categoryName) && (
                                   <tr>
                                     <td colSpan="8" className="px-0 py-0">
@@ -574,7 +548,6 @@ const Stock = () => {
                                   </tr>
                                 )}
 
-                                {}
                                 <tr
                                   className="bg-orange-50 dark:bg-orange-900/10 hover:bg-orange-100 dark:hover:bg-orange-900/20 cursor-pointer"
                                   onClick={() => toggleCategoryCheckouts(item.categoryName)}
@@ -593,7 +566,6 @@ const Stock = () => {
                                     </div>
                                   </td>
                                 </tr>
-                                {}
                                 {expandedCategoryCheckouts.has(item.categoryName) && (
                                   <tr>
                                     <td colSpan="8" className="px-0 py-0">
@@ -647,7 +619,6 @@ const Stock = () => {
                                   </tr>
                                 )}
 
-                                {}
                                 <tr
                                   className="bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 cursor-pointer"
                                   onClick={() => toggleCategoryDiscrepancies(item.categoryName)}
@@ -684,7 +655,6 @@ const Stock = () => {
                                     </div>
                                   </td>
                                 </tr>
-                                {}
                                 {expandedCategoryDiscrepancies.has(item.categoryName) && (
                                   <tr>
                                     <td colSpan="8" className="px-0 py-0">
@@ -773,7 +743,6 @@ const Stock = () => {
                                 )}
                               </>
 
-                            {}
                             {categorySkuData[item.categoryName].map((sku) => (
                             <React.Fragment key={sku.sku}>
                               <tr
@@ -842,10 +811,8 @@ const Stock = () => {
                                   </span>
                                 </td>
                               </tr>
-                              {}
                               {expandedSKUs.has(sku.sku) && (
                                 <>
-                                  {}
                                   <tr
                                     className="bg-blue-50 dark:bg-blue-900/10 hover:bg-blue-100 dark:hover:bg-blue-900/20 cursor-pointer"
                                     onClick={(e) => {
@@ -868,7 +835,6 @@ const Stock = () => {
                                     </td>
                                   </tr>
 
-                                  {}
                                   {expandedSkuPurchases.has(sku.sku) && sku.purchaseHistory && sku.purchaseHistory.length > 0 && (
                                     <tr>
                                       <td colSpan="8" className="px-0 py-0">
@@ -1016,7 +982,6 @@ const Stock = () => {
           </div>
         )}
       </Card>
-      {}
       <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
         <div className="flex items-start gap-3">
           <ArchiveBoxIcon className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
@@ -1031,7 +996,6 @@ const Stock = () => {
           </div>
         </div>
       </Card>
-      {}
       {showDiscrepancyModal && (
         <DiscrepancyModal
           onClose={() => {
@@ -1231,7 +1195,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Enter the details of the stock count difference</p>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {}
           {prefilledItem && prefilledItem.categoryName && !prefilledItem.itemName && (
             <>
               <div className="p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
@@ -1244,7 +1207,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                 </p>
               </div>
 
-              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Select Item *
@@ -1295,10 +1257,8 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
               </div>
             </>
           )}
-          {}
           {(!prefilledItem || !prefilledItem.itemName) && !prefilledItem?.categoryName && (
             <>
-              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Invoice Number *
@@ -1321,7 +1281,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                     </div>
                   )}
                 </div>
-                {}
                 {invoices.length > 0 && (
                   <div className="mt-2 border border-gray-200 dark:border-gray-700 rounded-lg max-h-48 overflow-y-auto">
                     {invoices.map((invoice) => (
@@ -1340,7 +1299,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   </div>
                 )}
               </div>
-              {}
               {selectedInvoice && selectedInvoice.lineItems && selectedInvoice.lineItems.length > 0 && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1367,7 +1325,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
               )}
             </>
           )}
-          {}
           {prefilledItem && prefilledItem.itemName && (
             <div className="p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
               <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">Item Details</h3>
@@ -1387,7 +1344,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
               </div>
             </div>
           )}
-          {}
           {formData.itemName && (
             <>
               <div>
@@ -1401,7 +1357,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
                 />
               </div>
-              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Actual Quantity (Physical Count) *
@@ -1417,7 +1372,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   step="1"
                 />
               </div>
-              {}
               {formData.actualQuantity !== 0 && (
                 <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <div className="flex items-center justify-between">
@@ -1428,7 +1382,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   </div>
                 </div>
               )}
-              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Discrepancy Type *
@@ -1441,7 +1394,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   placeholder="Auto-detected from difference"
                 />
               </div>
-              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Reason
@@ -1454,7 +1406,6 @@ const DiscrepancyModal = ({ onClose, onSuccess, prefilledItem }) => {
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
               </div>
-              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Additional Notes

@@ -22,7 +22,6 @@ const CaseQuantityMapping = () => {
   const { showSuccess, showError, showWarning } = useContext(ToastContext);
 
   const [saving, setSaving] = useState(false);
-  // Local edits keyed by SKU. Survives page changes so Save All keeps working.
   const [edits, setEdits] = useState({});
   const [pendingChanges, setPendingChanges] = useState(new Set());
   const [searchText, setSearchText] = useState('');
@@ -63,7 +62,6 @@ const CaseQuantityMapping = () => {
     if (extra) setStats(extra);
   }, [extra]);
 
-  // Page rows with any unsaved local edits applied on top.
   const items = pageItems.map((item) =>
     edits[item.sku] ? { ...item, ...edits[item.sku] } : item
   );
@@ -217,8 +215,6 @@ const CaseQuantityMapping = () => {
         </p>
       </div>
 
-      {/* Same compact stat cards as the other list screens (e.g. Purchase Orders);
-          the explanation for each card is in its hover tooltip. */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {statCards.map((card) => (
           <div

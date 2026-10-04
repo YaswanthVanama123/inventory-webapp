@@ -159,7 +159,6 @@ const EmployeeActivities = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 py-8">
       <div className="container mx-auto px-6 max-w-7xl">
-        {}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Employee Activities
@@ -168,7 +167,6 @@ const EmployeeActivities = () => {
             Track and monitor all employee actions and performance
           </p>
         </div>
-        {}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
@@ -224,7 +222,6 @@ const EmployeeActivities = () => {
             </Card>
           </div>
         )}
-        {}
         <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
           <nav className="-mb-px flex space-x-8">
             {[
@@ -251,10 +248,8 @@ const EmployeeActivities = () => {
             })}
           </nav>
         </div>
-        {}
         <Card className="mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Users className="w-4 h-4 inline mr-1" />
@@ -273,7 +268,6 @@ const EmployeeActivities = () => {
                 ))}
               </select>
             </div>
-            {}
             {activeTab === 'all' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -294,7 +288,6 @@ const EmployeeActivities = () => {
                 </select>
               </div>
             )}
-            {}
             {activeTab === 'all' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -315,7 +308,6 @@ const EmployeeActivities = () => {
                 </select>
               </div>
             )}
-            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Calendar className="w-4 h-4 inline mr-1" />
@@ -340,7 +332,6 @@ const EmployeeActivities = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
-            {}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Search className="w-4 h-4 inline mr-1" />
@@ -354,7 +345,6 @@ const EmployeeActivities = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
-            {}
             <div className="flex items-end">
               <button
                 onClick={clearFilters}
@@ -365,7 +355,6 @@ const EmployeeActivities = () => {
             </div>
           </div>
         </Card>
-        {}
         <Card>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -392,7 +381,6 @@ const EmployeeActivities = () => {
                   key={activity._id}
                   className="flex items-start space-x-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:shadow-md transition-shadow"
                 >
-                  {}
                   <div className={`flex-shrink-0 p-2 rounded-full ${
                     getActionBadgeVariant(activity.action) === 'success' ? 'bg-green-100 dark:bg-green-900' :
                     getActionBadgeVariant(activity.action) === 'danger' ? 'bg-red-100 dark:bg-red-900' :
@@ -401,7 +389,6 @@ const EmployeeActivities = () => {
                   }`}>
                     {getActionIcon(activity.action)}
                   </div>
-                  {}
                   <div className="flex-grow">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center space-x-2">
@@ -457,7 +444,6 @@ const EmployeeActivities = () => {
               ))}
             </div>
           )}
-          {}
           {!loading && activities.length > 0 && pagination.pages > 1 && (
             <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
               <div className="text-sm text-gray-600 dark:text-gray-400">

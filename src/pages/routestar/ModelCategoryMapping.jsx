@@ -19,8 +19,6 @@ const ModelCategoryMapping = () => {
 
   const [initialLoading, setInitialLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  // Per-model local edits (categoryItemId/categoryItemName/notes) keyed by modelNumber.
-  // Survives page changes so Save / Save All keep working across pages.
   const [edits, setEdits] = useState({});
   const [routeStarItems, setRouteStarItems] = useState([]);
   const [searchText, setSearchText] = useState('');
@@ -29,7 +27,6 @@ const ModelCategoryMapping = () => {
   const [pendingChanges, setPendingChanges] = useState(new Set());
   const [stats, setStats] = useState({ total: 0, mapped: 0, unmapped: 0 });
 
-  // Load the FULL RouteStar items list once (dropdown source, must stay full).
   useEffect(() => {
     const loadItems = async () => {
       try {
@@ -45,7 +42,6 @@ const ModelCategoryMapping = () => {
     loadItems();
   }, []);
 
-  // Server-paginated models list.
   const {
     items: pageModels,
     page,
@@ -75,12 +71,10 @@ const ModelCategoryMapping = () => {
     { pageSize: 20, resetKey: `${debouncedSearch}|${filterStatus}` }
   );
 
-  // Stats come from the backend (computed over the full set).
   useEffect(() => {
     if (extra) setStats(extra);
   }, [extra]);
 
-  // Apply any pending local edits on top of the freshly-fetched page rows.
   const models = pageModels.map((m) =>
     edits[m.modelNumber] ? { ...m, ...edits[m.modelNumber] } : m
   );
@@ -113,12 +107,10 @@ const ModelCategoryMapping = () => {
     }));
     setPendingChanges(prev => new Set([...prev, modelNumber]));
   };
-  // Resolve the current view of a model (page row merged with local edits).
   const getModel = (modelNumber) => {
     const base = pageModels.find(m => m.modelNumber === modelNumber);
     const edit = edits[modelNumber];
     if (base) return { ...base, ...(edit || {}) };
-    // Falling back to edits alone (e.g. saving from Save All after page change).
     return edit ? { modelNumber, ...edit } : null;
   };
   const saveMapping = async (modelNumber) => {
@@ -209,7 +201,6 @@ const ModelCategoryMapping = () => {
   }
   return (
     <div className="p-6 space-y-6">
-      {}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Model Category Mapping
@@ -218,9 +209,7 @@ const ModelCategoryMapping = () => {
           Map order model numbers (SKUs) to RouteStar item categories
         </p>
       </div>
-      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -234,7 +223,6 @@ const ModelCategoryMapping = () => {
             </div>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -253,7 +241,6 @@ const ModelCategoryMapping = () => {
             </p>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -272,7 +259,6 @@ const ModelCategoryMapping = () => {
             </p>
           </div>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -292,7 +278,6 @@ const ModelCategoryMapping = () => {
           </div>
         </div>
       </div>
-      {}
       <Card className="sticky top-0 z-20">
         <div className="flex flex-col lg:flex-row justify-between gap-4">
           <div className="flex flex-wrap gap-2">
@@ -343,7 +328,6 @@ const ModelCategoryMapping = () => {
           </div>
         </div>
       </Card>
-      {}
       <Card>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">

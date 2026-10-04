@@ -171,7 +171,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
       closeOnOverlayClick={!loading}
     >
       <form onSubmit={handleSubmit} className="space-y-5">
-        {}
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-sm text-blue-900">
             Resetting password for: <span className="font-semibold">{user?.fullName}</span>
@@ -180,7 +179,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
             {user?.email}
           </p>
         </div>
-        {}
         {alert && (
           <Alert
             variant={alert.type}
@@ -190,7 +188,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
             {alert.message}
           </Alert>
         )}
-        {}
         <div>
           <div className="relative">
             <Input
@@ -216,7 +213,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
-          {}
           {formData.newPassword && (
             <div className="mt-3">
               <div className="flex items-center justify-between mb-1">
@@ -280,7 +276,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
             </div>
           )}
         </div>
-        {}
         <div className="relative">
           <Input
             label="Confirm Password"
@@ -305,7 +300,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
             {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
         </div>
-        {}
         {formData.confirmPassword && (
           <div className="flex items-center gap-2 text-sm">
             {formData.newPassword === formData.confirmPassword ? (
@@ -321,7 +315,6 @@ const ResetPasswordModal = ({ isOpen, onClose, user }) => {
             )}
           </div>
         )}
-        {}
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />

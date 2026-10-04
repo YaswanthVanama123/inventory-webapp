@@ -22,8 +22,6 @@ const UserList = () => {
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  // Full-page spinner only until the first load finishes; searches and
-  // filters then refresh just the list (keeps the search box focused).
   const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,8 +46,6 @@ const UserList = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin, debouncedSearch, roleFilter, statusFilter, currentPage, itemsPerPage]);
-  // Search, role and status all run on the backend, so paging spans every
-  // matching user rather than a client-side slice of the first N fetched.
   const fetchUsers = async () => {
     setLoading(true);
     setError(null);
@@ -63,8 +59,6 @@ const UserList = () => {
       const pagination = response.data?.data?.pagination;
       const resolvedTotal = pagination?.total ?? usersData.length;
       const resolvedPages = pagination?.pages || 1;
-      // Deleting the last row on the last page can leave currentPage past the
-      // end — fall back to the final page instead of rendering an empty list.
       if (currentPage > resolvedPages && resolvedTotal > 0) {
         setCurrentPage(resolvedPages);
         return;
@@ -244,7 +238,6 @@ const UserList = () => {
   }
   return (
     <div className="space-y-6">
-      {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -261,10 +254,8 @@ const UserList = () => {
           </Button>
         </div>
       </div>
-      {}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-slate-200">
         <div className="space-y-4">
-          {}
           <div className="w-full">
             <SearchBar
               value={searchTerm}
@@ -273,9 +264,7 @@ const UserList = () => {
               fullWidth
             />
           </div>
-          {}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {}
             <Select
               name="role"
               value={roleFilter}
@@ -284,7 +273,6 @@ const UserList = () => {
               placeholder="All Roles"
               fullWidth
             />
-            {}
             <Select
               name="status"
               value={statusFilter}
@@ -293,7 +281,6 @@ const UserList = () => {
               placeholder="All Statuses"
               fullWidth
             />
-            {}
             {(searchTerm || roleFilter || statusFilter) && (
               <Button
                 variant="outline"
@@ -307,7 +294,6 @@ const UserList = () => {
                 Clear Filters
               </Button>
             )}
-            {}
             <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('table')}
@@ -343,7 +329,6 @@ const UserList = () => {
           </div>
         </div>
       </div>
-      {}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-center gap-3">
@@ -364,7 +349,6 @@ const UserList = () => {
           </div>
         </div>
       )}
-      {}
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm p-12 border border-slate-200">
           <LoadingSpinner size="lg" text="Loading..." className="mx-auto" />
@@ -399,7 +383,6 @@ const UserList = () => {
         </div>
       ) : (
         <>
-          {}
           {viewMode === 'table' && (
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
               <div className="overflow-x-auto">
@@ -521,7 +504,6 @@ const UserList = () => {
               </div>
             </div>
           )}
-          {}
           {viewMode === 'card' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {users.map((user) => (
@@ -530,7 +512,6 @@ const UserList = () => {
                   className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer"
                   onClick={() => handleViewUser(user._id)}
                 >
-                  {}
                   <div className="bg-slate-50 p-6 border-b border-slate-200">
                     <div className="flex items-center justify-center">
                       <div className="h-20 w-20 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-2xl">
@@ -538,7 +519,6 @@ const UserList = () => {
                       </div>
                     </div>
                   </div>
-                  {}
                   <div className="p-4">
                     <div className="text-center mb-4">
                       <h3 className="text-lg font-semibold text-slate-900">{user.fullName || 'N/A'}</h3>
@@ -566,7 +546,6 @@ const UserList = () => {
                         <span className="text-slate-900 text-xs">{formatDate(user.lastLogin)}</span>
                       </div>
                     </div>
-                    {}
                     <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2">
                         <Button
@@ -628,7 +607,6 @@ const UserList = () => {
               ))}
             </div>
           )}
-          {}
           <div className="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
             <Pagination
               currentPage={currentPage}
@@ -644,19 +622,16 @@ const UserList = () => {
           </div>
         </>
       )}
-      {}
       <ResetPasswordModal
         isOpen={showResetPasswordModal}
         onClose={handleResetPasswordClose}
         user={selectedUser}
       />
-      {}
       <ScreenPermissionsModal
         isOpen={showScreenPermissionsModal}
         onClose={handleScreenPermissionsClose}
         user={selectedUser}
       />
-      {}
       <Modal
         isOpen={showDeleteModal}
         onClose={() => {
@@ -752,7 +727,6 @@ const UserList = () => {
           </div>
         )}
       </Modal>
-      {}
       <Modal
         isOpen={showToggleStatusModal}
         onClose={() => {

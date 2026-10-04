@@ -321,7 +321,6 @@ const Dashboard = () => {
   };
   return (
     <div className="space-y-6" style={{ contain: 'layout' }}>
-      {}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 md:p-8 text-white" style={{ minHeight: '140px', contain: 'layout style' }}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex-1">
@@ -346,7 +345,6 @@ const Dashboard = () => {
           </button>
         </div>
       </div>
-      {}
       {error && !dashboardData && (
         <Card className="p-6">
           <ErrorState
@@ -358,7 +356,6 @@ const Dashboard = () => {
           />
         </Card>
       )}
-      {}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-3">
           Sales Analytics (RouteStar)
@@ -419,7 +416,6 @@ const Dashboard = () => {
           />
         </div>
       </div>
-      {}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-3">
           Purchase Analytics (CustomerConnect)
@@ -450,9 +446,7 @@ const Dashboard = () => {
           />
         </div>
       </div>
-      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        {}
         <Card className="p-6" style={{ minHeight: '500px' }}>
           {loading ? (
             <ChartSkeleton />
@@ -507,7 +501,6 @@ const Dashboard = () => {
             </div>
           )}
         </Card>
-        {}
         <Card className="p-6" style={{ minHeight: '500px' }}>
           {loading ? (
             <ChartSkeleton />
@@ -547,7 +540,6 @@ const Dashboard = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              {}
               <div className="grid grid-cols-2 gap-2 mt-4">
                 {categoryDistribution.map((category, index) => (
                   <div key={index} className="flex items-center gap-2">
@@ -568,7 +560,6 @@ const Dashboard = () => {
           )}
         </Card>
       </div>
-      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <Card className="p-6" style={{ minHeight: '480px' }}>
           <div className="mb-6" style={{ minHeight: '60px' }}>
@@ -621,7 +612,6 @@ const Dashboard = () => {
             </div>
           )}
         </Card>
-        {}
         <Card className="p-6" style={{ minHeight: '280px' }}>
           <div className="mb-6" style={{ minHeight: '60px' }}>
             <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
@@ -630,7 +620,6 @@ const Dashboard = () => {
           <QuickActions />
         </Card>
       </div>
-      {}
       <Card className="p-6" style={{ minHeight: '400px' }}>
         <div className="flex items-center justify-between mb-6" style={{ minHeight: '48px' }}>
           <div>

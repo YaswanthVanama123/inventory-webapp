@@ -84,7 +84,6 @@ const OrderDetail = () => {
   }
   return (
     <div className="space-y-6">
-      {}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -117,9 +116,7 @@ const OrderDetail = () => {
           )}
         </div>
       </div>
-      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
             Order Information
@@ -153,7 +150,6 @@ const OrderDetail = () => {
             </div>
           </dl>
         </div>
-        {}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
             Vendor Information
@@ -184,7 +180,6 @@ const OrderDetail = () => {
           </dl>
         </div>
       </div>
-      {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
           Stock Processing Status
@@ -222,7 +217,6 @@ const OrderDetail = () => {
           )}
         </div>
       </div>
-      {}
       {order.items && order.items.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-200 dark:border-gray-700">
@@ -320,7 +314,6 @@ const OrderDetail = () => {
           </div>
         </div>
       )}
-      {}
       {order.notes && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">

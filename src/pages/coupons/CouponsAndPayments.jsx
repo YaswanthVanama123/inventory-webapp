@@ -214,7 +214,6 @@ const CouponsAndPayments = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-6 lg:px-8 py-8 max-w-[1800px]">
-        {}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
             <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-md">
@@ -226,7 +225,6 @@ const CouponsAndPayments = () => {
             Manage discount coupons and payment methods
           </p>
         </div>
-        {}
         <div className="mb-6 flex gap-4">
           <button
             onClick={() => setActiveTab('coupons')}
@@ -251,10 +249,8 @@ const CouponsAndPayments = () => {
             Payment Types
           </button>
         </div>
-        {}
         {activeTab === 'coupons' && (
           <>
-            {}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
               <Card padding="lg" className="border border-slate-200 dark:border-gray-700 shadow-sm">
                 <div className="flex items-center justify-between">
@@ -301,7 +297,6 @@ const CouponsAndPayments = () => {
                 </div>
               </Card>
             </div>
-            {}
             <div className="mb-6">
               <Button
                 onClick={() => {
@@ -314,7 +309,6 @@ const CouponsAndPayments = () => {
                 Add New Coupon
               </Button>
             </div>
-            {}
             {loadingCoupons ? (
               <LoadingSpinner />
             ) : coupons.length === 0 ? (
@@ -420,10 +414,8 @@ const CouponsAndPayments = () => {
             )}
           </>
         )}
-        {}
         {activeTab === 'payments' && (
           <>
-            {}
             <div className="mb-6">
               <Button
                 onClick={() => {
@@ -436,7 +428,6 @@ const CouponsAndPayments = () => {
                 Add Payment Type
               </Button>
             </div>
-            {}
             {loadingPayments ? (
               <LoadingSpinner />
             ) : paymentTypes.length === 0 ? (
@@ -509,7 +500,6 @@ const CouponsAndPayments = () => {
             )}
           </>
         )}
-        {}
         <Modal
           isOpen={showCouponModal}
           onClose={() => {
@@ -520,7 +510,6 @@ const CouponsAndPayments = () => {
           size="lg"
         >
           <form onSubmit={handleCouponSubmit} className="space-y-6">
-            {}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Basic Information</h3>
               <div className="space-y-4">
@@ -554,7 +543,6 @@ const CouponsAndPayments = () => {
                 />
               </div>
             </div>
-            {}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Discount Details</h3>
               <div className="space-y-4">
@@ -598,7 +586,6 @@ const CouponsAndPayments = () => {
                 </div>
               </div>
             </div>
-            {}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Usage & Validity</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -637,7 +624,6 @@ const CouponsAndPayments = () => {
             </div>
           </form>
         </Modal>
-        {}
         <Modal
           isOpen={showPaymentModal}
           onClose={() => {
@@ -647,7 +633,6 @@ const CouponsAndPayments = () => {
           title={editingPayment ? 'Edit Payment Type' : 'Add Payment Type'}
         >
           <form onSubmit={handlePaymentSubmit} className="space-y-6">
-            {}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Basic Information</h3>
               <div className="space-y-4">
@@ -673,7 +658,6 @@ const CouponsAndPayments = () => {
                 />
               </div>
             </div>
-            {}
             <div className="bg-slate-50 dark:bg-gray-800 p-5 rounded-lg border border-slate-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Settings</h3>
               <div className="grid grid-cols-2 gap-4">

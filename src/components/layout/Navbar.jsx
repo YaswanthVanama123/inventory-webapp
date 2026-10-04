@@ -90,7 +90,6 @@ const Navbar = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {}
           <div className="flex items-center">
             <Link to="/dashboard" className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
@@ -101,7 +100,6 @@ const Navbar = () => {
               </span>
             </Link>
           </div>
-          {}
           <div className="hidden md:flex items-center space-x-1">
             {navigationLinks.map((link) => (
               <Link
@@ -117,9 +115,7 @@ const Navbar = () => {
               </Link>
             ))}
           </div>
-          {}
           <div className="flex items-center space-x-4">
-            {}
             <form onSubmit={handleSearch} className="hidden lg:block">
               <div className="relative">
                 <input
@@ -144,7 +140,6 @@ const Navbar = () => {
                 </svg>
               </div>
             </form>
-            {}
             <div className="relative">
               <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors relative">
                 <svg
@@ -167,7 +162,6 @@ const Navbar = () => {
                 )}
               </button>
             </div>
-            {}
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -200,7 +194,6 @@ const Navbar = () => {
                   />
                 </svg>
               </button>
-              {}
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
                   <div className="px-4 py-3 border-b border-gray-200">
@@ -283,7 +276,6 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-            {}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
@@ -321,11 +313,9 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-      {}
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-gray-200 bg-white">
           <div className="px-4 py-3 space-y-1">
-            {}
             <form onSubmit={handleSearch} className="mb-3">
               <div className="relative">
                 <input
@@ -350,7 +340,6 @@ const Navbar = () => {
                 </svg>
               </div>
             </form>
-            {}
             {navigationLinks.map((link) => (
               <Link
                 key={link.path}

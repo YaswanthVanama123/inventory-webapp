@@ -43,7 +43,6 @@ const EmployeeDashboard = () => {
     } catch (err) {
       const message =
         err?.response?.data?.message || err?.message || 'Failed to load your dashboard';
-      // A missing truck assignment isn't a hard error — show a friendly note.
       if (/truck/i.test(message)) {
         setNoTruck(true);
       } else {
@@ -138,7 +137,6 @@ const EmployeeDashboard = () => {
           </div>
         )}
 
-        {/* Stat cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {statCards.map((c) => (
             <Card key={c.label} padding="normal">
@@ -162,7 +160,6 @@ const EmployeeDashboard = () => {
           ))}
         </div>
 
-        {/* Recent invoices + top items */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <Card padding="normal">
             <div className="flex items-center justify-between mb-4">

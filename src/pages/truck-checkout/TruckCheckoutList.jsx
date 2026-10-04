@@ -41,7 +41,6 @@ const TruckCheckoutList = () => {
   const [salesSubTab, setSalesSubTab] = useState('all');
   const [loading, setLoading] = useState(true);
   const [checkouts, setCheckouts] = useState([]);
-  // Ticked rows for the admin bulk-purge bar.
   const [selectedCheckoutIds, setSelectedCheckoutIds] = useState(new Set());
   const [myCheckoutsByItem, setMyCheckoutsByItem] = useState([]);
   const [salesTracking, setSalesTracking] = useState([]);
@@ -694,14 +693,12 @@ const TruckCheckoutList = () => {
                   : { name: `${checkout.itemsTaken?.length || 0} items`, qty: checkout.itemsTaken?.reduce((sum, item) => sum + item.quantity, 0) || 0 };
                 return (
                   <div key={checkout._id}>
-                    {}
                     <div
                       onClick={() => setExpandedCheckout(isExpanded ? null : checkout._id)}
                       className={`flex items-center gap-4 px-6 py-4 cursor-pointer transition-colors ${
                         isExpanded ? 'bg-blue-50/50' : 'hover:bg-slate-50'
                       }`}
                     >
-                      {}
                       <input
                         type="checkbox"
                         checked={selectedCheckoutIds.has(checkout._id)}
@@ -710,7 +707,6 @@ const TruckCheckoutList = () => {
                         className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
                         aria-label={`Select checkout for ${checkout.employeeName}`}
                       />
-                      {}
                       <div className="text-slate-400">
                         {isExpanded ? (
                           <ChevronDownIcon className="w-5 h-5 text-blue-600" />
@@ -719,7 +715,6 @@ const TruckCheckoutList = () => {
                         )}
                       </div>
 
-                      {}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-semibold text-slate-900 truncate">
@@ -742,10 +737,8 @@ const TruckCheckoutList = () => {
                         </div>
                       </div>
 
-                      {}
                       {getStatusBadge(checkout.status)}
 
-                      {}
                       <div onClick={(e) => e.stopPropagation()}>
                         <button
                           onClick={(e) => handleDelete(checkout._id, e)}
@@ -757,11 +750,9 @@ const TruckCheckoutList = () => {
                       </div>
                     </div>
 
-                    {}
                     {isExpanded && (
                       <div className="px-6 pb-5 bg-blue-50/30 border-t border-slate-100">
                         <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {}
                           <div className="bg-white rounded-lg border border-slate-200 p-4">
                             <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
                               <UserIcon className="w-4 h-4 text-slate-500" />
@@ -796,7 +787,6 @@ const TruckCheckoutList = () => {
                             </dl>
                           </div>
 
-                          {}
                           <div className="bg-white rounded-lg border border-slate-200 p-4">
                             <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
                               <CubeIcon className="w-4 h-4 text-slate-500" />
@@ -836,7 +826,6 @@ const TruckCheckoutList = () => {
                             )}
                           </div>
 
-                          {}
                           <div className="bg-white rounded-lg border border-slate-200 p-4">
                             <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
                               <CalendarIcon className="w-4 h-4 text-slate-500" />
@@ -870,7 +859,6 @@ const TruckCheckoutList = () => {
                             </dl>
                           </div>
                         </div>
-                        {}
                         <div className="mt-4 text-center">
                           <button
                             onClick={() => handleRowClick(checkout._id)}
@@ -887,7 +875,6 @@ const TruckCheckoutList = () => {
             )}
           </div>
 
-          {}
           {(pagination.pages > 1 || pagination.total > 0) && (
             <div className="px-6 py-4 border-t border-slate-200">
               <Pagination

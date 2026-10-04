@@ -15,10 +15,16 @@ const Input = ({
   disabled = false,
   required = false,
   fullWidth = false,
+  size = 'md',
   className = '',
   ...props
 }) => {
-  const baseInputStyles = 'block w-full px-3 py-2 sm:py-2.5 border rounded-lg shadow-sm focus:outline-none focus:ring-2 transition-colors duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed dark:bg-gray-800 dark:disabled:bg-gray-900 text-base min-h-[44px]';
+  // md is the original look; sm matches Button size="sm" (40px, 14px text).
+  const sizeStyles = {
+    sm: 'px-3 py-2 text-sm min-h-[40px]',
+    md: 'px-3 py-2 sm:py-2.5 text-base min-h-[44px]',
+  };
+  const baseInputStyles = `block w-full ${sizeStyles[size] || sizeStyles.md} border rounded-lg shadow-sm focus:outline-none focus:ring-2 transition-colors duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed dark:bg-gray-800 dark:disabled:bg-gray-900`;
 
   const normalStyles = 'border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:text-white';
   const errorStyles = 'border-red-500 focus:border-red-500 focus:ring-red-500 dark:border-red-400';
@@ -90,6 +96,7 @@ Input.propTypes = {
   disabled: PropTypes.bool,
   required: PropTypes.bool,
   fullWidth: PropTypes.bool,
+  size: PropTypes.oneOf(['sm', 'md']),
   className: PropTypes.string,
 };
 export default Input;

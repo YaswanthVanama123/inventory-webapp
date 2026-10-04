@@ -26,6 +26,10 @@ export default function useServerPagination(fetchPage, { pageSize = 20, resetKey
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [reloadFlag, setReloadFlag] = useState(0);
+  // True only until the FIRST fetch completes. Pages should gate their
+  // full-page spinner on this - NOT on `loading` - so search / tab / page
+  // refetches only refresh the table and keep the search box mounted.
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   // Keep the latest fetcher without making it a fetch trigger.
   const fetchRef = useRef(fetchPage);
@@ -56,7 +60,10 @@ export default function useServerPagination(fetchPage, { pageSize = 20, resetKey
         if (active) setError(err);
       })
       .finally(() => {
-        if (active) setLoading(false);
+        if (active) {
+          setLoading(false);
+          setHasLoaded(true);
+        }
       });
     return () => {
       active = false;
@@ -73,6 +80,7 @@ export default function useServerPagination(fetchPage, { pageSize = 20, resetKey
     totalPages,
     extra,
     loading,
+    initialLoading: loading && !hasLoaded,
     error,
     refetch,
   };

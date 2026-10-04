@@ -28,6 +28,8 @@ const SalesReport = () => {
     totalPages,
     extra,
     loading,
+    initialLoading,
+    refetch,
   } = useServerPagination(
     ({ page, limit }) =>
       routeStarItemsService
@@ -50,7 +52,8 @@ const SalesReport = () => {
     }
     setExpandedItems(newExpanded);
   };
-  if (loading) {
+  // Full-page spinner only for the first load; searches refresh just the table.
+  if (initialLoading) {
     return <LoadingSpinner />;
   }
   return (
@@ -67,7 +70,7 @@ const SalesReport = () => {
         </div>
         <Button
           variant="secondary"
-          onClick={loadData}
+          onClick={refetch}
           size="sm"
         >
           <ArrowPathIcon className="w-4 h-4 mr-2" />
@@ -160,7 +163,7 @@ const SalesReport = () => {
       </Card>
       {}
       <Card>
-        <div className="overflow-x-auto">
+        <div className={`overflow-x-auto transition-opacity ${loading ? 'opacity-60' : ''}`}>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
@@ -194,7 +197,7 @@ const SalesReport = () => {
               {filteredItems.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                    No items found
+                    {loading ? 'Loading...' : 'No items found'}
                   </td>
                 </tr>
               ) : (

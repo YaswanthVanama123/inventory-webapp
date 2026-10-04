@@ -40,6 +40,8 @@ const ItemsInvoiceUsage = () => {
     totalPages,
     extra,
     loading,
+    initialLoading,
+    refetch,
   } = useServerPagination(
     ({ page, limit }) =>
       routestarService
@@ -71,7 +73,8 @@ const ItemsInvoiceUsage = () => {
       day: 'numeric'
     });
   };
-  if (loading) {
+  // Full-page spinner only for the first load; searches refresh just the table.
+  if (initialLoading) {
     return <LoadingSpinner />;
   }
   return (
@@ -86,7 +89,7 @@ const ItemsInvoiceUsage = () => {
             View all item names and their invoice usage in a folder structure
           </p>
         </div>
-        <Button variant="secondary" onClick={loadData} size="sm">
+        <Button variant="secondary" onClick={refetch} size="sm">
           <ArrowPathIcon className="w-4 h-4 mr-2" />
           Refresh
         </Button>
@@ -156,7 +159,9 @@ const ItemsInvoiceUsage = () => {
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Items ({filteredItems.length} items)
         </h2>
-        {filteredItems.length === 0 ? (
+        {loading && filteredItems.length === 0 ? (
+          <LoadingSpinner text="Loading items..." className="py-12" />
+        ) : filteredItems.length === 0 ? (
           <div className="text-center py-12">
             <CubeIcon className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
             <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -164,7 +169,7 @@ const ItemsInvoiceUsage = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className={`overflow-x-auto transition-opacity ${loading ? 'opacity-60' : ''}`}>
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>

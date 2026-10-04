@@ -23,6 +23,9 @@ const OrdersList = () => {
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  // Full-page spinner only until the first load finishes; searches and
+  // filters then refresh just the list (keeps the search box focused).
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncingNew, setSyncingNew] = useState(false);
   const [syncingOld, setSyncingOld] = useState(false);
@@ -132,6 +135,7 @@ const OrdersList = () => {
       setOrders([]);
     } finally {
       setLoading(false);
+      setHasLoaded(true);
     }
   };
   const handleSyncNew = async () => {
@@ -466,7 +470,7 @@ const OrdersList = () => {
       setSubmittingVerification(false);
     }
   };
-  if (loading && orders.length === 0) {
+  if (loading && !hasLoaded) {
     return (
       <div className="flex items-center justify-center h-96">
         <LoadingSpinner size="lg" />

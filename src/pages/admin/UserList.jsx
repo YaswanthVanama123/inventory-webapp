@@ -22,6 +22,9 @@ const UserList = () => {
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  // Full-page spinner only until the first load finishes; searches and
+  // filters then refresh just the list (keeps the search box focused).
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 400);
@@ -77,6 +80,7 @@ const UserList = () => {
       setTotalPages(1);
     } finally {
       setLoading(false);
+      setHasLoaded(true);
     }
   };
   const handleSearch = (value) => {
@@ -231,7 +235,7 @@ const UserList = () => {
       </div>
     );
   }
-  if (loading && users.length === 0) {
+  if (loading && !hasLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" text="Loading users..." />

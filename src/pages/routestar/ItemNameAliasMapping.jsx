@@ -60,6 +60,7 @@ const ItemNameAliasMapping = () => {
     totalPages,
     extra,
     loading,
+    initialLoading,
     refetch,
   } = useServerPagination(
     ({ page, limit }) =>
@@ -355,7 +356,8 @@ const ItemNameAliasMapping = () => {
       setSaving(false);
     }
   };
-  if (loading && pageItems.length === 0) {
+  // Full-page spinner only for the first load; searches refresh just the table.
+  if (initialLoading) {
     return <LoadingSpinner />;
   }
   return (
@@ -606,7 +608,7 @@ const ItemNameAliasMapping = () => {
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Item Names ({total})
         </h2>
-        <div className="overflow-x-auto">
+        <div className={`overflow-x-auto transition-opacity ${loading ? 'opacity-60' : ''}`}>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
@@ -654,7 +656,7 @@ const ItemNameAliasMapping = () => {
               {pageItems.length === 0 ? (
                 <tr>
                   <td colSpan="9" className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                    No items found
+                    {loading ? 'Loading...' : 'No items found'}
                   </td>
                 </tr>
               ) : (

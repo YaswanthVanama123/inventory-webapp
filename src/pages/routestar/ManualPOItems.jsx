@@ -49,6 +49,7 @@ const ManualPOItems = () => {
     totalPages,
     extra,
     loading,
+    initialLoading,
     refetch,
   } = useServerPagination(
     ({ page, limit }) =>
@@ -208,7 +209,7 @@ const ManualPOItems = () => {
     }
   };
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="flex items-center justify-center h-96">
         <LoadingSpinner size="lg" />
@@ -273,7 +274,9 @@ const ManualPOItems = () => {
 
       {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
-        {pageItems.length === 0 ? (
+        {loading && pageItems.length === 0 ? (
+          <LoadingSpinner text="Loading items..." className="py-12" />
+        ) : pageItems.length === 0 ? (
           <EmptyState
             title="No items found"
             description={searchText ? "Try adjusting your search" : "Create your first manual PO item to get started"}
@@ -286,7 +289,7 @@ const ManualPOItems = () => {
             }
           />
         ) : (
-          <div className="overflow-x-auto">
+          <div className={`overflow-x-auto transition-opacity ${loading ? 'opacity-60' : ''}`}>
             <table className="w-full">
               <thead className="bg-slate-50 dark:bg-gray-700 border-b border-slate-200 dark:border-gray-600">
                 <tr>

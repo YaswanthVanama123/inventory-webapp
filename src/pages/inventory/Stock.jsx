@@ -49,6 +49,7 @@ const Stock = () => {
     total,
     totalPages,
     loading,
+    initialLoading,
     refetch,
   } = useServerPagination(
     ({ page, limit }) =>
@@ -188,7 +189,9 @@ const Stock = () => {
   // is the current page of (search-filtered) categories; `total` is the full
   // filtered count. `searchQuery` only drives the empty-state copy.
   const searchQuery = searchText.trim().toLowerCase();
-  if (loading) {
+  // Full-page spinner only for the first load; searches, tab switches and
+  // paging refresh just the table (keeps the search box mounted and focused).
+  if (initialLoading) {
     return <LoadingSpinner />;
   }
   return (
@@ -349,7 +352,9 @@ const Stock = () => {
       </div>
       {}
       <Card>
-        {total === 0 ? (
+        {loading && total === 0 ? (
+          <LoadingSpinner text="Loading stock..." className="py-12" />
+        ) : total === 0 ? (
           <div className="text-center py-12">
             <ArchiveBoxIcon className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
             <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -366,7 +371,7 @@ const Stock = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className={`overflow-x-auto transition-opacity ${loading ? 'opacity-60' : ''}`}>
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>

@@ -257,7 +257,7 @@ const EnhancedDashboard = () => {
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">
-              Welcome back, {user?.fullName || 'Admin'}! 👋
+              Welcome back, {user?.fullName || 'Admin'}!
             </h1>
             <p className="text-blue-100 text-lg">
               Here's your business performance overview

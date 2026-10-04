@@ -175,6 +175,7 @@ const CaseQuantityMapping = () => {
     }
   };
 
+  const mappedPct = stats.total > 0 ? Math.round((stats.mapped / stats.total) * 100) : 0;
   const statCards = [
     {
       label: 'Purchased Items',
@@ -186,7 +187,8 @@ const CaseQuantityMapping = () => {
       label: 'Mapped',
       value: stats.mapped,
       valueClass: 'text-emerald-600 dark:text-emerald-500',
-      hint: `${stats.total > 0 ? Math.round((stats.mapped / stats.total) * 100) : 0}% completion`,
+      hint: `${mappedPct}% completion`,
+      suffix: `${mappedPct}%`,
     },
     {
       label: 'Unmapped',
@@ -215,19 +217,24 @@ const CaseQuantityMapping = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Same compact stat cards as the other list screens (e.g. Purchase Orders);
+          the explanation for each card is in its hover tooltip. */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {statCards.map((card) => (
           <div
             key={card.label}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-200"
+            title={card.hint}
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4"
           >
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-              {card.label}
+            <p className="text-sm text-gray-600 dark:text-gray-400">{card.label}</p>
+            <p className={`text-2xl font-bold mt-1 ${card.valueClass}`}>
+              {card.value ?? 0}
+              {card.suffix && (
+                <span className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                  {card.suffix}
+                </span>
+              )}
             </p>
-            <p className={`text-3xl font-bold ${card.valueClass}`}>{card.value ?? 0}</p>
-            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-              <p className="text-xs text-gray-500 dark:text-gray-400">{card.hint}</p>
-            </div>
           </div>
         ))}
       </div>
@@ -238,6 +245,7 @@ const CaseQuantityMapping = () => {
             {FILTERS.map((filter) => (
               <Button
                 key={filter.key}
+                size="sm"
                 variant={filterStatus === filter.key ? 'primary' : 'secondary'}
                 onClick={() => setFilterStatus(filter.key)}
               >
@@ -246,25 +254,26 @@ const CaseQuantityMapping = () => {
             ))}
           </div>
           <div className="flex flex-wrap gap-2">
-            <div className="relative flex-1 min-w-[200px]">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search SKU, item or category..."
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+            <Input
+              type="text"
+              size="sm"
+              icon={<MagnifyingGlassIcon className="w-5 h-5" />}
+              placeholder="Search SKU, item or category..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="flex-1 min-w-[200px]"
+            />
             <Button
               variant="secondary"
+              size="sm"
               onClick={reload}
-              icon={<ArrowPathIcon className="w-5 h-5" />}
+              icon={<ArrowPathIcon className="w-4 h-4" />}
             >
               Refresh
             </Button>
             <Button
               variant="primary"
+              size="sm"
               onClick={saveAllChanges}
               disabled={pendingChanges.size === 0 || saving}
             >
@@ -349,6 +358,7 @@ const CaseQuantityMapping = () => {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <Input
+                          size="sm"
                           type="number"
                           min="1"
                           step="1"
@@ -363,6 +373,7 @@ const CaseQuantityMapping = () => {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <Input
+                          size="sm"
                           type="text"
                           placeholder="Case"
                           value={item.purchaseUnitLabel || ''}
@@ -372,6 +383,7 @@ const CaseQuantityMapping = () => {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <Input
+                          size="sm"
                           type="text"
                           placeholder="Each"
                           value={item.sellingUnitLabel || ''}
@@ -389,6 +401,7 @@ const CaseQuantityMapping = () => {
                       </td>
                       <td className="px-4 py-4">
                         <Input
+                          size="sm"
                           type="text"
                           placeholder="Add notes..."
                           value={item.notes || ''}

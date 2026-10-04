@@ -21,6 +21,9 @@ const InvoiceList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
+  // Full-page spinner only until the first load finishes; searches and
+  // filters then refresh just the list (keeps the search box focused).
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
@@ -80,6 +83,7 @@ const InvoiceList = () => {
       setInvoices([]);
     } finally {
       setLoading(false);
+      setHasLoaded(true);
     }
   };
   const handleSearch = (value) => {
@@ -228,7 +232,7 @@ const InvoiceList = () => {
     { value: 'overdue', label: 'Overdue' },
   ];
   const hasActiveFilters = searchTerm || statusFilter || paymentStatusFilter || dateFrom || dateTo;
-  if (loading && invoices.length === 0) {
+  if (loading && !hasLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" text="Loading invoices..." />

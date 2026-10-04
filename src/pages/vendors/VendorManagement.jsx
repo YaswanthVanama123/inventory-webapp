@@ -39,17 +39,21 @@ const VendorManagement = () => {
     setPageSize,
     total,
     totalPages,
+    extra,
     loading,
+    initialLoading,
     refetch,
   } = useServerPagination(
     ({ page, limit }) =>
       vendorService
         .getAllVendors({ search: debouncedSearch, page, limit })
-        .then((res) => ({ items: res.vendors || [], total: res.total || 0, pages: res.pages || 1 })),
+        .then((res) => ({ items: res.vendors || [], total: res.total || 0, pages: res.pages || 1, extra: res.stats })),
     { pageSize: 20, resetKey: debouncedSearch }
   );
 
   const loadData = refetch;
+  // Counts across ALL vendors from the server - the list itself is paged.
+  const stats = extra || { total, active: 0, inactive: 0 };
 
   const handleOpenModal = (vendor = null) => {
     if (vendor) {
@@ -139,7 +143,7 @@ const VendorManagement = () => {
     }
   };
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="flex items-center justify-center h-96">
         <LoadingSpinner size="lg" />
@@ -185,26 +189,28 @@ const VendorManagement = () => {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <p className="text-sm text-slate-600 dark:text-gray-400">Total Vendors</p>
           <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-            {vendors.length}
+            {stats.total}
           </p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <p className="text-sm text-slate-600 dark:text-gray-400">Active</p>
           <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
-            {vendors.filter(v => v.isActive).length}
+            {stats.active}
           </p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <p className="text-sm text-slate-600 dark:text-gray-400">Inactive</p>
           <p className="text-2xl font-bold text-gray-600 dark:text-gray-400 mt-1">
-            {vendors.filter(v => !v.isActive).length}
+            {stats.inactive}
           </p>
         </div>
       </div>
 
       {}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
-        {filteredVendors.length === 0 ? (
+        {loading && filteredVendors.length === 0 ? (
+          <LoadingSpinner text="Loading vendors..." className="py-12" />
+        ) : filteredVendors.length === 0 ? (
           <EmptyState
             title="No vendors found"
             description={searchText ? "Try adjusting your search" : "Create your first vendor to get started"}
@@ -217,7 +223,7 @@ const VendorManagement = () => {
             }
           />
         ) : (
-          <div className="overflow-x-auto">
+          <div className={`overflow-x-auto transition-opacity ${loading ? 'opacity-60' : ''}`}>
             <table className="w-full">
               <thead className="bg-slate-50 dark:bg-gray-700 border-b border-slate-200 dark:border-gray-600">
                 <tr>

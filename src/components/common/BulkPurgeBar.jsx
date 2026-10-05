@@ -8,7 +8,7 @@ import Input from './Input';
 import Modal from './Modal';
 import { TrashIcon } from '@heroicons/react/24/solid';
 
-const BulkPurgeBar = ({ type, label, selectedIds = [], onDone, className = '' }) => {
+const BulkPurgeBar = ({ type, label, selectedLabel = 'Delete Selected', selectedIds = [], onDone, className = '' }) => {
   const { showSuccess, showError } = useContext(ToastContext);
   const { isAdmin } = useContext(AuthContext);
   const [confirmMode, setConfirmMode] = useState(null);
@@ -54,7 +54,7 @@ const BulkPurgeBar = ({ type, label, selectedIds = [], onDone, className = '' })
           disabled={selectedIds.length === 0 || purging}
           icon={<TrashIcon className="w-4 h-4" />}
         >
-          Delete Selected ({selectedIds.length})
+          {selectedLabel} ({selectedIds.length})
         </Button>
         <Button
           variant="danger"
@@ -118,6 +118,7 @@ const BulkPurgeBar = ({ type, label, selectedIds = [], onDone, className = '' })
 BulkPurgeBar.propTypes = {
   type: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
+  selectedLabel: PropTypes.string,
   selectedIds: PropTypes.arrayOf(PropTypes.string),
   onDone: PropTypes.func,
   className: PropTypes.string,

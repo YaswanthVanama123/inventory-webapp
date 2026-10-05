@@ -14,6 +14,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import Modal from '../../components/common/Modal';
 import Input from '../../components/common/Input';
+import BulkPurgeBar from '../../components/common/BulkPurgeBar';
 
 const OrdersList = () => {
   const navigate = useNavigate();
@@ -882,19 +883,31 @@ const OrdersList = () => {
                       Select All ({selectedOrders.length}/{orders.length})
                     </span>
                   </label>
-                  {selectedOrders.length > 0 && (
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={handleBulkDelete}
-                      className="flex items-center gap-2"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                      Delete Selected ({selectedOrders.length})
-                    </Button>
-                  )}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {selectedOrders.length > 0 && (
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={handleBulkDelete}
+                        className="flex items-center gap-2"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete Selected ({selectedOrders.length})
+                      </Button>
+                    )}
+                    <BulkPurgeBar
+                      type="order-verifications"
+                      label="Order Verifications"
+                      selectedLabel="Delete Verification"
+                      selectedIds={orders.filter((o) => selectedOrders.includes(o.orderNumber)).map((o) => o._id)}
+                      onDone={() => {
+                        setSelectedOrders([]);
+                        fetchOrders();
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             )}

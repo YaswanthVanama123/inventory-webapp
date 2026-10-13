@@ -16,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
 import useDebounce from '../../hooks/useDebounce';
+import { fuzzyFilter } from '../../utils/fuzzySearch';
 import useServerPagination from '../../hooks/useServerPagination';
 import Pagination from '../../components/common/Pagination';
 
@@ -94,18 +95,15 @@ const ItemNameAliasMapping = () => {
 
   const loadData = refetch;
 
-  const filteredItems = uniqueItems.filter((item) => {
-    if (debouncedSearch) {
-      const searchLower = debouncedSearch.toLowerCase();
-      const matches =
-        item.itemName.toLowerCase().includes(searchLower) ||
-        (item.canonicalName && item.canonicalName.toLowerCase().includes(searchLower));
-      if (!matches) return false;
-    }
-    if (filterStatus === 'mapped') return item.isMapped;
-    if (filterStatus === 'unmapped') return !item.isMapped;
-    return true;
-  });
+  const filteredItems = fuzzyFilter(
+    uniqueItems.filter((item) => {
+      if (filterStatus === 'mapped') return item.isMapped;
+      if (filterStatus === 'unmapped') return !item.isMapped;
+      return true;
+    }),
+    debouncedSearch,
+    (item) => [item.itemName, item.canonicalName]
+  );
   const openCreateModal = () => {
     setEditingMapping(null);
     setModalData({
@@ -138,18 +136,21 @@ const ItemNameAliasMapping = () => {
     setModalData(prev => ({ ...prev, aliases: newAliases }));
 
     if (value.trim().length > 0) {
-      const searchLower = value.toLowerCase();
       const currentAliasesLower = newAliases
         .filter((_, i) => i !== index)
         .map(a => a.toLowerCase());
 
-      const suggestions = uniqueItems.filter(item => {
-        const isAvailable = !item.isMapped ||
-          (editingMapping && item.canonicalName === editingMapping.canonicalName);
-        const notAlreadyAdded = !currentAliasesLower.includes(item.itemName.toLowerCase());
-        const matchesSearch = item.itemName.toLowerCase().includes(searchLower);
-        return isAvailable && notAlreadyAdded && matchesSearch;
-      }).slice(0, 10);
+      const suggestions = fuzzyFilter(
+        uniqueItems.filter(item => {
+          const isAvailable = !item.isMapped ||
+            (editingMapping && item.canonicalName === editingMapping.canonicalName);
+          const notAlreadyAdded = !currentAliasesLower.includes(item.itemName.toLowerCase());
+          return isAvailable && notAlreadyAdded;
+        }),
+        value,
+        item => item.itemName,
+        10
+      );
 
       setAliasSuggestions(suggestions);
       setActiveAliasIndex(index);
@@ -288,18 +289,15 @@ const ItemNameAliasMapping = () => {
       setSaving(false);
     }
   };
-  const getFilteredItemsForQuickMap = () => {
-    return uniqueItems.filter(item => {
+  const getFilteredItemsForQuickMap = () => fuzzyFilter(
+    uniqueItems.filter(item => {
       if (item.isMapped && !existingMapping) return false;
       if (item.isMapped && existingMapping && item.canonicalName !== existingMapping.canonicalName) return false;
-      if (quickMapSearchText) {
-        const searchLower = quickMapSearchText.toLowerCase();
-        return item.itemName.toLowerCase().includes(searchLower) ||
-               (item.itemParent && item.itemParent.toLowerCase().includes(searchLower));
-      }
       return true;
-    });
-  };
+    }),
+    quickMapSearchText,
+    item => [item.itemName, item.itemParent]
+  );
   const toggleItemSelection = (itemName) => {
     const newSelected = new Set(selectedItems);
     if (newSelected.has(itemName)) {

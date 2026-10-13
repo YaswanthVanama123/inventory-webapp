@@ -135,6 +135,10 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
       currency: 'USD',
     }).format(amount || 0);
   };
+  const getCaseInfo = (group) => ({
+    unitsPerCase: Number(group?.unitsPerCase) > 0 ? Number(group.unitsPerCase) : 1,
+    purchaseUnit: group?.purchaseUnitLabel || 'Case',
+  });
   const formatFullDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -251,7 +255,10 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
         }
       );
 
-      const message = response.data?.message || 'Item verified successfully';
+      const result = response.data?.data;
+      const message = result && result.fullyReceived === false
+        ? `Partial receipt recorded - ${result.remaining} ${getCaseInfo(groupedItems.find(item => item.sku === sku)).purchaseUnit} remaining`
+        : response.data?.message || 'Item verified successfully';
       showSuccess(message);
 
       console.log('[FolderView] Verification successful, refetching from database...');
@@ -374,6 +381,8 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
       {filteredItems.map((group) => {
         const isExpanded = expandedItems[group.sku];
         const isSelected = selectedItems.includes(group.sku);
+        const caseInfo = getCaseInfo(group);
+        const orderCases = (group.orders || []).reduce((sum, order) => sum + (order.qty || 0), 0);
         return (
           <div
             key={group.sku}
@@ -430,13 +439,16 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                 </p>
               </div>
               <div
-                className="hidden lg:flex items-center gap-6 mr-2 cursor-pointer"
+                className="hidden lg:flex items-start gap-6 mr-2 cursor-pointer"
                 onClick={() => toggleItemFolder(group.sku)}
               >
                 <div className="text-right">
                   <p className="text-xs text-slate-500 uppercase font-medium mb-1">Total Ordered</p>
                   <p className="text-lg font-bold text-slate-900">
-                    {group.totalQuantity}
+                    {group.totalQuantity} units
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {group.totalCases ?? group.totalQuantity} {caseInfo.purchaseUnit} × {caseInfo.unitsPerCase}
                   </p>
                 </div>
                 <div className="text-right">
@@ -536,10 +548,13 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                                   {order.vendor || 'N/A'}
                                 </span>
                               </td>
-                              <td className="px-6 py-4">
-                                <span className="text-sm font-bold text-slate-900">
-                                  {order.qty}
-                                </span>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm font-bold text-slate-900">
+                                  {(order.qty || 0) * caseInfo.unitsPerCase} units
+                                </div>
+                                <div className="text-xs text-slate-500">
+                                  {order.qty || 0} {caseInfo.purchaseUnit} × {caseInfo.unitsPerCase}
+                                </div>
                               </td>
                               <td className="px-6 py-4 text-sm font-medium text-slate-900">
                                 {formatCurrency(order.unitPrice)}
@@ -574,7 +589,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                                   </div>
                                 ) : (order.receivedQuantity && order.receivedQuantity > 0) ? (
                                   <div className="flex flex-col gap-2">
-                                    <Badge variant="info" size="sm">Partial ({order.receivedQuantity}/{order.qty})</Badge>
+                                    <Badge variant="info" size="sm">Partial ({order.receivedQuantity}/{order.qty} {caseInfo.purchaseUnit})</Badge>
                                     {order.verificationHistory && order.verificationHistory.length > 0 && (
                                       <span className="text-xs text-blue-600">
                                         {order.verificationHistory.length} receipt(s)
@@ -611,10 +626,13 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                           <td colSpan="4" className="px-6 py-3 text-right text-sm font-semibold text-slate-700">
                             Totals:
                           </td>
-                          <td className="px-6 py-3">
-                            <span className="text-sm font-bold text-slate-900">
-                              {group.orders.reduce((sum, order) => sum + order.qty, 0)}
-                            </span>
+                          <td className="px-6 py-3 whitespace-nowrap">
+                            <div className="text-sm font-bold text-slate-900">
+                              {orderCases * caseInfo.unitsPerCase} units
+                            </div>
+                            <div className="text-xs text-slate-500">
+                              {orderCases} {caseInfo.purchaseUnit} × {caseInfo.unitsPerCase}
+                            </div>
                           </td>
                           <td className="px-6 py-3 text-sm font-medium text-slate-700">
                             Avg: {formatCurrency(group.avgUnitPrice)}
@@ -764,6 +782,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
           const receivingNow = parseFloat(receivedQuantity) || 0;
           const remainingAfter = Math.max(0, expectedQty - previouslyReceived - receivingNow);
           const verificationHistory = itemToVerify.order.verificationHistory || [];
+          const caseInfo = getCaseInfo(groupedItems.find(item => item.sku === itemToVerify.sku));
 
           console.log('[FolderView Modal] Rendering modal with data:', {
             expectedQty,
@@ -885,19 +904,22 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium text-gray-700">Ordered Quantity:</span>
-                    <span className="text-lg font-bold text-gray-900">{expectedQty}</span>
+                    <span className="text-lg font-bold text-gray-900">
+                      {expectedQty} {caseInfo.purchaseUnit}
+                      <span className="ml-1 text-xs font-medium text-gray-500">({expectedQty * caseInfo.unitsPerCase} units)</span>
+                    </span>
                   </div>
 
                   {previouslyReceived > 0 && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium text-gray-700">Previously Received:</span>
-                      <span className="text-lg font-bold text-blue-600">{previouslyReceived}</span>
+                      <span className="text-lg font-bold text-blue-600">{previouslyReceived} {caseInfo.purchaseUnit}</span>
                     </div>
                   )}
 
                   <div className="pt-2 border-t border-blue-300">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      How many did you receive now? *
+                      How many did you receive now? ({caseInfo.purchaseUnit}) *
                     </label>
                     <input
                       type="number"
@@ -910,6 +932,9 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                       placeholder="Enter quantity received"
                       required
                     />
+                    <p className="mt-1 text-xs text-gray-500">
+                      {receivingNow} {caseInfo.purchaseUnit} × {caseInfo.unitsPerCase} = {receivingNow * caseInfo.unitsPerCase} units added to stock
+                    </p>
                   </div>
 
                   <div className="flex justify-between items-center pt-2 border-t border-blue-300">
@@ -919,7 +944,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
                         ? 'text-green-600'
                         : 'text-orange-600'
                     }`}>
-                      {remainingAfter}
+                      {remainingAfter} {caseInfo.purchaseUnit}
                     </span>
                   </div>
                 </div>
@@ -941,7 +966,7 @@ const FolderView = ({ items, isAdmin, onDeleteItem, getImageUrl, searchTerm = ''
               {remainingAfter > 0 && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <p className="text-sm text-blue-800">
-                    <strong>Note:</strong> This is a partial receipt. You'll need to verify again when the remaining {remainingAfter} unit(s) arrive.
+                    <strong>Note:</strong> This is a partial receipt. You'll need to verify again when the remaining {remainingAfter} {caseInfo.purchaseUnit} ({remainingAfter * caseInfo.unitsPerCase} units) arrive.
                   </p>
                 </div>
               )}
